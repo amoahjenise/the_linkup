@@ -1,0 +1,1 @@
+SELECT * FROM link_up_histories WHERE user_id = $1;
