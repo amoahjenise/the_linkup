@@ -1,17 +1,53 @@
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require("bcrypt");
 const { pool } = require("../db");
 
-const getUser = async (req, res) => {
-  const { phoneNumber } = req.query;
+const createUser = async (req, res) => {
+  const { newUser } = req.body;
 
-  const queryPath = path.join(
-    __dirname,
-    "../db/queries/getUserByPhoneNumber.sql"
-  );
+  try {
+    // Hash the password before storing it in the database
+    const hashedPassword = await bcrypt.hash(newUser.password.trim(), 10);
 
+    // Insert the user into the database
+    const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+    const queryValues = [
+      newUser.phoneNumber,
+      hashedPassword,
+      newUser.firstName,
+      newUser.gender,
+      newUser.dateOfBirth,
+      newUser.avatar,
+    ];
+
+    const { rows, rowCount } = await pool.query(query, queryValues);
+
+    if (rows.length > 0) {
+      const user = rows[0];
+      // Return the created user data in the response
+      res.json({
+        success: true,
+        message: "User created successfully",
+        user: user,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to create user" });
+    }
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ success: false, message: "Failed to create user" });
+  }
+};
+
+const getUserById = async (req, res) => {
+  const { userId } = req.query;
+  const queryPath = path.join(__dirname, "../db/queries/getUserById.sql");
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [phoneNumber];
+  const queryValues = [userId];
 
   try {
     const { rows } = await pool.query(query, queryValues);
@@ -81,7 +117,8 @@ const updateUserAvatar = async (req, res) => {
 };
 
 module.exports = {
-  getUser,
+  createUser,
+  getUserById,
   updateUserBio,
   updateUserAvatar,
 };

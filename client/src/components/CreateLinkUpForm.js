@@ -6,7 +6,8 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { createLinkUp } from "../api/linkUpAPI";
+import { useSelector } from "react-redux";
+import { Snackbar } from "@material-ui/core"; // Import Snackbar and Alert from @material-ui/core
 
 const useStyles = makeStyles((theme) => ({
   searchInputContainer: {
@@ -21,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     overflowY: "auto",
-    backgroundColor: "#f9f9f9",
   },
   createContainer: {
     flex: "1",
@@ -48,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderRadius: "24px",
-    backgroundColor: "#f5f8fa",
   },
   createLinkUpButton: {
     padding: theme.spacing(1),
@@ -57,39 +56,91 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "4px",
     cursor: "pointer",
   },
+  // Define styles for the custom dropdown
+  customDropdown: {
+    position: "relative",
+    marginBottom: theme.spacing(2),
+    "& select": {
+      width: "100%",
+      padding: theme.spacing(1),
+      borderRadius: "24px",
+      border: "1px solid #ccc",
+      marginTop: theme.spacing(1),
+      appearance: "none",
+      background: "transparent",
+      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
+      backgroundPosition: "right 12px center",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "auto 20px",
+      paddingRight: "2.5rem", // Ensure room for the arrow icon
+      "&:focus": {
+        outline: "none",
+        borderColor: theme.palette.primary.main,
+      },
+    },
+  },
 }));
 
-const CreateLinkUpForm = ({ updateFeed }) => {
+const CreateLinkUpForm = ({ createLinkup, setLinkUps }) => {
   const classes = useStyles();
   const [selectedDate, setSelectedDate] = useState(null);
+  const [genderPreference, setGenderPreference] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const { id, name } = loggedUser?.user || {};
 
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
     const activity = e.target.activity.value;
     const location = e.target.location.value;
-    const date = selectedDate.toISOString();
-
-    // Create the link-up object
-    const linkUpData = {
-      activity,
-      location,
-      date,
-      status: "Active",
-    };
+    // Extract date and time from selectedDate
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth() + 1; // Note: Months are zero-indexed
+    const day = selectedDate.getDate();
+    const hours = selectedDate.getHours();
+    const minutes = selectedDate.getMinutes();
 
     try {
       // Call the API to create the link-up
-      const response = await createLinkUp(linkUpData);
+      const response = await createLinkup({
+        creator_id: id,
+        creator_name: name,
+        location: location,
+        activity: activity,
+        date: `${year}-${month}-${day}`, // Format: YYYY-MM-DD
+        time: `${hours}:${minutes}`, // Format: HH:mm
+        gender_preference: genderPreference,
+      });
 
-      // Update the feed with the newly created link-up
-      updateFeed(response.data);
+      if (response.success) {
+        // Update the linkUps state in the parent component
+        setLinkUps((prevLinkUps) => [response.linkUp, ...prevLinkUps]);
+        // Show the success message
+        setSuccessMessage("Your Link Up was created!");
+      }
+      // Reset the form inputs
+      e.target.reset();
+      setSelectedDate(null);
+      setGenderPreference("");
     } catch (error) {
       console.log(error);
       // Handle error if needed
     }
   };
+
+  const handleSnackbarClose = () => {
+    setSuccessMessage("");
+  };
+
   return (
     <div className={classes.createLinkUpContainer}>
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={successMessage}
+        ContentProps={{ className: classes.snackbar }}
+      />
       <div className={classes.searchInputContainer}>
         <TextField
           className={classes.createLinkUpInput}
@@ -123,6 +174,7 @@ const CreateLinkUpForm = ({ updateFeed }) => {
             name="location"
             required
           />
+
           <DatePicker
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
@@ -135,6 +187,23 @@ const CreateLinkUpForm = ({ updateFeed }) => {
             placeholderText="Select date and time"
             required
           />
+
+          <div className={classes.customDropdown}>
+            <select
+              value={genderPreference}
+              onChange={(e) => setGenderPreference(e.target.value)}
+              displayEmpty
+              aria-label="Gender Preference"
+              required
+            >
+              <option value="" disabled>
+                Gender Preference
+              </option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="any">Any</option>
+            </select>
+          </div>
           <div className="cta-buttons">
             <Button
               type="submit"

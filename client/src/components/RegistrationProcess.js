@@ -16,8 +16,7 @@ import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepPr
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-
-import axios from "axios";
+import { createUser } from "../api/usersAPI";
 
 const useStyles = makeStyles((theme) => ({
   buttonContainer: {
@@ -27,10 +26,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const authServiceUrl = process.env.REACT_APP_AUTH_SERVICE_URL;
-const userServiceUrl = process.env.REACT_APP_USER_SERVICE_URL;
-
-console.log("SERVICE_URL", userServiceUrl);
 const RegistrationProcess = ({ password, setPassword }) => {
   const classes = useStyles();
   const registrationData = useSelector((state) => state.registration);
@@ -45,28 +40,28 @@ const RegistrationProcess = ({ password, setPassword }) => {
   const handleLaunchLuul = async () => {
     try {
       if (registrationData.currentStep === 3) {
-        // Create user using axios
-
-        const response = await axios.post(`${authServiceUrl}/api/create-user`, {
+        // Create object for user creation
+        const newUser = {
           phoneNumber: authState.phoneNumber,
           password: password,
-          registrationData: registrationData.registrationData,
-        });
+          firstName: registrationData.registrationData.firstName,
+          gender: registrationData.registrationData.gender,
+          dateOfBirth: registrationData.registrationData.dateOfBirth,
+          avatar: registrationData.registrationData.profilePicture,
+        };
 
-        if (response.status === "200") {
-          // perform uploadAvatar
+        const response = await createUser({ newUser: newUser });
+
+        if (response.success) {
+          navigate(`/profile/me`);
+          // Set the user data in the Redux store
+          // Mark the user as logged in by dispatching the login action
+          // Reset the registration data after successful registration
+          dispatch(setCurrentUser(response.data.user));
+          dispatch(login());
+          dispatch(clearRegistrationState);
+          setPassword();
         }
-        // Set the user data in the Redux store
-        dispatch(setCurrentUser(response.data.user));
-
-        navigate(`/profile/me`);
-        // Reset the registration data after successful registration
-        // Mark the user as logged in by dispatching the login action
-        dispatch(login());
-        setPassword();
-        dispatch(clearRegistrationState);
-      } else {
-        alert("Incomplete registration data. Please complete all steps.");
       }
     } catch (error) {
       console.error("Error creating user:", error);

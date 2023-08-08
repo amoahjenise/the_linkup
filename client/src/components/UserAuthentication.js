@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/reducers/authReducer";
+import { setCurrentUser } from "../redux/reducers/loggedUserReducer";
+
 import {
   Button,
   TextField,
@@ -13,7 +15,7 @@ import { LockOutlined as LockOutlinedIcon } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import LoadingSpinner from "./LoadingSpinner";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { authenticateUser } from "../api/authenticationAPI";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -48,7 +50,6 @@ const UserAuthentication = ({ password, setPassword }) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const authServiceUrl = process.env.REACT_APP_AUTH_SERVICE_URL;
 
   // Retrieve phone number and country code from the Redux store
   const phoneNumber = useSelector((state) => state.auth.phoneNumber);
@@ -73,27 +74,16 @@ const UserAuthentication = ({ password, setPassword }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${authServiceUrl}/api/login`, {
-        phoneNumber: phoneNumber,
-        password: password,
-      });
-
-      if (response.status === 200) {
-        const authenticationResult = response.data;
-
-        if (authenticationResult.success) {
-          // Save the access token in an HttpOnly cookie
-          document.cookie = `accessToken=${authenticationResult.token}; path=/; HttpOnly`;
-
-          dispatch(login());
-          setPassword();
-          navigate("/home");
-        } else {
-          setErrorMessage("Authentication failed. Please try again.");
-        }
+      const response = await authenticateUser(phoneNumber, password);
+      if (response.data.success) {
+        // Save the access token in an HttpOnly cookie
+        document.cookie = `accessToken=${response.data.token}; path=/; HttpOnly`;
+        dispatch(setCurrentUser(response.data.user));
+        dispatch(login());
+        setPassword();
+        navigate("/home");
       } else {
-        console.error("Server error:", response.status);
-        setErrorMessage("Server error. Please try again later.");
+        setErrorMessage("Authentication failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during user authentication:", error);

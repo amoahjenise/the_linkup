@@ -1,12 +1,11 @@
 // LogoutButton.js
 import React from "react";
 import { useDispatch } from "react-redux";
-import { logout } from "../redux/reducers/authReducer";
+import { logout as logoutReducerFunction } from "../redux/reducers/authReducer";
+import { logout } from "../api/authenticationAPI";
 import { makeStyles } from "@material-ui/core/styles";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { Link } from "react-router-dom"; // Import the Link component
-
-const authServiceUrl = process.env.REACT_APP_AUTH_SERVICE_URL;
 
 const useStyles = makeStyles((theme) => ({
   logoutLink: {
@@ -26,10 +25,10 @@ const LogoutButton = () => {
   const handleLogout = async () => {
     try {
       // Call the logout endpoint to clear the access token cookie
-      const response = await fetch(`${authServiceUrl}/api/logout`);
-      if (response.ok) {
+      const response = await logout();
+      if (response.succes) {
         // Dispatch the logout action to update the Redux state
-        dispatch(logout());
+        dispatch(logoutReducerFunction());
       }
     } catch (error) {
       console.error("Error during logout:", error);

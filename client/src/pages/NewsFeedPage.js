@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import LeftMenu from "../components/LeftMenu";
 import FeedSection from "../components/FeedSection";
 import CreateLinkUpForm from "../components/CreateLinkUpForm";
-import { getActiveLinkUps, createLinkUp } from "../api/linkUpAPI";
+import { getPendingLinkups, createLinkUp } from "../api/linkUpAPI";
 
 const drawerWidth = "20%";
 
@@ -19,56 +19,74 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     height: "50px",
-    marginBottom: theme.spacing(2), // Add margin-bottom for the logo
+    marginBottom: theme.spacing(2),
   },
   feedSection: {
-    flex: "2", // Update the flex value to take the remaining space
+    flex: "2",
     overflowY: "auto",
-    maxWidth: "calc(100% - 2 * " + drawerWidth + ")", // Calculate the width based on the drawer width
+    maxWidth: `calc(100% - 2 * ${drawerWidth})`,
     marginLeft: "auto",
     marginRight: "auto",
+    borderRight: "1px solid #e1e8ed",
   },
 }));
 
 const NewsFeedPage = () => {
   const classes = useStyles();
   const [linkUps, setLinkUps] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+  const [startIndex, setStartIndex] = useState(0);
+  const feedSectionRef = useRef(null); // Reference to the feed section container
 
   useEffect(() => {
-    // Fetch active link ups from the API
-    const fetchActiveLinkUps = async () => {
+    const fetchPendingLinkups = async () => {
       try {
-        const response = await getActiveLinkUps();
-        setLinkUps(response);
+        const response = await getPendingLinkups();
+
+        if (response?.linkUps.length > 0) {
+          setLinkUps(response.linkUps);
+        } else {
+          setLinkUps([]);
+        }
       } catch (error) {
-        console.log("Error fetching active link ups:", error);
+        console.log("Error fetching linkups:", error);
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 300); // Delay setting loading state to false by 300 milliseconds
       }
     };
 
-    fetchActiveLinkUps();
+    fetchPendingLinkups();
   }, []);
 
-  const updateFeed = async (newLinkUp) => {
-    try {
-      // Call the API to create the link-up
-      const response = await createLinkUp(newLinkUp);
-
-      // Update the link-ups state with the newly created link-up at the beginning
-      setLinkUps([response.data, ...linkUps]);
-    } catch (error) {
-      console.log("Error updating feed:", error);
-      // Handle error if needed
+  useEffect(() => {
+    // Scroll to the first link up in the feed section when linkUps are updated
+    if (feedSectionRef.current) {
+      feedSectionRef.current.scrollTop = 0;
     }
+  }, [linkUps]);
+
+  const handleLoadMore = () => {
+    // Load more posts when the "Load more" button is clicked
+    setStartIndex((prevIndex) => prevIndex + 10);
   };
 
   return (
     <div>
       <div className={classes.newsFeedPage}>
         <LeftMenu />
-        <div className={classes.feedSection}>
-          <FeedSection linkUps={linkUps} />
+        <div
+          className={classes.feedSection}
+          ref={feedSectionRef} // Attach the ref to the feed section
+        >
+          <FeedSection
+            linkUps={linkUps.slice(0, startIndex + 10)}
+            onLoadMore={handleLoadMore}
+            isLoading={isLoading}
+          />
         </div>
-        <CreateLinkUpForm updateFeed={updateFeed} />
+        <CreateLinkUpForm createLinkup={createLinkUp} setLinkUps={setLinkUps} />
       </div>
     </div>
   );

@@ -12,8 +12,8 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     zIndex: theme.zIndex.appBar,
-    backgroundColor: "#fff",
-    borderBottom: "1px solid lightgrey",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderBottom: "1px solid #e1e8ed",
   },
   toolbar: {
     display: "flex",
@@ -30,7 +30,7 @@ const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
   const classes = useStyles();
 
   return (
-    <AppBar className={classes.appBar} color="inherit">
+    <AppBar className={classes.appBar} elevation={0}>
       <Toolbar className={classes.toolbar}>
         <Typography variant="h6" className={classes.headerText}>
           {title}

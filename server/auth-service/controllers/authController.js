@@ -66,7 +66,7 @@ const authenticateUser = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+const getUserByPhoneNumber = async (req, res) => {
   const { phoneNumber } = req.query;
 
   const queryPath = path.join(
@@ -77,6 +77,7 @@ const getUser = async (req, res) => {
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [phoneNumber];
 
+  console.log(phoneNumber);
   try {
     const { rows } = await pool.query(query, queryValues);
 
@@ -95,65 +96,25 @@ const getUser = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  const { phoneNumber, password, registrationData } = req.body;
-
-  try {
-    // Hash the password before storing it in the database
-    password.trim();
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Insert the user into the database
-    const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
-    const query = fs.readFileSync(queryPath, "utf8");
-    const queryValues = [
-      phoneNumber,
-      hashedPassword,
-      registrationData.firstName,
-      registrationData.gender,
-      registrationData.dateOfBirth,
-      registrationData.profilePicture,
-    ];
-
-    const { rows, rowCount } = await pool.query(query, queryValues);
-
-    if (rows.length > 0) {
-      const user = rows[0];
-      // Return the created user data in the response
-      res.json({
-        success: true,
-        message: "User created successfully",
-        user: user,
-      });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: "Failed to create user" });
-    }
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ success: false, message: "Failed to create user" });
-  }
-};
-
 const verifyCode = async (req, res) => {
   const { phoneNumber, verificationCode } = req.body;
 
   try {
     // Verify the verification code using Twilio API
-    const verificationCheck = await client.verify.v2
+    const verificationResponse = await client.verify.v2
       .services(verifySid)
       .verificationChecks.create({
         to: phoneNumber,
         code: verificationCode,
       });
 
-    const verificationStatus = verificationCheck.status;
-
-    if (verificationStatus === "approved") {
+    if (verificationResponse.status === "approved") {
       // Phone number is verified
-      // Return the token to the client
-      res.json({ success: true });
+      res.json({
+        success: true,
+        message: "Phone number verified successfully",
+        response: verificationResponse,
+      });
     } else {
       // Verification code is invalid
       res.json({ success: false, message: "Invalid verification code" });
@@ -168,37 +129,36 @@ const verifyCode = async (req, res) => {
 
 const sendVerificationCode = async (req, res) => {
   const { phoneNumber } = req.body;
-  client.verify.v2
-    .services(verifySid)
-    .verifications.create({
-      to: phoneNumber,
-      channel: "sms",
-    })
-    .then((verification) => {
-      console.log(verification.status);
-    })
-    .catch((error) => {
-      console.error("Error sending verification code:", error);
-      res.status(500).json({ message: "Failed to send verification code" });
-    });
-};
-
-const resendVerificationCode = async (req, res) => {
-  const { phoneNumber } = req.body;
-
   try {
-    // Resend verification code using Twilio API
-    client.verify.v2
+    const response = await client.verify.v2
       .services(verifySid)
       .verifications.create({
         to: phoneNumber,
         channel: "sms",
-      })
-      .then((verification) => {
-        console.log(verification.status);
       });
+    res.json({
+      message: "Verification code sent successfully",
+      response: response,
+    });
+  } catch (error) {
+    console.error("Error sending verification code:", error);
+    res.status(500).json({ message: "Failed to send verification code" });
+  }
+};
 
-    res.json({ message: "Verification code resent successfully" });
+const resendVerificationCode = async (req, res) => {
+  const { phoneNumber } = req.body;
+  try {
+    const response = await client.verify.v2
+      .services(verifySid)
+      .verifications.create({
+        to: phoneNumber,
+        channel: "sms",
+      });
+    res.json({
+      message: "Verification code resent successfully",
+      response: response,
+    });
   } catch (error) {
     console.error("Error resending verification code:", error);
     res.status(500).json({ message: "Failed to resend verification code" });
@@ -256,13 +216,12 @@ const verifyAccessToken = (req, res) => {
 
 const logout = (req, res) => {
   res.clearCookie("accessToken");
-  res.json({ message: "Logged out successfully" });
+  res.json({ succes: true, message: "Logged out successfully" });
 };
 
 module.exports = {
   authenticateUser,
-  getUser,
-  createUser,
+  getUserByPhoneNumber,
   resendVerificationCode,
   sendVerificationCode,
   verifyCode,

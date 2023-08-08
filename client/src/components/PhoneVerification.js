@@ -6,7 +6,11 @@ import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
 import { updatePhoneNumber } from "../redux/reducers/authReducer";
 import startsWith from "lodash.startswith";
-import axios from "axios";
+import {
+  getUserByPhoneNumber,
+  sendVerificationCode,
+  verifyCode,
+} from "../api/authenticationAPI";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -39,7 +43,6 @@ function PhoneVerification({
   setNavigateToUserAuthentication,
 }) {
   const classes = useStyles();
-  const authServiceUrl = process.env.REACT_APP_AUTH_SERVICE_URL;
   const LOGIN = "LOGIN";
   const SIGNUP = "SIGNUP";
 
@@ -90,18 +93,18 @@ function PhoneVerification({
     setIsVerificationCodeSent(true);
     // ----
 
-    // // Update the state to trigger the rendering of verification code input
-    // setIsVerificationCodeSent(true);
-    // setShowSnackbar(true);
-    // setSnackbarMessage("Verification code sent successfully!");
-
     // try {
-    //   // Send verification code using backend API
-    //   await axios.post(`${authServiceUrl}/api/send-verification-code`, {
-    //     phoneNumber: phoneNumber,
-    //   });
+    //   // Resend verification code using backend API
+    //   await sendVerificationCode(phoneNumber);
+
+    //   setShowSnackbar(true);
+    //   setSnackbarMessage("Verification code sent successfully!");
+    //   setIsVerificationCodeSent(true);
+    //   setVerificationCode("");
+    //   setVerificationError(""); // Reset verificationError state
     // } catch (error) {
-    //   console.error("Error sending verification code:", error);
+    //   console.error("Error resending verification code:", error);
+    //   alert("Failed to resend verification code. Please try again.");
     // }
   };
 
@@ -111,16 +114,10 @@ function PhoneVerification({
 
     // Verification successful, check if user exists
     try {
-      const response = await axios.get(`${authServiceUrl}/api/getUser`, {
-        params: {
-          phoneNumber: phoneNumber,
-        },
-      });
-
-      let data = response.data;
+      const response = await getUserByPhoneNumber(phoneNumber);
 
       if (action === LOGIN) {
-        if (data.success) {
+        if (response.data.success) {
           // User exists, notify parent component (LoginPage.js)
           setNavigateToUserAuthentication(true);
           return;
@@ -132,7 +129,7 @@ function PhoneVerification({
           return;
         }
       } else if (action === SIGNUP) {
-        if (data.success) {
+        if (response.data.success) {
           // User exists, notify parent component (SignupPage.js)
           setNavigateToUserAuthentication(true);
         } else {
@@ -156,29 +153,17 @@ function PhoneVerification({
 
     // // Verify the verification code using backend API
     // try {
-    //   const response = await axios.post(`${authServiceUrl}/api/verify-code`, {
-    //     phoneNumber: phoneNumber,
-    //     verificationCode: verificationCode,
-    //   });
+    //   const response = await verifyCode(phoneNumber, verificationCode);
 
-    //   const data = response.data;
-
-    //   if (data.success) {
+    //   if (response.data.success) {
     //     dispatch(updatePhoneNumber(phoneNumber));
 
     //     // Verification successful, check if user exists
     //     try {
-    //       const response = await axios.get(
-    //         `${authServiceUrl}/api/getUser`,
-    //         {
-    //           phoneNumber: phoneNumber,
-    //         }
-    //       );
-
-    //       const data = response.data;
+    //       const { user } = await getUserByPhoneNumber(phoneNumber);
 
     //       if (action === LOGIN) {
-    //         if (data.success) {
+    //         if (user) {
     //           // User exists, notify parent component (LoginPage.js)
     //           setNavigateToUserAuthentication(true);
     //           return;
@@ -190,7 +175,7 @@ function PhoneVerification({
     //           return;
     //         }
     //       } else if (action === SIGNUP) {
-    //         if (data.success) {
+    //         if (user) {
     //           // User exists, notify parent component (SignupPage.js)
     //           setNavigateToUserAuthentication(true);
     //         } else {
@@ -204,29 +189,11 @@ function PhoneVerification({
     //     }
     //   } else {
     //     // Verification failed, display error message
-    //     setVerificationError(data.message);
+    //     setVerificationError(response.data.message);
     //   }
     // } catch (error) {
     //   setVerificationError("Failed to verify code. Please try again.", error);
     // }
-  };
-
-  const handleResendCode = async () => {
-    try {
-      setShowSnackbar(true);
-      setSnackbarMessage("Verification code resent successfully!");
-      setIsVerificationCodeSent(true);
-      setVerificationCode("");
-      setVerificationError(""); // Reset verificationError state
-
-      // Resend verification code using backend API
-      await axios.post(`${authServiceUrl}/api/send-verification-code`, {
-        phoneNumber: phoneNumber,
-      });
-    } catch (error) {
-      console.error("Error resending verification code:", error);
-      alert("Failed to resend verification code. Please try again.");
-    }
   };
 
   return (
@@ -285,7 +252,7 @@ function PhoneVerification({
           <Button
             variant="outlined"
             color="primary"
-            onClick={handleResendCode}
+            onClick={handleSendVerificationCode}
             className={classes.button}
           >
             Resend Code

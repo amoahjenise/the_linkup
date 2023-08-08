@@ -1,10 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import axios from "axios";
-
 const userServiceUrl = process.env.REACT_APP_USER_SERVICE_URL;
 
 const useStyles = makeStyles((theme) => ({
@@ -25,31 +24,32 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "50%",
     padding: theme.spacing(0.5),
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
-  },
-  closeButton: {
-    position: "absolute",
-    top: theme.spacing(1),
-    right: theme.spacing(1),
-    background: "#fff",
-    borderRadius: "50%",
-    padding: theme.spacing(0.5),
-    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+    display: ({ isLoggedUserProfile }) =>
+      isLoggedUserProfile ? "block" : "none",
   },
   input: {
     display: "none",
   },
 }));
 
-const AvatarUpdate = ({ userId, currentAvatar }) => {
-  const classes = useStyles();
-  const [previewImage, setPreviewImage] = useState(null);
+const AvatarUpdate = ({ userId, currentAvatarUrl, isLoggedUserProfile }) => {
+  const classes = useStyles({ isLoggedUserProfile });
+  const [previewImage, setPreviewImage] = useState(currentAvatarUrl);
   const inputRef = useRef(null);
 
-  const updateAvatar = (imageUrl) => {
-    axios.post(`${userServiceUrl}/api/upload-avatar`, {
-      userId: userId,
-      imageUrl: imageUrl,
-    });
+  useEffect(() => {
+    setPreviewImage(currentAvatarUrl); // Update previewImage when currentAvatarUrl changes
+  }, [currentAvatarUrl]);
+
+  const updateAvatar = async (imageUrl) => {
+    try {
+      await axios.post(`${userServiceUrl}/upload-avatar`, {
+        userId: userId,
+        imageUrl: imageUrl,
+      });
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+    }
   };
 
   const handleImageChange = (event) => {
@@ -58,6 +58,7 @@ const AvatarUpdate = ({ userId, currentAvatar }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
+        // Update user's avatar in database
         updateAvatar(reader.result);
       };
       reader.readAsDataURL(file);
@@ -71,26 +72,30 @@ const AvatarUpdate = ({ userId, currentAvatar }) => {
   return (
     <div className={classes.avatarUpdate}>
       <Avatar
-        src={previewImage || currentAvatar}
+        src={previewImage}
         alt="Profile Avatar"
         className={classes.avatar}
         onClick={handleClick}
       />
-      <input
-        type="file"
-        ref={inputRef}
-        accept="image/*"
-        className={classes.input}
-        onChange={handleImageChange}
-      />
-      <IconButton
-        className={classes.cameraIcon}
-        component="span"
-        aria-label="Upload Avatar"
-        onClick={handleClick}
-      >
-        <PhotoCameraIcon />
-      </IconButton>
+      {isLoggedUserProfile && (
+        <>
+          <input
+            type="file"
+            ref={inputRef}
+            accept="image/*"
+            className={classes.input}
+            onChange={handleImageChange}
+          />
+          <IconButton
+            className={classes.cameraIcon}
+            component="span"
+            aria-label="Upload Avatar"
+            onClick={handleClick}
+          >
+            <PhotoCameraIcon />
+          </IconButton>
+        </>
+      )}
     </div>
   );
 };

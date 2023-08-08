@@ -8,8 +8,8 @@ const useStyles = makeStyles((theme) => ({
     width: "400px",
     height: "400px",
     overflow: "hidden",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    // borderRadius: "8px",
+    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
   },
   card: {
     position: "absolute",

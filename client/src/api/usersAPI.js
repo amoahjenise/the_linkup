@@ -1,31 +1,62 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://64a9f80a8b9afaf4844b2957.mockapi.io/api/v1"; // "https://link-us-up-live.free.beeceptor.com";
+const BASE_URL = process.env.REACT_APP_USER_SERVICE_URL;
 
-export const getActiveUsers = () => {
-  // API call to fetch all link ups
-  return axios
-    .get(`${API_BASE_URL}/users`)
-    .then((response) => {
-      console.log(response);
-      // Filter active users based on the "status" property
-      return response.data.filter((linkUp) => linkUp.status === "Active");
-    })
-    .catch((error) => {
-      // Handle error if needed
-      console.log(error);
-      return []; // Return an empty array if there's an error
+export const createUser = async (userData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/create-user`, userData);
+    return response;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+};
+
+export const getUserById = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/get-user-by-id`, {
+      params: { userId },
     });
+
+    return {
+      success: true,
+      user: response.data.user,
+    };
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    return {
+      success: false,
+      error: "Failed to fetch user data.",
+    };
+  }
 };
 
-export const createUser = (registrationData) => {
-  // API call to create a new link up
-  return axios.post(`${API_BASE_URL}/users`, registrationData);
+export const updateUserBio = async (userId, bio) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/update-user-bio/${userId}`, {
+      bio,
+    });
+    return {
+      success: true,
+      bio: response.data.bio,
+    };
+  } catch (error) {
+    console.error("Error updating user bio:", error);
+    throw error;
+  }
 };
 
-export const updateUser = (userId, userData) => {
-  // API call to update a link up
-  return axios.put(`${API_BASE_URL}/users/${userId}`, userData);
+export const updateUserAvatar = async (userId, avatar) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/update-user-avatar/${userId}`,
+      {
+        avatar,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user avatar:", error);
+    throw error;
+  }
 };
-
-// Add more API functions as needed for your application

@@ -5,7 +5,7 @@ import {
 } from "./types";
 import axios from "axios"; // Import Axios
 
-const authServiceUrl = process.env.REACT_APP_AUTH_SERVICE_URL;
+const userServiceUrl = process.env.REACT_APP_USER_SERVICE_URL;
 
 export const logout = () => (dispatch) => {
   // Add any other logout-related actions here, such as clearing local storage, etc.
@@ -14,21 +14,21 @@ export const logout = () => (dispatch) => {
 
 // Action creator function to fetch user data
 export const fetchUserData = () => async (dispatch, getState) => {
-  const phoneNumber = getState().auth.phoneNumber;
+  const id = getState().loggedUser.id;
   try {
     // Call the server route to fetch user data using Axios
-    const response = await axios.get(`${authServiceUrl}/api/getUser`, {
+    const response = await axios.get(`${userServiceUrl}/get-user-by-id`, {
       params: {
-        phoneNumber: phoneNumber,
+        id: id,
       },
     });
 
-    const userData = response.data.user;
+    const user = response.data.user;
 
     // Dispatch the FETCH_USER_DATA_SUCCESS action with the retrieved user data
     dispatch({
       type: FETCH_USER_DATA_SUCCESS,
-      payload: userData,
+      payload: user,
     });
   } catch (error) {
     // Dispatch the FETCH_USER_DATA_FAILURE action with the error message

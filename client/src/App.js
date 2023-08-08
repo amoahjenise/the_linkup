@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,25 +17,16 @@ import LinkUpHistoryPage from "./pages/LinkUpHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUserData } from "./redux/actions/userActions";
+import { useSelector } from "react-redux";
 import "./App.css";
 
 const App = () => {
-  const dispatch = useDispatch(); // Step 2: Initialize dispatch
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
 
   const PrivateRoutes = ({ path, element }) => {
     return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
   };
-
-  // Use useEffect to fetch user data when the app starts
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(fetchUserData()); // Dispatch the fetchUserData action
-    }
-  }, [dispatch, isAuthenticated]);
 
   return (
     <div className="app">
