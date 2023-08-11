@@ -9,7 +9,7 @@ import {
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import NewsFeedPage from "./pages/NewsFeedPage";
+import HomePage from "./pages/HomePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SendRequestPage from "./pages/SendRequestPage";
 import MessagesPage from "./pages/MessagesPage";
@@ -18,6 +18,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
 import { useSelector } from "react-redux";
+import { SnackbarProvider } from "./contexts/SnackbarContext";
 import "./App.css";
 
 const App = () => {
@@ -29,29 +30,37 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <Router>
-        <Routes>
-          <Route path="/" exact element={<LandingPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          {/* Protected routes */}
-          <Route element={<PrivateRoutes />}>
-            <Route path="/home" element={<NewsFeedPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/profile/:id" element={<UserProfilePage />} />
-            <Route path="/send-request/:postId" element={<SendRequestPage />} />
-            <Route path="/history" element={<LinkUpHistoryPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route
-              path="/messages/:messageid/chat"
-              element={<SelectedMessagePage />}
-            />
-            <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
-          </Route>
-        </Routes>
-      </Router>
-    </div>
+    <SnackbarProvider>
+      <div className="app">
+        <Router>
+          <Routes>
+            <Route path="/" exact element={<LandingPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            {/* Protected routes */}
+            <Route element={<PrivateRoutes />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/profile/:id" element={<UserProfilePage />} />
+              <Route
+                path="/send-request/:postId"
+                element={<SendRequestPage />}
+              />
+              <Route path="/history" element={<LinkUpHistoryPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route
+                path="/messages/:messageid/chat"
+                element={<SelectedMessagePage />}
+              />
+              <Route
+                path="/linkup-request/:id"
+                element={<AcceptDeclinePage />}
+              />
+            </Route>
+          </Routes>
+        </Router>
+      </div>
+    </SnackbarProvider>
   );
 };
 

@@ -1,5 +1,5 @@
 INSERT INTO link_ups (id, creator_id, creator_name, location, activity, date, time, gender_preference, created_at, updated_at, status)
-VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6, $7, now(), now(), 'pending')
+VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6, $7, now(), now(), 'active')
 RETURNING
     link_ups.id,
     link_ups.creator_id,

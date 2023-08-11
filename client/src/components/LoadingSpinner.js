@@ -17,7 +17,7 @@ const LoadingSpinner = () => {
 
   return (
     <div className={classes.loadingSpinnerContainer}>
-      <CircularProgress size={24} />
+      <CircularProgress size={48} />
     </div>
   );
 };

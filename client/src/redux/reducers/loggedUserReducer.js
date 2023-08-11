@@ -1,7 +1,7 @@
 import {
   FETCH_USER_DATA_SUCCESS,
   FETCH_USER_DATA_FAILURE,
-} from "../actions/types";
+} from "../actions/loggedUserActions";
 
 // Action types
 const SET_CURRENT_USER = "SET_CURRENT_USER";

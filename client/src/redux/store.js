@@ -19,8 +19,4 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = createStore(persistedReducer, middleware);
-export const persistor = persistStore(store, null, () => {
-  // On rehydration complete, you can dispatch an action to clear the state.
-  // This ensures that the state is cleared after rehydration.
-  store.dispatch({ type: "CLEAR_STATE" });
-});
+export const persistor = persistStore(store, null, () => {});

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
 import PostCard from "./PostCard";
 import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { deleteLinkup } from "../redux/actions/linkupActions";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -28,7 +30,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FeedSection = ({ linkUps, onLoadMore, isLoading }) => {
+const FeedSection = ({
+  linkupList,
+  onLoadMore,
+  isLoading,
+  setShouldFetchLinkups,
+  setEditingLinkup,
+  setIsEditing,
+  isEditing,
+}) => {
   const classes = useStyles();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -38,10 +48,14 @@ const FeedSection = ({ linkUps, onLoadMore, isLoading }) => {
     setIsLoadingMore(false);
   };
 
+  const handleDeleteLinkup = (linkupId) => {
+    // Call your Redux action to delete the linkup
+    deleteLinkup(linkupId);
+  };
+
   return (
     <div className={classes.mainContainer}>
       <TopNavBar title="Home" />
-
       {isLoading ? (
         <div
           style={{
@@ -56,25 +70,50 @@ const FeedSection = ({ linkUps, onLoadMore, isLoading }) => {
       ) : (
         <div className={classes.feedContainer}>
           <div className={classes.feedContent}>
-            {linkUps.length === 0 ? (
+            {linkupList.length === 0 ? (
               <EmptyFeedPlaceholder />
             ) : (
-              linkUps.map((post) => <PostCard key={post.id} post={post} />)
+              (console.log("linkupList:", linkupList),
+              linkupList?.map((linkup) => (
+                <PostCard
+                  key={linkup.id}
+                  post={linkup}
+                  linkupList={linkupList}
+                  onDeleteLinkup={handleDeleteLinkup}
+                  setShouldFetchLinkups={setShouldFetchLinkups}
+                  setEditingLinkup={setEditingLinkup}
+                  setIsEditing={setIsEditing}
+                  isEditing={isEditing}
+                />
+              )))
+            )}
+
+            {linkupList.length === 0 ? (
+              <div />
+            ) : (
+              <Button
+                variant="outlined"
+                className={classes.loadMoreButton}
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? "Loading..." : "Load more"}
+              </Button>
             )}
           </div>
-          {/* "Load more" button */}
-          <Button
-            variant="outlined"
-            className={classes.loadMoreButton}
-            onClick={handleLoadMore}
-            disabled={isLoadingMore} // Disable the button while loading
-          >
-            {isLoadingMore ? "Loading..." : "Load more"}
-          </Button>
         </div>
       )}
     </div>
   );
 };
 
-export default FeedSection;
+const mapStateToProps = (state) => ({
+  linkupList: state.linkups.linkupList,
+  isLoading: state.linkups.isLoading,
+});
+
+const mapDispatchToProps = {
+  deleteLinkup,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(FeedSection);

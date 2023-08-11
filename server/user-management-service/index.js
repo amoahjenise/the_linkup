@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const avatarRoutes = require("./routes/avatarRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 const cors = require("cors");
@@ -12,13 +11,23 @@ app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:3000",
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "PATCH"],
     optionsSuccessStatus: 200,
   })
 );
 
-// Mount the avatarRoutes
-app.use("/api", avatarRoutes);
+// // Will need to modify CORS configuration for production
+// app.use(
+//   cors({
+//     origin: [
+//       "https://your-production-domain.com",
+//       "https://your-other-domain.com",
+//     ],
+//     methods: ["POST", "GET", "PATCH"],
+//     optionsSuccessStatus: 200,
+//   })
+// );
+
 app.use("/api", userRoutes);
 
 // Start the server

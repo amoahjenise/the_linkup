@@ -6,11 +6,13 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Snackbar } from "@material-ui/core"; // Import Snackbar and Alert from @material-ui/core
-import debounce from "lodash.debounce";
+import { Snackbar } from "@material-ui/core";
 import { connect } from "react-redux";
-import { createLinkup, updateLinkupList } from "../redux/actions/linkupActions";
-import io from "socket.io-client";
+import { updateLinkup } from "../redux/actions/linkupActions";
+import {
+  setEditingLinkup,
+  clearEditingLinkup,
+} from "../redux/actions/editingLinkupActions";
 
 const useStyles = makeStyles((theme) => ({
   searchInputContainer: {
@@ -19,14 +21,14 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  createLinkUpContainer: {
+  editLinkUpContainer: {
     flex: "1",
     borderLeft: "0.1px solid lightgrey",
     position: "sticky",
     top: 0,
     overflowY: "auto",
   },
-  createContainer: {
+  editContainer: {
     flex: "1",
     color: "black",
     padding: theme.spacing(2),
@@ -38,21 +40,21 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     overflowY: "auto",
   },
-  createLinkUpTitle: {
+  editLinkUpTitle: {
     textAlign: "center",
     fontSize: "20px",
     marginBottom: theme.spacing(2),
   },
-  createLinkUpForm: {
+  editLinkUpForm: {
     display: "flex",
     flexDirection: "column",
   },
-  createLinkUpInput: {
+  editLinkUpInput: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderRadius: "24px",
   },
-  createLinkUpButton: {
+  updateLinkupButton: {
     padding: theme.spacing(1),
     color: "white",
     border: "none",
@@ -84,73 +86,65 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
-
-const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
+const EditLinkupForm = ({
+  linkup,
+  setShouldFetchLinkups,
+  setIsEditing,
+  updateLinkup,
+  setEditingLinkup,
+  clearEditingLinkup,
+}) => {
   const classes = useStyles();
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [genderPreference, setGenderPreference] = useState("");
+  const [hours, minutes] = linkup.time.split(":");
+  const initialDate = new Date(linkup.date);
+  initialDate.setHours(hours);
+  initialDate.setMinutes(minutes);
+  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const [activity, setActivity] = useState(linkup.activity);
+  const [location, setLocation] = useState(linkup.location);
+  const [genderPreference, setGenderPreference] = useState(
+    linkup.gender_preference
+  );
   const [successMessage, setSuccessMessage] = useState("");
-  const { id, name } = loggedUser?.user || {};
-  const [socket, setSocket] = useState(null);
 
-  // Initialize socket connection
   useEffect(() => {
-    const newSocket = io(linkupSocketUrl);
-    setSocket(newSocket);
+    // Set the editing linkup when the component mounts
+    setEditingLinkup(linkup.id);
 
-    // Clean up socket connection on component unmount
+    // Clear the editing linkup when the component unmounts
     return () => {
-      newSocket.disconnect();
+      clearEditingLinkup();
     };
-  }, []);
+  }, [linkup.id, setEditingLinkup, clearEditingLinkup]);
 
-  // Listen for new linkup event using the socket variable
-  useEffect(() => {
-    if (socket) {
-      socket.on("newLinkup", (newLinkup) => {
-        // Update linkupList state with the new linkup
-        updateLinkupList(newLinkup);
-      });
-    }
-  }, [socket, updateLinkupList]);
-
-  const handleCreateLinkUp = async (e) => {
-    console.log("handleCreateLinkUp ran ");
+  const handleUpdateLinkup = async (e) => {
     e.preventDefault();
-    const activity = e.target.activity.value;
-    const location = e.target.location.value;
-    // Extract date and time from selectedDate
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth() + 1; // Note: Months are zero-indexed
-    const day = selectedDate.getDate();
-    const hours = selectedDate.getHours();
-    const minutes = selectedDate.getMinutes();
 
     try {
-      // Call the API to create the link-up
-      const response = await createLinkup({
-        creator_id: id,
-        creator_name: name,
-        location: location,
-        activity: activity,
-        date: `${year}-${month}-${day}`, // Format: YYYY-MM-DD
-        time: `${hours}:${minutes}`, // Format: HH:mm
+      const updatedLinkup = {
+        location,
+        activity,
+        date: selectedDate.toISOString().substring(0, 10),
+        time: selectedDate.toISOString().substring(11, 16),
         gender_preference: genderPreference,
-      });
+      };
 
-      // // Notify parent component to reload the linkup list
-      // setShouldFetchLinkups(true);
-      // // Show the success message
-      // setSuccessMessage("Your Link Up was created!");
+      const response = await updateLinkup(linkup.id, updatedLinkup);
 
-      // Reset the form inputs
-      e.target.reset();
-      setSelectedDate(null);
-      setGenderPreference("");
+      if (response.success) {
+        setShouldFetchLinkups(true);
+        setSuccessMessage("Your Link Up was edited!");
+        clearEditingLinkup(); // Clear editing state
+      }
+
+      setSelectedDate(new Date(`${linkup.date}T${linkup.time}`));
+      setActivity(linkup.activity);
+      setLocation(linkup.location);
+      setGenderPreference(linkup.gender_preference);
     } catch (error) {
       console.log(error);
-      // Handle error if needed
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -158,32 +152,17 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
     setSuccessMessage("");
   };
 
-  function SearchBar({ onSearch }) {
-    const handleSearch = debounce((query) => {
-      onSearch(query);
-    }, 300);
-
-    return (
-      <input
-        type="text"
-        placeholder="Search..."
-        onChange={(e) => handleSearch(e.target.value)}
-      />
-    );
-  }
-
   return (
-    <div className={classes.createLinkUpContainer}>
+    <div className={classes.editLinkUpContainer}>
       <Snackbar
         open={!!successMessage}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
         message={successMessage}
-        ContentProps={{ className: classes.snackbar }}
       />
       <div className={classes.searchInputContainer}>
         <TextField
-          className={classes.createLinkUpInput}
+          className={classes.editLinkUpInput}
           placeholder="Search for Link Ups"
           InputProps={{
             startAdornment: (
@@ -194,27 +173,27 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
           }}
         />
       </div>
-      <div className={classes.createContainer}>
-        <h2 className={classes.createLinkUpTitle}>Create a Link Up</h2>
-        <form
-          className={classes.createLinkUpForm}
-          onSubmit={handleCreateLinkUp}
-        >
+      <div className={classes.editContainer}>
+        <h2 className={classes.editLinkUpTitle}>Edit Link Up</h2>
+        <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>
           <input
-            className={classes.createLinkUpInput}
+            className={classes.editLinkUpInput}
             type="text"
             placeholder="Activity"
             name="activity"
+            value={activity}
+            onChange={(e) => setActivity(e.target.value)}
             required
           />
           <input
-            className={classes.createLinkUpInput}
+            className={classes.editLinkUpInput}
             type="text"
             placeholder="Location"
             name="location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             required
           />
-
           <DatePicker
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
@@ -223,11 +202,10 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
             timeIntervals={15}
             timeCaption="Time"
             dateFormat="MMMM d, yyyy h:mm aa"
-            className={classes.createLinkUpInput}
+            className={classes.editLinkUpInput}
             placeholderText="Select date and time"
             required
           />
-
           <div className={classes.customDropdown}>
             <select
               value={genderPreference}
@@ -248,9 +226,9 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
               type="submit"
               variant="contained"
               color="primary"
-              className={classes.createLinkUpButton}
+              className={classes.updateLinkupButton}
             >
-              Create
+              Update
             </Button>
           </div>
         </form>
@@ -259,15 +237,10 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    loggedUser: state.loggedUser,
-  };
-};
-
 const mapDispatchToProps = {
-  createLinkup,
-  updateLinkupList,
+  updateLinkup,
+  setEditingLinkup,
+  clearEditingLinkup,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateLinkupForm);
+export default connect(null, mapDispatchToProps)(EditLinkupForm);

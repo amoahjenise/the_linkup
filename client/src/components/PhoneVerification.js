@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, TextField, Snackbar } from "@material-ui/core";
+import React, { useState, useEffect, useCallback } from "react";
+import { Button, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import "react-phone-input-2/lib/style.css";
@@ -11,6 +11,7 @@ import {
   sendVerificationCode,
   verifyCode,
 } from "../api/authenticationAPI";
+import { useSnackbar } from "../contexts/SnackbarContext";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -27,14 +28,6 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: theme.spacing(2),
   },
-  snackbar: {
-    backgroundColor: "#87CEFA",
-    textAlign: "center",
-    fontSize: "14px",
-    borderRadius: "4px",
-    padding: theme.spacing(1, 2),
-    minWidth: "200px",
-  },
 }));
 
 function PhoneVerification({
@@ -48,41 +41,30 @@ function PhoneVerification({
 
   // Redux state management:
   const dispatch = useDispatch();
-
+  const { addSnackbar } = useSnackbar();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [country, setCountry] = useState({
+    countryCode: "ca",
+    dialCode: "1",
+    format: "+. (...) ...-....",
+    name: "Canada",
+  });
   const [verificationCode, setVerificationCode] = useState("");
   const [isVerificationCodeSent, setIsVerificationCodeSent] = useState(false);
   const [verificationError, setVerificationError] = useState("");
-
   const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(false);
 
-  // State to control snackbar visibility and message
-  const [showSnackbar, setShowSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  // Validate phone number format using useCallback to memoize the function
+  const validatePhoneNumberFormat = useCallback(() => {
+    const regex = /^[+\d]+$/;
+    const numDigits = country.format.split(".").length - 1;
 
-  const customPhoneNumberValidation = (inputNumber, country) => {
-    // Regular expression to validate phone number format (allowing only digits and '+' sign)
-    const phoneFormatRegex = /^[+\d]+$/;
-
-    // Check if the entered phone number starts with any of the country dial codes or if any of the dial codes starts with the entered phone number.
-    const isValidDialCode =
-      startsWith(inputNumber, country.dialCode) ||
-      startsWith(country.dialCode, inputNumber);
-
-    // Check if the entered phone number satisfies the format regex and has a minimum and maximum length (you can adjust the min and max lengths as needed)
-    const isValidFormat =
-      phoneFormatRegex.test(inputNumber) &&
-      inputNumber.length >= 11 &&
-      inputNumber.length <= 15;
-
-    if (isValidDialCode && isValidFormat) {
-      setIsValidPhoneNumber(true);
-    } else {
-      setIsValidPhoneNumber(false);
-    }
-
-    return isValidDialCode && isValidFormat;
-  };
+    return (
+      startsWith(phoneNumber, country.dialCode) &&
+      regex.test(phoneNumber) &&
+      phoneNumber.length === numDigits
+    );
+  }, [country.dialCode, country.format, phoneNumber]);
 
   const handleVerifyCodeChange = (event) => {
     setVerificationCode(event.target.value);
@@ -91,33 +73,34 @@ function PhoneVerification({
   const handleSendVerificationCode = async () => {
     // Uncomment for testing purposes ------------------
     setIsVerificationCodeSent(true);
+    addSnackbar("Verification code sent successfully!", {
+      timeout: 3000,
+    });
     // ----
 
     // try {
-    //   // Resend verification code using backend API
-    //   await sendVerificationCode(phoneNumber);
-
-    //   setShowSnackbar(true);
-    //   setSnackbarMessage("Verification code sent successfully!");
+    //   // Send verification code using backend API
+    //   await sendVerificationCode(`+${phoneNumber}`);
+    //   addSnackbar("Verification code sent successfully!");
     //   setIsVerificationCodeSent(true);
     //   setVerificationCode("");
     //   setVerificationError(""); // Reset verificationError state
     // } catch (error) {
-    //   console.error("Error resending verification code:", error);
-    //   alert("Failed to resend verification code. Please try again.");
+    //   console.error("Error sending verification code:", error);
+    //   addSnackbar("Failed to send verification code. Please try again.");
     // }
   };
 
   const handleVerifyCode = async () => {
     // Uncomment for Testing purposes -------------------
-    dispatch(updatePhoneNumber(phoneNumber));
+    dispatch(updatePhoneNumber(`+${phoneNumber}`));
 
     // Verification successful, check if user exists
     try {
-      const response = await getUserByPhoneNumber(phoneNumber);
+      const response = await getUserByPhoneNumber(`+${phoneNumber}`);
 
       if (action === LOGIN) {
-        if (response.data.success) {
+        if (response.success) {
           // User exists, notify parent component (LoginPage.js)
           setNavigateToUserAuthentication(true);
           return;
@@ -129,7 +112,7 @@ function PhoneVerification({
           return;
         }
       } else if (action === SIGNUP) {
-        if (response.data.success) {
+        if (response.success) {
           // User exists, notify parent component (SignupPage.js)
           setNavigateToUserAuthentication(true);
         } else {
@@ -153,14 +136,14 @@ function PhoneVerification({
 
     // // Verify the verification code using backend API
     // try {
-    //   const response = await verifyCode(phoneNumber, verificationCode);
+    //   const response = await verifyCode(`+${phoneNumber}`, verificationCode);
 
-    //   if (response.data.success) {
-    //     dispatch(updatePhoneNumber(phoneNumber));
+    //   if (response.success) {
+    //     dispatch(updatePhoneNumber(`+${phoneNumber}`));
 
     //     // Verification successful, check if user exists
     //     try {
-    //       const { user } = await getUserByPhoneNumber(phoneNumber);
+    //       const { user } = await getUserByPhoneNumber(`+${phoneNumber}`);
 
     //       if (action === LOGIN) {
     //         if (user) {
@@ -189,12 +172,21 @@ function PhoneVerification({
     //     }
     //   } else {
     //     // Verification failed, display error message
-    //     setVerificationError(response.data.message);
+    //     setVerificationError(response.message);
     //   }
     // } catch (error) {
     //   setVerificationError("Failed to verify code. Please try again.", error);
     // }
   };
+
+  const handlePhoneNumberChange = useCallback((phoneNumber, country) => {
+    setPhoneNumber(phoneNumber);
+    setCountry(country);
+  }, []);
+
+  useEffect(() => {
+    setIsValidPhoneNumber(validatePhoneNumberFormat(phoneNumber));
+  }, [phoneNumber, country, validatePhoneNumberFormat]);
 
   return (
     <div className={classes.container}>
@@ -205,16 +197,13 @@ function PhoneVerification({
           required: true,
           autoFocus: true,
         }}
-        country={"ca"} // Default country code if needed
+        country={"ca"} // Default country code set to "Canada"
+        // onlyCountries={["ca", "us", "fr"]}
+        preferredCountries={["ca", "us", "fr"]}
+        enableLongNumbers={true}
         value={phoneNumber}
-        onChange={(phone) => {
-          setPhoneNumber(`+${phone}`);
-        }}
-        inputClass={classes.input}
-        containerClass={classes.input}
-        isValid={(inputNumber, country) =>
-          customPhoneNumberValidation(inputNumber, country)
-        }
+        onChange={handlePhoneNumberChange}
+        isValid={isValidPhoneNumber}
       />
 
       {!isVerificationCodeSent ? (
@@ -257,14 +246,6 @@ function PhoneVerification({
           >
             Resend Code
           </Button>
-          {/* Snackbar to display messages */}
-          <Snackbar
-            open={showSnackbar}
-            autoHideDuration={3000}
-            onClose={() => setShowSnackbar(false)}
-            message={snackbarMessage}
-            ContentProps={{ className: classes.snackbar }}
-          />
         </>
       )}
     </div>

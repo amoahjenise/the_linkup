@@ -3,6 +3,8 @@ const router = express.Router();
 const linkupController = require("../controllers/linkupController");
 
 router.get("/get-linkups", linkupController.getLinkups);
+router.post("/update-linkup", linkupController.updateLinkup);
 router.post("/create-linkup", linkupController.createLinkup);
+router.delete("/delete-linkup", linkupController.deleteLinkup);
 
 module.exports = router;

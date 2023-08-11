@@ -137,31 +137,13 @@ const sendVerificationCode = async (req, res) => {
         channel: "sms",
       });
     res.json({
+      success: true,
       message: "Verification code sent successfully",
       response: response,
     });
   } catch (error) {
     console.error("Error sending verification code:", error);
     res.status(500).json({ message: "Failed to send verification code" });
-  }
-};
-
-const resendVerificationCode = async (req, res) => {
-  const { phoneNumber } = req.body;
-  try {
-    const response = await client.verify.v2
-      .services(verifySid)
-      .verifications.create({
-        to: phoneNumber,
-        channel: "sms",
-      });
-    res.json({
-      message: "Verification code resent successfully",
-      response: response,
-    });
-  } catch (error) {
-    console.error("Error resending verification code:", error);
-    res.status(500).json({ message: "Failed to resend verification code" });
   }
 };
 
@@ -222,7 +204,6 @@ const logout = (req, res) => {
 module.exports = {
   authenticateUser,
   getUserByPhoneNumber,
-  resendVerificationCode,
   sendVerificationCode,
   verifyCode,
   verifyRefreshToken,

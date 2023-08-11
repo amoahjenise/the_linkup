@@ -2,61 +2,67 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_AUTH_SERVICE_URL;
 
+const handleError = (error, action) => {
+  console.error(`Error ${action}:`, error);
+  throw error;
+};
+
 export const authenticateUser = async (phoneNumber, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/authenticate-user`, {
+    const response = await axios.post(`${BASE_URL}/api/authenticate-user`, {
       phoneNumber,
       password,
     });
-
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Error authenticating user:", error);
-    throw error;
+    handleError(error, "authenticating user");
   }
 };
 
 export const getUserByPhoneNumber = async (phoneNumber) => {
   try {
-    const response = await axios.get(`${BASE_URL}/get-user-by-phonenumber`, {
-      params: { phoneNumber },
-    });
-    return response;
+    const response = await axios.get(
+      `${BASE_URL}/api/get-user-by-phonenumber`,
+      {
+        params: { phoneNumber },
+      }
+    );
+    return response.data;
   } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
+    handleError(error, "fetching user");
   }
 };
 
 export const verifyCode = async (phoneNumber, verificationCode) => {
   try {
-    const response = await axios.post(`${BASE_URL}/verify-code`, {
+    const response = await axios.post(`${BASE_URL}/api/verify-code`, {
       phoneNumber,
       verificationCode,
     });
-    return response;
+    return response.data;
   } catch (error) {
-    console.error("Error verifying phone number:", error);
-    throw error;
+    handleError(error, "verifying phone number");
   }
 };
 
 export const sendVerificationCode = async (phoneNumber) => {
   try {
-    const response = await axios.post(`${BASE_URL}/send-verification-code`, {
-      phoneNumber,
-    });
-    return response;
+    const response = await axios.post(
+      `${BASE_URL}/api/send-verification-code`,
+      {
+        phoneNumber,
+      }
+    );
+    return response.data;
   } catch (error) {
-    console.error("Error sending verification code:", error);
-    throw error;
+    handleError(error, "sending verification code");
   }
 };
 
 export const verifyRefreshToken = async (refreshToken) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/verify-refresh-token`,
+      `${BASE_URL}/api/verify-refresh-token`,
       { refreshToken },
       {
         headers: {
@@ -67,15 +73,14 @@ export const verifyRefreshToken = async (refreshToken) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error verifying refresh token:", error);
-    throw error;
+    handleError(error, "verifying refresh token");
   }
 };
 
 export const verifyAccessToken = async (accessToken) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/verify-access-token`,
+      `${BASE_URL}/api/verify-access-token`,
       {},
       {
         headers: {
@@ -86,17 +91,15 @@ export const verifyAccessToken = async (accessToken) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error verifying access token:", error);
-    throw error;
+    handleError(error, "verifying access token");
   }
 };
 
 export const logout = async () => {
   try {
-    const response = await axios.post(`${BASE_URL}/logout`);
+    const response = await axios.post(`${BASE_URL}/api/logout`);
     return response.data;
   } catch (error) {
-    console.error("Error logging out:", error);
-    throw error;
+    handleError(error, "logging out");
   }
 };

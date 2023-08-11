@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     marginBottom: theme.spacing(8),
     backgroundColor: "rgba(207, 217, 222, 0.1)",
-    width: "100%",
     padding: theme.spacing(2),
   },
   commentInput: {
@@ -62,7 +61,6 @@ const useStyles = makeStyles((theme) => ({
   editButton: {
     marginLeft: "auto", // Pushes buttons to the right
     cursor: "pointer",
-    marginRight: theme.spacing(4),
   },
   saveButton: {
     width: "fit-content",
@@ -71,7 +69,6 @@ const useStyles = makeStyles((theme) => ({
   cancelButton: {
     width: "fit-content",
     fontSize: "14px",
-    marginRight: theme.spacing(4),
   },
 
   leftMargin: {
@@ -148,7 +145,7 @@ const UserProfilePage = () => {
   const convertToDataURL = (file) => {
     if (file) {
       if (file.type === "Buffer") {
-        const avatarData = new Uint8Array(file.data);
+        const avatarData = new Uint8Array(file);
         const binary = avatarData.reduce(
           (str, byte) => str + String.fromCharCode(byte),
           ""
@@ -272,7 +269,7 @@ const UserProfilePage = () => {
                       />
                     </div>
                   ) : (
-                    <p>{userData?.bio}</p>
+                    <p>Bio: {userData?.bio}</p>
                     // If it's the logged-in user's profile, show updatedBio, otherwise show bio from the Redux store.
                   )}
                 </div>
@@ -281,13 +278,13 @@ const UserProfilePage = () => {
               {renderEditButton()}
             </div>
           )}
-          {isLoading ? (
+          {/* {isLoading ? (
             <LoadingSpinner />
           ) : (
             <div className={classes.centeredContent}>
               <Cards images={mockUserData.profileImages} />
             </div>
-          )}
+          )} */}
         </div>
         <div style={{ flex: 2 }} />
       </div>

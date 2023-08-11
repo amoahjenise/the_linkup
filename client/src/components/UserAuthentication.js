@@ -74,11 +74,11 @@ const UserAuthentication = ({ password, setPassword }) => {
     setLoading(true);
 
     try {
-      const response = await authenticateUser(phoneNumber, password);
-      if (response.data.success) {
+      const result = await authenticateUser(phoneNumber, password);
+      if (result.success) {
         // Save the access token in an HttpOnly cookie
-        document.cookie = `accessToken=${response.data.token}; path=/; HttpOnly`;
-        dispatch(setCurrentUser(response.data.user));
+        document.cookie = `accessToken=${result.token}; path=/; HttpOnly`;
+        dispatch(setCurrentUser(result.user));
         dispatch(login());
         setPassword();
         navigate("/home");
@@ -120,6 +120,7 @@ const UserAuthentication = ({ password, setPassword }) => {
             label="Password"
             type="password"
             id="password"
+            autoComplete="new-password"
             value={password}
             onChange={handlePasswordChange}
           />

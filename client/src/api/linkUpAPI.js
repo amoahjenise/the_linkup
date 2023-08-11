@@ -2,56 +2,52 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_LINKUP_SERVICE_URL;
 
+const handleError = (error) => {
+  console.error("Error:", error);
+  throw error;
+};
+
 export const getPendingLinkups = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/get-linkups`);
-    const pendingLinkUps = response.data.linkups.filter(
-      (linkUp) => linkUp.status === "pending"
-    );
-    const sortedLinkUps = pendingLinkUps.sort(
-      (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
-    );
-    return {
-      success: true,
-      message: "Pending link-ups fetched successfully",
-      linkUps: sortedLinkUps,
-    };
+    const response = await axios.get(`${BASE_URL}/api/get-linkups`);
+    return response.data;
   } catch (error) {
-    console.log("Error fetching link-ups:", error);
-    return { success: false, message: "Error fetching link-ups", linkUps: [] };
+    handleError(error);
   }
 };
 
-export const createLinkUp = async (linkUpData) => {
+export const createLinkup = async (linkUpData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/create-linkup`, {
+    const response = await axios.post(`${BASE_URL}/api/create-linkup`, {
       linkup: linkUpData,
     });
-    const createdLinkUp = response.data.linkup;
-    return {
-      success: true,
-      message: "Link-up created successfully",
-      linkUp: createdLinkUp,
-    };
+    return response.data;
   } catch (error) {
-    console.log("Error creating link-up:", error);
-    return { success: false, message: "Error creating link-up", linkUp: null };
+    handleError(error);
   }
 };
 
-export const updateLinkUp = async (linkUpId, linkUpData) => {
+export const deleteLinkup = async (linkupId) => {
   try {
-    const response = await axios.put(`${BASE_URL}/update-linkup/${linkUpId}`, {
-      linkup: linkUpData,
-    });
-    const updatedLinkUp = response.data.linkup;
-    return {
-      success: true,
-      message: "Link-up updated successfully",
-      linkUp: updatedLinkUp,
-    };
+    const response = await axios.delete(
+      `${BASE_URL}/api/delete-linkup?id=${linkupId}`
+    );
+    return response.data;
   } catch (error) {
-    console.log("Error updating link-up:", error);
-    return { success: false, message: "Error updating link-up", linkUp: null };
+    handleError(error);
+  }
+};
+
+export const updateLinkup = async (linkupId, linkupData) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/update-linkup?id=${linkupId}`,
+      {
+        linkup: linkupData,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
   }
 };

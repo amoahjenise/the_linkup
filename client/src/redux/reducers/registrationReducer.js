@@ -9,7 +9,7 @@ const initialState = {
   steps: ["User Info", "Profile Picture", "Password", "Launch LUUL"],
 };
 
-const CLEAR_STATE = "CLEAR_STATE";
+const CLEAR_REGISTRATION_STATE = "CLEAR_REGISTRATION_STATE";
 
 export const updateRegistrationData = (data) => ({
   type: "UPDATE_REGISTRATION_DATA",
@@ -30,7 +30,7 @@ export const createUser = (userData) => ({
 });
 
 export const clearRegistrationState = () => ({
-  type: "CLEAR_STATE",
+  type: "CLEAR_REGISTRATION_STATE",
 });
 
 const registrationReducer = (state = initialState, action) => {
@@ -58,7 +58,7 @@ const registrationReducer = (state = initialState, action) => {
         ...state,
         registrationData: action.payload,
       };
-    case CLEAR_STATE:
+    case CLEAR_REGISTRATION_STATE:
       return {
         ...initialState,
       };

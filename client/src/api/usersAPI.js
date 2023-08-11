@@ -2,61 +2,71 @@ import axios from "axios";
 
 const BASE_URL = process.env.REACT_APP_USER_SERVICE_URL;
 
+const handleError = (error, errorMessage) => {
+  console.error(errorMessage, error);
+  return {
+    success: false,
+    message: errorMessage,
+    error: error.message,
+  };
+};
+
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/create-user`, userData);
-    return response;
+    const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
+    return {
+      success: true,
+      message: "User created successfully",
+      data: response.data,
+    };
   } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
+    return handleError(error, "Failed to create user");
   }
 };
 
 export const getUserById = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/get-user-by-id`, {
+    const response = await axios.get(`${BASE_URL}/api/get-user-by-id`, {
       params: { userId },
     });
-
-    return {
-      success: true,
-      user: response.data.user,
-    };
+    return response.data;
   } catch (error) {
-    console.error("Error fetching user:", error);
-    return {
-      success: false,
-      error: "Failed to fetch user data.",
-    };
+    return handleError(error, "Failed to fetch user data");
   }
 };
 
 export const updateUserBio = async (userId, bio) => {
   try {
-    const response = await axios.post(`${BASE_URL}/update-user-bio/${userId}`, {
-      bio,
-    });
+    const response = await axios.patch(
+      `${BASE_URL}/api/update-user-bio/${userId}`,
+      {
+        bio,
+      }
+    );
     return {
       success: true,
-      bio: response.data.bio,
+      message: "User bio updated successfully",
+      data: response.data,
     };
   } catch (error) {
-    console.error("Error updating user bio:", error);
-    throw error;
+    return handleError(error, "Failed to update user bio");
   }
 };
 
 export const updateUserAvatar = async (userId, avatar) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/update-user-avatar/${userId}`,
+    const response = await axios.patch(
+      `${BASE_URL}/api/update-user-avatar/${userId}`,
       {
         avatar,
       }
     );
-    return response.data;
+    return {
+      success: true,
+      message: "User avatar updated successfully",
+      data: response.data,
+    };
   } catch (error) {
-    console.error("Error updating user avatar:", error);
-    throw error;
+    return handleError(error, "Failed to update user avatar");
   }
 };

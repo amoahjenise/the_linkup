@@ -1,1 +1,3 @@
-DELETE FROM link_ups WHERE id = $1;
+UPDATE link_ups
+SET status = 'inactive', updated_at = now()
+WHERE id = $1;
