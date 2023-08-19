@@ -7,9 +7,12 @@ import {
   CloseOutlined,
   QueryBuilderOutlined,
 } from "@material-ui/icons";
+import moment from "moment";
+import nlp from "compromise";
+const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
-  linkUpActive: {
+  linkupHistoryItem: {
     backgroundColor: "#fff",
     padding: theme.spacing(4),
     marginBottom: theme.spacing(1),
@@ -41,17 +44,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkUpActive = ({ post }) => {
+const LinkupHistoryItem = ({ post }) => {
   const classes = useStyles();
 
-  const { username, activity, type, location, date, status } = post;
+  const { creator_name, avatar, activity, location, date, status } = post;
 
   const renderStatusIcon = () => {
     if (status === "active") {
       return <QueryBuilderOutlined />;
     } else if (status === "Accepted") {
       return <CheckCircleOutlined />;
-    } else if (status === "Declined") {
+    } else if (status === "expired") {
       return <CloseOutlined />;
     }
     return null;
@@ -60,10 +63,10 @@ const LinkUpActive = ({ post }) => {
   const getStatusLabel = () => {
     if (status === "active") {
       return "pending";
-    } else if (status === "Accepted") {
+    } else if (status === "linked") {
       return "Linked Up";
-    } else if (status === "Declined") {
-      return "Didn't Link Up";
+    } else if (status === "expired") {
+      return "expired";
     }
     return null;
   };
@@ -73,34 +76,51 @@ const LinkUpActive = ({ post }) => {
       return classes.pendingChip;
     } else if (status === "Accepted") {
       return classes.acceptedChip;
-    } else if (status === "Declined") {
+    } else if (status === "expired") {
       return classes.declinedChip;
     }
     return null;
   };
 
-  const getLinkUpText = () => {
-    if (type === "trylink" && status === "active") {
-      return ` You are trying to link up for ${activity} at ${location} ${date}.`;
-    } else if (type === "linkup" && status === "Accepted") {
-      return `You linked up for ${activity} at ${location} with ${username}.`;
-    } else if (type === "trylink" && status === "Declined") {
-      return `You did not link up for ${activity} at ${location}.`;
-    } else {
-      // Handle other types if needed
-      return "";
+  const renderLinkupItemText = () => {
+    let linkupItemText = "";
+    const doc = compromise(activity);
+    const startsWithVerb = doc.verbs().length > 0;
+    const isVerbEndingWithIng = activity.endsWith("ing");
+
+    let activityText = "";
+    if (activity) {
+      if (isVerbEndingWithIng) {
+        activityText = `for ${activity}`;
+      } else {
+        activityText = `${startsWithVerb ? "to" : "for"} ${activity}`;
+      }
     }
+    const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
+    const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
+
+    // Capitalize the first letter of each word in the location
+    const formattedLocation = location
+      .toLowerCase() // Convert to lowercase
+      .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
+
+    if (status === "active") {
+      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText}.`;
+    } else if (status === "expired") {
+      linkupItemText = `Link up ${activityText.toLowerCase()} at ${formattedLocation} on 
+          ${dateText} ${timeText} has expired.`;
+    } else {
+      linkupItemText = "";
+    }
+
+    return linkupItemText;
   };
 
   return (
-    <div className={classes.linkUpActive}>
+    <div className={classes.linkupHistoryItem}>
       <div className={classes.postDetails}>
-        <Avatar
-          alt={username}
-          src="/path/to/profile-picture.jpg"
-          className={classes.avatar}
-        />
-        <p>{getLinkUpText()}</p>
+        <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
+        <p>{renderLinkupItemText()}</p>
         <Chip
           label={getStatusLabel()}
           icon={renderStatusIcon()}
@@ -112,4 +132,4 @@ const LinkUpActive = ({ post }) => {
   );
 };
 
-export default LinkUpActive;
+export default LinkupHistoryItem;

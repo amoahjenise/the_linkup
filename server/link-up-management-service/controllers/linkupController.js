@@ -56,9 +56,15 @@ const createLinkup = async (req, res) => {
 };
 
 const getLinkups = async (req, res) => {
-  const queryPath = path.join(__dirname, "../db/queries/getLinkups.sql");
+  const userId = req.query.userId;
+  let queryPath = path.join(__dirname, "../db/queries/getLinkups.sql");
+
+  if (userId) {
+    queryPath = path.join(__dirname, "../db/queries/getLinkupsByUserId.sql");
+  }
+
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [];
+  const queryValues = userId ? [userId] : [];
 
   try {
     const { rows } = await pool.query(query, queryValues);

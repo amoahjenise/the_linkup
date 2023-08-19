@@ -1,7 +1,6 @@
 import {
   markLinkupsAsExpired as markLinkupsAsExpiredAPI,
   updateLinkup as updateLinkupAPI,
-  getActiveLinkups,
 } from "../../api/linkupAPI";
 
 import {
@@ -68,23 +67,6 @@ export const markLinkupsAsExpired = () => {
       }
     } catch (error) {
       console.log("Error marking link-ups as expired:", error);
-    }
-  };
-};
-
-export const fetchLinkups = () => {
-  return async (dispatch) => {
-    try {
-      const result = await getActiveLinkups();
-      if (result.success) {
-        dispatch(fetchLinkupsSuccess(result.linkupList));
-      } else {
-        console.log("Error fetching linkups:", result.message);
-      }
-    } catch (error) {
-      console.log("Error fetching linkups:", error);
-    } finally {
-      dispatch(setIsLoading(false));
     }
   };
 };

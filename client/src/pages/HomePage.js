@@ -11,7 +11,7 @@ import {
   setIsLoading,
   fetchLinkupsSuccess,
 } from "../redux/actions/linkupActions";
-import { getActiveLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
+import { getLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
 
 const drawerWidth = "20%";
 
@@ -46,10 +46,14 @@ const HomePage = ({ linkupList, isLoading }) => {
   const dispatch = useDispatch();
 
   const fetchLinkups = useCallback(async () => {
+    dispatch(setIsLoading(true));
     try {
-      const response = await getActiveLinkups();
+      const response = await getLinkups();
       if (response.success) {
-        dispatch(fetchLinkupsSuccess(response.linkupList));
+        const activeLinkups = response.linkupList.filter(
+          (linkup) => linkup.status === "active"
+        );
+        dispatch(fetchLinkupsSuccess(activeLinkups));
       } else {
         console.log(response.message);
       }
