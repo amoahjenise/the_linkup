@@ -7,7 +7,7 @@ const handleError = (error) => {
   throw error;
 };
 
-export const getPendingLinkups = async () => {
+export const getActiveLinkups = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/get-linkups`);
     return response.data;
@@ -32,6 +32,15 @@ export const deleteLinkup = async (linkupId) => {
     const response = await axios.delete(
       `${BASE_URL}/api/delete-linkup?id=${linkupId}`
     );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const markLinkupsAsExpired = async () => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/mark-expired-linkups`);
     return response.data;
   } catch (error) {
     handleError(error);

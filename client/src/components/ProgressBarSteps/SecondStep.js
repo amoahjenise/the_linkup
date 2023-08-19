@@ -1,10 +1,10 @@
 import React from "react";
 import AvatarUploadInput from "../AvatarUploadInput";
 
-const SecondStep = () => {
+const SecondStep = ({ avatarURL, setAvatarURL }) => {
   return (
     <div>
-      <AvatarUploadInput />
+      <AvatarUploadInput avatarURL={avatarURL} setAvatarURL={setAvatarURL} />
     </div>
   );
 };

@@ -5,6 +5,11 @@ const userController = require("../controllers/userController");
 // Define routes
 router.get("/get-user-by-id", userController.getUserById);
 router.post("/create-user", userController.createUser);
+router.post("/delete-user/:userId", userController.deleteUser);
+router.patch(
+  "/set-user-status-active/:userId",
+  userController.setUserStatusActive
+); // Use PATCH for partial updates
 router.patch("/update-user-bio/:userId", userController.updateUserBio); // Use PATCH for partial updates
 router.patch("/update-user-avatar/:userId", userController.updateUserAvatar); // Use PATCH for partial updates
 

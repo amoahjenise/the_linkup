@@ -1,50 +1,44 @@
-import React, { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateRegistrationData } from "../../redux/reducers/registrationReducer";
+import React from "react";
 
-const FirstStep = () => {
-  const registrationData = useSelector(
-    (state) => state.registration.registrationData
-  );
-  const dispatch = useDispatch();
-
-  const handleChange = useCallback(
-    (e) => {
-      const { name, value } = e.target;
-      dispatch(updateRegistrationData({ [name]: value }));
-    },
-    [dispatch]
-  );
-
+const FirstStep = ({
+  name,
+  dateOfBirth,
+  gender,
+  setName,
+  setDateOfBirth,
+  setGender,
+}) => {
   return (
     <div className="form">
-      <label>First Name</label>
+      <label htmlFor="name">First Name</label>
       <input
-        autoComplete="off"
         type="text"
-        name="firstName"
+        id="name"
+        name="name"
         placeholder="Add your first name"
-        value={registrationData.firstName}
-        onChange={handleChange}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
       />
 
       <label htmlFor="dateOfBirth">Date of Birth</label>
       <input
-        autoComplete="off"
         type="date"
         id="dateOfBirth"
         name="dateOfBirth"
-        value={registrationData.dateOfBirth}
-        onChange={handleChange}
+        value={dateOfBirth}
+        onChange={(e) => setDateOfBirth(e.target.value)}
+        max={new Date().toISOString().split("T")[0]} // Set max date to today
+        required
       />
 
       <label htmlFor="gender">Gender</label>
       <select
-        autoComplete="off"
         id="gender"
         name="gender"
-        value={registrationData.gender}
-        onChange={handleChange}
+        value={gender}
+        onChange={(e) => setGender(e.target.value)}
+        required
       >
         <option value="">--Select--</option>
         <option value="male">Male</option>

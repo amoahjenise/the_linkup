@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../logo.png";
@@ -7,6 +7,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import HistoryIcon from "@material-ui/icons/History";
 import MessageIcon from "@material-ui/icons/Message";
+import SettingsIcon from "@material-ui/icons/Settings";
 import LogoutButton from "./LogoutButton";
 
 const drawerWidth = "24%";
@@ -56,6 +57,11 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftMenu = () => {
   const classes = useStyles();
+  const [activeSection, setActiveSection] = useState("account");
+
+  const handleMenuItemClick = (section) => {
+    setActiveSection(section); // Set the active section when a menu item is clicked
+  };
 
   return (
     <div className={classes.main}>
@@ -87,6 +93,14 @@ const LeftMenu = () => {
           <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
             <Link to="/messages" className={classes.menuItemLink}>
               <MessageIcon /> Messages
+            </Link>
+          </li>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover}`}
+            onClick={() => handleMenuItemClick("account")} // Set activeSection to "account" on click
+          >
+            <Link to="/settings" className={classes.menuItemLink}>
+              <SettingsIcon /> Settings
             </Link>
           </li>
           <li className={`${classes.menuItem} ${classes.menuItemHover}`}>

@@ -3,6 +3,31 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const { pool } = require("../db");
 
+const deleteUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId];
+
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } else {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to delete user" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const createUser = async (req, res) => {
   const { newUser } = req.body;
 
@@ -16,10 +41,10 @@ const createUser = async (req, res) => {
     const queryValues = [
       newUser.phoneNumber,
       hashedPassword,
-      newUser.firstName,
+      newUser.name,
       newUser.gender,
       newUser.dateOfBirth,
-      newUser.avatar,
+      newUser.avatarURL,
     ];
 
     const { rows, rowCount } = await pool.query(query, queryValues);
@@ -116,9 +141,46 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
+const setUserStatusActive = async (req, res) => {
+  const userId = req.params.userId;
+  const { avatar } = req.body;
+
+  try {
+    // Use the SQL query from the previous response to update the user profile properties
+
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/setUserStatusActive.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId];
+    const result = await pool.query(query, values);
+
+    if (result.rows.length > 0) {
+      console.log("USER IN SET STATUS ACTIVE", user);
+      const data = rows[0];
+      res.json({
+        success: true,
+        message: "User status set to 'active'",
+        data: data,
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "User status not updated to 'active'",
+        data: data,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createUser,
+  deleteUser,
   getUserById,
   updateUserBio,
   updateUserAvatar,
+  setUserStatusActive,
 };

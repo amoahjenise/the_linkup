@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useDispatch } from "react-redux";
 import "react-phone-input-2/lib/style.css";
 import PhoneInput from "react-phone-input-2";
-import { updatePhoneNumber } from "../redux/reducers/authReducer";
+import { updatePhoneNumber } from "../redux/actions/authActions";
 import startsWith from "lodash.startswith";
 import {
   getUserByPhoneNumber,
@@ -12,6 +12,7 @@ import {
   verifyCode,
 } from "../api/authenticationAPI";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import { updateDeactivatedUser } from "../redux/actions/authActions";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -53,6 +54,11 @@ function PhoneVerification({
   const [isVerificationCodeSent, setIsVerificationCodeSent] = useState(false);
   const [verificationError, setVerificationError] = useState("");
   const [isValidPhoneNumber, setIsValidPhoneNumber] = useState(false);
+
+  // Clear deactivatedUser when the component mounts
+  useEffect(() => {
+    dispatch(updateDeactivatedUser(null));
+  }, [dispatch]);
 
   // Validate phone number format using useCallback to memoize the function
   const validatePhoneNumberFormat = useCallback(() => {
@@ -98,6 +104,10 @@ function PhoneVerification({
     // Verification successful, check if user exists
     try {
       const response = await getUserByPhoneNumber(`+${phoneNumber}`);
+
+      if (response.user && response.user.status === "inactive") {
+        dispatch(updateDeactivatedUser(response.user));
+      }
 
       if (action === LOGIN) {
         if (response.success) {

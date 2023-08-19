@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateRegistrationData } from "../redux/reducers/registrationReducer";
 import { useDropzone } from "react-dropzone";
 import { makeStyles } from "@material-ui/core/styles";
+import Resizer from "react-image-file-resizer";
 
 const useStyles = makeStyles((theme) => ({
   cardInput: {
@@ -43,34 +42,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AvatarUploadInput = () => {
+const AvatarUploadInput = ({ avatarURL, setAvatarURL }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-
-  const profilePicture = useSelector(
-    (state) => state.registration.registrationData.profilePicture
-  );
-
-  const [isImageUploaded, setIsImageUploaded] = useState(!!profilePicture);
+  const [isImageUploaded, setIsImageUploaded] = useState(!!avatarURL);
 
   useEffect(() => {
-    // Update 'isImageUploaded' state when 'profilePicture' changes
-    setIsImageUploaded(!!profilePicture);
-  }, [profilePicture]);
+    // Update 'isImageUploaded' state when 'avatarURL' changes
+    setIsImageUploaded(!!avatarURL);
+  }, [avatarURL]);
 
   const handleImageChange = (acceptedFiles) => {
     try {
       const file = acceptedFiles[0];
       if (file) {
-        // Read the image file as a data URL
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          // Update the registrationData with the data URL of the selected image
-          dispatch(updateRegistrationData({ profilePicture: reader.result }));
-          setIsImageUploaded(true);
-        };
-
-        reader.readAsDataURL(file);
+        // Resize the image using ImageFileResizer
+        Resizer.imageFileResizer(
+          file,
+          300,
+          300,
+          "JPEG",
+          80,
+          0,
+          (resizedImage) => {
+            // Update the registration with the data URL of the resized image
+            // dispatch(updateRegistrationData({ avatarURL: resizedImage }));
+            setAvatarURL(resizedImage);
+            // setIsImageUploaded(true);
+          },
+          "base64"
+        );
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -92,7 +92,7 @@ const AvatarUploadInput = () => {
         <input {...getInputProps()} />
         <div className={classes.avatar}>
           {isImageUploaded ? (
-            <img src={profilePicture} alt="" className={classes.avatarImage} />
+            <img src={avatarURL} alt="" className={classes.avatarImage} />
           ) : (
             <span className={classes.uploadText}>
               Upload Profile Picture. Drag and drop an image here

@@ -17,6 +17,7 @@ import LinkUpHistoryPage from "./pages/LinkUpHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
+import SettingsPage from "./pages/SettingsPage";
 import { useSelector } from "react-redux";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import "./App.css";
@@ -56,6 +57,7 @@ const App = () => {
                 path="/linkup-request/:id"
                 element={<AcceptDeclinePage />}
               />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Routes>
         </Router>

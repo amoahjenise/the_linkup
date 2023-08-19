@@ -21,7 +21,6 @@ const createLinkup = async (req, res) => {
     linkup.location,
     linkup.activity,
     linkup.date,
-    linkup.time,
     linkup.gender_preference,
   ];
 
@@ -32,7 +31,7 @@ const createLinkup = async (req, res) => {
       const linkup = rows[0];
 
       // Emit a real-time event to notify clients about the new linkup
-      socketIo.emit("newLinkup", linkup);
+      socketIo.emit("createLinkup", linkup);
 
       res.json({
         success: true,
@@ -128,7 +127,6 @@ const updateLinkup = async (req, res) => {
     linkup.location,
     linkup.activity,
     linkup.date,
-    linkup.time,
     linkup.gender_preference,
     id,
   ];
@@ -160,10 +158,49 @@ const updateLinkup = async (req, res) => {
   }
 };
 
+const markLinkupsAsExpired = async (req, res) => {
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/markLinkupsAsExpired.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+    console.log("Expired Link-Ups:", rows);
+    if (rows.length > 0) {
+      // Emit a real-time event to notify clients about expired link-ups
+      const expiredLinkups = rows;
+      socketIo.emit("linkupsExpired", expiredLinkups);
+
+      res.json({
+        success: true,
+        message: "Link-ups updated successfully",
+        linkupList: rows,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "No link-ups to update",
+        linkupList: [],
+      });
+    }
+  } catch (error) {
+    console.error("Error updating link-ups:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update link-ups",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   initializeSocket,
   createLinkup,
   getLinkups,
   deleteLinkup,
   updateLinkup,
+  markLinkupsAsExpired,
 };

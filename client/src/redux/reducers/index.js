@@ -1,14 +1,14 @@
 import { combineReducers } from "redux";
 import authReducer from "./authReducer";
 import registrationReducer from "./registrationReducer";
-import loggedUserReducer from "./loggedUserReducer";
+import userReducer from "./userReducer";
 import editingLinkupReducer from "./editingLinkupReducer";
 import linkupReducer from "./linkupReducer";
 
 const appReducer = combineReducers({
   auth: authReducer,
   registration: registrationReducer,
-  loggedUser: loggedUserReducer,
+  loggedUser: userReducer,
   linkups: linkupReducer,
   editingLinkup: editingLinkupReducer,
 });

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -6,11 +7,10 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Snackbar } from "@material-ui/core"; // Import Snackbar and Alert from @material-ui/core
-import debounce from "lodash.debounce";
 import { connect } from "react-redux";
-import { createLinkup, updateLinkupList } from "../redux/actions/linkupActions";
-import io from "socket.io-client";
+import { createLinkup } from "../api/linkupAPI";
+import { updateLinkupList } from "../redux/actions/linkupActions";
+import { useSnackbar } from "../contexts/SnackbarContext";
 
 const useStyles = makeStyles((theme) => ({
   searchInputContainer: {
@@ -84,48 +84,38 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
-
-const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
+const CreateLinkupForm = ({
+  socket,
+  updateLinkupList,
+  scrollToTopCallback,
+}) => {
+  // Access user data from Redux store
+  const loggedUser = useSelector((state) => state.loggedUser);
   const classes = useStyles();
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState();
   const [genderPreference, setGenderPreference] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const { id, name } = loggedUser?.user || {};
-  const [socket, setSocket] = useState(null);
+  const { addSnackbar } = useSnackbar();
 
-  // Initialize socket connection
-  useEffect(() => {
-    const newSocket = io(linkupSocketUrl);
-    setSocket(newSocket);
+  const maxTime = new Date();
+  maxTime.setHours(23); // Set hours to 11
+  maxTime.setMinutes(45); // Set minutes to 45
 
-    // Clean up socket connection on component unmount
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
+  const minTimeDefault = new Date();
+  minTimeDefault.setHours(0); // Set hours to 0 (midnight)
+  minTimeDefault.setMinutes(0); // Set minutes to 0
 
-  // Listen for new linkup event using the socket variable
-  useEffect(() => {
-    if (socket) {
-      socket.on("newLinkup", (newLinkup) => {
-        // Update linkupList state with the new linkup
-        updateLinkupList(newLinkup);
-      });
-    }
-  }, [socket, updateLinkupList]);
+  const currentDate = new Date();
+  const minTime = selectedDate
+    ? selectedDate.toDateString() === currentDate.toDateString()
+      ? currentDate
+      : minTimeDefault
+    : currentDate;
 
   const handleCreateLinkUp = async (e) => {
-    console.log("handleCreateLinkUp ran ");
     e.preventDefault();
     const activity = e.target.activity.value;
     const location = e.target.location.value;
-    // Extract date and time from selectedDate
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth() + 1; // Note: Months are zero-indexed
-    const day = selectedDate.getDate();
-    const hours = selectedDate.getHours();
-    const minutes = selectedDate.getMinutes();
 
     try {
       // Call the API to create the link-up
@@ -134,57 +124,36 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
         creator_name: name,
         location: location,
         activity: activity,
-        date: `${year}-${month}-${day}`, // Format: YYYY-MM-DD
-        time: `${hours}:${minutes}`, // Format: HH:mm
+        date: selectedDate,
         gender_preference: genderPreference,
       });
 
-      // // Notify parent component to reload the linkup list
-      // setShouldFetchLinkups(true);
-      // // Show the success message
-      // setSuccessMessage("Your Link Up was created!");
-
-      // Reset the form inputs
-      e.target.reset();
-      setSelectedDate(null);
-      setGenderPreference("");
+      if (socket && response.success) {
+        // Update linkupList state with the new linkup
+        updateLinkupList(response.newLinkup);
+        // Emit the "createLinkup" event with the created linkup data
+        socket.emit("createLinkup", response.newLinkup);
+        addSnackbar("Link-up created successfully!");
+        // Reset the form inputs
+        e.target.reset();
+        setSelectedDate(null);
+        setGenderPreference("");
+        // Call the callback function - Scroll to top
+        scrollToTopCallback();
+      } else {
+        addSnackbar("An error occured. Please try again.");
+      }
     } catch (error) {
-      console.log(error);
-      // Handle error if needed
+      addSnackbar(error.message);
     }
   };
 
-  const handleSnackbarClose = () => {
-    setSuccessMessage("");
-  };
-
-  function SearchBar({ onSearch }) {
-    const handleSearch = debounce((query) => {
-      onSearch(query);
-    }, 300);
-
-    return (
-      <input
-        type="text"
-        placeholder="Search..."
-        onChange={(e) => handleSearch(e.target.value)}
-      />
-    );
-  }
-
   return (
     <div className={classes.createLinkUpContainer}>
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        message={successMessage}
-        ContentProps={{ className: classes.snackbar }}
-      />
       <div className={classes.searchInputContainer}>
         <TextField
           className={classes.createLinkUpInput}
-          placeholder="Search for Link Ups"
+          placeholder="Search for Link-Ups"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -195,7 +164,7 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
         />
       </div>
       <div className={classes.createContainer}>
-        <h2 className={classes.createLinkUpTitle}>Create a Link Up</h2>
+        <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
         <form
           className={classes.createLinkUpForm}
           onSubmit={handleCreateLinkUp}
@@ -223,6 +192,9 @@ const CreateLinkupForm = ({ loggedUser, createLinkup, updateLinkupList }) => {
             timeIntervals={15}
             timeCaption="Time"
             dateFormat="MMMM d, yyyy h:mm aa"
+            minDate={new Date()} // Set the minimum date to the current date
+            minTime={minTime} // Set the minimum time to the current time
+            maxTime={maxTime}
             className={classes.createLinkUpInput}
             placeholderText="Select date and time"
             required
@@ -266,7 +238,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  createLinkup,
   updateLinkupList,
 };
 

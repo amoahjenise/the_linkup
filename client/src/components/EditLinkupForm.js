@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -6,13 +7,13 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Snackbar } from "@material-ui/core";
-import { connect } from "react-redux";
-import { updateLinkup } from "../redux/actions/linkupActions";
+import { updateLinkup } from "../api/linkupAPI";
+import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import {
   setEditingLinkup,
   clearEditingLinkup,
 } from "../redux/actions/editingLinkupActions";
+import { useSnackbar } from "../contexts/SnackbarContext";
 
 const useStyles = makeStyles((theme) => ({
   searchInputContainer: {
@@ -54,6 +55,14 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     borderRadius: "24px",
   },
+  cancelLinkupButton: {
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(1),
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
   updateLinkupButton: {
     padding: theme.spacing(1),
     color: "white",
@@ -86,80 +95,89 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditLinkupForm = ({
-  linkup,
-  setShouldFetchLinkups,
-  setIsEditing,
-  updateLinkup,
-  setEditingLinkup,
-  clearEditingLinkup,
-}) => {
+const EditLinkupForm = ({ setShouldFetchLinkups }) => {
   const classes = useStyles();
-  const [hours, minutes] = linkup.time.split(":");
-  const initialDate = new Date(linkup.date);
-  initialDate.setHours(hours);
-  initialDate.setMinutes(minutes);
-  const [selectedDate, setSelectedDate] = useState(initialDate);
-  const [activity, setActivity] = useState(linkup.activity);
-  const [location, setLocation] = useState(linkup.location);
+  const dispatch = useDispatch();
+  const editingLinkup = useSelector((state) => state.editingLinkup);
+  const { id } = editingLinkup.linkup;
+  const [selectedDate, setSelectedDate] = useState(editingLinkup.linkup.date);
+  const [activity, setActivity] = useState(editingLinkup.linkup.activity);
+  const [location, setLocation] = useState(editingLinkup.linkup.location);
   const [genderPreference, setGenderPreference] = useState(
-    linkup.gender_preference
+    editingLinkup.linkup.gender_preference
   );
-  const [successMessage, setSuccessMessage] = useState("");
+  const { addSnackbar } = useSnackbar();
+
+  const maxTime = new Date();
+  maxTime.setHours(23); // Set hours to 11
+  maxTime.setMinutes(45); // Set minutes to 45
+
+  const minTimeDefault = new Date();
+  minTimeDefault.setHours(0); // Set hours to 0 (midnight)
+  minTimeDefault.setMinutes(0); // Set minutes to 0
+
+  const currentDate = new Date();
+  const minTime = selectedDate
+    ? new Date(selectedDate).toDateString() === currentDate.toDateString()
+      ? currentDate
+      : minTimeDefault
+    : currentDate;
 
   useEffect(() => {
     // Set the editing linkup when the component mounts
-    setEditingLinkup(linkup.id);
+    setEditingLinkup(id, true);
 
     // Clear the editing linkup when the component unmounts
     return () => {
       clearEditingLinkup();
     };
-  }, [linkup.id, setEditingLinkup, clearEditingLinkup]);
+  }, [id]);
 
-  const handleUpdateLinkup = async (e) => {
-    e.preventDefault();
+  const performUpdateLinkup = useCallback(async () => {
+    const updatedLinkup = {
+      location,
+      activity,
+      date: selectedDate,
+      gender_preference: genderPreference,
+    };
 
     try {
-      const updatedLinkup = {
-        location,
-        activity,
-        date: selectedDate.toISOString().substring(0, 10),
-        time: selectedDate.toISOString().substring(11, 16),
-        gender_preference: genderPreference,
-      };
-
-      const response = await updateLinkup(linkup.id, updatedLinkup);
+      const response = await updateLinkup(id, updatedLinkup);
 
       if (response.success) {
         setShouldFetchLinkups(true);
-        setSuccessMessage("Your Link Up was edited!");
-        clearEditingLinkup(); // Clear editing state
+        dispatch(updateLinkupSuccess(response.linkup));
+        dispatch(clearEditingLinkup());
+        addSnackbar("Updated successfully!");
       }
-
-      setSelectedDate(new Date(`${linkup.date}T${linkup.time}`));
-      setActivity(linkup.activity);
-      setLocation(linkup.location);
-      setGenderPreference(linkup.gender_preference);
     } catch (error) {
-      console.log(error);
-    } finally {
-      setIsEditing(false);
+      addSnackbar(error.message);
     }
-  };
+  }, [
+    id,
+    location,
+    activity,
+    selectedDate,
+    genderPreference,
+    dispatch,
+    setShouldFetchLinkups,
+    addSnackbar,
+  ]);
 
-  const handleSnackbarClose = () => {
-    setSuccessMessage("");
-  };
+  const handleUpdateLinkup = useCallback(
+    async (e) => {
+      e.preventDefault();
+      performUpdateLinkup();
+    },
+    [performUpdateLinkup]
+  );
+
+  const handleCancelClick = useCallback(() => {
+    dispatch(clearEditingLinkup());
+  }, [dispatch]);
 
   return (
     <div className={classes.editLinkUpContainer}>
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        message={successMessage}
-      />
       <div className={classes.searchInputContainer}>
         <TextField
           className={classes.editLinkUpInput}
@@ -174,7 +192,7 @@ const EditLinkupForm = ({
         />
       </div>
       <div className={classes.editContainer}>
-        <h2 className={classes.editLinkUpTitle}>Edit Link Up</h2>
+        <h2 className={classes.editLinkUpTitle}>Edit Link-Up</h2>
         <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>
           <input
             className={classes.editLinkUpInput}
@@ -195,13 +213,16 @@ const EditLinkupForm = ({
             required
           />
           <DatePicker
-            selected={selectedDate}
+            selected={new Date(selectedDate)}
             onChange={(date) => setSelectedDate(date)}
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={15}
             timeCaption="Time"
             dateFormat="MMMM d, yyyy h:mm aa"
+            minDate={new Date()} // Set the minimum date to the current date
+            minTime={minTime} // Set the minimum time conditionally
+            maxTime={maxTime}
             className={classes.editLinkUpInput}
             placeholderText="Select date and time"
             required
@@ -230,6 +251,14 @@ const EditLinkupForm = ({
             >
               Update
             </Button>
+            <Button
+              variant="contained"
+              color="default"
+              onClick={handleCancelClick}
+              className={classes.cancelLinkupButton}
+            >
+              Cancel
+            </Button>
           </div>
         </form>
       </div>
@@ -237,10 +266,4 @@ const EditLinkupForm = ({
   );
 };
 
-const mapDispatchToProps = {
-  updateLinkup,
-  setEditingLinkup,
-  clearEditingLinkup,
-};
-
-export default connect(null, mapDispatchToProps)(EditLinkupForm);
+export default EditLinkupForm;

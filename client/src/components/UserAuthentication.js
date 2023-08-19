@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/reducers/authReducer";
-import { setCurrentUser } from "../redux/reducers/loggedUserReducer";
-
+import { login, updateDeactivatedUser } from "../redux/actions/authActions";
+import { setCurrentUser } from "../redux/actions/userActions";
+import { authenticateUser } from "../api/authenticationAPI";
+import { setUserStatusActive } from "../api/usersAPI";
 import {
   Button,
   TextField,
@@ -15,7 +16,6 @@ import { LockOutlined as LockOutlinedIcon } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import LoadingSpinner from "./LoadingSpinner";
 import { useNavigate } from "react-router-dom";
-import { authenticateUser } from "../api/authenticationAPI";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -46,15 +46,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UserAuthentication = ({ password, setPassword }) => {
+const UserAuthentication = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
 
   // Retrieve phone number and country code from the Redux store
   const phoneNumber = useSelector((state) => state.auth.phoneNumber);
+  const deactivatedUser = useSelector((state) => state.auth.deactivatedUser);
 
-  const [loading, setLoading] = useState(false);
+  const name = deactivatedUser?.name;
 
   // State variables for managing error and success messages
   const [errorMessage, setErrorMessage] = useState("");
@@ -71,16 +74,17 @@ const UserAuthentication = ({ password, setPassword }) => {
 
   // Handle setting the password and user authentication
   const handleSendPassword = async () => {
-    setLoading(true);
-
     try {
       const result = await authenticateUser(phoneNumber, password);
       if (result.success) {
         // Save the access token in an HttpOnly cookie
         document.cookie = `accessToken=${result.token}; path=/; HttpOnly`;
-        dispatch(setCurrentUser(result.user));
         dispatch(login());
-        setPassword();
+        dispatch(setCurrentUser(result.user));
+        if (deactivatedUser) {
+          setUserStatusActive(result.user.id);
+          dispatch(updateDeactivatedUser(null)); // Clear deactivatedUser when the user authenticates
+        }
         navigate("/home");
       } else {
         setErrorMessage("Authentication failed. Please try again.");
@@ -88,7 +92,6 @@ const UserAuthentication = ({ password, setPassword }) => {
     } catch (error) {
       console.error("Error during user authentication:", error);
       setErrorMessage("Authentication failed. Please try again.");
-      clearMessages();
     } finally {
       setLoading(false);
     }
@@ -98,12 +101,18 @@ const UserAuthentication = ({ password, setPassword }) => {
   const handleFormSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
     clearMessages(); // Clear the messages
+    setLoading(true);
     handleSendPassword(); // Manually handle the form submission
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
+        {name && (
+          <Typography component="h1" variant="h3">
+            Welcome back {name}!
+          </Typography>
+        )}
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
@@ -139,8 +148,8 @@ const UserAuthentication = ({ password, setPassword }) => {
           <Link to="/forgot-password" variant="body2">
             Forgot Password?
           </Link>
-          {loading && <LoadingSpinner />}{" "}
           {/* Render the LoadingSpinner component */}
+          {loading && <LoadingSpinner />}{" "}
         </form>
       </div>
     </Container>

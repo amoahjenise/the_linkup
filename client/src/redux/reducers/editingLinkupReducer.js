@@ -3,10 +3,10 @@
 import {
   SET_EDITING_LINKUP,
   CLEAR_EDITING_LINKUP,
-} from "../actions/editingLinkupActions";
+} from "../actions/actionTypes";
 
 const initialState = {
-  linkupId: null,
+  linkup: null,
   isEditing: false,
 };
 
@@ -14,7 +14,7 @@ const editingLinkupReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_EDITING_LINKUP:
       return {
-        linkupId: action.payload.linkupId,
+        linkup: action.payload.linkup,
         isEditing: action.payload.isEditing,
       };
     case CLEAR_EDITING_LINKUP:

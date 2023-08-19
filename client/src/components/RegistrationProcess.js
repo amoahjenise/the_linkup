@@ -1,21 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  clearRegistrationState,
-  updateRegistrationData,
-  nextStep,
-  previousStep,
-} from "../redux/reducers/registrationReducer";
-import { login } from "../redux/reducers/authReducer";
-import { setCurrentUser } from "../redux/reducers/loggedUserReducer";
+import { useNavigate } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
+// Import Redux Actions
+import { nextStep, previousStep } from "../redux/actions/registrationActions";
+import { login } from "../redux/actions/authActions";
+import { setCurrentUser } from "../redux/actions/userActions";
+// Import Registration Steps
 import FirstStep from "../components/ProgressBarSteps/FirstStep";
 import SecondStep from "../components/ProgressBarSteps/SecondStep";
 import ThirdStep from "../components/ProgressBarSteps/ThirdStep";
 import LastStep from "../components/ProgressBarSteps/LastStep";
-import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
-import { useNavigate } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+// Import API functions
 import { createUser } from "../api/usersAPI";
 
 const useStyles = makeStyles((theme) => ({
@@ -26,46 +24,59 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const RegistrationProcess = ({ password, setPassword }) => {
+const RegistrationProcess = () => {
   const classes = useStyles();
-  const registrationData = useSelector((state) => state.registration);
-  const authState = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleUpdateRegistrationData = (data) => {
-    dispatch(updateRegistrationData(data));
-  };
+  const [name, setName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("");
+  const [avatarURL, setAvatarURL] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  const registrationData = useSelector((state) => state.registration);
+  const authState = useSelector((state) => state.auth);
 
   const handleLaunchLuul = async () => {
-    try {
-      if (registrationData.currentStep === 3) {
-        // Create object for user creation
-        const newUser = {
-          phoneNumber: authState.phoneNumber,
-          password: password,
-          firstName: registrationData.registrationData.firstName,
-          gender: registrationData.registrationData.gender,
-          dateOfBirth: registrationData.registrationData.dateOfBirth,
-          avatar: registrationData.registrationData.profilePicture,
-        };
+    navigate(`/profile/me`);
+  };
 
+  const handleNextStep = async () => {
+    // Handle navigation to the next step
+    dispatch(nextStep());
+
+    if (registrationData.currentStep === 2) {
+      // Create object for user creation
+      const newUser = {
+        phoneNumber: authState.phoneNumber,
+        name: name,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        avatarURL: avatarURL,
+        password: password,
+      };
+
+      try {
         const response = await createUser({ newUser: newUser });
-
         if (response.success) {
-          navigate(`/profile/me`);
           // Set the user data in the Redux store
-          // Mark the user as logged in by dispatching the login action
-          // Reset the registration data after successful registration
           dispatch(setCurrentUser(response.data.user));
+          // Mark the user as logged in by dispatching the login action
           dispatch(login());
-          dispatch(clearRegistrationState);
-          setPassword();
+          // Reset local states
+          setPassword("");
+          setIsPasswordValid(false);
+          setName("");
+          setDateOfBirth("");
+          setGender("");
+          setAvatarURL("");
         }
+      } catch (error) {
+        console.error("Error creating user:", error);
+        alert("Failed to create user. Please try again.");
       }
-    } catch (error) {
-      console.error("Error creating user:", error);
-      alert("Failed to create user. Please try again.");
     }
   };
 
@@ -91,33 +102,27 @@ const RegistrationProcess = ({ password, setPassword }) => {
       case 0:
         return (
           <FirstStep
-            registrationData={registrationData.registrationData}
-            updateRegistrationData={handleUpdateRegistrationData}
+            name={name}
+            dateOfBirth={dateOfBirth}
+            gender={gender}
+            setName={setName}
+            setDateOfBirth={setDateOfBirth}
+            setGender={setGender}
           />
         );
       case 1:
-        return (
-          <SecondStep
-            registrationData={registrationData.registrationData}
-            updateRegistrationData={handleUpdateRegistrationData}
-          />
-        );
+        return <SecondStep avatarURL={avatarURL} setAvatarURL={setAvatarURL} />;
       case 2:
         return (
           <ThirdStep
-            registrationData={registrationData.registrationData}
-            updateRegistrationData={handleUpdateRegistrationData}
             password={password}
             setPassword={setPassword}
+            isPasswordValid={isPasswordValid}
+            setIsPasswordValid={setIsPasswordValid}
           />
         );
       default:
-        return (
-          <LastStep
-            registrationData={registrationData.registrationData}
-            updateRegistrationData={handleUpdateRegistrationData}
-          />
-        );
+        return <LastStep name={name} />;
     }
   };
 
@@ -151,16 +156,12 @@ const RegistrationProcess = ({ password, setPassword }) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => dispatch(nextStep())}
+              onClick={handleNextStep}
               disabled={
-                (registrationData.currentStep === 1 &&
-                  !registrationData.registrationData.profilePicture) ||
+                (registrationData.currentStep === 1 && !avatarURL) ||
                 (registrationData.currentStep === 0 &&
-                  (!registrationData.registrationData.firstName ||
-                    !registrationData.registrationData.gender ||
-                    !registrationData.registrationData.dateOfBirth)) ||
-                (registrationData.currentStep === 2 &&
-                  !registrationData.registrationData.isPasswordValid)
+                  (!name || !gender || !dateOfBirth)) ||
+                (registrationData.currentStep === 2 && !isPasswordValid)
               }
             >
               Continue

@@ -2,14 +2,9 @@ const express = require("express");
 const app = express();
 const router = require("./routes/linkupRoutes");
 const cors = require("cors");
-const linkupController = require("./controllers/linkupController");
-
-const io = require("socket.io")(3004, {
-  cors: {
-    origin: "http://localhost:3000",
-    credentials: true,
-  },
-});
+const http = require("http");
+const socketIo = require("socket.io");
+const linkupSocket = require("./socket/linkupSocket");
 
 app.use(express.json());
 
@@ -23,28 +18,19 @@ app.use(
 
 app.use("/api", router);
 
-// Listen to incoming WebSocket connections
-io.on("connection", (socket) => {
-  console.log("A user connected");
+const server = http.createServer(app);
 
-  // Example: Send a welcome message to the connected user
-  socket.emit("welcome", "Welcome to the Link Up Management Service!");
-
-  // Handle real-time events here
-  socket.on("createLinkup", (data) => {
-    // Process the data and emit events as needed
-  });
-
-  // Handle disconnect
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
+// Configure CORS for Socket.IO
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Allow connections from the frontend
+    methods: ["GET", "POST"],
+  },
 });
 
-// Pass the io object to the controller
-linkupController.initializeSocket(io);
+linkupSocket(io); // Initialize socket.io with the server instance
 
 const PORT = process.env.PORT || 3003;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Link-Up service running on port ${PORT}`);
 });

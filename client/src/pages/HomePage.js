@@ -1,11 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import LeftMenu from "../components/LeftMenu";
 import FeedSection from "../components/FeedSection";
 import CreateLinkupForm from "../components/CreateLinkupForm";
 import EditLinkupForm from "../components/EditLinkupForm";
-import { fetchLinkups } from "../redux/actions/linkupActions";
+import {
+  setIsLoading,
+  fetchLinkupsSuccess,
+} from "../redux/actions/linkupActions";
+import { getActiveLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
 
 const drawerWidth = "20%";
 
@@ -17,62 +23,116 @@ const useStyles = makeStyles((theme) => ({
   feedSection: {
     flex: "2",
     overflowY: "auto",
+    overflowX: "hidden",
+
     maxWidth: `calc(100% - 2 * ${drawerWidth})`,
     marginLeft: "auto",
     marginRight: "auto",
     borderRight: "1px solid #e1e8ed",
   },
+  editingFeedSection: {
+    overflowY: "hidden",
+  },
 }));
 
-const HomePage = ({ linkupList, isLoading, fetchLinkups }) => {
+const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
+
+const HomePage = ({ linkupList, isLoading }) => {
   const classes = useStyles();
   const feedSectionRef = useRef(null);
-  const [startIndex, setStartIndex] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingLinkup, setEditingLinkup] = useState(null);
+  const editingLinkup = useSelector((state) => state.editingLinkup);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
+  const [socket, setSocket] = useState(null);
+  const dispatch = useDispatch();
+
+  const fetchLinkups = useCallback(async () => {
+    try {
+      const response = await getActiveLinkups();
+      if (response.success) {
+        dispatch(fetchLinkupsSuccess(response.linkupList));
+      } else {
+        console.log(response.message);
+      }
+    } catch (error) {
+      console.log("Error fetching linkups:", error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+  }, [dispatch]);
+
+  const removeExpiredLinkups = useCallback(async () => {
+    try {
+      // Perform the API call to mark link-ups as expired
+      const result = await markLinkupsAsExpired();
+
+      if (result.success) {
+        // dispatch(updateLinkupList(result.linkupList)); // Dispatch the updated linkupList to Redux store
+        return result; // Return the result if needed
+      } else {
+        console.log("Error marking link-ups as expired:", result.message);
+      }
+    } catch (error) {
+      console.log("Error marking link-ups as expired:", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (shouldFetchLinkups) {
+      removeExpiredLinkups();
       fetchLinkups();
       setShouldFetchLinkups(false);
     }
-  }, [fetchLinkups, shouldFetchLinkups]);
+  }, [dispatch, fetchLinkups, removeExpiredLinkups, shouldFetchLinkups]);
 
   useEffect(() => {
+    // Initialize socket connection
+    const socket = io(linkupSocketUrl);
+    setSocket(socket);
+
+    // Listener for 'linkupsExpired' event
+    const handleLinkupsExpired = () => {
+      alert("WE MADE IT!");
+    };
+
+    socket.on("linkupsExpired", handleLinkupsExpired);
+
+    return () => {
+      // Clean up by disconnecting the socket and removing the event listener
+      socket.off("linkupsExpired", handleLinkupsExpired);
+      socket.disconnect();
+    };
+  }, []);
+
+  // Define the callback function for scrolling to the top
+  const scrollToTop = () => {
     if (feedSectionRef.current) {
       feedSectionRef.current.scrollTop = 0;
     }
-  }, [linkupList]);
-
-  const handleLoadMore = () => {
-    setStartIndex((prevIndex) => prevIndex + 10);
-    setShouldFetchLinkups(true); // Trigger fetching when loading more
   };
 
   return (
     <div className={classes.homePage}>
       <LeftMenu />
-      <div className={classes.feedSection} ref={feedSectionRef}>
+      <div
+        className={`${classes.feedSection} ${
+          editingLinkup.isEditing ? classes.editingFeedSection : ""
+        }`}
+        ref={feedSectionRef}
+      >
         <FeedSection
-          linkupList={linkupList.slice(0, startIndex + 10)}
-          onLoadMore={handleLoadMore}
+          linkupList={linkupList}
           isLoading={isLoading}
           setShouldFetchLinkups={setShouldFetchLinkups}
-          setEditingLinkup={setEditingLinkup}
-          setIsEditing={setIsEditing}
-          isEditing={isEditing}
         />
       </div>
-      {isEditing ? (
-        <EditLinkupForm
-          linkup={editingLinkup}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          setIsEditing={setIsEditing}
-          isEditing={isEditing}
-        />
+      {editingLinkup.isEditing ? (
+        <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
       ) : (
-        <CreateLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
+        <CreateLinkupForm
+          socket={socket}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          scrollToTopCallback={scrollToTop}
+        />
       )}
     </div>
   );
@@ -83,8 +143,4 @@ const mapStateToProps = (state) => ({
   isLoading: state.linkups.isLoading,
 });
 
-const mapDispatchToProps = {
-  fetchLinkups,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(mapStateToProps)(HomePage);

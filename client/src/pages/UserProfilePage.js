@@ -99,7 +99,7 @@ const UserProfilePage = () => {
     const fetchData = async () => {
       try {
         // Fetch user data from API
-        const response = await getUserById(userID); // Assuming this function returns user data
+        const response = await getUserById(userID);
 
         if (response.success) {
           setUserData(response.user); // Store the fetched user data
@@ -141,21 +141,6 @@ const UserProfilePage = () => {
     };
     fetchData();
   }, [loggedUser.user.id, userID, userData?.bio]);
-
-  const convertToDataURL = (file) => {
-    if (file) {
-      if (file.type === "Buffer") {
-        const avatarData = new Uint8Array(file);
-        const binary = avatarData.reduce(
-          (str, byte) => str + String.fromCharCode(byte),
-          ""
-        );
-        return binary;
-      }
-    } else {
-      return "";
-    }
-  };
 
   const mockUserData = {
     profileImages: [
@@ -249,14 +234,16 @@ const UserProfilePage = () => {
               <div style={{ display: "flex", alignItems: "center" }}>
                 <AvatarUpdate
                   userId={userData?.id}
-                  currentAvatarUrl={convertToDataURL(userData?.avatar)}
+                  currentAvatarUrl={userData?.avatar}
                   isLoggedUserProfile={isLoggedUserProfile}
                 />
                 <div className={classes.leftMargin}>
                   <h2>
                     {userData?.name}, {calculateAge(userData?.date_of_birth)}
                   </h2>
-                  <p>{userLocation}</p>
+                  <span style={{ fontWeight: "normal" }}>
+                    <p>{userLocation}</p>
+                  </span>
                   {isBioEditMode ? (
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <textarea
@@ -269,8 +256,12 @@ const UserProfilePage = () => {
                       />
                     </div>
                   ) : (
-                    <p>Bio: {userData?.bio}</p>
-                    // If it's the logged-in user's profile, show updatedBio, otherwise show bio from the Redux store.
+                    <div>
+                      {" "}
+                      <span style={{ fontWeight: "normal" }}>
+                        Bio: {userData?.bio}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -278,13 +269,13 @@ const UserProfilePage = () => {
               {renderEditButton()}
             </div>
           )}
-          {/* {isLoading ? (
+          {isLoading ? (
             <LoadingSpinner />
           ) : (
             <div className={classes.centeredContent}>
               <Cards images={mockUserData.profileImages} />
             </div>
-          )} */}
+          )}
         </div>
         <div style={{ flex: 2 }} />
       </div>

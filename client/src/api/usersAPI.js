@@ -11,6 +11,20 @@ const handleError = (error, errorMessage) => {
   };
 };
 
+export const deleteUser = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/delete-user/${userId}`);
+    console.log("RESPONSE", response);
+
+    return {
+      success: response.data.success,
+      message: response.data.message,
+    };
+  } catch (error) {
+    return handleError(error, "Failed to delete user");
+  }
+};
+
 export const createUser = async (userData) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
@@ -44,8 +58,8 @@ export const updateUserBio = async (userId, bio) => {
       }
     );
     return {
-      success: true,
-      message: "User bio updated successfully",
+      success: response.data.success,
+      message: response.data.message,
       data: response.data,
     };
   } catch (error) {
@@ -62,11 +76,25 @@ export const updateUserAvatar = async (userId, avatar) => {
       }
     );
     return {
-      success: true,
-      message: "User avatar updated successfully",
+      success: response.data.success,
+      message: response.data.message,
       data: response.data,
     };
   } catch (error) {
     return handleError(error, "Failed to update user avatar");
+  }
+};
+
+export const setUserStatusActive = async (userId) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/api/set-user-status-active/${userId}`
+    );
+    return {
+      success: response.data.success,
+      message: response.data.message,
+    };
+  } catch (error) {
+    return handleError(error, "Failed to update user status to 'active'");
   }
 };

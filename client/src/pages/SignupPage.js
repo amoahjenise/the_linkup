@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
+import LogoHeader from "../components/LogoHeader";
 import PhoneVerification from "../components/PhoneVerification";
 import RegistrationProcess from "../components/RegistrationProcess";
-import LogoHeader from "../components/LogoHeader";
-import UserAuthentication from "../components/UserAuthentication"; // Import the UserAuthentication component
+import UserAuthentication from "../components/UserAuthentication";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -36,18 +36,13 @@ const SignupPage = () => {
   const [isNavigateToRegistration, setNavigateToRegistration] = useState(false);
   const [isNavigateToUserAuthentication, setNavigateToUserAuthentication] =
     useState(false);
-  const [password, setPassword] = useState("");
 
   const handleNavigateToRegistration = () => {
-    setTimeout(() => {
-      setNavigateToRegistration(true);
-    }, 0);
+    setNavigateToRegistration(true);
   };
 
   const handleNavigateToUserAuthentication = () => {
-    setTimeout(() => {
-      setNavigateToUserAuthentication(true);
-    }, 0);
+    setNavigateToUserAuthentication(true);
   };
 
   return (
@@ -58,15 +53,9 @@ const SignupPage = () => {
             <div className={classes.content}>
               <LogoHeader />
               {isNavigateToRegistration ? (
-                <RegistrationProcess
-                  password={password}
-                  setPassword={setPassword}
-                />
+                <RegistrationProcess />
               ) : isNavigateToUserAuthentication ? (
-                <UserAuthentication
-                  password={password}
-                  setPassword={setPassword}
-                />
+                <UserAuthentication />
               ) : (
                 <PhoneVerification
                   action="SIGNUP"

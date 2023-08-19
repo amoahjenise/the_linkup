@@ -1,9 +1,8 @@
-export const SET_EDITING_LINKUP = "SET_EDITING_LINKUP";
-export const CLEAR_EDITING_LINKUP = "CLEAR_EDITING_LINKUP";
+import { SET_EDITING_LINKUP, CLEAR_EDITING_LINKUP } from "./actionTypes";
 
-export const setEditingLinkup = (linkupId, isEditing) => ({
+export const setEditingLinkup = (linkup, isEditing) => ({
   type: SET_EDITING_LINKUP,
-  payload: { linkupId, isEditing },
+  payload: { linkup, isEditing },
 });
 
 export const clearEditingLinkup = () => ({

@@ -1,3 +1,4 @@
 SELECT *
 FROM users
-WHERE id = $1;
+WHERE id = $1
+AND status = 'active';

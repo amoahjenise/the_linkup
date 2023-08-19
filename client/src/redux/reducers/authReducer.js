@@ -1,28 +1,15 @@
+import {
+  LOGIN,
+  UPDATE_PHONE_NUMBER,
+  UPDATE_DEACTIVATED_USER,
+} from "../actions/actionTypes";
+
 // Define the initial state for authentication
 const initialState = {
   isAuthenticated: false,
   phoneNumber: "",
+  deactivatedUser: null, // Handles the scenario where a deleted user is trying to authenticate.
 };
-
-// Define the action types
-const LOGIN = "LOGIN";
-const LOGOUT = "LOGOUT";
-const UPDATE_PHONE_NUMBER = "UPDATE_PHONE_NUMBER";
-
-// Define the action creators
-
-export const login = () => ({
-  type: LOGIN,
-});
-
-export const logout = () => ({
-  type: LOGOUT,
-});
-
-export const updatePhoneNumber = (phoneNumber) => ({
-  type: UPDATE_PHONE_NUMBER,
-  payload: phoneNumber,
-});
 
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -31,12 +18,15 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isAuthenticated: true,
       };
-    case LOGOUT:
-      return initialState;
     case UPDATE_PHONE_NUMBER:
       return {
         ...state,
         phoneNumber: action.payload,
+      };
+    case UPDATE_DEACTIVATED_USER:
+      return {
+        ...state,
+        deactivatedUser: action.payload,
       };
     default:
       return state;

@@ -9,7 +9,7 @@ import {
 } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
-  linkUpPending: {
+  linkUpActive: {
     backgroundColor: "#fff",
     padding: theme.spacing(4),
     marginBottom: theme.spacing(1),
@@ -41,13 +41,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkUpPending = ({ post }) => {
+const LinkUpActive = ({ post }) => {
   const classes = useStyles();
 
   const { username, activity, type, location, date, status } = post;
 
   const renderStatusIcon = () => {
-    if (status === "Pending") {
+    if (status === "active") {
       return <QueryBuilderOutlined />;
     } else if (status === "Accepted") {
       return <CheckCircleOutlined />;
@@ -58,8 +58,8 @@ const LinkUpPending = ({ post }) => {
   };
 
   const getStatusLabel = () => {
-    if (status === "Pending") {
-      return "Pending";
+    if (status === "active") {
+      return "pending";
     } else if (status === "Accepted") {
       return "Linked Up";
     } else if (status === "Declined") {
@@ -69,7 +69,7 @@ const LinkUpPending = ({ post }) => {
   };
 
   const getStatusChipClass = () => {
-    if (status === "Pending") {
+    if (status === "active") {
       return classes.pendingChip;
     } else if (status === "Accepted") {
       return classes.acceptedChip;
@@ -80,7 +80,7 @@ const LinkUpPending = ({ post }) => {
   };
 
   const getLinkUpText = () => {
-    if (type === "trylink" && status === "Pending") {
+    if (type === "trylink" && status === "active") {
       return ` You are trying to link up for ${activity} at ${location} ${date}.`;
     } else if (type === "linkup" && status === "Accepted") {
       return `You linked up for ${activity} at ${location} with ${username}.`;
@@ -93,7 +93,7 @@ const LinkUpPending = ({ post }) => {
   };
 
   return (
-    <div className={classes.linkUpPending}>
+    <div className={classes.linkUpActive}>
       <div className={classes.postDetails}>
         <Avatar
           alt={username}
@@ -112,4 +112,4 @@ const LinkUpPending = ({ post }) => {
   );
 };
 
-export default LinkUpPending;
+export default LinkUpActive;

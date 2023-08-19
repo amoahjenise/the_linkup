@@ -34,12 +34,9 @@ const LoginPage = () => {
   const classes = useStyles();
   const [isNavigateToUserAuthentication, setNavigateToUserAuthentication] =
     useState(false);
-  const [password, setPassword] = useState("");
 
   const handleNavigateToUserAuthentication = () => {
-    setTimeout(() => {
-      setNavigateToUserAuthentication(true);
-    }, 0);
+    setNavigateToUserAuthentication(true);
   };
 
   return (
@@ -49,10 +46,7 @@ const LoginPage = () => {
           <div className={classes.content}>
             <LogoHeader />
             {isNavigateToUserAuthentication ? (
-              <UserAuthentication
-                password={password}
-                setPassword={setPassword}
-              />
+              <UserAuthentication />
             ) : (
               <PhoneVerification
                 action="LOGIN"

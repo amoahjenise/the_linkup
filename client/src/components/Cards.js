@@ -8,7 +8,6 @@ const useStyles = makeStyles((theme) => ({
     width: "400px",
     height: "400px",
     overflow: "hidden",
-    // borderRadius: "8px",
     boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
   },
   card: {
@@ -22,12 +21,12 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     overflow: "hidden",
     cursor: "pointer",
+    transition: "transform 0.3s ease-in-out",
   },
   cardImage: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    borderRadius: "8px",
   },
   imageStack: {
     position: "absolute",
@@ -36,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     gap: "4px",
+    zIndex: 3, // Bring image stack above cards
   },
   imageStackItem: {
     width: "32px",
@@ -44,9 +44,7 @@ const useStyles = makeStyles((theme) => ({
     border: "2px solid #fff",
     boxShadow: "0 0 4px rgba(0, 0, 0, 0.3)",
     overflow: "hidden",
-    "&:last-child": {
-      border: "none",
-    },
+    cursor: "pointer",
   },
 }));
 
@@ -77,6 +75,10 @@ const Cards = ({ images }) => {
     }
   };
 
+  const handleClickAvatar = (index) => {
+    setCurrentImageIndex(index);
+  };
+
   return (
     <div className={classes.cardsContainer}>
       {images.map((image, index) => (
@@ -85,10 +87,7 @@ const Cards = ({ images }) => {
           className={classes.card}
           onClick={handleClickImage}
           style={{
-            transform: `translateX(${
-              -100 * (index - currentImageIndex)
-            }%) rotate(${index - currentImageIndex}deg)`,
-            zIndex: index === currentImageIndex ? 2 : 1,
+            transform: `translateX(${(currentImageIndex - index) * 100}%)`,
           }}
         >
           <img src={image} alt="User" className={classes.cardImage} />
@@ -96,13 +95,20 @@ const Cards = ({ images }) => {
       ))}
       {images.length > 1 && (
         <div className={classes.imageStack}>
-          {images.slice(1).map((image, index) => (
+          {images.map((image, index) => (
             <Avatar
               key={index}
               src={image}
               alt="User Avatar"
               className={classes.imageStackItem}
-              style={{ zIndex: images.length - index - 1 }}
+              onClick={() => handleClickAvatar(index)}
+              style={{
+                zIndex: images.length - index,
+                border:
+                  index === currentImageIndex
+                    ? "2px solid #ff6b6b"
+                    : "2px solid #fff",
+              }}
             />
           ))}
         </div>

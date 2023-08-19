@@ -1,17 +1,23 @@
 import React from "react";
-import LinkUpPending from "../components/LinkUpPending";
+import LinkUpActive from "../components/LinkUpActive";
 import LeftMenu from "../components/LeftMenu";
 import { makeStyles } from "@material-ui/core/styles";
 import TopNavBar from "../components/TopNavBar";
+
+const drawerWidth = "20%";
 
 const useStyles = makeStyles((theme) => ({
   linkUpHistoryPage: {
     display: "flex",
     height: "100vh",
   },
-  historySection: {
-    flex: "1", // Update the flex value to take the remaining space
+  mainContainer: {
+    display: "flex",
+    flexDirection: "column",
     overflowY: "auto",
+    maxWidth: `calc(100% - 2.5 * ${drawerWidth})`,
+    width: "100%",
+    borderRight: "1px solid #e1e8ed",
   },
 }));
 
@@ -19,10 +25,10 @@ const LinkUpHistoryPage = () => {
   const classes = useStyles();
 
   const tabs = [
-    { id: 1, label: "Requests Sent" },
-    { id: 2, label: "My Pending Link Ups" },
-    { id: 3, label: "Link Ups" },
-    { id: 4, label: "Tab 4" },
+    { id: 1, label: "Active Link-Ups" },
+    { id: 2, label: "Requests Sent" },
+    // { id: 3, label: "Link Ups" },
+    // { id: 4, label: "Tab 4" },
   ];
 
   // Mock data for multiple link ups
@@ -34,37 +40,38 @@ const LinkUpHistoryPage = () => {
       location: "Jarry Park",
       date: "Today",
       type: "trylink",
-      status: "Pending",
+      status: "active",
     },
-    // {
-    //   id: 2,
-    //   username: "Amanda",
-    //   activity: "Yoga",
-    //   location: "Central Park",
-    //   date: "Tomorrow",
-    //   type: "linkup",
-    //   status: "Accepted",
-    // },
-    // {
-    //   id: 3,
-    //   username: "John",
-    //   activity: "Running",
-    //   location: "Beach",
-    //   date: "Next Week",
-    //   type: "trylink",
-    //   status: "Declined",
-    // },
+    {
+      id: 2,
+      username: "Amanda",
+      activity: "Yoga",
+      location: "Central Park",
+      date: "Tomorrow",
+      type: "linkup",
+      status: "Accepted",
+    },
+    {
+      id: 3,
+      username: "John",
+      activity: "Running",
+      location: "Beach",
+      date: "Next Week",
+      type: "trylink",
+      status: "Declined",
+    },
   ];
 
   return (
     <div className={classes.linkUpHistoryPage}>
       <LeftMenu />
-      <div className={classes.historySection}>
+      <div className={classes.mainContainer}>
         <TopNavBar title="Link Ups" tabs={tabs} />
         {linkUps.map((linkUp) => (
-          <LinkUpPending key={linkUp.id} post={linkUp} />
+          <LinkUpActive key={linkUp.id} post={linkUp} />
         ))}
       </div>
+      <div style={{ flex: 2 }} />
     </div>
   );
 };
