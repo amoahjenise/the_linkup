@@ -48,11 +48,9 @@ For any inquiries, contributions, or support requests, please refer to the docum
 
 ---
 
-Certainly! Here's a high-level documentation template that you can include in your GitHub README file:
 
 ---
 
-Certainly, here's a high-level documentation for your GitHub README file based on the details you provided:
 
 # Linkup App Documentation
 
