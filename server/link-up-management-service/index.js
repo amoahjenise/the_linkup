@@ -32,5 +32,5 @@ linkupSocket(io); // Initialize socket.io with the server instance
 
 const PORT = process.env.PORT || 3003;
 server.listen(PORT, () => {
-  console.log(`Link-Up service running on port ${PORT}`);
+  console.log(`Link-up service running on port ${PORT}`);
 });

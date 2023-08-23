@@ -184,11 +184,7 @@ const LinkupItem = React.memo(({ linkupItem, setShouldFetchLinkups }) => {
   };
 
   const getRedirectPath = () => {
-    if (type === "trylink") {
-      return `/send-request/${id}`;
-    } else {
-      return `/linkup-request/${id}`;
-    }
+    return `/send-request/${id}`;
   };
 
   const renderNotificationIcon = () => {
@@ -196,24 +192,6 @@ const LinkupItem = React.memo(({ linkupItem, setShouldFetchLinkups }) => {
       return <LinkRounded />;
     } else if (type === "trylink") {
       return <LinkTwoTone />;
-    }
-    return null;
-  };
-
-  const renderCheckInButton = () => {
-    if (notificationText) {
-      return (
-        <Button
-          variant="contained"
-          color="default"
-          size="small"
-          className={classes.checkInButton}
-          component={Link}
-          to={getRedirectPath()}
-        >
-          Check-In
-        </Button>
-      );
     }
     return null;
   };
@@ -260,6 +238,22 @@ const LinkupItem = React.memo(({ linkupItem, setShouldFetchLinkups }) => {
           {renderLinkupItemText()}
         </div>
         <div className={classes.linkupItemDetails}>
+          {/* Use the Link component to navigate to SendRequestPage */}
+          {loggedUser.user.id !== linkupItem.creator_id && (
+            <div className={classes.buttonsContainer}>
+              <Link to={getRedirectPath()}>
+                <Button
+                  variant="contained"
+                  color="default"
+                  size="small"
+                  className={classes.checkInButton}
+                >
+                  Request
+                </Button>
+              </Link>
+            </div>
+          )}
+
           <div className={classes.buttonsContainer}>
             {editingLinkup.isEditing &&
             editingLinkup.linkup.id === linkupItem.id ? (

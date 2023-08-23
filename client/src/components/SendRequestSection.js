@@ -3,10 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import SendRequest from "./SendRequest";
 import TopNavBar from "./TopNavBar";
 
-const posts = [
-  { id: "1", username: "Latifa", activity: "Movies", location: "Cinema Guzzo" },
-];
-
 const useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
@@ -23,14 +19,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SendRequestSection = ({ mockData }) => {
+const SendRequestSection = ({ linkupId, linkups }) => {
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
       <TopNavBar title="Request a Link Up" />
       <div className={classes.messagesContainer}>
-        <SendRequest posts={posts} />
+        <SendRequest linkups={linkups} linkupId={linkupId} />
       </div>
     </div>
   );

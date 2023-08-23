@@ -28,3 +28,6 @@ export const MARK_LINKUPS_AS_EXPIRED_SUCCESS =
 // Editing linkup actions types
 export const SET_EDITING_LINKUP = "SET_EDITING_LINKUP";
 export const CLEAR_EDITING_LINKUP = "CLEAR_EDITING_LINKUP";
+
+// Messages action types
+export const SET_MESSAGES_DATA = "SET_MESSAGES_DATA";

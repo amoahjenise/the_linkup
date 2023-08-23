@@ -4,31 +4,27 @@ import Notifications from "../components/Notifications";
 import TopNavBar from "../components/TopNavBar";
 import LeftMenu from "../components/LeftMenu";
 
+const drawerWidth = "20%";
+
 const useStyles = makeStyles((theme) => ({
   notificationsPage: {
     display: "flex",
     height: "100vh",
+    flexGrow: 1,
   },
   container: {
     display: "flex",
     flexDirection: "column",
-    // alignItems: "center",
     backgroundColor: theme.palette.background.default,
-    flexGrow: 1,
-    minHeight: 0,
-    width: "50%",
-  },
-  notificationContainer: {
-    display: "flex",
-
-    // flexDirection: "column",
-    // alignItems: "center",
-    backgroundColor: theme.palette.background.default,
-    // overflowY: "auto",
-    // width: "100%",
+    maxWidth: `calc(100% - 1.5 * ${drawerWidth})`,
+    width: "100%",
+    height: "100%",
+    borderRight: "1px solid #e1e8ed",
   },
   notificationSection: {
-    flex: "1", // Update the flex value to take the remaining space
+    flex: 20,
+    display: "flex",
+    flexDirection: "column",
     overflowY: "auto",
   },
 }));
@@ -42,11 +38,10 @@ const NotificationsPage = () => {
       <div className={classes.notificationSection}>
         <div className={classes.container}>
           <TopNavBar title="Notifications" />
-          <div className={classes.notificationContainer}>
-            <Notifications />
-          </div>
+          <Notifications />
         </div>
       </div>
+      <div style={{ flex: 1 }} />
     </div>
   );
 };

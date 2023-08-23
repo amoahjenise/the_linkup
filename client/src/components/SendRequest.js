@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
+import moment from "moment";
+import { sendRequest } from "../api/linkupRequestAPI";
+import { useSnackbar } from "../contexts/SnackbarContext";
+import io from "socket.io-client";
 
 const useStyles = makeStyles((theme) => ({
   sendRequest: {
@@ -34,41 +39,58 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const mockUserData = {
-  profileImages: [
-    "https://www.gstatic.com/webp/gallery/1.jpg",
-    "https://www.gstatic.com/webp/gallery/2.jpg",
-    "https://www.gstatic.com/webp/gallery/3.jpg",
-  ],
-};
-
-const SendRequest = ({ posts }) => {
-  const { postId } = useParams();
-
+const SendRequest = ({ linkupId, linkups }) => {
+  const { addSnackbar } = useSnackbar();
+  const loggedUser = useSelector((state) => state.loggedUser);
   // Find the post by postId
-  const post = posts.find((p) => p.id === postId);
+  const post = linkups.find((p) => p.id === linkupId);
+  const requesterId = loggedUser.user.id;
+  const requesterName = loggedUser.user.name;
 
   const classes = useStyles();
   const [message, setMessage] = useState("");
   const navigate = useNavigate(); // useNavigate hook for navigation
 
-  const handleSendMessage = () => {
+  const socket = io("http://localhost:3004"); // Initialize socket connection
+
+  useEffect(() => {
+    // Emit the user ID to store the socket connection
+    socket.emit("store-user-id", loggedUser.user.id);
+  }, [loggedUser.user.id, socket]);
+
+  const handleSendRequest = async () => {
     // Implement the logic to send the request with the message
-    console.log("Sending request:", message);
-    navigate("/messages"); // Redirect to the /messages path
+    const response = await sendRequest(
+      requesterId,
+      requesterName,
+      post.creator_id,
+      linkupId,
+      message
+    );
+
+    if (response.success) {
+      addSnackbar("Request sent!");
+      navigate("/messages"); // Redirect to the /messages path
+    } else {
+      addSnackbar("Request send failed. Please try again.");
+    }
   };
 
   const renderPostText = () => {
     // Replace with your logic to generate the post text
-    return `${post.username} is trying to link up today for ${post.activity} at ${post.location}.`;
+    const dateText = post.date
+      ? `${moment(post.date).format("MMM DD, YYYY")}`
+      : "";
+    const timeText = post.date ? `(${moment(post.date).format("h:mm A")})` : "";
+    return `${post.creator_name} is trying to link up for ${post.activity} at ${post.location} on ${dateText} ${timeText}.`;
   };
 
   return (
     <div className={classes.sendRequest}>
       <div className={classes.mainSection}>
         <Avatar
-          alt={post.username}
-          src={mockUserData.profileImages[0]}
+          alt={post.creator_name}
+          src={post.avatar}
           className={classes.avatar}
         />
         <div className={classes.linkUpInfo}>
@@ -88,7 +110,7 @@ const SendRequest = ({ posts }) => {
             variant="contained"
             color="primary"
             className={classes.sendButton}
-            onClick={handleSendMessage}
+            onClick={handleSendRequest}
           >
             Send Request
           </Button>

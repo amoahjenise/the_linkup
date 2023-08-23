@@ -17,7 +17,7 @@ import TopNavBar from "../components/TopNavBar";
 // Set your Google Maps API key (you need to get one from the Google Cloud Console)
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
-const drawerWidth = "20%";
+const drawerWidth = "25%";
 
 const useStyles = makeStyles((theme) => ({
   userProfilePage: {
@@ -29,12 +29,11 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     overflowY: "auto",
-    maxWidth: `calc(100% - 2.5 * ${drawerWidth})`,
+    maxWidth: `calc(100% - 2 * ${drawerWidth})`,
     width: "100%",
     borderRight: "1px solid #e1e8ed",
   },
   profileSection: {
-    flex: 1,
     display: "flex",
     flexDirection: "column",
   },
@@ -144,7 +143,7 @@ const UserProfilePage = () => {
 
   const mockUserData = {
     profileImages: [
-      "https://www.gstatic.com/webp/gallery/5.jpg",
+      "https://www.gstatic.com/webp/gallery/3.jpg",
       "https://www.gstatic.com/webp/gallery/1.jpg",
       "https://www.gstatic.com/webp/gallery/4.jpg",
     ],
@@ -277,7 +276,7 @@ const UserProfilePage = () => {
             </div>
           )}
         </div>
-        <div style={{ flex: 2 }} />
+        {/* <div style={{ flex: 2 }} /> */}
       </div>
     </div>
   );

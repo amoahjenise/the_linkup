@@ -78,7 +78,7 @@ const ChatComponent = ({ selectedMessage }) => {
                 <Grid
                   container
                   alignItems="flex-start"
-                  justify={
+                  justifyContent={
                     message.sender === "John" ? "flex-end" : "flex-start"
                   }
                 >

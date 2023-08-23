@@ -1,4 +1,7 @@
 import React from "react";
+import { useParams, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessagesData } from "../redux/actions/conversationActions";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   List,
@@ -20,6 +23,17 @@ const useStyles = makeStyles((theme) => ({
 
 const Messages = ({ messages, selectedMessage, onMessageClick }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
+  const messagesData = useSelector((state) => state.messagesData);
+  const { participants, initialMessage, notificationId, linkupId } =
+    messagesData;
+
+  // Initiate conversation on page load
+  React.useEffect(() => {
+    // Dispatch an action to initiate the conversation
+    dispatch(setMessagesData(participants, linkupId, initialMessage));
+  }, [dispatch, participants, linkupId, initialMessage]);
 
   const getElapsedTime = (timestamp) => {
     const currentTime = new Date();

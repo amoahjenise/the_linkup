@@ -1,0 +1,107 @@
+version: '3'
+services:
+  client:
+    build:
+      context: . 
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app/client
+    depends_on:
+      - auth-service
+      - user-management-service
+      - link-up-management-service
+      - link-up-request-service
+      - notification-service
+      - messaging-service
+    env_file:
+      - ./client/.env         
+
+  # Add a PostgreSQL service
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: process.env.POSTGRES_USER
+      POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD
+      POSTGRES_DB: process.env.POSTGRES_DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      
+  auth-service:
+    build:
+      context: ./server/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/auth-service:/app/server/auth-service
+    command: npm start
+    env_file:
+      - ./server/auth-service/.env
+
+  user-management-service:
+    build:
+      context: ./server/user-management-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./server/user-management-service:/app/server/user-management-service
+    command: npm start
+    env_file:
+      - ./server/user-management-service/.env 
+
+  link-up-management-service:
+    build:
+      context: ./server/link-up-management-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./server/link-up-management-service:/app/server/link-up-management-service
+    command: npm start
+    env_file:
+      - ./server/link-up-management-service/.env 
+
+  link-up-request-service:
+    build:
+      context: ./server/link-up-request-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./server/link-up-request-service:/app/server/link-up-request-service
+    command: npm start
+    env_file:
+      - ./server/link-up-request-service/.env 
+
+  notification-service:
+    build:
+      context: ./server/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./server/notification-service:/app/server/notification-service
+    command: npm start    
+    env_file:
+      - ./server/notification-service/.env 
+
+  messaging-service:
+    build:
+      context: ./server/messaging-service
+      dockerfile: Dockerfile
+    ports:
+      - "3006:3006"
+    volumes:
+      - ./server/messaging-service:/app/server/messaging-service
+    command: npm start
+    env_file:
+      - ./server/messaging-service/.env    
+
+volumes:
+  pg_data:
+    external: false      

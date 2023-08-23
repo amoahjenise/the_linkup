@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     flex: "2",
     overflowY: "auto",
     overflowX: "hidden",
-
+    backgroundColor: theme.palette.background.default,
     maxWidth: `calc(100% - 2 * ${drawerWidth})`,
     marginLeft: "auto",
     marginRight: "auto",

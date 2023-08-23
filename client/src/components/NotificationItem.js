@@ -20,14 +20,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const NotificationItem = ({ notification }) => {
+const NotificationItem = ({ notification, onClick }) => {
   const classes = useStyles();
-
-  const { sender, notificationText, createdAt } = notification;
 
   const getTimeAgo = () => {
     const now = moment();
-    const created = moment(createdAt);
+    const created = moment(notification.created_at);
     const duration = moment.duration(now.diff(created));
     const days = duration.days();
     const hours = duration.hours();
@@ -45,15 +43,15 @@ const NotificationItem = ({ notification }) => {
   };
 
   return (
-    <div className={classes.notificationItem}>
+    <div className={classes.notificationItem} onClick={onClick}>
       <Avatar
-        alt={sender.username}
-        src={sender.avatar}
+        alt={notification.requester_name}
+        src={notification.requester_avatar}
         className={classes.avatar}
       />
       <div className={classes.content}>
-        <Typography variant="subtitle1">{sender.username}</Typography>
-        <Typography variant="body2">{notificationText}</Typography>
+        <Typography variant="subtitle1">{notification.content}</Typography>
+        <Typography variant="body2">{notification.message}</Typography>
         <Typography variant="caption">{getTimeAgo()}</Typography>
       </div>
     </div>

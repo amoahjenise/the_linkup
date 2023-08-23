@@ -44,7 +44,7 @@ const App = () => {
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/profile/:id" element={<UserProfilePage />} />
               <Route
-                path="/send-request/:postId"
+                path="/send-request/:linkupId"
                 element={<SendRequestPage />}
               />
               <Route path="/history" element={<LinkUpHistoryPage />} />
