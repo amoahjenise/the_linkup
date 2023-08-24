@@ -145,3 +145,131 @@ The backend (server/) services handle authentication, user management, linkup ma
 This documentation provides a high-level overview of the Linkup app's features and functionalities. For detailed implementation and code examples, please refer to the app's source code.
 
 ---
+
+---
+
+## Database Tables Documentation
+
+### Table: users
+Stores user information including profile details, authentication, and preferences.
+
+Columns:
+- `id`: Unique identifier for each user.
+- `phone_number`: User's phone number.
+- `name`: User's name.
+- `gender`: User's gender.
+- `date_of_birth`: User's date of birth.
+- `password`: User's password.
+- `link_up_score`: User's linkup score.
+- `created_at`: Timestamp of user creation.
+- `updated_at`: Timestamp of last user update.
+- `bio`: User's biography.
+- `status`: User's status.
+- `avatar`: User's avatar image URL.
+
+### Table: link_ups
+Stores details about created linkups, their creators, and associated information.
+
+Columns:
+- `id`: Unique identifier for each linkup.
+- `creator_id`: ID of the user who created the linkup.
+- `location`: Location of the linkup.
+- `activity`: Activity of the linkup.
+- `date`: Date and time of the linkup.
+- `gender_preference`: Gender preference for the linkup.
+- `created_at`: Timestamp of linkup creation.
+- `updated_at`: Timestamp of last linkup update.
+- `status`: Linkup status.
+- `creator_name`: Name of the linkup creator.
+
+### Table: link_up_requests
+Manages requests related to linkups, including status and messages.
+
+Columns:
+- `id`: Unique identifier for each linkup request.
+- `linkup_id`: ID of the related linkup.
+- `receiver_id`: ID of the user receiving the request.
+- `status`: Request status.
+- `created_at`: Timestamp of request creation.
+- `updated_at`: Timestamp of last request update.
+- `message`: Request message.
+- `requester_id`: ID of the user making the request.
+
+### Table: images
+Stores user images, including avatars.
+
+Columns:
+- `id`: Unique identifier for each image.
+- `user_id`: ID of the user associated with the image.
+- `image_url`: URL of the image.
+- `is_avatar`: Indicates if the image is an avatar.
+- `created_at`: Timestamp of image creation.
+- `updated_at`: Timestamp of last image update.
+
+### Table: conversations
+Stores information about conversations, such as participants, unread counts, and status.
+
+Columns:
+- `conversation_id`: Unique identifier for each conversation.
+- `participants`: Array of participant IDs.
+- `created_at`: Timestamp of conversation creation.
+- `updated_at`: Timestamp of last conversation update.
+- `last_message`: Content of the last message.
+- `unread_count`: Count of unread messages.
+- `archived`: Indicates if the conversation is archived.
+- `muted`: Indicates if the conversation is muted.
+- `pinned`: Indicates if the conversation is pinned.
+- `notifications_enabled`: Indicates if notifications are enabled for the conversation.
+
+### Table: messages
+Stores individual messages within conversations.
+
+Columns:
+- `message_id`: Unique identifier for each message.
+- `conversation_id`: ID of the conversation the message belongs to.
+- `sender_id`: ID of the message sender.
+- `content`: Content of the message.
+- `timestamp`: Timestamp of message creation.
+- `is_read`: Indicates if the message is read.
+- `is_system_message`: Indicates if the message is a system message.
+- `attachments`: JSON array of message attachments.
+
+### Table: notifications
+Manages notifications for users.
+
+Columns:
+- `id`: Unique identifier for each notification.
+- `user_id`: ID of the user associated with the notification.
+- `type`: Type of the notification.
+- `content`: Notification content.
+- `is_read`: Indicates if the notification is read.
+- `created_at`: Timestamp of notification creation.
+- `updated_at`: Timestamp of last notification update.
+- `requester_id`: ID of the request sender (if applicable).
+- `link_up_id`: ID of the related linkup (if applicable).
+
+### Table: participants
+Manages participants in conversations, including their status and join time.
+
+Columns:
+- `participant_id`: Unique identifier for each participant.
+- `user_id`: ID of the participant user.
+- `conversation_id`: ID of the related conversation.
+- `last_read_message_id`: ID of the last read message.
+- `is_muted`: Indicates if the participant is muted.
+- `is_blocked`: Indicates if the participant is blocked.
+- `joined_at`: Timestamp of participant join time.
+
+### Table: ratings
+Stores ratings provided by users for linkups.
+
+Columns:
+- `id`: Unique identifier for each rating.
+- `link_up_id`: ID of the rated linkup.
+- `user_id`: ID of the user providing the rating.
+- `rating`: Rating value.
+- `reason`: Rating reason.
+- `created_at`: Timestamp of rating creation.
+- `updated_at`: Timestamp of last rating update.
+
+---
