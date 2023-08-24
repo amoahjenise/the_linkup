@@ -77,9 +77,10 @@ const getUserByPhoneNumber = async (req, res) => {
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [phoneNumber];
 
-  console.log(phoneNumber);
   try {
     const { rows } = await pool.query(query, queryValues);
+
+    console.log(rows);
 
     if (rows.length > 0) {
       const user = rows[0];
