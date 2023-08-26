@@ -143,7 +143,6 @@ const updateUserAvatar = async (req, res) => {
 
 const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
-  const { avatar } = req.body;
 
   try {
     // Use the SQL query from the previous response to update the user profile properties
@@ -157,7 +156,6 @@ const setUserStatusActive = async (req, res) => {
     const result = await pool.query(query, values);
 
     if (result.rows.length > 0) {
-      console.log("USER IN SET STATUS ACTIVE", user);
       const data = rows[0];
       res.json({
         success: true,

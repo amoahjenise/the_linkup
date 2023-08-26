@@ -31,3 +31,12 @@ export const CLEAR_EDITING_LINKUP = "CLEAR_EDITING_LINKUP";
 
 // Messages action types
 export const SET_MESSAGES_DATA = "SET_MESSAGES_DATA";
+
+// Notifications action types
+export const FETCH_UNREAD_NOTIFICATIONS_COUNT =
+  "FETCH_UNREAD_NOTIFICATIONS_COUNT";
+export const UPDATE_UNREAD_NOTIFICATIONS_COUNT =
+  "UPDATE_UNREAD_NOTIFICATIONS_COUNT";
+
+// User Sent Requests types
+export const ADD_SENT_REQUEST = "ADD_SENT_REQUEST";

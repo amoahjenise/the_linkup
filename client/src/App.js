@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import io from "socket.io-client";
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,17 +20,57 @@ import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
 import SettingsPage from "./pages/SettingsPage";
+import NotificationsTestPage from "./__tests__/componentTests/NotificationTestPage";
+import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
+import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { useSelector } from "react-redux";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import "./App.css";
 
 const App = () => {
+  const dispatch = useDispatch();
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const unreadNotificationsCount = useSelector(
+    (state) => state.notifications.unreadCount
+  );
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
-
   const PrivateRoutes = ({ path, element }) => {
     return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
   };
+
+  useEffect(() => {
+    // Fetch unread notifications count and update Redux state
+    getUnreadNotificationsCount(loggedUser.user.id)
+      .then((data) => {
+        dispatch(updateUnreadNotificationsCount(Number(data.unreadCount)));
+      })
+      .catch((error) => {
+        console.error("Error fetching unread notifications count:", error);
+      });
+  }, [dispatch, loggedUser.user.id]);
+
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_NOTIFICATIONS_SERVICE_URL);
+
+    socket.on("connect", () => {
+      console.log("Client Connected to notification WebSocket server");
+
+      // Emit the user's ID to store the socket connection
+      socket.emit("store-user-id", loggedUser.user?.id);
+    });
+
+    socket.on("notification", (notification) => {
+      console.log("Received notification", notification);
+      // Handle the incoming notification and update UI
+      dispatch(updateUnreadNotificationsCount(unreadNotificationsCount + 1));
+      alert(`Received notification: ${notification.content}`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch, loggedUser.user?.id, unreadNotificationsCount]);
 
   return (
     <SnackbarProvider>
@@ -59,6 +101,11 @@ const App = () => {
               />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
+
+            <Route
+              path="/test-notifications"
+              element={<NotificationsTestPage />}
+            />
           </Routes>
         </Router>
       </div>

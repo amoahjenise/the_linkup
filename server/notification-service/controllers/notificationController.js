@@ -2,15 +2,37 @@ const { pool } = require("../db");
 const fs = require("fs");
 const path = require("path");
 
-const getUnreadNotifications = async (req, res) => {
-  const { requesterId } = req.query; // Use req.query to access query parameters
-  const queryPath = path.join(__dirname, "../db/queries/getNotifications.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const values = [requesterId];
+const getUnreadNotificationsCount = async (req, res) => {
+  const { userId } = req.query; // Assuming you pass the user's ID as a query parameter
 
-  console.log("MADE IT THIS FAR", requesterId);
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/getUnreadNotificationsCount.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const values = [userId];
+
   try {
     const { rows } = await pool.query(query, values);
+    res.json({ unreadCount: rows[0].unread_count }); // Send the unread count as response
+  } catch (error) {
+    console.error("Error fetching unread notifications count:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch unread notifications count" });
+  }
+};
+
+const getNotifications = async (req, res) => {
+  const { userId } = req.query; // Use req.query to access query parameters
+  const queryPath = path.join(__dirname, "../db/queries/getNotifications.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const values = [userId];
+
+  try {
+    const { rows } = await pool.query(query, values);
+    console.log("ROWS", JSON.stringify(rows[5]));
+
     res.json(rows); // Send the response back to the client
   } catch (error) {
     console.error("Error fetching unread notifications:", error);
@@ -18,14 +40,18 @@ const getUnreadNotifications = async (req, res) => {
   }
 };
 
-const createNotification = async (userId, type, content) => {
-  const query = `
-    INSERT INTO notifications (user_id, type, content, is_read, created_at, updated_at)
-    VALUES ($1, $2, $3, false, NOW(), NOW())
-    RETURNING id;
-  `;
+const createNotification = async (req, res) => {
+  const { creatorId, requesterId, type, content, linkupId } = data;
 
-  const values = [userId, type, content];
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/createNotification.sql"
+  );
+
+  const query = fs.readFileSync(queryPath, "utf8");
+
+  console.log("TYPE:", type);
+  const values = [creatorId, requesterId, type, content, linkupId];
 
   try {
     const { rows } = await pool.query(query, values);
@@ -36,7 +62,9 @@ const createNotification = async (userId, type, content) => {
   }
 };
 
-const markNotificationAsRead = async (notificationId) => {
+const markNotificationAsRead = async (req, res) => {
+  const { notificationId } = req.query;
+
   const query = `
     UPDATE notifications
     SET is_read = true
@@ -44,9 +72,10 @@ const markNotificationAsRead = async (notificationId) => {
   `;
 
   const values = [notificationId];
-
+  console.log("Values", values);
   try {
-    await pool.query(query, values);
+    const { rows } = await pool.query(query, values);
+    return rows[0];
   } catch (error) {
     console.error("Error marking notification as read:", error);
     throw error;
@@ -54,7 +83,8 @@ const markNotificationAsRead = async (notificationId) => {
 };
 
 module.exports = {
+  getUnreadNotificationsCount,
   createNotification,
-  getUnreadNotifications,
+  getNotifications,
   markNotificationAsRead,
 };

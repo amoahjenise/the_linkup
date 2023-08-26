@@ -9,8 +9,16 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    borderTop: "1px solid #e1e8ed",
+    borderBottom: "1px solid #e1e8ed",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease-in-out", // Added transition for smooth effect
+    "&:hover": {
+      backgroundColor: "#F5F8FA", // Change the background color on hover
+    },
+  },
+  unread: {
+    backgroundColor: "#F5F8FA",
   },
   avatar: {
     marginRight: theme.spacing(2),
@@ -43,7 +51,12 @@ const NotificationItem = ({ notification, onClick }) => {
   };
 
   return (
-    <div className={classes.notificationItem} onClick={onClick}>
+    <div
+      className={`${classes.notificationItem} ${
+        notification.is_read ? "" : classes.unread
+      }`}
+      onClick={onClick}
+    >
       <Avatar
         alt={notification.requester_name}
         src={notification.requester_avatar}
@@ -51,7 +64,7 @@ const NotificationItem = ({ notification, onClick }) => {
       />
       <div className={classes.content}>
         <Typography variant="subtitle1">{notification.content}</Typography>
-        <Typography variant="body2">{notification.message}</Typography>
+        {/* <Typography variant="body2">{notification.message}</Typography> */}
         <Typography variant="caption">{getTimeAgo()}</Typography>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import LinkupItem from "./LinkupItem";
@@ -30,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
   const classes = useStyles();
+  const userSentRequests = useSelector((state) => state.userSentRequests);
 
   return (
     <div className={classes.mainContainer}>
@@ -56,6 +58,7 @@ const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
                   key={linkup.id}
                   linkupItem={linkup}
                   setShouldFetchLinkups={setShouldFetchLinkups}
+                  disableRequest={userSentRequests.includes(linkup.id)}
                 />
               ))
             )}

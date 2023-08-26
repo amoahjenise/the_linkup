@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import NotificationItem from "./NotificationItem";
 import { setMessagesData } from "../redux/actions/conversationActions";
+import { updateUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   markNotificationAsRead,
-  getUnreadNotifications,
+  getNotifications,
 } from "../api/notificationAPI";
 import { useNavigate } from "react-router-dom";
 
@@ -27,13 +28,16 @@ const Notifications = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const unreadNotificationsCount = useSelector(
+    (state) => state.notifications.unreadCount
+  );
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id } = loggedUser?.user || {};
   const [notifications, setNotifications] = useState([]);
 
   const fetchUnreadNotifications = useCallback(async () => {
     try {
-      const response = await getUnreadNotifications(id);
+      const response = await getNotifications(id);
       setNotifications(response);
     } catch (error) {
       console.log("Error fetching unread notifications:", error);
@@ -45,17 +49,25 @@ const Notifications = () => {
   }, [fetchUnreadNotifications]);
 
   const handleNotificationClick = async (notification) => {
-    if (notification.type === "link_up_request") {
+    if (notification.notification_type === "linkup_request") {
       try {
-        dispatch(
-          setMessagesData(
-            [notification.user_id, notification.requester_id],
-            notification.message,
-            notification.id,
-            notification.link_up_id
-          )
-        );
-        navigate(`/messages/${notification.link_up_id}`);
+        // dispatch(
+        //   setMessagesData(
+        //     [notification.user_id, notification.requester_id],
+        //     notification.message,
+        //     notification.id,
+        //     notification.link_up_id
+        //   )
+        // );
+        // navigate(`/messages/${notification.link_up_id}`);
+
+        if (notification.is_read === false) {
+          markNotificationAsRead(notification.id);
+          dispatch(
+            updateUnreadNotificationsCount(unreadNotificationsCount - 1)
+          );
+        }
+        navigate("/messages");
       } catch (error) {
         console.log("Error marking notification as read:", error);
       }

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -7,8 +8,8 @@ import { useNavigate } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import moment from "moment";
 import { sendRequest } from "../api/linkupRequestAPI";
+import { addSentRequest } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import io from "socket.io-client";
 
 const useStyles = makeStyles((theme) => ({
   sendRequest: {
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SendRequest = ({ linkupId, linkups }) => {
+  const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
   // Find the post by postId
@@ -50,13 +52,6 @@ const SendRequest = ({ linkupId, linkups }) => {
   const classes = useStyles();
   const [message, setMessage] = useState("");
   const navigate = useNavigate(); // useNavigate hook for navigation
-
-  const socket = io("http://localhost:3004"); // Initialize socket connection
-
-  useEffect(() => {
-    // Emit the user ID to store the socket connection
-    socket.emit("store-user-id", loggedUser.user.id);
-  }, [loggedUser.user.id, socket]);
 
   const handleSendRequest = async () => {
     // Implement the logic to send the request with the message
@@ -69,8 +64,9 @@ const SendRequest = ({ linkupId, linkups }) => {
     );
 
     if (response.success) {
+      dispatch(addSentRequest(linkupId));
       addSnackbar("Request sent!");
-      navigate("/messages"); // Redirect to the /messages path
+      navigate("/home");
     } else {
       addSnackbar("Request send failed. Please try again.");
     }

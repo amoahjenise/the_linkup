@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import logo from "../logo.png";
+import Badge from "@material-ui/core/Badge";
 import HomeIcon from "@material-ui/icons/Home";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
@@ -53,11 +55,25 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: "100px",
     },
   },
+  badge: {
+    marginLeft: theme.spacing(2),
+  },
 }));
 
 const LeftMenu = () => {
   const classes = useStyles();
   const [activeSection, setActiveSection] = useState("account");
+  const unreadNotificationsCount = useSelector(
+    (state) => state.notifications.unreadCount
+  );
+
+  useEffect(() => {
+    // This effect will run whenever the unreadNotificationsCount prop changes
+    console.log(
+      "Unread notifications count changed:",
+      unreadNotificationsCount
+    );
+  }, [unreadNotificationsCount]);
 
   const handleMenuItemClick = (section) => {
     setActiveSection(section); // Set the active section when a menu item is clicked
@@ -78,6 +94,12 @@ const LeftMenu = () => {
           <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
             <Link to="/notifications" className={classes.menuItemLink}>
               <NotificationsIcon /> Notifications
+              {/* Display the Badge component with the unreadNotificationsCount */}
+              <Badge
+                className={classes.badge}
+                badgeContent={parseInt(unreadNotificationsCount)}
+                color="secondary"
+              ></Badge>
             </Link>
           </li>
           <li className={`${classes.menuItem} ${classes.menuItemHover}`}>

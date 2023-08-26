@@ -5,6 +5,8 @@ import userReducer from "./userReducer";
 import editingLinkupReducer from "./editingLinkupReducer";
 import linkupReducer from "./linkupReducer";
 import conversationReducer from "./conversationReducer";
+import notificationReducer from "./notificationReducer";
+import userSentRequestsReducer from "./userSentRequestsReducer";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -13,6 +15,8 @@ const appReducer = combineReducers({
   linkups: linkupReducer,
   editingLinkup: editingLinkupReducer,
   messagesData: conversationReducer,
+  notifications: notificationReducer,
+  userSentRequests: userSentRequestsReducer,
 });
 
 const rootReducer = (state, action) => {

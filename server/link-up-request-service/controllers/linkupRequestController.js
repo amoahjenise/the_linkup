@@ -1,73 +1,69 @@
 require("dotenv").config();
+
 const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
-const { getSocketByUserId } = require("../socket/linkupRequestSocket");
+const io = require("socket.io-client");
+const NOTIFICATION_SERVICE_URL = "http://localhost:3005";
 
-// Now you can use the linkupRequestSocket function
+const socket = io(NOTIFICATION_SERVICE_URL); // Initialize socket connection to notification service
 
-let socketIo;
+const {
+  createNotification,
+} = require("../../notification-service/controllers/notificationController");
 
-// Function to initialize the Socket.IO instance
-const initializeSocket = (io) => {
-  socketIo = io;
-};
+// initSocketServer();
 
 const sendRequest = async (req, res) => {
-  const { requesterId, requesterName, creator_id, linkupId, message } =
+  const { requesterId, requesterName, creator_id, linkupId, content } =
     req.body;
   const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [requesterId, creator_id, linkupId, message];
+  const queryValues = [requesterId, creator_id, linkupId, content];
+
+  console.log(requesterId, creator_id, linkupId, content);
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    // Post Linkup Request
+    var { rows } = await pool.query(query, queryValues);
 
-    // Store a notification for the creator
+    if (rows.length > 0) {
+      // Post Notification
+      const notificationData = {
+        creatorId: creator_id,
+        requesterName,
+        requesterName,
+        requesterId: requesterId,
+        type: "linkup_request",
+        linkupId: linkupId,
+        content: `New linkup request from ${requesterName}`,
+      };
 
-    const notificationQueryPath = path.join(
-      __dirname,
-      "../../notification-service/db/queries/createNotification.sql"
-    );
-    const notificationsQuery = fs.readFileSync(notificationQueryPath, "utf8");
+      var notificationID = await createNotification(notificationData);
 
-    //   const notificationsQuery = `
-    //   INSERT INTO notifications (user_id, requester_id, type, content, link_up_id, is_read, created_at, updated_at)
-    //   VALUES ($1, $2, $3, $4, $5, false, NOW(), NOW())
-    //   RETURNING id;
-    // `;
+      if (notificationID) {
+        try {
+          // Emit the user ID to store the socket connection
+          socket.emit("store-user-id", requesterId);
 
-    const notificationsValues = [
-      creator_id,
-      requesterId,
-      "link_up_request",
-      `New link-up request from ${requesterName}`,
-      linkupId,
-    ];
+          // Emit the new linkup request event
+          socket.emit("new-linkup-request", notificationData);
 
-    const { NotificationRows } = await pool.query(
-      notificationsQuery,
-      notificationsValues
-    );
-
-    // Emit a real-time event to notify the creator
-    const creatorSocket = getSocketByUserId(creator_id);
-    if (creatorSocket) {
-      creatorSocket.emit("request-sent", {
-        requestId: rows[0].id,
-        linkupId,
-        requesterId,
-        message,
-      });
+          res.json({
+            success: true,
+            message: "Request sent successfully",
+            linkupRequest: rows[0],
+          });
+        } catch (error) {
+          res.status(500).json({
+            success: false,
+            message: "Failed to emit notification event",
+            error: error.message,
+          });
+        }
+      }
     }
-
-    res.json({
-      success: true,
-      message: "Request sent successfully",
-      linkupRequest: rows[0],
-    });
   } catch (error) {
-    console.error("Request error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to request link-up",
@@ -131,7 +127,7 @@ const declineRequest = async (req, res) => {
 };
 
 module.exports = {
-  initializeSocket,
+  // initializeSocket,
   sendRequest,
   acceptRequest,
   declineRequest,

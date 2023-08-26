@@ -15,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
   container: {
     display: "flex",
     flexDirection: "column",
-    backgroundColor: theme.palette.background.default,
     maxWidth: `calc(100% - 1.5 * ${drawerWidth})`,
     width: "100%",
     height: "100%",
