@@ -200,7 +200,7 @@ const UserProfilePage = () => {
           // After successful update, update userData with the new bio
           setUserData((prevUserData) => ({
             ...prevUserData,
-            bio: response.bio,
+            bio: response.data.bio,
           }));
           // After successful update, exit edit mode
 

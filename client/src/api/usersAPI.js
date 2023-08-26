@@ -57,11 +57,8 @@ export const updateUserBio = async (userId, bio) => {
         bio,
       }
     );
-    return {
-      success: response.data.success,
-      message: response.data.message,
-      data: response.data,
-    };
+    console.log(JSON.stringify(response));
+    return response.data;
   } catch (error) {
     return handleError(error, "Failed to update user bio");
   }
