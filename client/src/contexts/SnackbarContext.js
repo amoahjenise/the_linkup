@@ -36,27 +36,31 @@ export function SnackbarProvider({ children }) {
           position: "fixed",
           bottom: "20px",
           left: "50%",
-          transform: "translateX(-50%)", // Center horizontally
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column-reverse", // Display new snackbars at the top
+          alignItems: "center",
         }}
       >
         {snackbars.map((snackbar) => (
           <div
             key={snackbar.id}
             style={{
-              backgroundColor: "#f5f6f7", // Light gray background
+              backgroundColor: "#323232", // Dark gray background
+              color: "#FFFFFF", // White text color
               textAlign: "center",
               fontSize: "14px",
-              borderRadius: "8px",
+              borderRadius: "4px",
               padding: "8px 16px",
               minWidth: "200px",
               margin: "8px",
-              boxShadow: "0px 0px 8px rgba(0, 0, 0, 0.2)", // Light shadow
+              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)", // Light shadow
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center", // Center text vertically
             }}
           >
-            <div>{snackbar.message}</div>
+            <div style={{ marginBottom: "4px" }}>{snackbar.message}</div>
             {snackbar.onRetry && (
               <button
                 style={{
