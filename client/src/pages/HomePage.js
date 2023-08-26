@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: `calc(100% - 2 * ${drawerWidth})`,
     marginLeft: "auto",
     marginRight: "auto",
-    borderRight: "1px solid #e1e8ed",
   },
   editingFeedSection: {
     overflowY: "hidden",
