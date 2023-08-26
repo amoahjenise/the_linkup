@@ -63,7 +63,7 @@ const createNotification = async (req, res) => {
 };
 
 const markNotificationAsRead = async (req, res) => {
-  const { notificationId } = req.query;
+  const { notificationId } = req.params;
 
   const query = `
     UPDATE notifications
