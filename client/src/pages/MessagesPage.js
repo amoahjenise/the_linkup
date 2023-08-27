@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MessagesPage = () => {
+const MessagesPage = ({ isMobile }) => {
   const classes = useStyles();
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -55,16 +55,28 @@ const MessagesPage = () => {
 
   return (
     <div className={classes.messagesPage}>
-      <div className={classes.messageSection}>
-        <MessagesSection
-          messages={messages}
-          selectedMessage={selectedMessage}
-          onMessageClick={handleOpenChat}
-        />
-      </div>
-      <div className={classes.chatSection}>
-        <ChatComponent selectedMessage={selectedMessage} />
-      </div>
+      {isMobile ? (
+        <div className={classes.messageSection}>
+          <MessagesSection
+            messages={messages}
+            selectedMessage={selectedMessage}
+            onMessageClick={handleOpenChat}
+          />
+        </div>
+      ) : (
+        <div>
+          <div className={classes.messageSection}>
+            <MessagesSection
+              messages={messages}
+              selectedMessage={selectedMessage}
+              onMessageClick={handleOpenChat}
+            />
+          </div>
+          <div className={classes.chatSection}>
+            <ChatComponent selectedMessage={selectedMessage} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

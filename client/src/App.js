@@ -26,7 +26,8 @@ import { updateUnreadNotificationsCount } from "./redux/actions/notificationActi
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { useSelector } from "react-redux";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import "./App.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,8 @@ const App = () => {
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
   const [activeSection, setActiveSection] = useState("home"); // Manage active section here
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const PrivateRoutes = ({ path, element }) => {
     return isAuthenticated ? (
@@ -95,43 +98,54 @@ const App = () => {
   }, [dispatch, loggedUser.user?.id, unreadNotificationsCount]);
 
   return (
-    <SnackbarProvider>
-      <div className="app">
-        <Router>
-          <Routes>
-            <Route path="/" exact element={<LandingPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            {/* Protected routes */}
-            <Route element={<PrivateRoutes />}>
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/profile/:id" element={<UserProfilePage />} />
-              <Route
-                path="/send-request/:linkupId"
-                element={<SendRequestPage />}
-              />
-              <Route path="/history" element={<LinkUpHistoryPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route
-                path="/messages/:messageid/chat"
-                element={<SelectedMessagePage />}
-              />
-              <Route
-                path="/linkup-request/:id"
-                element={<AcceptDeclinePage />}
-              />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Route>
+    <ThemeProvider theme={theme}>
+      <SnackbarProvider>
+        <div className="app">
+          <Router>
+            <Routes>
+              <Route path="/" exact element={<LandingPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              {/* Protected routes */}
+              <Route element={<PrivateRoutes />}>
+                <Route
+                  path="/home"
+                  element={<HomePage isMobile={isMobile} />}
+                />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/profile/:id" element={<UserProfilePage />} />
+                <Route
+                  path="/send-request/:linkupId"
+                  element={<SendRequestPage />}
+                />
+                <Route
+                  path="/history"
+                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/messages"
+                  element={<MessagesPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/messages/:messageid/chat"
+                  element={<SelectedMessagePage />}
+                />
+                <Route
+                  path="/linkup-request/:id"
+                  element={<AcceptDeclinePage />}
+                />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Route>
 
-            <Route
-              path="/test-notifications"
-              element={<NotificationsTestPage />}
-            />
-          </Routes>
-        </Router>
-      </div>
-    </SnackbarProvider>
+              <Route
+                path="/test-notifications"
+                element={<NotificationsTestPage />}
+              />
+            </Routes>
+          </Router>
+        </div>
+      </SnackbarProvider>
+    </ThemeProvider>
   );
 };
 

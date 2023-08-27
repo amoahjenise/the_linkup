@@ -60,6 +60,9 @@ const useStyles = makeStyles((theme) => ({
   },
   badge: {
     marginLeft: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: theme.spacing(0),
+    },
   },
 
   mobileMenuContainer: {
@@ -152,6 +155,7 @@ const LeftMenu = ({ activeSection, setActiveSection }) => {
             className={`${classes.mobileMenuItem} ${
               classes.mobileMenuItemHover
             } ${activeSection === "messages" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("messages")}
           >
             <MessageIcon />
           </Link>

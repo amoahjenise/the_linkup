@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
 import LinkupRequestItem from "../components/LinkupRequestItem";
-import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import TopNavBar from "../components/TopNavBar";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../redux/actions/linkupActions";
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkUpHistoryPage = () => {
+const LinkUpHistoryPage = ({ isMobile }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [linkupList, setLinkupList] = useState([]);
@@ -38,9 +38,6 @@ const LinkUpHistoryPage = () => {
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
   const userID = loggedUser.user.id;
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const tabs = [
     { id: 0, label: isMobile ? "Active" : "Active Link-Ups" },
@@ -84,56 +81,54 @@ const LinkUpHistoryPage = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.linkUpHistoryPage}>
-        <TopNavBar title="Link Ups" />
-        <Tabs
-          className={classes.tabBar}
-          value={activeTab}
-          onChange={handleTabChange}
-          variant={isMobile ? "scrollable" : "standard"} // Use scrollable variant for mobile
-          indicatorColor="primary"
-          textColor="primary"
-          style={{ width: isMobile ? "100%" : "auto" }} // Adjust width based on mobile mode
-        >
-          {tabs.map((tab) => (
-            <Tab
-              key={tab.id}
-              label={tab.label}
-              style={{ width: isMobile ? "33%" : "100%" }}
-            />
-          ))}
-        </Tabs>
-        {/* Render content based on activeTab */}
-        {activeTab === 0 && (
+    <div className={classes.linkUpHistoryPage}>
+      <TopNavBar title="Link Ups" />
+      <Tabs
+        className={classes.tabBar}
+        value={activeTab}
+        onChange={handleTabChange}
+        variant={isMobile ? "scrollable" : "standard"} // Use scrollable variant for mobile
+        indicatorColor="primary"
+        textColor="primary"
+        style={{ width: isMobile ? "100%" : "auto" }} // Adjust width based on mobile mode
+      >
+        {tabs.map((tab) => (
+          <Tab
+            key={tab.id}
+            label={tab.label}
+            style={{ width: isMobile ? "33%" : "100%" }}
+          />
+        ))}
+      </Tabs>
+      {/* Render content based on activeTab */}
+      {activeTab === 0 && (
+        <div>
+          {linkupList
+            .filter((linkup) => linkup.status === "active")
+            .map((linkUp) => (
+              <LinkupHistoryItem key={linkUp.id} post={linkUp} />
+            ))}
+        </div>
+      )}
+      {activeTab === 1 && (
+        <div>
+          {linkupList
+            .filter((linkup) => linkup.status === "expired")
+            .map((linkUp) => (
+              <LinkupHistoryItem key={linkUp.id} post={linkUp} />
+            ))}
+        </div>
+      )}
+      {activeTab === 2 && (
+        <div>
           <div>
-            {linkupList
-              .filter((linkup) => linkup.status === "active")
-              .map((linkUp) => (
-                <LinkupHistoryItem key={linkUp.id} post={linkUp} />
-              ))}
-          </div>
-        )}
-        {activeTab === 1 && (
-          <div>
-            {linkupList
-              .filter((linkup) => linkup.status === "expired")
-              .map((linkUp) => (
-                <LinkupHistoryItem key={linkUp.id} post={linkUp} />
-              ))}
-          </div>
-        )}
-        {activeTab === 2 && (
-          <div>
-            <div>
-              {linkupRequestList.map((request) => (
-                <LinkupRequestItem key={request.id} post={request} />
-              ))}
-            </div>{" "}
-          </div>
-        )}
-      </div>
-    </ThemeProvider>
+            {linkupRequestList.map((request) => (
+              <LinkupRequestItem key={request.id} post={request} />
+            ))}
+          </div>{" "}
+        </div>
+      )}
+    </div>
   );
 };
 

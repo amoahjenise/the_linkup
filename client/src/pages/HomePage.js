@@ -19,7 +19,7 @@ const compromise = nlp;
 const useStyles = makeStyles((theme) => ({
   homePage: {
     display: "flex",
-    width: "80%",
+    width: "100%",
   },
   feedSection: {
     flex: "2",
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
 
 const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
 
-const HomePage = ({ linkupList, isLoading }) => {
+const HomePage = ({ isMobile, linkupList, isLoading }) => {
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
   const feedSectionRef = useRef(null);
@@ -156,26 +156,42 @@ const HomePage = ({ linkupList, isLoading }) => {
 
   return (
     <div className={classes.homePage}>
-      <div
-        className={`${classes.feedSection} ${
-          editingLinkup.isEditing ? classes.editingFeedSection : ""
-        }`}
-        ref={feedSectionRef}
-      >
-        <FeedSection
-          linkupList={linkupList}
-          isLoading={isLoading}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-        />
-      </div>
-      {editingLinkup.isEditing ? (
-        <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
+      {isMobile ? (
+        editingLinkup.isEditing ? (
+          <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
+        ) : (
+          <div className={classes.feedSection}>
+            <FeedSection
+              linkupList={linkupList}
+              isLoading={isLoading}
+              setShouldFetchLinkups={setShouldFetchLinkups}
+            />
+          </div>
+        )
       ) : (
-        <CreateLinkupForm
-          socket={socket}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          scrollToTopCallback={scrollToTop}
-        />
+        <div className={classes.homePage}>
+          <div
+            className={`${classes.feedSection} ${
+              editingLinkup.isEditing ? classes.editingFeedSection : ""
+            }`}
+            ref={feedSectionRef}
+          >
+            <FeedSection
+              linkupList={linkupList}
+              isLoading={isLoading}
+              setShouldFetchLinkups={setShouldFetchLinkups}
+            />
+          </div>
+          {editingLinkup.isEditing ? (
+            <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
+          ) : (
+            <CreateLinkupForm
+              socket={socket}
+              setShouldFetchLinkups={setShouldFetchLinkups}
+              scrollToTopCallback={scrollToTop}
+            />
+          )}
+        </div>
       )}
     </div>
   );
