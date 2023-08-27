@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
+import LinkupRequestItem from "../components/LinkupRequestItem";
 import { makeStyles } from "@material-ui/core/styles";
 import TopNavBar from "../components/TopNavBar";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../redux/actions/linkupActions";
-import { getUserLinkups } from "../api/linkupAPI";
+import { getLinkupRequests, getUserLinkups } from "../api/linkupAPI";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 
@@ -17,12 +18,16 @@ const useStyles = makeStyles((theme) => ({
     width: "50%",
     borderRight: "1px solid #e1e8ed",
   },
+  tabBar: {
+    borderBottom: "1px solid lightgrey",
+  },
 }));
 
 const LinkUpHistoryPage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [linkupList, setLinkupList] = useState([]);
+  const [linkupRequestList, setLinkupRequestList] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
 
   // Access user data from Redux store
@@ -36,15 +41,27 @@ const LinkUpHistoryPage = () => {
   ];
 
   const fetchLinkups = useCallback(async () => {
-    dispatch(setIsLoading(true));
-
     try {
+      dispatch(setIsLoading(true));
       const response = await getUserLinkups(userID);
       if (response.success) {
         setLinkupList(response.linkupList);
       }
     } catch (error) {
       console.log("Error fetching linkups:", error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+
+    try {
+      dispatch(setIsLoading(true));
+
+      const response = await getLinkupRequests(userID);
+      if (response.success) {
+        setLinkupRequestList(response.linkupRequestList);
+      }
+    } catch (error) {
+      console.log("Error fetching linkup requests:", error);
     } finally {
       dispatch(setIsLoading(false));
     }
@@ -61,7 +78,11 @@ const LinkUpHistoryPage = () => {
   return (
     <div className={classes.linkUpHistoryPage}>
       <TopNavBar title="Link Ups" />
-      <Tabs value={activeTab} onChange={handleTabChange}>
+      <Tabs
+        className={classes.tabBar}
+        value={activeTab}
+        onChange={handleTabChange}
+      >
         {tabs.map((tab) => (
           <Tab key={tab.id} label={tab.label} />
         ))}
@@ -87,7 +108,11 @@ const LinkUpHistoryPage = () => {
       )}
       {activeTab === 2 && (
         <div>
-          <p>Tab 3</p>
+          <div>
+            {linkupRequestList.map((request) => (
+              <LinkupRequestItem key={request.id} post={request} />
+            ))}
+          </div>{" "}
         </div>
       )}
     </div>

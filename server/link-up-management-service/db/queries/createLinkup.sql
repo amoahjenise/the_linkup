@@ -11,4 +11,4 @@ RETURNING
     link_ups.created_at,
     link_ups.updated_at,
     link_ups.status,
-    (SELECT avatar FROM users WHERE users.id = CAST($1 AS UUID));
+    (SELECT avatar FROM users WHERE users.id = $1::uuid);

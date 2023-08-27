@@ -12,14 +12,16 @@ import nlp from "compromise";
 const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
-  linkupHistoryItem: {
+  linkupRequestItem: {
     backgroundColor: "#fff",
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
+    borderBottom: "1px solid lightgrey",
   },
   postDetails: {
     display: "flex",
     alignItems: "center",
+    // color: theme.palette.text.secondary,
   },
   avatar: {
     marginRight: theme.spacing(1),
@@ -41,46 +43,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryItem = ({ post }) => {
+const LinkupRequestItem = ({ post }) => {
   const classes = useStyles();
 
-  const { creator_name, avatar, activity, location, date, status } = post;
+  const { creator_name, activity, avatar, status, link_up_date } = post;
 
   const renderStatusIcon = () => {
-    if (status === "active") {
+    if (status === "pending") {
       return <QueryBuilderOutlined />;
-    } else if (status === "Accepted") {
+    } else if (status === "accepted") {
       return <CheckCircleOutlined />;
-    } else if (status === "expired") {
+    } else if (status === "declined") {
       return <CloseOutlined />;
     }
     return null;
   };
 
   const getStatusLabel = () => {
-    if (status === "active") {
+    if (status === "pending") {
       return "pending";
-    } else if (status === "linked") {
-      return "Linked Up";
-    } else if (status === "expired") {
-      return "expired";
+    } else if (status === "accepted") {
+      return "accepted";
+    } else if (status === "declined") {
+      return "declined";
     }
     return null;
   };
 
   const getStatusChipClass = () => {
-    if (status === "active") {
+    if (status === "pending") {
       return classes.pendingChip;
-    } else if (status === "Accepted") {
+    } else if (status === "accepted") {
       return classes.acceptedChip;
-    } else if (status === "expired") {
+    } else if (status === "declined") {
       return classes.declinedChip;
     }
     return null;
   };
 
   const renderLinkupItemText = () => {
-    let linkupItemText = "";
+    let itemText = "";
     const doc = compromise(activity);
     const startsWithVerb = doc.verbs().length > 0;
     const isVerbEndingWithIng = activity.endsWith("ing");
@@ -93,28 +95,21 @@ const LinkupHistoryItem = ({ post }) => {
         activityText = `${startsWithVerb ? "to" : "for"} ${activity}`;
       }
     }
-    const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
-    const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
 
-    // Capitalize the first letter of each word in the location
-    const formattedLocation = location
-      .toLowerCase() // Convert to lowercase
-      .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
+    const dateText = link_up_date
+      ? `${moment(link_up_date).format("MMM DD, YYYY")}`
+      : "";
+    const timeText = link_up_date
+      ? `(${moment(link_up_date).format("h:mm A")})`
+      : "";
 
-    if (status === "active") {
-      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText}.`;
-    } else if (status === "expired") {
-      linkupItemText = `Link up ${activityText.toLowerCase()} at ${formattedLocation} on 
-          ${dateText} ${timeText} has expired.`;
-    } else {
-      linkupItemText = "";
-    }
+    itemText = `Request sent to ${creator_name} ${activityText} scheduled for ${dateText} ${timeText}`;
 
-    return linkupItemText;
+    return itemText;
   };
 
   return (
-    <div className={classes.linkupHistoryItem}>
+    <div className={classes.linkupRequestItem}>
       <div className={classes.postDetails}>
         <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
         <p>{renderLinkupItemText()}</p>
@@ -129,4 +124,4 @@ const LinkupHistoryItem = ({ post }) => {
   );
 };
 
-export default LinkupHistoryItem;
+export default LinkupRequestItem;
