@@ -44,10 +44,14 @@ const HomePage = ({ linkupList, isLoading }) => {
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
 
+  // Access user data from Redux store
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const userID = loggedUser.user.id;
+
   const fetchLinkups = useCallback(async () => {
     dispatch(setIsLoading(true));
     try {
-      const response = await getLinkups();
+      const response = await getLinkups(userID);
       if (response.success) {
         const activeLinkups = response.linkupList.filter(
           (linkup) => linkup.status === "active"
@@ -61,7 +65,7 @@ const HomePage = ({ linkupList, isLoading }) => {
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch]);
+  }, [dispatch, userID]);
 
   const removeExpiredLinkups = useCallback(async () => {
     try {

@@ -9,11 +9,18 @@ const handleError = (error) => {
 
 export const getLinkups = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-linkups`, {
-      params: {
-        userId: userId,
-      },
-    });
+    const response = await axios.get(`${BASE_URL}/api/get-linkups/${userId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getUserLinkups = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/get-user-linkups/${userId}`
+    );
     return response.data;
   } catch (error) {
     handleError(error);

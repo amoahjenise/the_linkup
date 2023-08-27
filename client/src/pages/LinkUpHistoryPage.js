@@ -5,7 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TopNavBar from "../components/TopNavBar";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../redux/actions/linkupActions";
-import { getLinkups } from "../api/linkupAPI";
+import { getUserLinkups } from "../api/linkupAPI";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 
@@ -39,7 +39,7 @@ const LinkUpHistoryPage = () => {
     dispatch(setIsLoading(true));
 
     try {
-      const response = await getLinkups(userID);
+      const response = await getUserLinkups(userID);
       if (response.success) {
         setLinkupList(response.linkupList);
       }
