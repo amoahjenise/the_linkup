@@ -14,15 +14,14 @@ const compromise = nlp;
 const useStyles = makeStyles((theme) => ({
   linkupHistoryItem: {
     backgroundColor: "#fff",
-    padding: theme.spacing(4),
+    padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
-    border: "1px solid lightgrey",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    borderTop: "1px solid lightgrey",
   },
   postDetails: {
     display: "flex",
     alignItems: "center",
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
   },
   avatar: {
     marginRight: theme.spacing(1),

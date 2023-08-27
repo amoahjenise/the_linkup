@@ -77,116 +77,116 @@ function PhoneVerification({
   };
 
   const handleSendVerificationCode = async () => {
-    // // Uncomment for testing purposes ------------------
-    // setIsVerificationCodeSent(true);
-    // addSnackbar("Verification code sent successfully!", {
-    //   timeout: 3000,
-    // });
-    // // ----
+    // Uncomment for testing purposes ------------------
+    setIsVerificationCodeSent(true);
+    addSnackbar("Verification code sent successfully!", {
+      timeout: 3000,
+    });
+    // ----
 
-    try {
-      // Send verification code using backend API
-      await sendVerificationCode(`+${phoneNumber}`);
-      addSnackbar("Verification code sent successfully!");
-      setIsVerificationCodeSent(true);
-      setVerificationCode("");
-      setVerificationError(""); // Reset verificationError state
-    } catch (error) {
-      console.error("Error sending verification code:", error);
-      addSnackbar("Failed to send verification code. Please try again.");
-    }
+    // try {
+    //   // Send verification code using backend API
+    //   await sendVerificationCode(`+${phoneNumber}`);
+    //   addSnackbar("Verification code sent successfully!");
+    //   setIsVerificationCodeSent(true);
+    //   setVerificationCode("");
+    //   setVerificationError(""); // Reset verificationError state
+    // } catch (error) {
+    //   console.error("Error sending verification code:", error);
+    //   addSnackbar("Failed to send verification code. Please try again.");
+    // }
   };
 
   const handleVerifyCode = async () => {
-    // // Uncomment for Testing purposes -------------------
-    // dispatch(updatePhoneNumber(`+${phoneNumber}`));
+    // Uncomment for Testing purposes -------------------
+    dispatch(updatePhoneNumber(`+${phoneNumber}`));
 
-    // // Verification successful, check if user exists
-    // try {
-    //   const response = await getUserByPhoneNumber(`+${phoneNumber}`);
-
-    //   if (response.user && response.user.status === "inactive") {
-    //     dispatch(updateDeactivatedUser(response.user));
-    //   }
-
-    //   if (action === LOGIN) {
-    //     if (response.success) {
-    //       // User exists, notify parent component (LoginPage.js)
-    //       setNavigateToUserAuthentication(true);
-    //       return;
-    //     } else {
-    //       // User doesn't exists, display error message
-    //       setVerificationError(
-    //         "No user with the provided phone number exists."
-    //       );
-    //       return;
-    //     }
-    //   } else if (action === SIGNUP) {
-    //     if (response.success) {
-    //       // User exists, notify parent component (SignupPage.js)
-    //       setNavigateToUserAuthentication(true);
-    //     } else {
-    //       setNavigateToRegistration(true);
-    //     }
-    //   } else {
-    //     return;
-    //   }
-    // } catch (error) {
-    //   console.error("Error while fetching user: ", error);
-    // }
-    // // --------------------------------------------------
-
-    // Perform verification code validation logic
-    setVerificationError(""); // Reset verificationError state
-
-    if (!(verificationCode.length > 0)) {
-      setVerificationError("Please enter a verification code.");
-      return;
-    }
-
-    // Verify the verification code using backend API
+    // Verification successful, check if user exists
     try {
-      const response = await verifyCode(`+${phoneNumber}`, verificationCode);
+      const response = await getUserByPhoneNumber(`+${phoneNumber}`);
 
-      if (response.success) {
-        dispatch(updatePhoneNumber(`+${phoneNumber}`));
+      if (response.user && response.user.status === "inactive") {
+        dispatch(updateDeactivatedUser(response.user));
+      }
 
-        // Verification successful, check if user exists
-        try {
-          const { user } = await getUserByPhoneNumber(`+${phoneNumber}`);
-
-          if (action === LOGIN) {
-            if (user) {
-              // User exists, notify parent component (LoginPage.js)
-              setNavigateToUserAuthentication(true);
-              return;
-            } else {
-              // User doesn't exist, display error message
-              setVerificationError(
-                "No user with the provided phone number exists."
-              );
-              return;
-            }
-          } else if (action === SIGNUP) {
-            if (user) {
-              // User exists, notify parent component (SignupPage.js)
-              setNavigateToUserAuthentication(true);
-            } else {
-              setNavigateToRegistration(true);
-            }
-          } else {
-            return;
-          }
-        } catch (error) {
-          console.error("Error while fetching user:", error);
+      if (action === LOGIN) {
+        if (response.success) {
+          // User exists, notify parent component (LoginPage.js)
+          setNavigateToUserAuthentication(true);
+          return;
+        } else {
+          // User doesn't exists, display error message
+          setVerificationError(
+            "No user with the provided phone number exists."
+          );
+          return;
+        }
+      } else if (action === SIGNUP) {
+        if (response.success) {
+          // User exists, notify parent component (SignupPage.js)
+          setNavigateToUserAuthentication(true);
+        } else {
+          setNavigateToRegistration(true);
         }
       } else {
-        // Verification failed, display error message
-        setVerificationError(response.message);
+        return;
       }
     } catch (error) {
-      setVerificationError("Failed to verify code. Please try again.", error);
+      console.error("Error while fetching user: ", error);
     }
+    // --------------------------------------------------
+
+    // // Perform verification code validation logic
+    // setVerificationError(""); // Reset verificationError state
+
+    // if (!(verificationCode.length > 0)) {
+    //   setVerificationError("Please enter a verification code.");
+    //   return;
+    // }
+
+    // // Verify the verification code using backend API
+    // try {
+    //   const response = await verifyCode(`+${phoneNumber}`, verificationCode);
+
+    //   if (response.success) {
+    //     dispatch(updatePhoneNumber(`+${phoneNumber}`));
+
+    //     // Verification successful, check if user exists
+    //     try {
+    //       const { user } = await getUserByPhoneNumber(`+${phoneNumber}`);
+
+    //       if (action === LOGIN) {
+    //         if (user) {
+    //           // User exists, notify parent component (LoginPage.js)
+    //           setNavigateToUserAuthentication(true);
+    //           return;
+    //         } else {
+    //           // User doesn't exist, display error message
+    //           setVerificationError(
+    //             "No user with the provided phone number exists."
+    //           );
+    //           return;
+    //         }
+    //       } else if (action === SIGNUP) {
+    //         if (user) {
+    //           // User exists, notify parent component (SignupPage.js)
+    //           setNavigateToUserAuthentication(true);
+    //         } else {
+    //           setNavigateToRegistration(true);
+    //         }
+    //       } else {
+    //         return;
+    //       }
+    //     } catch (error) {
+    //       console.error("Error while fetching user:", error);
+    //     }
+    //   } else {
+    //     // Verification failed, display error message
+    //     setVerificationError(response.message);
+    //   }
+    // } catch (error) {
+    //   setVerificationError("Failed to verify code. Please try again.", error);
+    // }
   };
 
   const handlePhoneNumberChange = useCallback((phoneNumber, country) => {

@@ -19,7 +19,6 @@ const SendRequestPage = () => {
 
   return (
     <div className={classes.sendRequestPage}>
-      <LeftMenu />
       <SendRequestSection linkupId={linkupId} linkups={linkups.linkupList} />
     </div>
   );

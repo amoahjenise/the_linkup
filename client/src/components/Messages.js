@@ -1,5 +1,4 @@
 import React from "react";
-import { useParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setMessagesData } from "../redux/actions/conversationActions";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +13,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
   listItem: {
+    borderBottom: "1px solid #e1e8ed",
     cursor: "pointer",
     "&.selected": {
       backgroundColor: theme.palette.grey[200],
@@ -26,8 +26,7 @@ const Messages = ({ messages, selectedMessage, onMessageClick }) => {
   const dispatch = useDispatch();
 
   const messagesData = useSelector((state) => state.messagesData);
-  const { participants, initialMessage, notificationId, linkupId } =
-    messagesData;
+  const { participants, initialMessage, linkupId } = messagesData;
 
   // Initiate conversation on page load
   React.useEffect(() => {

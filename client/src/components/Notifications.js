@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import NotificationItem from "./NotificationItem";
-import { setMessagesData } from "../redux/actions/conversationActions";
 import { updateUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   markNotificationAsRead,
   getNotifications,
 } from "../api/notificationAPI";
 import { useNavigate } from "react-router-dom";
+import TopNavBar from "../components/TopNavBar";
 
 const useStyles = makeStyles((theme) => ({
-  notificationsContainer: {
+  mainContainer: {
     display: "flex",
     flexDirection: "column",
     overflowY: "auto",
@@ -51,16 +51,6 @@ const Notifications = () => {
   const handleNotificationClick = async (notification) => {
     if (notification.notification_type === "linkup_request") {
       try {
-        // dispatch(
-        //   setMessagesData(
-        //     [notification.user_id, notification.requester_id],
-        //     notification.message,
-        //     notification.id,
-        //     notification.link_up_id
-        //   )
-        // );
-        // navigate(`/messages/${notification.link_up_id}`);
-
         if (notification.is_read === false) {
           markNotificationAsRead(notification.id);
           dispatch(
@@ -75,7 +65,9 @@ const Notifications = () => {
   };
 
   return (
-    <div className={classes.notificationsContainer}>
+    <div className={classes.mainContainer}>
+      <TopNavBar title="Notifications" />
+
       <ul className={classes.notificationsList}>
         {notifications.map((notification) => (
           <NotificationItem

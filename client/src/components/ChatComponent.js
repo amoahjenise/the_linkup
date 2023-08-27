@@ -1,7 +1,5 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -12,14 +10,10 @@ import SendIcon from "@material-ui/icons/Send";
 
 const useStyles = makeStyles((theme) => ({
   chatSection: {
-    border: "1px solid #ddd",
-    height: "100vh",
-    width: "75%",
-  },
-  messageArea: {
-    flex: "1",
     overflow: "auto",
-    padding: theme.spacing(2),
+    padding: theme.spacing(4),
+    height: "80%",
+    borderBottom: "1px solid #e1e8ed",
   },
   listItemRight: {
     justifyContent: "flex-end",
@@ -30,8 +24,23 @@ const useStyles = makeStyles((theme) => ({
   avatarRight: {
     marginLeft: theme.spacing(1),
   },
+  chatContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between", // Added to position at the bottom
+    height: "100%",
+  },
+  sendContainer: {
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(2),
+  },
+  textField: {
+    flex: 1,
+    marginRight: theme.spacing(1),
+  },
   sendButton: {
-    marginTop: theme.spacing(1),
+    flexShrink: 0,
   },
 }));
 
@@ -64,68 +73,42 @@ const ChatComponent = ({ selectedMessage }) => {
   ];
 
   return (
-    <div>
-      <Grid container className={classes.chatSection}>
-        <Grid item xs={12}>
-          <List className={classes.messageArea}>
-            {messages.map((message) => (
-              <ListItem
-                key={message.id}
-                className={
-                  message.sender === "John" ? classes.listItemRight : undefined
-                }
-              >
-                <Grid
-                  container
-                  alignItems="flex-start"
-                  justifyContent={
-                    message.sender === "John" ? "flex-end" : "flex-start"
-                  }
-                >
-                  <Avatar
-                    alt={message.sender}
-                    src={message.avatar}
-                    className={
-                      message.sender === "John"
-                        ? classes.avatarRight
-                        : classes.avatarLeft
-                    }
-                  />
-                  <Grid item>
-                    <ListItemText
-                      align={message.sender === "John" ? "right" : "left"}
-                      primary={message.content}
-                    />
-                    <ListItemText
-                      align={message.sender === "John" ? "right" : "left"}
-                      secondary={message.timestamp}
-                    />
-                  </Grid>
-                </Grid>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <Grid container style={{ padding: "30px" }}>
-            <Grid item xs={11}>
-              <TextField
-                id="outlined-basic-email"
-                label="Type Something"
-                fullWidth
-              />
-            </Grid>
-            <Grid xs={1} align="right">
-              <Fab
-                color="primary"
-                aria-label="add"
-                className={classes.sendButton}
-              >
-                <SendIcon />
-              </Fab>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
+    <div className={classes.chatContainer}>
+      <List className={classes.chatSection}>
+        {messages.map((message) => (
+          <ListItem
+            key={message.id}
+            className={
+              message.sender === "John" ? classes.listItemRight : undefined
+            }
+          >
+            <Avatar
+              alt={message.sender}
+              src={message.avatar}
+              className={
+                message.sender === "John"
+                  ? classes.avatarRight
+                  : classes.avatarLeft
+              }
+            />
+            <ListItemText
+              align={message.sender === "John" ? "right" : "left"}
+              primary={message.content}
+              secondary={message.timestamp}
+            />
+          </ListItem>
+        ))}
+      </List>
+      <div className={classes.sendContainer}>
+        <TextField
+          id="outlined-basic-email"
+          label="Type Something"
+          className={classes.textField}
+        />
+        <Fab color="primary" aria-label="send" className={classes.sendButton}>
+          <SendIcon />
+        </Fab>
+      </div>
     </div>
   );
 };

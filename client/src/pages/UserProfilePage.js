@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import LeftMenu from "../components/LeftMenu";
 import Cards from "../components/Cards";
 import IconButton from "@material-ui/core/IconButton";
 import SaveIcon from "@material-ui/icons/Save";
@@ -17,22 +16,15 @@ import TopNavBar from "../components/TopNavBar";
 // Set your Google Maps API key (you need to get one from the Google Cloud Console)
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
-const drawerWidth = "25%";
-
 const useStyles = makeStyles((theme) => ({
   userProfilePage: {
     display: "flex",
-    height: "100vh",
-    flexGrow: 1,
-  },
-  mainContainer: {
-    display: "flex",
     flexDirection: "column",
-    overflowY: "auto",
-    maxWidth: `calc(100% - 2 * ${drawerWidth})`,
-    width: "100%",
+    height: "100%",
+    width: "50%",
     borderRight: "1px solid #e1e8ed",
   },
+
   profileSection: {
     display: "flex",
     flexDirection: "column",
@@ -221,62 +213,57 @@ const UserProfilePage = () => {
 
   return (
     <div className={classes.userProfilePage}>
-      <LeftMenu />
-
-      <div className={classes.mainContainer}>
-        <TopNavBar title="Profile" />
-        <div className={classes.profileSection}>
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <div className={classes.profileHeader}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <AvatarUpdate
-                  userId={userData?.id}
-                  currentAvatarUrl={userData?.avatar}
-                  isLoggedUserProfile={isLoggedUserProfile}
-                />
-                <div className={classes.leftMargin}>
-                  <h2>
-                    {userData?.name}, {calculateAge(userData?.date_of_birth)}
-                  </h2>
-                  <span style={{ fontWeight: "normal" }}>
-                    <p>{userLocation}</p>
-                  </span>
-                  {isBioEditMode ? (
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <textarea
-                        value={updatedBio}
-                        onChange={(e) =>
-                          setUpdatedBio(e.target.value.slice(0, 160))
-                        }
-                        className={classes.commentInput}
-                        placeholder="Edit your bio (maximum of 160 characters)..."
-                      />
-                    </div>
-                  ) : (
-                    <div>
-                      {" "}
-                      <span style={{ fontWeight: "normal" }}>
-                        Bio: {userData?.bio}
-                      </span>
-                    </div>
-                  )}
-                </div>
+      <TopNavBar title="Profile" />
+      <div className={classes.profileSection}>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className={classes.profileHeader}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <AvatarUpdate
+                userId={userData?.id}
+                currentAvatarUrl={userData?.avatar}
+                isLoggedUserProfile={isLoggedUserProfile}
+              />
+              <div className={classes.leftMargin}>
+                <h2>
+                  {userData?.name}, {calculateAge(userData?.date_of_birth)}
+                </h2>
+                <span style={{ fontWeight: "normal" }}>
+                  <p>{userLocation}</p>
+                </span>
+                {isBioEditMode ? (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <textarea
+                      value={updatedBio}
+                      onChange={(e) =>
+                        setUpdatedBio(e.target.value.slice(0, 160))
+                      }
+                      className={classes.commentInput}
+                      placeholder="Edit your bio (maximum of 160 characters)..."
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    {" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      Bio: {userData?.bio}
+                    </span>
+                  </div>
+                )}
               </div>
+            </div>
 
-              {renderEditButton()}
-            </div>
-          )}
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <div className={classes.centeredContent}>
-              <Cards images={mockUserData.profileImages} />
-            </div>
-          )}
-        </div>
-        {/* <div style={{ flex: 2 }} /> */}
+            {renderEditButton()}
+          </div>
+        )}
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className={classes.centeredContent}>
+            <Cards images={mockUserData.profileImages} />
+          </div>
+        )}
       </div>
     </div>
   );

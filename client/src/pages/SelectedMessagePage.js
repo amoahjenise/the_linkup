@@ -48,7 +48,6 @@ const SelectedMessagePage = ({ selectedMessage }) => {
   return (
     <div>
       <div className={classes.selectedMessagePage}>
-        <LeftMenu />
         <div className={classes.messageSection}>
           <MessagesSection />
         </div>

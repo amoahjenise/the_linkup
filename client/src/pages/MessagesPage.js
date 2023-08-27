@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import LeftMenu from "../components/LeftMenu";
 import MessagesSection from "../components/MessagesSection";
 import ChatComponent from "../components/ChatComponent";
 
 const useStyles = makeStyles((theme) => ({
   messagesPage: {
     display: "flex",
-    height: "100vh",
+    width: "75%",
   },
   messageSection: {
     flex: 1,
-    overflowY: "auto",
-    marginLeft: "auto",
-    marginRight: "auto",
+    borderRight: "1px solid #e1e8ed",
   },
   chatSection: {
-    flex: 1,
+    borderRight: "1px solid #e1e8ed",
+    overflowY: "auto",
   },
 }));
 
@@ -27,15 +25,6 @@ const MessagesPage = () => {
 
   // Simulating API call to fetch user's messages
   useEffect(() => {
-    // API call to fetch messages associated with the active user
-    // Example API call: fetchUserMessages(userId)
-    // Replace `fetchUserMessages` with your actual API call
-    // const fetchUserMessages = async (userId) => {
-    //   const response = await fetch(`/api/users/${userId}/messages`);
-    //   const data = await response.json();
-    //   setMessages(data.messages);
-    // };
-
     // Mock data to simulate API response
     const mockMessages = [
       {
@@ -54,10 +43,6 @@ const MessagesPage = () => {
       },
       // Add more mock messages here
     ];
-
-    // ...
-
-    // Set the messages in state
     setMessages(mockMessages);
   }, []);
 
@@ -67,7 +52,6 @@ const MessagesPage = () => {
 
   return (
     <div className={classes.messagesPage}>
-      <LeftMenu />
       <div className={classes.messageSection}>
         <MessagesSection
           messages={messages}

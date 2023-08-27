@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import logo from "../logo.png";
 import Badge from "@material-ui/core/Badge";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import HomeIcon from "@material-ui/icons/Home";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
@@ -11,15 +11,18 @@ import HistoryIcon from "@material-ui/icons/History";
 import MessageIcon from "@material-ui/icons/Message";
 import SettingsIcon from "@material-ui/icons/Settings";
 import LogoutButton from "./LogoutButton";
+import logo from "../logo.png";
+import { useTheme } from "@material-ui/core/styles";
 
-const drawerWidth = "24%";
+const drawerWidth = "20%";
 
 const useStyles = makeStyles((theme) => ({
   main: {
-    flex: "0 0 " + drawerWidth,
+    // flex: "0 0 " + drawerWidth,
     color: "black",
     padding: theme.spacing(2),
     borderRight: "0.1px solid lightgrey",
+    width: "25%",
   },
   menu: {
     flex: "0 0 " + drawerWidth,
@@ -58,26 +61,115 @@ const useStyles = makeStyles((theme) => ({
   badge: {
     marginLeft: theme.spacing(2),
   },
+
+  mobileMenuContainer: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    backgroundColor: "#fff",
+    boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.1)",
+    zIndex: 1000,
+  },
+  mobileMenu: {
+    display: "flex",
+    justifyContent: "space-around",
+    padding: theme.spacing(1),
+  },
+  mobileMenuItem: {
+    fontSize: "1.5rem",
+    padding: theme.spacing(1),
+    color: "black",
+    textDecoration: "none",
+  },
+  active: {
+    backgroundColor: "#F5F8FA",
+    borderRadius: "100px",
+  },
 }));
 
-const LeftMenu = () => {
+const LeftMenu = ({ activeSection, setActiveSection }) => {
   const classes = useStyles();
-  const [activeSection, setActiveSection] = useState("account");
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
   );
 
-  useEffect(() => {
-    // This effect will run whenever the unreadNotificationsCount prop changes
-    console.log(
-      "Unread notifications count changed:",
-      unreadNotificationsCount
-    );
-  }, [unreadNotificationsCount]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleMenuItemClick = (section) => {
-    setActiveSection(section); // Set the active section when a menu item is clicked
+    setActiveSection(section);
   };
+
+  if (isMobile) {
+    return (
+      <div className={classes.mobileMenuContainer}>
+        <div className={classes.mobileMenu}>
+          <Link
+            to="/home"
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "home" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("home")}
+          >
+            <HomeIcon />
+          </Link>
+          <Link
+            to="/notifications"
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "notifications" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("notifications")}
+          >
+            <Badge
+              badgeContent={unreadNotificationsCount}
+              color="secondary"
+              className={classes.badge}
+            >
+              <NotificationsIcon />
+            </Badge>
+          </Link>
+          <Link
+            to="/profile/me"
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "profile" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("profile")}
+          >
+            <AccountCircleIcon />
+          </Link>
+          <Link
+            to="/history"
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "history" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("history")}
+          >
+            <HistoryIcon />
+          </Link>
+          <Link
+            to="/messages"
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "messages" ? classes.active : ""}`}
+          >
+            <MessageIcon />
+          </Link>
+          <div
+            className={`${classes.mobileMenuItem} ${
+              classes.mobileMenuItemHover
+            } ${activeSection === "settings" ? classes.active : ""}`}
+            onClick={() => handleMenuItemClick("settings")}
+          >
+            <Link to="/settings" className={classes.mobileMenuItemLink}>
+              <SettingsIcon />
+            </Link>
+          </div>
+          <LogoutButton />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={classes.main}>
@@ -86,15 +178,24 @@ const LeftMenu = () => {
           <div className={classes.logoContainer}>
             <img src={logo} alt="Logo" className={classes.logo} />
           </div>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "home" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("home")}
+          >
             <Link to="/home" className={classes.menuItemLink}>
               <HomeIcon /> Home
             </Link>
           </li>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "notifications" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("notifications")}
+          >
             <Link to="/notifications" className={classes.menuItemLink}>
               <NotificationsIcon /> Notifications
-              {/* Display the Badge component with the unreadNotificationsCount */}
               <Badge
                 className={classes.badge}
                 badgeContent={parseInt(unreadNotificationsCount)}
@@ -102,24 +203,41 @@ const LeftMenu = () => {
               ></Badge>
             </Link>
           </li>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "profile" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("profile")}
+          >
             <Link to="/profile/me" className={classes.menuItemLink}>
               <AccountCircleIcon /> Profile
             </Link>
           </li>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "history" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("history")}
+          >
             <Link to="/history" className={classes.menuItemLink}>
               <HistoryIcon /> Link Ups
             </Link>
           </li>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+          <li
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "messages" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("messages")}
+          >
             <Link to="/messages" className={classes.menuItemLink}>
               <MessageIcon /> Messages
             </Link>
           </li>
           <li
-            className={`${classes.menuItem} ${classes.menuItemHover}`}
-            onClick={() => handleMenuItemClick("account")} // Set activeSection to "account" on click
+            className={`${classes.menuItem} ${classes.menuItemHover} ${
+              activeSection === "settings" ? classes.active : ""
+            }`}
+            onClick={() => handleMenuItemClick("settings")}
           >
             <Link to="/settings" className={classes.menuItemLink}>
               <SettingsIcon /> Settings

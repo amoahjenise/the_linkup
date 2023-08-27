@@ -174,7 +174,6 @@ const markLinkupsAsExpired = async (req, res) => {
 
   try {
     const { rows } = await pool.query(query, queryValues);
-    console.log("Expired Link-Ups:", rows);
     if (rows.length > 0) {
       // Emit a real-time event to notify clients about expired link-ups
       const expiredLinkups = rows;

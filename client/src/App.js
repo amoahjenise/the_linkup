@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import io from "socket.io-client";
 import {
@@ -21,13 +21,23 @@ import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
 import SettingsPage from "./pages/SettingsPage";
 import NotificationsTestPage from "./__tests__/componentTests/NotificationTestPage";
+import LeftMenu from "./components/LeftMenu";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { useSelector } from "react-redux";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
+import { makeStyles } from "@material-ui/core/styles";
 import "./App.css";
 
+const useStyles = makeStyles((theme) => ({
+  app: {
+    display: "flex",
+    height: "100vh",
+  },
+}));
+
 const App = () => {
+  const classes = useStyles();
   const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
   const unreadNotificationsCount = useSelector(
@@ -35,8 +45,20 @@ const App = () => {
   );
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
+  const [activeSection, setActiveSection] = useState("home"); // Manage active section here
+
   const PrivateRoutes = ({ path, element }) => {
-    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+    return isAuthenticated ? (
+      <div className={classes.app}>
+        <LeftMenu
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+        <Outlet />
+      </div>
+    ) : (
+      <Navigate to="/login" />
+    );
   };
 
   useEffect(() => {
