@@ -7,9 +7,13 @@ const handleError = (error) => {
   throw error;
 };
 
-export const getLinkups = async (userId) => {
+export const getLinkups = async (userId, gender) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-linkups/${userId}`);
+    const response = await axios.get(`${BASE_URL}/api/get-linkups/${userId}`, {
+      params: {
+        gender: gender,
+      },
+    });
     return response.data;
   } catch (error) {
     handleError(error);

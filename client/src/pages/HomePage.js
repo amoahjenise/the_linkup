@@ -47,11 +47,12 @@ const HomePage = ({ linkupList, isLoading }) => {
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
   const userID = loggedUser.user.id;
+  const gender = loggedUser.user.gender;
 
   const fetchLinkups = useCallback(async () => {
     dispatch(setIsLoading(true));
     try {
-      const response = await getLinkups(userID);
+      const response = await getLinkups(userID, gender);
       if (response.success) {
         const activeLinkups = response.linkupList.filter(
           (linkup) => linkup.status === "active"
