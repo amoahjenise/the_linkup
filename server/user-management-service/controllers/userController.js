@@ -10,10 +10,10 @@ const deleteUser = async (req, res) => {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [userId];
+    console.log("DELETED", userId);
 
-    const { rows, rowCount } = await pool.query(query, values);
-
-    if (rowCount > 0) {
+    const { rows } = await pool.query(query, values);
+    if (rows.length > 0) {
       res.json({
         success: true,
         message: "User deleted successfully",

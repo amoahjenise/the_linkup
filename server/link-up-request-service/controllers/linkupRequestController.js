@@ -12,16 +12,12 @@ const {
   createNotification,
 } = require("../../notification-service/controllers/notificationController");
 
-// initSocketServer();
-
 const sendRequest = async (req, res) => {
   const { requesterId, requesterName, creator_id, linkupId, content } =
     req.body;
   const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [requesterId, creator_id, linkupId, content];
-
-  console.log(requesterId, creator_id, linkupId, content);
 
   try {
     // Post Linkup Request
@@ -31,13 +27,14 @@ const sendRequest = async (req, res) => {
       // Post Notification
       const notificationData = {
         creatorId: creator_id,
-        requesterName,
-        requesterName,
+        requesterName: requesterName,
         requesterId: requesterId,
         type: "linkup_request",
         linkupId: linkupId,
         content: `New linkup request from ${requesterName}`,
       };
+
+      console.log("ROES:", notificationID);
 
       var notificationID = await createNotification(notificationData);
 
@@ -127,7 +124,6 @@ const declineRequest = async (req, res) => {
 };
 
 module.exports = {
-  // initializeSocket,
   sendRequest,
   acceptRequest,
   declineRequest,

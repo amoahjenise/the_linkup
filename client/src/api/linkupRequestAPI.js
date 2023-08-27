@@ -12,7 +12,7 @@ export const sendRequest = async (
   requester_name,
   creator_id,
   linkupId,
-  message
+  content
 ) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/send-request`, {
@@ -20,7 +20,7 @@ export const sendRequest = async (
       requesterName: requester_name,
       creator_id: creator_id,
       linkupId: linkupId,
-      message: message,
+      content: content,
     });
     return response.data;
   } catch (error) {

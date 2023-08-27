@@ -61,7 +61,7 @@ const getLinkups = async (req, res) => {
 
   const queryPath = path.join(__dirname, "../db/queries/getLinkups.sql");
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = userId;
+  const queryValues = [userId, gender];
 
   try {
     const { rows } = await pool.query(query, queryValues);

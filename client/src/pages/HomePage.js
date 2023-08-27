@@ -19,6 +19,7 @@ const compromise = nlp;
 const useStyles = makeStyles((theme) => ({
   homePage: {
     display: "flex",
+    width: "80%",
   },
   feedSection: {
     flex: "2",
@@ -66,7 +67,7 @@ const HomePage = ({ linkupList, isLoading }) => {
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch, userID]);
+  }, [dispatch, gender, userID]);
 
   const removeExpiredLinkups = useCallback(async () => {
     try {
