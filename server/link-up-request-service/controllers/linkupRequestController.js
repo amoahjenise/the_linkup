@@ -123,8 +123,37 @@ const declineRequest = async (req, res) => {
   }
 };
 
+const getRequest = async (req, res) => {
+  const { linkupId, requesterId } = req.query;
+  let queryPath = path.join(__dirname, "../db/queries/getRequest.sql");
+
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [linkupId, requesterId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    console.log(rows);
+
+    if (rows.length > 0) {
+      res.json({
+        success: true,
+        message: "Linkup request fetched successfully",
+        linkupRequestId: rows[0].id,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Linkup request fetch failed",
+      linkupRequest: {},
+    });
+  }
+};
+
 module.exports = {
   sendRequest,
+  getRequest,
   acceptRequest,
   declineRequest,
 };

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // Import useLocation hook
 import { useSelector } from "react-redux";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
 import LinkupRequestItem from "../components/LinkupRequestItem";
@@ -31,6 +32,9 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   const [linkupList, setLinkupList] = useState([]);
   const [linkupRequestList, setLinkupRequestList] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
+
+  // Use the useLocation hook to get the current pathname
+  const location = useLocation();
 
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
@@ -70,8 +74,22 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   }, [dispatch, userID]);
 
   useEffect(() => {
+    // Update the active tab based on the location
+    switch (location.pathname) {
+      case "/history":
+        setActiveTab(0); // Set the active tab to 0 (Active Link-Ups)
+        break;
+      case "/history/expired":
+        setActiveTab(1); // Set the active tab to 1 (Expired Link-Ups)
+        break;
+      case "/history/requests":
+        setActiveTab(2); // Set the active tab to 2 (Requests)
+        break;
+      default:
+        setActiveTab(0); // Default to the first tab
+    }
     fetchLinkups();
-  }, [dispatch, fetchLinkups]);
+  }, [dispatch, fetchLinkups, location.pathname]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);

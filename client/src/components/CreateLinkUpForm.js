@@ -25,6 +25,8 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     overflowY: "auto",
+    justifyContent: "center",
+    alignItems: "center",
   },
   createContainer: {
     flex: "1",
@@ -33,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: "calc(100vh - 240px)",
+    height: "calc(100vh - 140px)",
     position: "sticky",
     top: 0,
     overflowY: "auto",
@@ -150,7 +152,7 @@ const CreateLinkupForm = ({
 
   return (
     <div className={classes.createLinkUpContainer}>
-      <div className={classes.searchInputContainer}>
+      {/* <div className={classes.searchInputContainer}>
         <TextField
           className={classes.createLinkUpInput}
           placeholder="Search for Link-Ups"
@@ -162,7 +164,7 @@ const CreateLinkupForm = ({
             ),
           }}
         />
-      </div>
+      </div> */}
       <div className={classes.createContainer}>
         <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
         <form

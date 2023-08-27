@@ -54,6 +54,7 @@ const App = () => {
     return isAuthenticated ? (
       <div className={classes.app}>
         <LeftMenu
+          isMobile={isMobile}
           activeSection={activeSection}
           setActiveSection={setActiveSection}
         />
@@ -113,13 +114,24 @@ const App = () => {
                   element={<HomePage isMobile={isMobile} />}
                 />
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/profile/:id" element={<UserProfilePage />} />
+                <Route
+                  path="/profile/:id"
+                  element={<UserProfilePage isMobile={isMobile} />}
+                />
                 <Route
                   path="/send-request/:linkupId"
                   element={<SendRequestPage />}
                 />
                 <Route
                   path="/history"
+                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/expired"
+                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/requests"
                   element={<LinkUpHistoryPage isMobile={isMobile} />}
                 />
                 <Route

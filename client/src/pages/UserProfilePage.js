@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Cards from "../components/Cards";
 import IconButton from "@material-ui/core/IconButton";
 import SaveIcon from "@material-ui/icons/Save";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
-import { useParams } from "react-router-dom";
 import AvatarUpdate from "../components/AvatarUpdate";
 import Geocode from "react-geocode";
-import { getUserById, updateUserBio } from "../api/usersAPI"; // Assuming you have an API function to fetch user data
+import { getUserById, updateUserBio } from "../api/usersAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
 
-// Set your Google Maps API key (you need to get one from the Google Cloud Console)
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
 const useStyles = makeStyles((theme) => ({
@@ -23,10 +22,9 @@ const useStyles = makeStyles((theme) => ({
     width: "55%",
     borderRight: "1px solid #e1e8ed",
     [theme.breakpoints.down("sm")]: {
-      width: "100%", // Set to 100% in mobile mode
+      width: "100%",
     },
   },
-
   profileSection: {
     display: "flex",
     flexDirection: "column",
@@ -39,9 +37,10 @@ const useStyles = makeStyles((theme) => ({
     },
     backgroundColor: "rgba(207, 217, 222, 0.1)",
     padding: theme.spacing(2),
+    borderBottom: "1px solid #e1e8ed",
   },
   commentInput: {
-    width: "55vh", // Set width to 100%
+    width: "55vh",
     resize: "none",
     [theme.breakpoints.down("sm")]: {
       width: "100%",
@@ -49,19 +48,19 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonsContainer: {
     gap: theme.spacing(1),
-    marginLeft: "auto", // Pushes buttons to the right
+    marginLeft: "auto",
   },
   centeredContent: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "100%",
+    height: "55%",
     [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2),
     },
   },
   editButton: {
-    marginLeft: "auto", // Pushes buttons to the right
+    marginLeft: "auto",
     cursor: "pointer",
   },
   saveButton: {
@@ -72,19 +71,41 @@ const useStyles = makeStyles((theme) => ({
     width: "fit-content",
     fontSize: "14px",
   },
-
   leftMargin: {
     marginLeft: theme.spacing(4),
   },
+  bioTextArea: {
+    height: "60px",
+    padding: theme.spacing(1),
+    resize: "none",
+    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+    fontSize: "15px",
+    fontWeight: "400",
+    lineHeight: "20px",
+    letterSpacing: "-0.2px",
+    border: "1px solid #e1e8ed",
+    borderRadius: "8px",
+    backgroundColor: "transparent",
+    width: "100%",
+    marginBottom: theme.spacing(2),
+  },
+  mobileTextArea: {
+    padding: theme.spacing(2),
+  },
+  mobileProfileHeader: {
+    padding: theme.spacing(2),
+    borderBottom: "1px solid #e1e8ed",
+    backgroundColor: "rgba(207, 217, 222, 0.1)",
+  },
 }));
 
-const UserProfilePage = () => {
+const UserProfilePage = ({ isMobile }) => {
   let { id: userID } = useParams();
   const classes = useStyles();
   const [isBioEditMode, setIsEditMode] = useState(false);
   const [updatedBio, setUpdatedBio] = useState("");
   const [userLocation, setUserLocation] = useState(null);
-  const [userData, setUserData] = useState(null); // State to hold fetched user data
+  const [userData, setUserData] = useState(null);
   const [isLoggedUserProfile, setIsLoggedUserProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -96,40 +117,33 @@ const UserProfilePage = () => {
   }
 
   useEffect(() => {
-    // Check if the id of the user visiting the profile is the same as the logged user id
     setIsLoggedUserProfile(userID === "me" || userID === loggedUser.user.id);
     const fetchData = async () => {
       try {
-        // Fetch user data from API
         const response = await getUserById(userID);
 
         if (response.success) {
-          setUserData(response.user); // Store the fetched user data
+          setUserData(response.user);
           setUpdatedBio(response.user.bio);
         }
 
-        // Fetch the user's current location using geolocation API
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
 
-            // Use reverse geocoding to get the city and country
             Geocode.fromLatLng(latitude, longitude).then(
               (response) => {
                 const address = response.results[0].formatted_address;
-                // Update the userLocation state with the city and country
                 setUserLocation(address);
               },
               (error) => {
                 console.error(error);
-                // If reverse geocoding fails, set a default location or show an error message
                 setUserLocation("Unknown Location");
               }
             );
           },
           (error) => {
             console.error(error);
-            // If geolocation fails, set a default location or show an error message
             setUserLocation("Unknown Location");
           }
         );
@@ -138,7 +152,7 @@ const UserProfilePage = () => {
       } finally {
         setTimeout(() => {
           setIsLoading(false);
-        }, 300); // Delay setting loading state to false by 300 milliseconds
+        }, 300);
       }
     };
     fetchData();
@@ -225,57 +239,126 @@ const UserProfilePage = () => {
   return (
     <div className={classes.userProfilePage}>
       <TopNavBar title="Profile" />
-      <div className={classes.profileSection}>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <div className={classes.profileHeader}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <AvatarUpdate
-                userId={userData?.id}
-                currentAvatarUrl={userData?.avatar}
-                isLoggedUserProfile={isLoggedUserProfile}
-              />
-              <div className={classes.leftMargin}>
-                <h2>
-                  {userData?.name}, {calculateAge(userData?.date_of_birth)}
-                </h2>
-                <span style={{ fontWeight: "normal" }}>
-                  <p>{userLocation}</p>
-                </span>
-                {isBioEditMode ? (
-                  <div style={{ display: "flex", flexDirection: "column" }}>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className={classes.profileSection}>
+          {/* Mobile mode */}
+          {isMobile && (
+            <>
+              {/* Profile header */}
+              <div className={classes.mobileProfileHeader}>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <AvatarUpdate
+                    userId={userData?.id}
+                    currentAvatarUrl={userData?.avatar}
+                    isLoggedUserProfile={isLoggedUserProfile}
+                  />
+                  <div className={classes.leftMargin}>
+                    <h2>
+                      {userData?.name}, {calculateAge(userData?.date_of_birth)}{" "}
+                    </h2>
+                    <span style={{ fontWeight: "normal" }}>
+                      <p>{userLocation}</p>
+                    </span>
+                  </div>{" "}
+                  {renderEditButton()}
+                </div>
+                {/* Bio text area */}
+                <div className={classes.mobileTextArea}>
+                  {isBioEditMode ? (
                     <textarea
+                      autoCapitalize="sentences"
+                      autoComplete="on"
+                      autoCorrect="on"
+                      maxLength="160"
+                      name="description"
+                      spellCheck="true"
+                      dir="auto"
+                      style={{ height: "60px", width: "100%" }}
                       value={updatedBio}
                       onChange={(e) =>
                         setUpdatedBio(e.target.value.slice(0, 160))
                       }
-                      className={classes.commentInput}
-                      placeholder="Edit your bio (maximum of 160 characters)..."
                     />
-                  </div>
-                ) : (
-                  <div>
-                    {" "}
-                    <span style={{ fontWeight: "normal" }}>
-                      Bio: {userData?.bio}
-                    </span>
-                  </div>
-                )}
+                  ) : (
+                    <div>
+                      <span style={{ fontWeight: "normal" }}>
+                        Bio: {userData?.bio}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </>
+          )}
 
-            {renderEditButton()}
-          </div>
-        )}
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <div className={classes.centeredContent}>
-            <Cards images={mockUserData.profileImages} />
-          </div>
-        )}
-      </div>
+          {/* Desktop mode */}
+          {!isMobile && (
+            <>
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <div className={classes.profileHeader}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <AvatarUpdate
+                      userId={userData?.id}
+                      currentAvatarUrl={userData?.avatar}
+                      isLoggedUserProfile={isLoggedUserProfile}
+                    />
+                    <div className={classes.leftMargin}>
+                      <h2>
+                        {userData?.name},{" "}
+                        {calculateAge(userData?.date_of_birth)}
+                      </h2>
+                      <span style={{ fontWeight: "normal" }}>
+                        <p>{userLocation}</p>
+                      </span>
+                      {isBioEditMode ? (
+                        <div
+                          style={{ display: "flex", flexDirection: "column" }}
+                        >
+                          <textarea
+                            autoCapitalize="sentences"
+                            autoComplete="on"
+                            autoCorrect="on"
+                            maxLength="160"
+                            name="description"
+                            spellCheck="true"
+                            dir="auto"
+                            style={{ height: "60px" }}
+                            value={updatedBio}
+                            onChange={(e) =>
+                              setUpdatedBio(e.target.value.slice(0, 160))
+                            }
+                            className={classes.commentInput}
+                            placeholder="Edit your bio (maximum of 160 characters)..."
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          {" "}
+                          <span style={{ fontWeight: "normal" }}>
+                            Bio: {userData?.bio}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {renderEditButton()}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className={classes.centeredContent}>
+          <Cards images={mockUserData.profileImages} />
+        </div>
+      )}
     </div>
   );
 };

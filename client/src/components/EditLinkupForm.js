@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: "calc(100vh - 240px)",
+    height: "calc(100vh - 140px)",
     position: "sticky",
     top: 0,
     overflowY: "auto",
@@ -178,7 +178,7 @@ const EditLinkupForm = ({ setShouldFetchLinkups }) => {
 
   return (
     <div className={classes.editLinkUpContainer}>
-      <div className={classes.searchInputContainer}>
+      {/* <div className={classes.searchInputContainer}>
         <TextField
           className={classes.editLinkUpInput}
           placeholder="Search for Link Ups"
@@ -190,7 +190,7 @@ const EditLinkupForm = ({ setShouldFetchLinkups }) => {
             ),
           }}
         />
-      </div>
+      </div> */}
       <div className={classes.editContainer}>
         <h2 className={classes.editLinkUpTitle}>Edit Link-Up</h2>
         <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>

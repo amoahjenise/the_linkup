@@ -1,13 +1,15 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import { useNavigate } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import moment from "moment";
-import { sendRequest } from "../api/linkupRequestAPI";
+import {
+  sendRequest,
+  getRequestByLinkupIdAndSenderId,
+} from "../api/linkupRequestAPI";
 import { addSentRequest } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
@@ -51,6 +53,7 @@ const SendRequest = ({ linkupId, linkups }) => {
 
   const classes = useStyles();
   const [message, setMessage] = useState("");
+  const [isRequestSent, setIsRequestSent] = useState(false);
   const navigate = useNavigate(); // useNavigate hook for navigation
 
   const handleSendRequest = async () => {
@@ -80,6 +83,28 @@ const SendRequest = ({ linkupId, linkups }) => {
     const timeText = post.date ? `(${moment(post.date).format("h:mm A")})` : "";
     return `${post.creator_name} is trying to link up for ${post.activity} at ${post.location} on ${dateText} ${timeText}.`;
   };
+
+  useEffect(() => {
+    // Fetch the request by linkupId and senderId to check if the request has been sent
+    getRequestByLinkupIdAndSenderId(linkupId, loggedUser.user.id)
+      .then((data) => {
+        if (data?.linkupRequestId) {
+          setIsRequestSent(true);
+        } else {
+          setIsRequestSent(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching request:", error);
+      });
+  }, [linkupId, loggedUser.user.id]);
+
+  useEffect(() => {
+    // Redirect the user if the request has already been sent
+    if (isRequestSent) {
+      navigate(`/history/requests`);
+    }
+  }, [isRequestSent, navigate, loggedUser.user.id]);
 
   return (
     <div className={classes.sendRequest}>

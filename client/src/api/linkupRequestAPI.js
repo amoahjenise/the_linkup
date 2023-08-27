@@ -49,3 +49,20 @@ export const declineRequest = async (requestId) => {
     handleError(error);
   }
 };
+
+export const getRequestByLinkupIdAndSenderId = async (
+  linkupId,
+  requesterId
+) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/get-request`, {
+      params: {
+        requesterId: requesterId,
+        linkupId: linkupId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};

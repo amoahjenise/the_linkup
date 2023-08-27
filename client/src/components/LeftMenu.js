@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import HomeIcon from "@material-ui/icons/Home";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
@@ -12,7 +11,6 @@ import MessageIcon from "@material-ui/icons/Message";
 import SettingsIcon from "@material-ui/icons/Settings";
 import LogoutButton from "./LogoutButton";
 import logo from "../logo.png";
-import { useTheme } from "@material-ui/core/styles";
 
 const drawerWidth = "20%";
 
@@ -58,9 +56,6 @@ const useStyles = makeStyles((theme) => ({
   },
   badge: {
     marginLeft: theme.spacing(2),
-    [theme.breakpoints.down("sm")]: {
-      marginLeft: theme.spacing(0),
-    },
   },
 
   mobileMenuContainer: {
@@ -89,14 +84,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LeftMenu = ({ activeSection, setActiveSection }) => {
+const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
   const classes = useStyles();
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
   );
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleMenuItemClick = (section) => {
     setActiveSection(section);
@@ -122,11 +114,7 @@ const LeftMenu = ({ activeSection, setActiveSection }) => {
             } ${activeSection === "notifications" ? classes.active : ""}`}
             onClick={() => handleMenuItemClick("notifications")}
           >
-            <Badge
-              badgeContent={unreadNotificationsCount}
-              color="secondary"
-              className={classes.badge}
-            >
+            <Badge badgeContent={unreadNotificationsCount} color="secondary">
               <NotificationsIcon />
             </Badge>
           </Link>
