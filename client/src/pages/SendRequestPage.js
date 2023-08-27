@@ -8,6 +8,9 @@ const useStyles = makeStyles((theme) => ({
   sendRequestPage: {
     display: "flex",
     width: "50%",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%", // Set to 100% in mobile mode
+    },
   },
 }));
 

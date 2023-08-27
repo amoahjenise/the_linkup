@@ -23,6 +23,10 @@ const useStyles = makeStyles((theme) => ({
     height: "100%",
     width: "50%",
     borderRight: "1px solid #e1e8ed",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%", // Set to 100% in mobile mode
+      borderRight: "none", // Remove border in mobile mode
+    },
   },
 
   profileSection: {
@@ -32,12 +36,18 @@ const useStyles = makeStyles((theme) => ({
   profileHeader: {
     display: "flex",
     marginBottom: theme.spacing(8),
+    [theme.breakpoints.down("sm")]: {
+      marginBottom: theme.spacing(2),
+    },
     backgroundColor: "rgba(207, 217, 222, 0.1)",
     padding: theme.spacing(2),
   },
   commentInput: {
     width: "55vh", // Set width to 100%
     resize: "none",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%",
+    },
   },
   buttonsContainer: {
     gap: theme.spacing(1),
@@ -48,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     height: "100%",
+    [theme.breakpoints.down("sm")]: {
+      padding: theme.spacing(2),
+    },
   },
   editButton: {
     marginLeft: "auto", // Pushes buttons to the right

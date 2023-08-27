@@ -8,7 +8,13 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flex: 1,
   },
-  mainSection: { width: "65%", borderRight: "1px solid #e1e8ed" },
+  mainSection: {
+    width: "65%",
+    borderRight: "1px solid #e1e8ed",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%", // Set to 100% in mobile mode
+    },
+  },
 }));
 
 const SettingsPage = () => {

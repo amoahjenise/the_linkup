@@ -7,6 +7,9 @@ const useStyles = makeStyles((theme) => ({
   messagesPage: {
     display: "flex",
     width: "75%",
+    [theme.breakpoints.down("sm")]: {
+      width: "100%", // Set to 100% in mobile mode
+    },
   },
   messageSection: {
     flex: 1,
