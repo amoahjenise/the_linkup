@@ -20,12 +20,10 @@ const useStyles = makeStyles((theme) => ({
   userProfilePage: {
     display: "flex",
     flexDirection: "column",
-    height: "100%",
-    width: "50%",
+    width: "55%",
     borderRight: "1px solid #e1e8ed",
     [theme.breakpoints.down("sm")]: {
       width: "100%", // Set to 100% in mobile mode
-      borderRight: "none", // Remove border in mobile mode
     },
   },
 

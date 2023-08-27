@@ -6,10 +6,7 @@ import ChatComponent from "../components/ChatComponent";
 const useStyles = makeStyles((theme) => ({
   messagesPage: {
     display: "flex",
-    width: "75%",
-    [theme.breakpoints.down("sm")]: {
-      width: "100%", // Set to 100% in mobile mode
-    },
+    width: "100%",
   },
   messageSection: {
     flex: 1,
@@ -64,7 +61,7 @@ const MessagesPage = ({ isMobile }) => {
           />
         </div>
       ) : (
-        <div>
+        <div className={classes.messagesPage}>
           <div className={classes.messageSection}>
             <MessagesSection
               messages={messages}

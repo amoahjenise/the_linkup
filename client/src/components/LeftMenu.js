@@ -18,16 +18,15 @@ const drawerWidth = "20%";
 
 const useStyles = makeStyles((theme) => ({
   main: {
-    // flex: "0 0 " + drawerWidth,
+    flex: "0 0 " + drawerWidth,
     color: "black",
     padding: theme.spacing(2),
     borderRight: "0.1px solid lightgrey",
-    width: "25%",
   },
   menu: {
     flex: "0 0 " + drawerWidth,
     color: "black",
-    marginLeft: theme.spacing(18),
+    marginLeft: theme.spacing(16),
   },
   menuList: {
     listStyleType: "none",
@@ -35,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
   },
   menuItem: {
-    fontSize: "1.2rem",
     marginBottom: theme.spacing(2),
     padding: theme.spacing(2),
   },

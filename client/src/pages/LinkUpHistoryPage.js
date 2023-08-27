@@ -9,18 +9,15 @@ import { setIsLoading } from "../redux/actions/linkupActions";
 import { getLinkupRequests, getUserLinkups } from "../api/linkupAPI";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles((theme) => ({
   linkUpHistoryPage: {
     display: "flex",
     flexDirection: "column",
-    height: "100%",
-    width: "50%",
+    width: "55%",
     borderRight: "1px solid #e1e8ed",
     [theme.breakpoints.down("sm")]: {
       width: "100%", // Set to 100% in mobile mode
-      borderRight: "none", // Remove border in mobile mode
     },
   },
   tabBar: {
@@ -93,11 +90,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
         style={{ width: isMobile ? "100%" : "auto" }} // Adjust width based on mobile mode
       >
         {tabs.map((tab) => (
-          <Tab
-            key={tab.id}
-            label={tab.label}
-            style={{ width: isMobile ? "33%" : "100%" }}
-          />
+          <Tab key={tab.id} label={tab.label} style={{ width: "33%" }} />
         ))}
       </Tabs>
       {/* Render content based on activeTab */}
