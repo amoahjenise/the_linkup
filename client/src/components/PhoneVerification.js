@@ -215,6 +215,7 @@ function PhoneVerification({
         value={phoneNumber}
         onChange={handlePhoneNumberChange}
         isValid={isValidPhoneNumber}
+        disabled={isVerificationCodeSent}
       />
 
       {!isVerificationCodeSent ? (
