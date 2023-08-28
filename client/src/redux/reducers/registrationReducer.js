@@ -1,8 +1,13 @@
-import { NEXT_STEP, PREVIOUS_STEP } from "../actions/actionTypes";
+// reducers/registrationReducer.js
+import {
+  NEXT_STEP,
+  PREVIOUS_STEP,
+  RESET_REGISTRATION_STATE,
+} from "../actions/actionTypes";
 
 const initialState = {
   currentStep: 0,
-  steps: ["User Info", "Profile Picture", "Password", "Launch LUUL"],
+  steps: ["User Info", "Avatar", "Password", "Launch"],
 };
 
 const registrationReducer = (state = initialState, action) => {
@@ -17,6 +22,8 @@ const registrationReducer = (state = initialState, action) => {
         ...state,
         currentStep: Math.max(state.currentStep - 1, 0),
       };
+    case RESET_REGISTRATION_STATE:
+      return initialState;
     default:
       return state;
   }

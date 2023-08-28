@@ -4,20 +4,22 @@ import Typography from "@material-ui/core/Typography";
 import logo from "../logo.png";
 
 const useStyles = makeStyles((theme) => ({
-  content: {
+  main: {
+    display: "flex",
+    justifyContent: "center",
     textAlign: "center",
   },
   title: {
     fontWeight: "bold",
-    marginBottom: theme.spacing(4),
   },
   logoContainer: {
+    marginBottom: theme.spacing(4),
     [theme.breakpoints.down("sm")]: {
-      marginBottom: theme.spacing(2),
+      marginBottom: theme.spacing(0),
     },
   },
   logo: {
-    height: "50px",
+    height: "40px",
   },
 }));
 
@@ -25,7 +27,7 @@ const LogoHeader = () => {
   const classes = useStyles();
 
   return (
-    <div>
+    <div className={classes.main}>
       <div className={classes.logoContainer}>
         <img src={logo} alt="Logo" className={classes.logo} />
       </div>

@@ -36,6 +36,14 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(2),
     },
   },
+  termsAndServices: {
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: theme.spacing(1),
+    marginLeft: theme.spacing(8),
+    marginRight: theme.spacing(8),
+    fontSize: "10px",
+  },
   centerText: {
     display: "flex",
     justifyContent: "center",
@@ -133,6 +141,16 @@ function LandingPage() {
               Create Account
             </Button>
           </div>
+          <Typography
+            variant="subtitle2"
+            component="small"
+            className={classes.termsAndServices}
+          >
+            By signing up, you agree to the{" "}
+            <a href="/terms-of-service">Terms of Service </a> and{" "}
+            <a href="/privacy-policy">Privacy Policy</a>, including{" "}
+            <a href="/cookie-use">Cookie Use</a>.
+          </Typography>
         </div>
         <main className={classes.main}>
           <Typography

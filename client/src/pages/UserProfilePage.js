@@ -12,6 +12,7 @@ import Geocode from "react-geocode";
 import { getUserById, updateUserBio } from "../api/usersAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
+import Typography from "@material-ui/core/Typography";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -268,21 +269,29 @@ const UserProfilePage = ({ isMobile }) => {
                 {/* Bio text area */}
                 <div className={classes.mobileTextArea}>
                   {isBioEditMode ? (
-                    <textarea
-                      autoCapitalize="sentences"
-                      autoComplete="on"
-                      autoCorrect="on"
-                      maxLength="160"
-                      name="description"
-                      spellCheck="true"
-                      dir="auto"
-                      style={{ height: "60px", width: "100%" }}
+                    <Typography
+                      variant="subtitle2"
                       value={updatedBio}
                       onChange={(e) =>
                         setUpdatedBio(e.target.value.slice(0, 160))
                       }
-                    />
+                      component="textarea"
+                    ></Typography>
                   ) : (
+                    // <textarea
+                    //   autoCapitalize="sentences"
+                    //   autoComplete="on"
+                    //   autoCorrect="on"
+                    //   maxLength="160"
+                    //   name="description"
+                    //   spellCheck="true"
+                    //   dir="auto"
+                    //   style={{ height: "60px", width: "100%" }}
+                    //   value={updatedBio}
+                    //   onChange={(e) =>
+                    //     setUpdatedBio(e.target.value.slice(0, 160))
+                    //   }
+                    // />
                     <div>
                       <span style={{ fontWeight: "normal" }}>
                         Bio: {userData?.bio}

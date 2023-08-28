@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 
-const ThirdStep = ({ password, setPassword, isPasswordValid }) => {
+const ThirdStep = ({ password, setPassword, setIsPasswordValid }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordErrors, setPasswordErrors] = useState([]);
-
-  useEffect(() => {
-    validatePasswordStrength(password);
-    validatePasswordMatch(confirmPassword);
-  }, [password, confirmPassword]);
 
   const validatePasswordStrength = (password) => {
     const errors = [];
@@ -30,13 +25,27 @@ const ThirdStep = ({ password, setPassword, isPasswordValid }) => {
     setPasswordErrors(errors);
   };
 
-  const validatePasswordMatch = (confirmPassword) => {
+  const validatePasswordMatch = useCallback(() => {
     setPasswordErrors((prevErrors) =>
       confirmPassword === password
         ? prevErrors.filter((error) => error !== "Passwords do not match.")
         : [...prevErrors, "Passwords do not match."]
     );
-  };
+  }, [confirmPassword, password]);
+
+  useEffect(() => {
+    validatePasswordStrength(password);
+    validatePasswordMatch(); // Call it here
+    setIsPasswordValid(
+      passwordErrors.length === 0 && password === confirmPassword
+    );
+  }, [
+    password,
+    confirmPassword,
+    validatePasswordMatch,
+    setIsPasswordValid,
+    passwordErrors.length,
+  ]);
 
   return (
     <div>

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
 // Import Redux Actions
-import { nextStep, previousStep } from "../redux/actions/registrationActions";
+import {
+  nextStep,
+  previousStep,
+  resetRegistrationState,
+} from "../redux/actions/registrationActions";
 import { login } from "../redux/actions/authActions";
 import { setCurrentUser } from "../redux/actions/userActions";
 // Import Registration Steps
@@ -122,9 +126,16 @@ const RegistrationProcess = () => {
           />
         );
       default:
-        return <LastStep name={name} />;
+        return <LastStep />;
     }
   };
+
+  useEffect(() => {
+    return () => {
+      // Clear the registration state when the component unmounts
+      dispatch(resetRegistrationState());
+    };
+  }, [dispatch]);
 
   return (
     <div>
