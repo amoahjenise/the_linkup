@@ -172,9 +172,13 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "home" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("home")}
+            // onClick={() => handleMenuItemClick("home")}
           >
-            <Link to="/home" className={classes.menuItemLink}>
+            <Link
+              to="/home"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("home")}
+            >
               <HomeIcon /> Home
             </Link>
           </li>
@@ -182,9 +186,12 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "notifications" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("notifications")}
           >
-            <Link to="/notifications" className={classes.menuItemLink}>
+            <Link
+              to="/notifications"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("notifications")}
+            >
               <NotificationsIcon /> Notifications
               <Badge
                 className={classes.badge}
@@ -197,9 +204,12 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "profile" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("profile")}
           >
-            <Link to="/profile/me" className={classes.menuItemLink}>
+            <Link
+              to="/profile/me"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("profile")}
+            >
               <AccountCircleIcon /> Profile
             </Link>
           </li>
@@ -207,9 +217,12 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "history" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("history")}
           >
-            <Link to="/history" className={classes.menuItemLink}>
+            <Link
+              to="/history"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("history")}
+            >
               <HistoryIcon /> Link Ups
             </Link>
           </li>
@@ -217,9 +230,12 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "messages" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("messages")}
           >
-            <Link to="/messages" className={classes.menuItemLink}>
+            <Link
+              to="/messages"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("messages")}
+            >
               <MessageIcon /> Messages
             </Link>
           </li>
@@ -227,9 +243,12 @@ const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
             className={`${classes.menuItem} ${classes.menuItemHover} ${
               activeSection === "settings" ? classes.active : ""
             }`}
-            onClick={() => handleMenuItemClick("settings")}
           >
-            <Link to="/settings" className={classes.menuItemLink}>
+            <Link
+              to="/settings"
+              className={classes.menuItemLink}
+              onClick={() => handleMenuItemClick("settings")}
+            >
               <SettingsIcon /> Settings
             </Link>
           </li>
