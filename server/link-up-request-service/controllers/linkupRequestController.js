@@ -12,6 +12,10 @@ const {
   createNotification,
 } = require("../../notification-service/controllers/notificationController");
 
+const {
+  createNewConversation,
+} = require("../../messaging-service/controllers/messagingController");
+
 const sendRequest = async (req, res) => {
   const { requesterId, requesterName, creator_id, linkupId, content } =
     req.body;
@@ -24,6 +28,17 @@ const sendRequest = async (req, res) => {
     var { rows } = await pool.query(query, queryValues);
 
     if (rows.length > 0) {
+      // Create a new conversation
+
+      // Post Notification
+      const conversationData = {
+        sender_id: requesterId,
+        recipient_id: creator_id,
+        message_content: content,
+      };
+
+      await createNewConversation(conversationData);
+
       // Post Notification
       const notificationData = {
         creatorId: creator_id,
@@ -33,8 +48,6 @@ const sendRequest = async (req, res) => {
         linkupId: linkupId,
         content: `New linkup request from ${requesterName}`,
       };
-
-      console.log("ROES:", notificationID);
 
       var notificationID = await createNotification(notificationData);
 

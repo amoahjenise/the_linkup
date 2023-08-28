@@ -7,8 +7,8 @@ const useStyles = makeStyles((theme) => ({
   navbar: {
     display: "flex",
     justifyContent: "space-between",
-    padding: theme.spacing(2),
-    borderBottom: "1px solid lightgrey",
+    padding: theme.spacing(1),
+    borderBottom: "1px solid #f5f8fa",
   },
   logo: {
     height: "50px",

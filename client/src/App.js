@@ -104,7 +104,11 @@ const App = () => {
         <div className="app">
           <Router>
             <Routes>
-              <Route path="/" exact element={<LandingPage />} />
+              <Route
+                path="/"
+                exact
+                element={<LandingPage isMobile={isMobile} />}
+              />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/login" element={<LoginPage />} />
               {/* Protected routes */}

@@ -72,10 +72,10 @@ const RegistrationProcess = () => {
           // Reset local states
           setPassword("");
           setIsPasswordValid(false);
-          setName("");
-          setDateOfBirth("");
-          setGender("");
-          setAvatarURL("");
+          // setName("");
+          // setDateOfBirth("");
+          // setGender("");
+          // setAvatarURL("");
         }
       } catch (error) {
         console.error("Error creating user:", error);
@@ -126,7 +126,7 @@ const RegistrationProcess = () => {
           />
         );
       default:
-        return <LastStep />;
+        return <LastStep name={name} />;
     }
   };
 

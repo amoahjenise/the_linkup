@@ -45,7 +45,15 @@ const useStyles = makeStyles((theme) => ({
 const LinkupHistoryItem = ({ post }) => {
   const classes = useStyles();
 
-  const { creator_name, avatar, activity, location, date, status } = post;
+  const {
+    creator_name,
+    avatar,
+    gender_preference,
+    activity,
+    location,
+    date,
+    status,
+  } = post;
 
   const renderStatusIcon = () => {
     if (status === "active") {
@@ -103,7 +111,8 @@ const LinkupHistoryItem = ({ post }) => {
       .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
 
     if (status === "active") {
-      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText}.`;
+      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText}
+      with a gender preference for ${gender_preference}.`;
     } else if (status === "expired") {
       linkupItemText = `Link up ${activityText.toLowerCase()} at ${formattedLocation} on 
           ${dateText} ${timeText} has expired.`;

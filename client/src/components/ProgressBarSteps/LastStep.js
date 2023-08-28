@@ -1,11 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
-const LastStep = () => {
+const LastStep = ({ name }) => {
   // Convert the first character to uppercase and the rest to lowercase
 
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const { name } = loggedUser.user;
+  // const loggedUser = useSelector((state) => state.loggedUser);
+  // const name = loggedUser.user?.name;
 
   const formattedName =
     name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
