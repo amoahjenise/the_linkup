@@ -69,6 +69,7 @@ Welcome to the documentation for the Linkup app, a platform that enables users t
 7. [Component Architecture](#component-architecture)
 8. [Styling and UI](#styling-and-ui)
 9. [Server and API Endpoints](#server-and-api-endpoints)
+10. [User Account Deactivation and Reactivation](#user-account-deactivation-and-reactivation)
 
 ## Linkup Creation and Management
 
@@ -139,6 +140,39 @@ The backend (server/) services handle authentication, user management, linkup ma
 
 - API endpoints manage authentication, user actions, linkup actions, messaging, and notifications.
 - Docker and Redis are utilized for enhanced app performance and scalability.
+
+## User Account Deactivation and Reactivation
+
+The implemented solution for user account deactivation and reactivation enhances user control while maintaining data integrity. Deactivation and reactivation functionalities are crucial for users who wish to temporarily pause or resume their engagement with the platform. The solution presented below uses soft deletes and status tracking to simplify the process and maintain data integrity.
+
+**Deactivation:**
+
+1. **User Request:** When a user requests to deactivate their account, their account status is changed to "inactive" in the database.
+
+2. **Data Soft Deletion:** To ensure user data is retained, we employ a soft deletion mechanism. We set the "hidden" column of the user's linkups, linkup requests, and notifications to true. This hides the data from user interfaces while keeping the data accessible for potential reactivation.
+
+**Reactivation:**
+
+1. **User Request:** When a user requests to reactivate their account, we update their account status to "active" in the database.
+
+2. **Data Restoration:** To restore user data, we simply set the "hidden" column back to false for the user's linkups, linkup requests, and notifications. This action makes the data visible again in the user interfaces.
+
+**Benefits of the Solution:**
+
+- **Simplicity:** The solution is straightforward and avoids the need for complex data restoration mechanisms.
+
+- **User Control:** Users have the autonomy to temporarily deactivate and reactivate their accounts without losing their data.
+
+- **Data Integrity:** Soft deletes ensure data integrity, as the data is not permanently removed from the system.
+
+- **Minimal Impact:** The approach minimally affects existing data structures and workflows, making it easy to implement.
+
+**Usage:**
+
+- To deactivate an account, the user initiates the process through the platform's interface.
+
+- To reactivate an account, users follow the reactivation process through the platform.
+
 
 ## Conclusion
 
