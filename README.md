@@ -143,9 +143,7 @@ The backend (server/) services handle authentication, user management, linkup ma
 
 ## User Account Deactivation and Reactivation
 
-**Introduction:**
-
-This document outlines the approach taken to implement user account deactivation and reactivation in the MVP of our web application. Deactivation and reactivation functionalities are crucial for users who wish to temporarily pause or resume their engagement with the platform. The solution presented below uses soft deletes and status tracking to simplify the process and maintain data integrity.
+The implemented solution for user account deactivation and reactivation enhances user control while maintaining data integrity. Deactivation and reactivation functionalities are crucial for users who wish to temporarily pause or resume their engagement with the platform. The solution presented below uses soft deletes and status tracking to simplify the process and maintain data integrity.
 
 **Deactivation:**
 
@@ -175,9 +173,6 @@ This document outlines the approach taken to implement user account deactivation
 
 - To reactivate an account, users follow the reactivation process through the platform.
 
-**Conclusion:**
-
-The implemented solution for user account deactivation and reactivation enhances user control while maintaining data integrity. It aligns with the MVP's goals of simplicity and optimization. This feature empowers users to take breaks from the platform without losing their data, and the implementation is documented here for reference.
 
 ## Conclusion
 
