@@ -81,8 +81,20 @@ const useStyles = makeStyles((theme) => ({
     width: "300px", // Adjust the width as needed
     textAlign: "center",
   },
+  editButton: {
+    color: theme.palette.primary.contrastText,
+    marginRight: theme.spacing(1),
+    boxShadow: theme.shadows[1],
+  },
+  cancelButton: {
+    color: theme.palette.primary.contrastText,
+    marginRight: theme.spacing(1),
+    boxShadow: theme.shadows[1],
+  },
   deleteButton: {
     color: theme.palette.primary.contrastText,
+    boxShadow: theme.shadows[1],
+    border: "1px solid #f5f8fa",
   },
   requestButton: {
     backgroundColor: theme.palette.background.paper,
@@ -183,9 +195,10 @@ const LinkupItem = React.memo(
           at <span className={classes.boldText}>{formattedLocation}</span> on{" "}
           <span className={classes.boldText}>
             {dateText} {timeText}
-          </span>{" "}
-          with a preference for{" "}
-          <span className={classes.boldText}>{gender_preference}</span>.
+          </span>
+          .{" "}
+          {/* with a preference for{" "}
+          <span className={classes.boldText}>{gender_preference}</span>. */}
         </p>
       );
 
@@ -244,8 +257,9 @@ const LinkupItem = React.memo(
               alt="avatar"
               loading="lazy"
             />
-            {renderLinkupItemText()}
           </div>
+          {renderLinkupItemText()}
+
           <div className={classes.linkupItemDetails}>
             {/* Use the Link component to navigate to SendRequestPage */}
             {loggedUser.user.id !== linkupItem.creator_id && (
@@ -269,7 +283,12 @@ const LinkupItem = React.memo(
             <div className={classes.buttonsContainer}>
               {editingLinkup.isEditing &&
               editingLinkup.linkup.id === linkupItem.id ? (
-                <Button color="default" onClick={handleCancelClick}>
+                <Button
+                  color="default"
+                  size="small"
+                  onClick={handleCancelClick}
+                  className={classes.cancelButton}
+                >
                   Cancel
                 </Button>
               ) : (
@@ -277,18 +296,24 @@ const LinkupItem = React.memo(
                   {loggedUser?.user.id === creator_id &&
                     !editingLinkup.isEditing && (
                       // Disabling buttons for other link-ups during editing
-                      <>
-                        <Button color="primary" onClick={handleEditClick}>
+                      <div className={classes.buttonsContainer}>
+                        <Button
+                          color="primary"
+                          size="small"
+                          onClick={handleEditClick}
+                          className={classes.editButton}
+                        >
                           Edit
                         </Button>
                         <Button
                           color="secondary"
+                          size="small"
                           onClick={handleDeleteClick}
                           className={classes.deleteButton}
                         >
                           Delete
                         </Button>
-                      </>
+                      </div>
                     )}
                 </>
               )}
