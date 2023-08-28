@@ -28,10 +28,10 @@ export const sendRequest = async (
   }
 };
 
-export const approveRequest = async (requestId) => {
+export const acceptLinkupRequest = async (linkupRequestId) => {
   try {
-    const response = await axios.delete(
-      `${BASE_URL}/api/approve-request?id=${requestId}`
+    const response = await axios.post(
+      `${BASE_URL}/api/accept-request/${linkupRequestId}`
     );
     return response.data;
   } catch (error) {
@@ -39,10 +39,21 @@ export const approveRequest = async (requestId) => {
   }
 };
 
-export const declineRequest = async (requestId) => {
+export const declineLinkupRequest = async (linkupRequestId) => {
   try {
-    const response = await axios.delete(
-      `${BASE_URL}/api/decline-request?id=${requestId}`
+    const response = await axios.post(
+      `${BASE_URL}/api/decline-request/${linkupRequestId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getLinkupRequests = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/get-linkup-requests/${userId}`
     );
     return response.data;
   } catch (error) {
@@ -55,12 +66,15 @@ export const getRequestByLinkupIdAndSenderId = async (
   requesterId
 ) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-request`, {
-      params: {
-        requesterId: requesterId,
-        linkupId: linkupId,
-      },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/api/get-request-by-linkupid-and-senderid`,
+      {
+        params: {
+          requesterId: requesterId,
+          linkupId: linkupId,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     handleError(error);

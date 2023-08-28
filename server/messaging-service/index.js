@@ -19,7 +19,7 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000", // Allow connections from frontend
+    origin: ["http://localhost:3000", "http://192.168.1.102:3000"],
     methods: ["GET", "POST"],
   },
 });

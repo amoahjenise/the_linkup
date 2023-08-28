@@ -4,7 +4,7 @@ const userSockets = require("./userSockets");
 const initSocketServer = (httpServer) => {
   const io = socketIo(httpServer, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "http://192.168.1.102:3000",
       methods: ["GET", "POST"],
       credentials: true,
     },

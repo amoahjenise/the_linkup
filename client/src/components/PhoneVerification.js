@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     padding: theme.spacing(2),
+    overflowX: "hidden",
   },
   input: {
     marginTop: theme.spacing(2),

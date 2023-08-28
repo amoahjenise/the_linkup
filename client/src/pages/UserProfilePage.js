@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     width: "55%",
     borderRight: "1px solid #e1e8ed",
+    overflowX: "hidden",
     [theme.breakpoints.down("sm")]: {
       width: "100%",
     },
@@ -73,21 +74,6 @@ const useStyles = makeStyles((theme) => ({
   },
   leftMargin: {
     marginLeft: theme.spacing(4),
-  },
-  bioTextArea: {
-    height: "60px",
-    padding: theme.spacing(1),
-    resize: "none",
-    fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-    fontSize: "15px",
-    fontWeight: "400",
-    lineHeight: "20px",
-    letterSpacing: "-0.2px",
-    border: "1px solid #e1e8ed",
-    borderRadius: "8px",
-    backgroundColor: "transparent",
-    width: "100%",
-    marginBottom: theme.spacing(2),
   },
   mobileTextArea: {
     padding: theme.spacing(2),
@@ -255,12 +241,27 @@ const UserProfilePage = ({ isMobile }) => {
                     isLoggedUserProfile={isLoggedUserProfile}
                   />
                   <div className={classes.leftMargin}>
-                    <h2>
-                      {userData?.name}, {calculateAge(userData?.date_of_birth)}{" "}
-                    </h2>
-                    <span style={{ fontWeight: "normal" }}>
-                      <p>{userLocation}</p>
-                    </span>
+                    {isMobile ? (
+                      <div>
+                        <h5>
+                          {userData?.name},{" "}
+                          {calculateAge(userData?.date_of_birth)}{" "}
+                        </h5>
+                        <span style={{ fontWeight: "normal" }}>
+                          <h6>{userLocation}</h6>
+                        </span>
+                      </div>
+                    ) : (
+                      <div>
+                        <h2>
+                          {userData?.name},{" "}
+                          {calculateAge(userData?.date_of_birth)}{" "}
+                        </h2>
+                        <span style={{ fontWeight: "normal" }}>
+                          <p>{userLocation}</p>
+                        </span>
+                      </div>
+                    )}
                   </div>{" "}
                   {renderEditButton()}
                 </div>

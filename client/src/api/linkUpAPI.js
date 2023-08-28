@@ -20,17 +20,6 @@ export const getLinkups = async (userId, gender) => {
   }
 };
 
-export const getLinkupRequests = async (userId, gender) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/api/get-user-linkup-requests/${userId}`
-    );
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
 export const getUserLinkups = async (userId) => {
   try {
     const response = await axios.get(

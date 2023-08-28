@@ -70,21 +70,20 @@ const sendRequest = async (req, res) => {
 };
 
 const acceptRequest = async (req, res) => {
-  const { linkupId } = req.body;
-  let queryPath = path.join(__dirname, "../db/queries/acceptRequest.sql");
-
+  const { linkupRequestId } = req.params;
+  const queryPath = path.join(__dirname, "../db/queries/acceptRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [linkupId];
+  const queryValues = [linkupRequestId];
 
   try {
     const { rows } = await pool.query(query, queryValues);
-
+    console.log(rows);
     if (rows.length > 0) {
-      const linkups = rows;
+      const linkupRequest = rows[0];
       res.json({
         success: true,
         message: "Approved request successfully",
-        linkupList: linkups,
+        linkupRequest: linkupRequest,
       });
     }
   } catch (error) {
@@ -97,21 +96,21 @@ const acceptRequest = async (req, res) => {
 };
 
 const declineRequest = async (req, res) => {
-  const { linkupId } = req.body;
+  const { linkupRequestId } = req.params;
   let queryPath = path.join(__dirname, "../db/queries/declineRequest.sql");
 
   const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [linkupId];
+  const queryValues = [linkupRequestId];
 
   try {
     const { rows } = await pool.query(query, queryValues);
 
     if (rows.length > 0) {
-      const linkups = rows;
+      const linkupRequest = rows[0];
       res.json({
         success: true,
         message: "Decline request successfully",
-        linkupList: linkups,
+        linkupRequest: linkupRequest,
       });
     }
   } catch (error) {
@@ -123,9 +122,48 @@ const declineRequest = async (req, res) => {
   }
 };
 
-const getRequest = async (req, res) => {
+const getLinkupRequests = async (req, res) => {
+  const userId = req.params.userId;
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/getLinkupRequestsByUserId.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [userId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    if (rows.length > 0) {
+      const linkupRequests = rows;
+      res.json({
+        success: true,
+        message: "Linkup Requests fetched successfully",
+        linkupRequestList: linkupRequests,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "No linkup requests in the database",
+        linkupRequestList: [],
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching linkup requests:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch linkup requests",
+      error: error.message,
+    });
+  }
+};
+
+const getRequestByLinkupidAndSenderid = async (req, res) => {
   const { linkupId, requesterId } = req.query;
-  let queryPath = path.join(__dirname, "../db/queries/getRequest.sql");
+  let queryPath = path.join(
+    __dirname,
+    "../db/queries/getRequestByLinkupidAndSenderid.sql"
+  );
 
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [linkupId, requesterId];
@@ -153,7 +191,8 @@ const getRequest = async (req, res) => {
 
 module.exports = {
   sendRequest,
-  getRequest,
+  getLinkupRequests,
+  getRequestByLinkupidAndSenderid,
   acceptRequest,
   declineRequest,
 };

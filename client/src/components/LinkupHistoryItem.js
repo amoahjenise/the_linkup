@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#fff",
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
+    borderBottom: "1px solid lightgrey",
   },
   postDetails: {
     display: "flex",

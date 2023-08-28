@@ -86,7 +86,7 @@ const RegistrationProcess = () => {
 
   const pageTitles = [
     "Welcome! First things first...",
-    "Now it’s time to upload some photos",
+    "Now it’s time to upload a photo!",
     "Create a Password",
     "You've completed the registration, you can start using LUUL!",
   ];

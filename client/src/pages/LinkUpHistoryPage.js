@@ -7,7 +7,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import TopNavBar from "../components/TopNavBar";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../redux/actions/linkupActions";
-import { getLinkupRequests, getUserLinkups } from "../api/linkupAPI";
+import { getUserLinkups } from "../api/linkupAPI";
+import { getLinkupRequests } from "../api/linkupRequestAPI";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 

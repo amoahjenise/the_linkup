@@ -14,6 +14,10 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     width: theme.spacing(15),
     height: theme.spacing(15),
+    [theme.breakpoints.down("sm")]: {
+      width: theme.spacing(8),
+      height: theme.spacing(8),
+    },
     border: `2px solid ${theme.palette.background.default}`,
   },
   cameraIcon: {

@@ -43,7 +43,6 @@ const FirstStep = ({
         <option value="">--Select--</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
-        <option value="non-binary">Non-Binary</option>
       </select>
     </div>
   );

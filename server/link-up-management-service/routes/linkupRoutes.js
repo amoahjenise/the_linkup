@@ -4,10 +4,6 @@ const linkupController = require("../controllers/linkupController");
 
 router.get("/get-linkups/:userId", linkupController.getLinkups);
 router.get("/get-user-linkups/:userId", linkupController.getUserLinkups);
-router.get(
-  "/get-user-linkup-requests/:userId",
-  linkupController.getLinkupRequests
-);
 router.post("/update-linkup", linkupController.updateLinkup);
 router.post("/mark-expired-linkups", linkupController.markLinkupsAsExpired);
 router.post("/create-linkup", linkupController.createLinkup);
