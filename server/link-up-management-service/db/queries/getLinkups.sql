@@ -5,4 +5,5 @@ WHERE
   (link_ups.creator_id = $1::uuid OR
   (link_ups.creator_id != $1::uuid AND
   (link_ups.gender_preference = $2 OR link_ups.gender_preference = 'any')))
+  AND link_ups.hidden <> true
 ORDER BY link_ups.created_at DESC;
