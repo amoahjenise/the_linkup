@@ -6,7 +6,6 @@ import moment from "moment";
 
 const useStyles = makeStyles((theme) => ({
   notificationItem: {
-    display: "flex",
     alignItems: "center",
     padding: theme.spacing(2),
     borderTop: "1px solid #e1e8ed",
@@ -23,8 +22,18 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     marginRight: theme.spacing(2),
   },
-  content: {
-    flexGrow: 1,
+  messageContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  message: {
+    fontSize: theme.typography.body2.fontSize,
+    color: theme.palette.text.secondary,
+  },
+  time: {
+    fontSize: theme.typography.caption.fontSize,
+    color: theme.palette.text.secondary,
   },
 }));
 
@@ -62,10 +71,17 @@ const NotificationItem = ({ notification, onClick }) => {
         src={notification.requester_avatar}
         className={classes.avatar}
       />
+
       <div className={classes.content}>
         <Typography variant="subtitle1">{notification.content}</Typography>
-        {/* <Typography variant="body2">{notification.message}</Typography> */}
-        <Typography variant="caption">{getTimeAgo()}</Typography>
+        <div className={classes.messageContainer}>
+          <Typography variant="caption" className={classes.message}>
+            {notification.message}
+          </Typography>
+          <Typography component="small" className={classes.time}>
+            {getTimeAgo()}
+          </Typography>
+        </div>
       </div>
     </div>
   );
