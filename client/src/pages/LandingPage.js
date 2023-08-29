@@ -1,6 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
@@ -8,12 +6,28 @@ import Typography from "@material-ui/core/Typography";
 import ImageIcon from "@material-ui/icons/Image";
 import PeopleIcon from "@material-ui/icons/People";
 import ExploreIcon from "@material-ui/icons/Explore";
-import Navbar from "../components/Navbar";
+import logo from "../logo.png";
 import IphoneImage from "../assets/iphone-13.jpg";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    padding: theme.spacing(6),
+    [theme.breakpoints.down("sm")]: {
+      padding: theme.spacing(2),
+    },
+  },
+  welcomeContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    [theme.breakpoints.down("sm")]: {
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(6),
+    },
+  },
+  logo: {
+    height: "50px",
   },
   leftColumn: {
     display: "flex",
@@ -27,18 +41,15 @@ const useStyles = makeStyles((theme) => ({
   rightColumn: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "start",
     justifyContent: "center",
-    [theme.breakpoints.down("sm")]: {
-      padding: theme.spacing(2),
-    },
+    padding: theme.spacing(2),
   },
   leftContainer: {
     backgroundPosition: "0px 0px",
   },
   rightContainer: {
     backgroundPosition: "0px 0px",
-    // padding: theme.spacing(2),
     border: "1px solid #e0e0e0",
   },
   hero: {
@@ -91,12 +102,29 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    marginTop: theme.spacing(4),
     backgroundColor: "#91e9ff",
+    marginTop: theme.spacing(1),
   },
-  button: {
-    width: "100%",
-    marginBottom: theme.spacing(2),
+  createAccountButton: {
+    display: "flex",
+    alignItems: "center",
+    marginTop: theme.spacing(4),
+  },
+  loginLink: {
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+    cursor: "pointer",
+    marginRight: theme.spacing(2),
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+  },
+  signUpLink: {
+    color: "blue",
+    textDecoration: "none",
+    cursor: "pointer",
+    marginLeft: theme.spacing(2),
+    fontSize: "1.5rem",
+    fontWeight: "bold",
   },
   feature: {
     display: "flex",
@@ -124,30 +152,30 @@ const useStyles = makeStyles((theme) => ({
   },
   footer: {
     flexShrink: 0,
-    color: "black",
+    color: "gray",
     backgroundColor: "#fff",
     textAlign: "center",
     borderTop: "1px solid #f5f8fa",
+    marginTop: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
 }));
 
 function LandingPage({ isMobile }) {
   const classes = useStyles();
-  const navigate = useNavigate();
-
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
 
   return (
     <div className={classes.root}>
-      <Navbar buttonText="Login" onLoginClick={handleLoginClick} />
+      {/* <Navbar buttonText="Login" onLoginClick={handleLoginClick} /> */}
       <Grid container spacing={0}>
         {isMobile ? (
           <Grid item xs={12} md={6} className={classes.rightColumn}>
             <div className={classes.rightContainer}>
               <div className={classes.icons}>
-                <h1 className={classes.heroTitle}>Welcome to LUUL</h1>
+                <div className={classes.welcomeContainer}>
+                  <img src={logo} alt="Logo" className={classes.logo} />
+                  <h1 className={classes.heroTitle}>Welcome to LUUL </h1>
+                </div>
                 <ImageIcon className={classes.featureIcon} />
                 <Typography
                   variant="h1"
@@ -195,15 +223,13 @@ function LandingPage({ isMobile }) {
                   join in the fun.
                 </Typography>
                 <div className={classes.createAccountButton}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    component={Link}
-                    to="/signup"
-                    className={classes.ctaButton}
-                  >
-                    Create Account
-                  </Button>
+                  <Link to="/login" className={classes.loginLink}>
+                    Log in
+                  </Link>
+                  <p>/</p>
+                  <Link to="/signup" className={classes.signUpLink}>
+                    Sign Up
+                  </Link>
                 </div>
                 <Typography
                   variant="subtitle2"
@@ -235,7 +261,10 @@ function LandingPage({ isMobile }) {
             <Grid item xs={12} md={6} className={classes.rightColumn}>
               <div className={classes.rightContainer}>
                 <div className={classes.icons}>
-                  <h1 className={classes.heroTitle}>Welcome to LUUL</h1>
+                  <div className={classes.welcomeContainer}>
+                    <img src={logo} alt="Logo" className={classes.logo} />
+                    <h1 className={classes.heroTitle}>Welcome to LUUL</h1>
+                  </div>
                   <ImageIcon className={classes.featureIcon} />
                   <Typography
                     variant="h1"
@@ -285,15 +314,13 @@ function LandingPage({ isMobile }) {
                     join in the fun.
                   </Typography>
                   <div className={classes.createAccountButton}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      component={Link}
-                      to="/signup"
-                      className={classes.ctaButton}
-                    >
-                      Create Account
-                    </Button>
+                    <Link to="/login" className={classes.loginLink}>
+                      Log in
+                    </Link>
+                    <p>/</p>
+                    <Link to="/signup" className={classes.signUpLink}>
+                      Sign Up
+                    </Link>
                   </div>
                   <Typography
                     variant="subtitle2"
