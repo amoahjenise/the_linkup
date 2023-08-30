@@ -104,7 +104,7 @@ const SendRequest = ({ linkupId, linkups }) => {
     if (isRequestSent) {
       navigate(`/history/requests`);
     }
-  }, [isRequestSent, navigate, loggedUser.user.id]);
+  }, [isRequestSent, navigate]);
 
   return (
     <div className={classes.sendRequest}>

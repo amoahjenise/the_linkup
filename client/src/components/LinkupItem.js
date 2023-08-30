@@ -11,6 +11,7 @@ import {
   setEditingLinkup,
 } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import Avatar from "@material-ui/core/Avatar";
 import { deleteLinkup } from "../api/linkupAPI";
 import nlp from "compromise";
 const compromise = nlp;
@@ -52,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "50%", // Make it circular
     objectFit: "cover", // To maintain the aspect ratio of the image
     marginRight: theme.spacing(1),
+    border: "1px solid #e1e8ed",
   },
   usernameLink: {
     textDecoration: "none",
@@ -121,7 +123,6 @@ const LinkupItem = React.memo(
       creator_name,
       location,
       activity,
-      gender_preference,
       created_at,
       date,
       avatar,
@@ -192,13 +193,12 @@ const LinkupItem = React.memo(
           </Link>{" "}
           is trying to link up{" "}
           <span className={classes.boldText}>{activityText.toLowerCase()}</span>{" "}
-          at <span className={classes.boldText}>{formattedLocation}</span> on{" "}
+          {/* at <span className={classes.boldText}>{formattedLocation}</span>  */}
+          on{" "}
           <span className={classes.boldText}>
             {dateText} {timeText}
           </span>
-          .{" "}
-          {/* with a preference for{" "}
-          <span className={classes.boldText}>{gender_preference}</span>. */}
+          .
         </p>
       );
 
@@ -251,12 +251,7 @@ const LinkupItem = React.memo(
         <div className={classes.linkupItemContent}>
           <div className={classes.iconHeader}>
             {renderNotificationIcon()}
-            <img
-              className={classes.avatar}
-              src={avatar}
-              alt="avatar"
-              loading="lazy"
-            />
+            <Avatar alt="Avatar" src={avatar} className={classes.avatar} />
           </div>
           {renderLinkupItemText()}
 

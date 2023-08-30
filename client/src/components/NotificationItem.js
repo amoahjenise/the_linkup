@@ -3,8 +3,17 @@ import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
+import logo from "../logo.png";
 
 const useStyles = makeStyles((theme) => ({
+  logo: {
+    height: "40px",
+  },
+
+  avatarContainer: {
+    display: "flex",
+    alignItems: "center",
+  },
   notificationItem: {
     alignItems: "center",
     padding: theme.spacing(2),
@@ -20,7 +29,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#F5F8FA",
   },
   avatar: {
-    marginRight: theme.spacing(2),
+    marginLeft: theme.spacing(2),
+  },
+  content: {
+    marginLeft: theme.spacing(8),
   },
   messageContainer: {
     display: "flex",
@@ -66,11 +78,18 @@ const NotificationItem = ({ notification, onClick }) => {
       }`}
       onClick={onClick}
     >
-      <Avatar
-        alt={notification.requester_name}
-        src={notification.requester_avatar}
-        className={classes.avatar}
-      />
+      <div className={classes.avatarContainer}>
+        {notification.notification_type === "linkup_request" ? (
+          <img src={logo} alt="Logo" className={classes.logo} />
+        ) : (
+          <img src="" alt="Logo" className={classes.logo} />
+        )}
+        <Avatar
+          alt={notification.requester_name}
+          src={notification.requester_avatar}
+          className={classes.avatar}
+        />
+      </div>
 
       <div className={classes.content}>
         <Typography variant="subtitle1">{notification.content}</Typography>

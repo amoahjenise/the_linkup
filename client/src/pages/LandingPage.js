@@ -138,7 +138,6 @@ const useStyles = makeStyles((theme) => ({
   featureIcon: {
     fontSize: "3rem",
     color: theme.palette.primary.main,
-    marginBottom: theme.spacing(2),
   },
   featureHeading: {
     fontSize: "1.5rem",
@@ -149,6 +148,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   footer: {
     flexShrink: 0,
@@ -189,7 +189,7 @@ function LandingPage({ isMobile }) {
                   component="p"
                   className={classes.featureDescription}
                 >
-                  Explore a wide range of activities and events curated for you.
+                  Explore a wide range of activities and events.
                 </Typography>
                 <PeopleIcon className={classes.featureIcon} />
                 <Typography
@@ -278,8 +278,7 @@ function LandingPage({ isMobile }) {
                     component="p"
                     className={classes.featureDescription}
                   >
-                    Explore a wide range of activities and events curated for
-                    you.
+                    Explore a wide range of activities and events.
                   </Typography>
                   <PeopleIcon className={classes.featureIcon} />
                   <Typography

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import moment from "moment";
 import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import Typography from "@material-ui/core/Typography";
 
 const compromise = nlp;
 
@@ -26,13 +27,8 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
     borderBottom: "1px solid lightgrey",
   },
-  postDetails: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   avatar: {
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(2),
   },
   pendingChip: {
     marginLeft: "auto",
@@ -49,10 +45,10 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "pink", // Pink
     color: theme.palette.text.secondary,
   },
-  requestDetails: {
+  postDetails: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   requestText: {
     marginRight: "auto",
@@ -72,14 +68,16 @@ const LinkupRequestItem = ({ post }) => {
   const classes = useStyles();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userID = loggedUser?.user?.id || "";
-  const [requestStatus, setRequestStatus] = React.useState(post.status); // Added state
+  const [requestStatus, setRequestStatus] = React.useState(post.status);
+  const [isMyLinkup, setIsMyLinkup] = useState(false);
+
   const {
     id,
     requester_name,
+    creator_id,
     creator_name,
     activity,
     avatar,
-    status,
     location,
     link_up_date,
     receiver_avatar,
@@ -164,7 +162,7 @@ const LinkupRequestItem = ({ post }) => {
 
     if (userID === receiver_id) {
       // If the logged user is the receiver of the request
-      itemText = `You received a request from ${requester_name} ${activityText} at ${location} scheduled for ${dateText} ${timeText}`;
+      itemText = `You received a request from ${requester_name} ${activityText} scheduled for ${dateText} ${timeText}`;
     } else {
       // If the logged user is not the receiver
       itemText = `Request sent to ${creator_name} ${activityText} scheduled for ${dateText} ${timeText}`;
@@ -173,17 +171,30 @@ const LinkupRequestItem = ({ post }) => {
     return itemText;
   };
 
+  useEffect(() => {
+    if (userID === creator_id) {
+      setIsMyLinkup(true);
+    }
+  }, [creator_id, userID]);
+
   return (
     <div className={classes.linkupRequestItem}>
+      <Avatar
+        alt={userID === receiver_id ? requester_name : creator_name}
+        src={userID === receiver_id ? receiver_avatar : avatar}
+        className={classes.avatar}
+      />
       <div className={classes.postDetails}>
-        <Avatar
-          alt={userID === receiver_id ? requester_name : creator_name}
-          src={userID === receiver_id ? receiver_avatar : avatar}
-          className={classes.avatar}
-        />
-        <p className={classes.requestText}>{renderLinkupItemText()}</p>
+        <div>
+          <p className={classes.requestText}>{renderLinkupItemText()}</p>
+          {isMyLinkup && (
+            <Typography variant="subtitle2" component="details">
+              <span>{location}</span>
+            </Typography>
+          )}
+        </div>
         {userID === receiver_id ? (
-          <div className={classes.requestDetails}>
+          <div>
             {requestStatus === "pending" ? ( // Display buttons only when status is pending
               <div className={classes.buttonGroup}>
                 <Button

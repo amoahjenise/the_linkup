@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Chip from "@material-ui/core/Chip";
@@ -8,6 +8,7 @@ import {
   QueryBuilderOutlined,
 } from "@material-ui/icons";
 import moment from "moment";
+import Typography from "@material-ui/core/Typography";
 import nlp from "compromise";
 const compromise = nlp;
 
@@ -42,10 +43,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryItem = ({ post }) => {
+const LinkupHistoryItem = ({ post, userID }) => {
   const classes = useStyles();
+  const [isMyLinkup, setIsMyLinkup] = useState(false);
 
   const {
+    creator_id,
     creator_name,
     avatar,
     gender_preference,
@@ -69,7 +72,7 @@ const LinkupHistoryItem = ({ post }) => {
   const getStatusLabel = () => {
     if (status === "active") {
       return "pending";
-    } else if (status === "linked") {
+    } else if (status === "accepted") {
       return "Linked Up";
     } else if (status === "expired") {
       return "expired";
@@ -80,13 +83,19 @@ const LinkupHistoryItem = ({ post }) => {
   const getStatusChipClass = () => {
     if (status === "active") {
       return classes.pendingChip;
-    } else if (status === "Accepted") {
+    } else if (status === "accepted") {
       return classes.acceptedChip;
     } else if (status === "expired") {
       return classes.declinedChip;
     }
     return null;
   };
+
+  useEffect(() => {
+    if (userID === creator_id) {
+      setIsMyLinkup(true);
+    }
+  }, [creator_id, userID]);
 
   const renderLinkupItemText = () => {
     let linkupItemText = "";
@@ -110,11 +119,14 @@ const LinkupHistoryItem = ({ post }) => {
       .toLowerCase() // Convert to lowercase
       .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
 
-    if (status === "active") {
-      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText}
+    if (status === "active" || status === "accepted") {
+      linkupItemText = `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText}
       with a gender preference for ${gender_preference}.`;
+    } else if (status === "accepted" && !isMyLinkup) {
+      linkupItemText = `You've linked up with ${creator_name} ${activityText.toLowerCase()} and it's scheduled for 
+          ${dateText} ${timeText}.`;
     } else if (status === "expired") {
-      linkupItemText = `Link up ${activityText.toLowerCase()} at ${formattedLocation} on 
+      linkupItemText = `Link up ${activityText.toLowerCase()} on 
           ${dateText} ${timeText} has expired.`;
     } else {
       linkupItemText = "";
@@ -125,9 +137,17 @@ const LinkupHistoryItem = ({ post }) => {
 
   return (
     <div className={classes.linkupHistoryItem}>
+      <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
+
       <div className={classes.postDetails}>
-        <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
-        <p>{renderLinkupItemText()}</p>
+        <div>
+          <p className={classes.requestText}>{renderLinkupItemText()}</p>
+          {isMyLinkup && (
+            <Typography variant="subtitle2" component="details">
+              <span>{location}</span>
+            </Typography>
+          )}
+        </div>
         <Chip
           label={getStatusLabel()}
           icon={renderStatusIcon()}
