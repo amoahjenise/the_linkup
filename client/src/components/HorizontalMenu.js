@@ -20,11 +20,11 @@ const HorizontalMenu = ({
   const classes = useStyles();
 
   const handleMenuClick = (event) => {
-    setMenuAnchor(event.currentTarget); // Update the menuAnchor in the parent component
+    setMenuAnchor(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setMenuAnchor(null); // Update the menuAnchor in the parent component
+    setMenuAnchor(null);
   };
 
   return (
@@ -43,10 +43,18 @@ const HorizontalMenu = ({
           horizontal: "right",
         }}
       >
-        <MenuItem onClick={onLinkupItemClick}>Go to linkup</MenuItem>
-        <MenuItem onClick={onEditClick}>Edit this linkup</MenuItem>
-        <MenuItem onClick={onDeleteClick}>Delete this linkup</MenuItem>
-        <MenuItem onClick={onCompleteClick}>Mark as completed</MenuItem>
+        {onLinkupItemClick && (
+          <MenuItem onClick={onLinkupItemClick}>Go to linkup</MenuItem>
+        )}
+        {onEditClick && (
+          <MenuItem onClick={onEditClick}>Edit this linkup</MenuItem>
+        )}
+        {onDeleteClick && (
+          <MenuItem onClick={onDeleteClick}>Delete this linkup</MenuItem>
+        )}
+        {onCompleteClick && (
+          <MenuItem onClick={onCompleteClick}>Mark as completed</MenuItem>
+        )}
       </Popover>
     </div>
   );
