@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupRequestItem = ({ post }) => {
+const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userID = loggedUser?.user?.id || "";
@@ -89,6 +89,7 @@ const LinkupRequestItem = ({ post }) => {
     try {
       await acceptLinkupRequest(id);
       setRequestStatus("accepted"); // Update the request status in state
+      setShouldFetchLinkups(true);
       addSnackbar("Link-up request accepted.");
     } catch (error) {
       addSnackbar(error.message);
@@ -99,6 +100,7 @@ const LinkupRequestItem = ({ post }) => {
     try {
       await declineLinkupRequest(id);
       setRequestStatus("declined"); // Update the request status in state
+      setShouldFetchLinkups(true);
       addSnackbar("Link-up request declined.");
     } catch (error) {
       addSnackbar(error.message);

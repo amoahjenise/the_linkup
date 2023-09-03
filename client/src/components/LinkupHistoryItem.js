@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Modal } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import {
+  clearEditingLinkup,
+  setEditingLinkup,
+} from "../redux/actions/editingLinkupActions";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Chip from "@material-ui/core/Chip";
@@ -8,7 +15,11 @@ import {
   QueryBuilderOutlined,
 } from "@material-ui/icons";
 import moment from "moment";
-import Typography from "@material-ui/core/Typography";
+import HorizontalMenu from "./HorizontalMenu";
+import EditLinkupForm from "./EditLinkupForm";
+import DeleteModal from "./DeleteModal";
+import { useSnackbar } from "../contexts/SnackbarContext";
+import { deleteLinkup } from "../api/linkupAPI";
 import nlp from "compromise";
 const compromise = nlp;
 
@@ -19,7 +30,12 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
     borderBottom: "1px solid lightgrey",
   },
-  postDetails: {
+  itemHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  linkupDetails: {
     display: "flex",
     alignItems: "center",
   },
@@ -41,14 +57,29 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "pink", // Pink
     color: theme.palette.text.secondary,
   },
+  editModal: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(4),
+    outline: "none",
+    width: "300px",
+    textAlign: "center",
+  },
 }));
 
-const LinkupHistoryItem = ({ post, userID }) => {
+const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
   const classes = useStyles();
-  const [isMyLinkup, setIsMyLinkup] = useState(false);
+  const dispatch = useDispatch();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const { addSnackbar } = useSnackbar();
 
   const {
-    creator_id,
     creator_name,
     avatar,
     gender_preference,
@@ -56,13 +87,53 @@ const LinkupHistoryItem = ({ post, userID }) => {
     location,
     date,
     status,
-  } = post;
+  } = linkup;
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  const handleEditClick = () => {
+    // Open the edit modal when "Edit this linkup" is clicked
+    setIsEditModalOpen(true);
+    dispatch(setEditingLinkup(linkup, true));
+    handleMenuClose();
+  };
+
+  const handleDeleteClick = async () => {
+    setShowDeleteModal(true); // Show the delete confirmation modal
+    handleMenuClose();
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await deleteLinkup(linkup.id);
+      if (response.success) {
+        addSnackbar("Link-up deleted successfully!");
+        setShouldFetchLinkups(true);
+      } else {
+        console.error("Error deleting link-up:", response.message);
+        addSnackbar("Error deleting link-up: " + response.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      addSnackbar("An error occurred while deleting the link-up");
+    } finally {
+      setShowDeleteModal(false); // Close the delete confirmation modal
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false); // Close the delete confirmation modal
+  };
 
   const renderStatusIcon = () => {
     if (status === "active") {
       return <QueryBuilderOutlined />;
-    } else if (status === "Accepted") {
+    } else if (status === "accepted") {
       return <CheckCircleOutlined />;
+    } else if (status === "declined") {
+      return <CloseOutlined />;
     } else if (status === "expired") {
       return <CloseOutlined />;
     }
@@ -71,11 +142,13 @@ const LinkupHistoryItem = ({ post, userID }) => {
 
   const getStatusLabel = () => {
     if (status === "active") {
-      return "pending";
+      return "Pending";
     } else if (status === "accepted") {
       return "Linked Up";
+    } else if (status === "declined") {
+      return "Declined";
     } else if (status === "expired") {
-      return "expired";
+      return "Expired";
     }
     return null;
   };
@@ -90,12 +163,6 @@ const LinkupHistoryItem = ({ post, userID }) => {
     }
     return null;
   };
-
-  useEffect(() => {
-    if (userID === creator_id) {
-      setIsMyLinkup(true);
-    }
-  }, [creator_id, userID]);
 
   const renderLinkupItemText = () => {
     let linkupItemText = "";
@@ -114,17 +181,13 @@ const LinkupHistoryItem = ({ post, userID }) => {
     const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
     const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
 
-    // Capitalize the first letter of each word in the location
     const formattedLocation = location
-      .toLowerCase() // Convert to lowercase
-      .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
+      .toLowerCase()
+      .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase());
 
-    if (status === "active" || status === "accepted") {
+    if (status === "active" || status === "accepted" || status === "declined") {
       linkupItemText = `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText}
       with a gender preference for ${gender_preference}.`;
-    } else if (status === "accepted" && !isMyLinkup) {
-      linkupItemText = `You've linked up with ${creator_name} ${activityText.toLowerCase()} and it's scheduled for 
-          ${dateText} ${timeText}.`;
     } else if (status === "expired") {
       linkupItemText = `Link up ${activityText.toLowerCase()} on 
           ${dateText} ${timeText} has expired.`;
@@ -137,16 +200,22 @@ const LinkupHistoryItem = ({ post, userID }) => {
 
   return (
     <div className={classes.linkupHistoryItem}>
-      <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
-
-      <div className={classes.postDetails}>
+      <div className={classes.itemHeader}>
+        <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
+        {status === "active" && (
+          <>
+            <HorizontalMenu
+              onEditClick={() => handleEditClick(linkup)}
+              onDeleteClick={() => handleDeleteClick(linkup.id)}
+              menuAnchor={menuAnchor}
+              setMenuAnchor={setMenuAnchor}
+            />
+          </>
+        )}
+      </div>
+      <div className={classes.linkupDetails}>
         <div>
           <p className={classes.requestText}>{renderLinkupItemText()}</p>
-          {isMyLinkup && (
-            <Typography variant="subtitle2" component="details">
-              <span>{location}</span>
-            </Typography>
-          )}
         </div>
         <Chip
           label={getStatusLabel()}
@@ -155,6 +224,29 @@ const LinkupHistoryItem = ({ post, userID }) => {
           className={getStatusChipClass()}
         />
       </div>
+      <Typography variant="subtitle2" component="details">
+        <span>{location}</span>
+      </Typography>
+      <DeleteModal
+        open={showDeleteModal}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+      />
+      {/* Render EditLinkupForm as a modal */}
+      <Modal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        aria-labelledby="edit-modal-title"
+        aria-describedby="edit-modal-description"
+      >
+        <div className={classes.editModal}>
+          {/* Render EditLinkupForm component here */}
+          <EditLinkupForm
+            setShouldFetchLinkups={setShouldFetchLinkups}
+            onClose={() => setIsEditModalOpen(false)}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

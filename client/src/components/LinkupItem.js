@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { LinkRounded, LinkTwoTone } from "@material-ui/icons";
-import { Button, Modal } from "@material-ui/core";
+import { Modal } from "@material-ui/core";
+import DeleteModal from "./DeleteModal";
+
 import moment from "moment";
 import { Link } from "react-router-dom";
 import {
@@ -13,7 +15,11 @@ import {
 import { useSnackbar } from "../contexts/SnackbarContext";
 import Avatar from "@material-ui/core/Avatar";
 import { deleteLinkup } from "../api/linkupAPI";
+import PostActions from "./PostActions";
+import HorizontalMenu from "./HorizontalMenu";
+import EditLinkupForm from "./EditLinkupForm";
 import nlp from "compromise";
+
 const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
@@ -25,19 +31,16 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "1px solid #ccc",
     alignItems: "flex-start",
   },
+  postedTimeText: {
+    color: theme.palette.text.secondary,
+    marginLeft: "auto",
+  },
+  postHeaderContainer: { display: "flex", alignItems: "center" },
   linkupItemContent: {
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
     wordWrap: "break-word",
-  },
-  linkupItemText: {
-    color: theme.palette.text.secondary,
-    marginLeft: "auto",
-  },
-  linkupItemDetails: {
-    display: "flex",
-    alignItems: "center",
   },
   boldText: {
     fontWeight: "bold",
@@ -46,12 +49,13 @@ const useStyles = makeStyles((theme) => ({
   iconHeader: {
     display: "flex",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   avatar: {
     width: "50px",
     height: "50px",
-    borderRadius: "50%", // Make it circular
-    objectFit: "cover", // To maintain the aspect ratio of the image
+    borderRadius: "50%",
+    objectFit: "cover",
     marginRight: theme.spacing(1),
     border: "1px solid #e1e8ed",
   },
@@ -60,18 +64,19 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.primary,
     fontWeight: "bold",
   },
-  checkInButton: {
-    marginRight: "auto",
+  postActions: {
+    fontSize: "12px",
+    marginTop: "25px",
   },
   buttonsContainer: {
     display: "flex",
-    marginRight: "auto",
+    alignItems: "center",
   },
   highlightedLinkupItem: {
-    backgroundColor: "#f5f8fa", // Background color when highlighted
-    transition: "background-color 0.3s ease", // Smooth transition
+    backgroundColor: "#f5f8fa",
+    transition: "background-color 0.3s ease",
   },
-  deleteModal: {
+  editModal: {
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -83,28 +88,6 @@ const useStyles = makeStyles((theme) => ({
     width: "300px", // Adjust the width as needed
     textAlign: "center",
   },
-  editButton: {
-    color: theme.palette.primary.contrastText,
-    marginRight: theme.spacing(1),
-    boxShadow: theme.shadows[1],
-  },
-  cancelButton: {
-    color: theme.palette.primary.contrastText,
-    marginRight: theme.spacing(1),
-    boxShadow: theme.shadows[1],
-  },
-  deleteButton: {
-    color: theme.palette.primary.contrastText,
-    boxShadow: theme.shadows[1],
-    border: "1px solid #f5f8fa",
-  },
-  requestButton: {
-    backgroundColor: theme.palette.background.paper,
-  },
-  requestButtonDisabled: {
-    backgroundColor: theme.palette.grey[300], // Disabled button color
-    color: theme.palette.text.primary,
-  },
 }));
 
 const LinkupItem = React.memo(
@@ -113,7 +96,8 @@ const LinkupItem = React.memo(
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isHovered, setIsHovered] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false); // State for delete confirmation modal
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State for edit modal
     const loggedUser = useSelector((state) => state.loggedUser);
     const editingLinkup = useSelector((state) => state.editingLinkup);
     const { addSnackbar } = useSnackbar();
@@ -128,9 +112,33 @@ const LinkupItem = React.memo(
       avatar,
       type,
     } = linkupItem;
+    const [menuAnchor, setMenuAnchor] = useState(null);
+
+    const handleMenuClose = () => {
+      setMenuAnchor(null);
+    };
 
     const handleEditClick = () => {
+      // Open the edit modal when "Edit this linkup" is clicked
+      setIsEditModalOpen(true);
       dispatch(setEditingLinkup(linkupItem, true));
+      handleMenuClose();
+    };
+
+    // Function to handle the click on the linkup item and redirect to history page
+    const handleLinkupItemClick = () => {
+      // Use the navigate function to redirect to the history page
+      navigate("/history"); // Change the path to the desired destination, in this case, "/"
+    };
+
+    const handleCompleteClick = () => {};
+
+    const handleRequestLinkup = () => {
+      if (disableRequest) {
+        navigate(`/history/requests`);
+      } else {
+        navigate(`/send-request/${id}`);
+      }
     };
 
     const handleCancelClick = () => {
@@ -157,6 +165,7 @@ const LinkupItem = React.memo(
 
     const handleDeleteClick = async (linkupId) => {
       setShowDeleteModal(true); // Show the delete confirmation modal
+      handleMenuClose();
     };
 
     const handleDeleteCancel = () => {
@@ -205,11 +214,7 @@ const LinkupItem = React.memo(
       return linkupItemText;
     };
 
-    const handleRequestClick = () => {
-      navigate(`/send-request/${id}`);
-    };
-
-    const renderNotificationIcon = () => {
+    const renderPostIcon = () => {
       if (type === "linkup") {
         return <LinkRounded />;
       } else if (type === "trylink") {
@@ -250,92 +255,55 @@ const LinkupItem = React.memo(
       >
         <div className={classes.linkupItemContent}>
           <div className={classes.iconHeader}>
-            {renderNotificationIcon()}
-            <Avatar alt="Avatar" src={avatar} className={classes.avatar} />
+            <div className={classes.postHeaderContainer}>
+              {renderPostIcon()}
+              <Avatar alt="Avatar" src={avatar} className={classes.avatar} />
+              {renderLinkupItemText()}
+            </div>
+            {!editingLinkup.isEditing &&
+              loggedUser.user.id === linkupItem.creator_id && (
+                <HorizontalMenu
+                  onLinkupItemClick={handleLinkupItemClick}
+                  onEditClick={handleEditClick}
+                  onDeleteClick={handleDeleteClick}
+                  onCompleteClick={handleCompleteClick}
+                  menuAnchor={menuAnchor}
+                  setMenuAnchor={setMenuAnchor}
+                />
+              )}
           </div>
-          {renderLinkupItemText()}
-
-          <div className={classes.linkupItemDetails}>
-            {/* Use the Link component to navigate to SendRequestPage */}
+          <div className={classes.postActions}>
             {loggedUser.user.id !== linkupItem.creator_id && (
               <div className={classes.buttonsContainer}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  className={
-                    disableRequest
-                      ? classes.requestButtonDisabled
-                      : classes.requestButton
-                  }
-                  onClick={handleRequestClick}
-                  disabled={disableRequest}
-                >
-                  {disableRequest ? "Request Sent" : "Request"}
-                </Button>
+                <PostActions
+                  onRequestClick={handleRequestLinkup}
+                  disableRequest={disableRequest}
+                />
+                <p className={classes.postedTimeText}>
+                  Posted {getTimeAgo(created_at)}
+                </p>
               </div>
             )}
-
-            <div className={classes.buttonsContainer}>
-              {editingLinkup.isEditing &&
-              editingLinkup.linkup.id === linkupItem.id ? (
-                <Button
-                  color="default"
-                  size="small"
-                  onClick={handleCancelClick}
-                  className={classes.cancelButton}
-                >
-                  Cancel
-                </Button>
-              ) : (
-                <>
-                  {loggedUser?.user.id === creator_id &&
-                    !editingLinkup.isEditing && (
-                      // Disabling buttons for other link-ups during editing
-                      <div className={classes.buttonsContainer}>
-                        <Button
-                          color="primary"
-                          size="small"
-                          onClick={handleEditClick}
-                          className={classes.editButton}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          color="secondary"
-                          size="small"
-                          onClick={handleDeleteClick}
-                          className={classes.deleteButton}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    )}
-                </>
-              )}
-            </div>
-            <p className={classes.linkupItemText}>
-              Posted {getTimeAgo(created_at)}
-            </p>
           </div>
         </div>
-        {/* Delete Confirmation Modal */}
-        <Modal
+        <DeleteModal
           open={showDeleteModal}
           onClose={handleDeleteCancel}
-          aria-labelledby="delete-modal-title"
-          aria-describedby="delete-modal-description"
+          onConfirm={handleDeleteConfirm}
+        />
+        {/* Render EditLinkupForm as a modal */}
+        <Modal
+          open={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          aria-labelledby="edit-modal-title"
+          aria-describedby="edit-modal-description"
         >
-          <div className={classes.deleteModal}>
-            <h2 id="delete-modal-title">Confirm Deletion</h2>
-            <p id="delete-modal-description">
-              Are you sure you want to delete this link-up?
-            </p>
-            <Button color="secondary" onClick={handleDeleteConfirm}>
-              Delete
-            </Button>
-            <Button color="default" onClick={handleDeleteCancel}>
-              Cancel
-            </Button>
+          <div className={classes.editModal}>
+            {/* Render EditLinkupForm component here */}
+            <EditLinkupForm
+              setShouldFetchLinkups={setShouldFetchLinkups}
+              onClose={() => setIsEditModalOpen(false)}
+            />
           </div>
         </Modal>
       </div>

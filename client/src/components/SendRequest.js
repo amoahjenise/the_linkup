@@ -53,7 +53,6 @@ const SendRequest = ({ linkupId, linkups }) => {
 
   const classes = useStyles();
   const [message, setMessage] = useState("");
-  const [isRequestSent, setIsRequestSent] = useState(false);
   const navigate = useNavigate(); // useNavigate hook for navigation
 
   const handleSendRequest = async () => {
@@ -69,7 +68,7 @@ const SendRequest = ({ linkupId, linkups }) => {
     if (response.success) {
       dispatch(addSentRequest(linkupId));
       addSnackbar("Request sent!");
-      navigate("/home");
+      navigate("/history/requests");
     } else {
       addSnackbar("Request send failed. Please try again.");
     }
@@ -83,28 +82,6 @@ const SendRequest = ({ linkupId, linkups }) => {
     const timeText = post.date ? `(${moment(post.date).format("h:mm A")})` : "";
     return `${post.creator_name} is trying to link up for ${post.activity} at ${post.location} on ${dateText} ${timeText}.`;
   };
-
-  useEffect(() => {
-    // Fetch the request by linkupId and senderId to check if the request has been sent
-    getRequestByLinkupIdAndSenderId(linkupId, loggedUser.user.id)
-      .then((data) => {
-        if (data?.linkupRequestId) {
-          setIsRequestSent(true);
-        } else {
-          setIsRequestSent(false);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching request:", error);
-      });
-  }, [linkupId, loggedUser.user.id]);
-
-  useEffect(() => {
-    // Redirect the user if the request has already been sent
-    if (isRequestSent) {
-      navigate(`/history/requests`);
-    }
-  }, [isRequestSent, navigate]);
 
   return (
     <div className={classes.sendRequest}>

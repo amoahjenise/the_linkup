@@ -10,7 +10,9 @@ import {
   setIsLoading,
   fetchLinkupsSuccess,
 } from "../redux/actions/linkupActions";
+import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { getLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
+import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import moment from "moment";
 import nlp from "compromise";
@@ -69,6 +71,20 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
     }
   }, [dispatch, gender, userID]);
 
+  // Function to fetch linkup requests and set them in Redux store
+  const fetchLinkupRequests = useCallback(async () => {
+    try {
+      const response = await getLinkupRequests(userID); // Fetch linkup requests
+      if (response.success) {
+        dispatch(fetchLinkupRequestsSuccess(response.linkupRequestList)); // Set linkup requests in Redux store
+      } else {
+        console.error("Error fetching linkup requests:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching linkup requests:", error);
+    }
+  }, [dispatch, userID]);
+
   const removeExpiredLinkups = useCallback(async () => {
     try {
       // Perform the API call to mark link-ups as expired
@@ -122,6 +138,11 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
   }, [dispatch, fetchLinkups, removeExpiredLinkups, shouldFetchLinkups]);
 
   useEffect(() => {
+    // Fetch linkup requests when the component mounts
+    fetchLinkupRequests();
+  }, [fetchLinkupRequests]);
+
+  useEffect(() => {
     // Initialize socket connection
     const socket = io(linkupSocketUrl);
     setSocket(socket);
@@ -145,7 +166,7 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
       socket.off("linkupsExpired", handleLinkupsExpired);
       socket.disconnect();
     };
-  }, []);
+  }, [addSnackbar]);
 
   // Define the callback function for scrolling to the top
   const scrollToTop = () => {
@@ -182,15 +203,11 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
               setShouldFetchLinkups={setShouldFetchLinkups}
             />
           </div>
-          {editingLinkup.isEditing ? (
-            <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
-          ) : (
-            <CreateLinkupForm
-              socket={socket}
-              setShouldFetchLinkups={setShouldFetchLinkups}
-              scrollToTopCallback={scrollToTop}
-            />
-          )}
+          <CreateLinkupForm
+            socket={socket}
+            setShouldFetchLinkups={setShouldFetchLinkups}
+            scrollToTopCallback={scrollToTop}
+          />
         </div>
       )}
     </div>

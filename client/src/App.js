@@ -15,7 +15,7 @@ import HomePage from "./pages/HomePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SendRequestPage from "./pages/SendRequestPage";
 import MessagesPage from "./pages/MessagesPage";
-import LinkUpHistoryPage from "./pages/LinkUpHistoryPage";
+import LinkupHistoryPage from "./pages/LinkupHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SelectedMessagePage from "./pages/SelectedMessagePage";
@@ -128,15 +128,15 @@ const App = () => {
                 />
                 <Route
                   path="/history"
-                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route
                   path="/history/expired"
-                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route
                   path="/history/requests"
-                  element={<LinkUpHistoryPage isMobile={isMobile} />}
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route
                   path="/messages"

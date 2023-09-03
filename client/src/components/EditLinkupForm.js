@@ -2,9 +2,6 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateLinkup } from "../api/linkupAPI";
@@ -24,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
   },
   editLinkUpContainer: {
     flex: "1",
-    borderLeft: "0.1px solid lightgrey",
     position: "sticky",
     top: 0,
     overflowY: "auto",
@@ -32,11 +28,9 @@ const useStyles = makeStyles((theme) => ({
   editContainer: {
     flex: "1",
     color: "black",
-    padding: theme.spacing(2),
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: "calc(100vh - 140px)",
     position: "sticky",
     top: 0,
     overflowY: "auto",
@@ -95,16 +89,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditLinkupForm = ({ setShouldFetchLinkups }) => {
+const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
-  const { id } = editingLinkup.linkup;
-  const [selectedDate, setSelectedDate] = useState(editingLinkup.linkup.date);
-  const [activity, setActivity] = useState(editingLinkup.linkup.activity);
-  const [location, setLocation] = useState(editingLinkup.linkup.location);
+  const id = editingLinkup?.linkup?.id;
+  const [selectedDate, setSelectedDate] = useState(editingLinkup?.linkup?.date);
+  const [activity, setActivity] = useState(editingLinkup?.linkup?.activity);
+  const [location, setLocation] = useState(editingLinkup?.linkup?.location);
   const [genderPreference, setGenderPreference] = useState(
-    editingLinkup.linkup.gender_preference
+    editingLinkup?.linkup?.gender_preference
   );
   const { addSnackbar } = useSnackbar();
 
@@ -147,6 +141,7 @@ const EditLinkupForm = ({ setShouldFetchLinkups }) => {
       if (response.success) {
         setShouldFetchLinkups(true);
         dispatch(updateLinkupSuccess(response.linkup));
+        onClose();
         dispatch(clearEditingLinkup());
         addSnackbar("Updated successfully!");
       }
@@ -154,13 +149,14 @@ const EditLinkupForm = ({ setShouldFetchLinkups }) => {
       addSnackbar(error.message);
     }
   }, [
-    id,
     location,
     activity,
     selectedDate,
     genderPreference,
-    dispatch,
+    id,
     setShouldFetchLinkups,
+    dispatch,
+    onClose,
     addSnackbar,
   ]);
 
@@ -174,7 +170,8 @@ const EditLinkupForm = ({ setShouldFetchLinkups }) => {
 
   const handleCancelClick = useCallback(() => {
     dispatch(clearEditingLinkup());
-  }, [dispatch]);
+    onClose();
+  }, [dispatch, onClose]);
 
   return (
     <div className={classes.editLinkUpContainer}>
