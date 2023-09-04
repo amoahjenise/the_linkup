@@ -62,7 +62,7 @@ const LinkupHistoryPage = ({ isMobile }) => {
   };
 
   const requestsFiltersInitialState = {
-    activeStatus: "All",
+    activeStatus: "Pending",
     dateFilter: "All",
   };
 
@@ -74,8 +74,8 @@ const LinkupHistoryPage = ({ isMobile }) => {
     requestsFiltersInitialState
   );
 
-  const statusOptions = ["Active", "Accepted", "Declined", "Expired", "All"];
-  const requestsStatusOptions = ["All", "Active", "Accepted", "Declined"];
+  const statusOptions = ["Active", "Completed", "Expired", "All"];
+  const requestsStatusOptions = ["All", "Pending", "Accepted", "Declined"];
 
   const tabs = [
     {

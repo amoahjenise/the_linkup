@@ -44,7 +44,7 @@ const FilterBar = ({
   activeTab,
 }) => {
   const classes = useStyles();
-  let statusOptions = ["All", "Active", "Accepted", "Declined", "Expired"];
+  let statusOptions = ["All", "Active", "Completed", "Expired"];
 
   if (activeTab === 1) {
     // Modify status options for the "Requests" tab

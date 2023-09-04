@@ -6,10 +6,7 @@ import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Avatar from "@material-ui/core/Avatar";
 import moment from "moment";
-import {
-  sendRequest,
-  getRequestByLinkupIdAndSenderId,
-} from "../api/linkupRequestAPI";
+import { sendRequest } from "../api/linkupRequestAPI";
 import { addSentRequest } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
@@ -39,6 +36,13 @@ const useStyles = makeStyles((theme) => ({
     width: theme.spacing(10),
     height: theme.spacing(10),
     marginBottom: theme.spacing(2),
+  },
+  locationDetails: {
+    display: "flex",
+    fontSize: theme.typography.body2.fontSize,
+    color: theme.palette.text.secondary,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));
 
@@ -80,7 +84,7 @@ const SendRequest = ({ linkupId, linkups }) => {
       ? `${moment(post.date).format("MMM DD, YYYY")}`
       : "";
     const timeText = post.date ? `(${moment(post.date).format("h:mm A")})` : "";
-    return `${post.creator_name} is trying to link up for ${post.activity} at ${post.location} on ${dateText} ${timeText}.`;
+    return `${post.creator_name} is trying to link up for ${post.activity} on ${dateText} ${timeText}.`;
   };
 
   return (
@@ -93,6 +97,9 @@ const SendRequest = ({ linkupId, linkups }) => {
         />
         <div className={classes.linkUpInfo}>
           <div>{renderPostText()}</div>
+          <p className={classes.locationDetails}>
+            Location details will be provided if the request gets accepted.
+          </p>
         </div>
         <TextField
           className={classes.messageInput}

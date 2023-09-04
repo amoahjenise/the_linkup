@@ -273,12 +273,18 @@ const LinkupItem = React.memo(
               )}
           </div>
           <div className={classes.postActions}>
-            {loggedUser.user.id !== linkupItem.creator_id && (
+            {loggedUser.user.id !== linkupItem.creator_id ? (
               <div className={classes.buttonsContainer}>
                 <PostActions
                   onRequestClick={handleRequestLinkup}
                   disableRequest={disableRequest}
                 />
+                <p className={classes.postedTimeText}>
+                  Posted {getTimeAgo(created_at)}
+                </p>
+              </div>
+            ) : (
+              <div className={classes.buttonsContainer}>
                 <p className={classes.postedTimeText}>
                   Posted {getTimeAgo(created_at)}
                 </p>

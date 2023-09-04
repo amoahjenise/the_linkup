@@ -142,13 +142,11 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
 
   const getStatusLabel = () => {
     if (status === "active") {
-      return "Pending";
-    } else if (status === "accepted") {
-      return "Linked Up";
-    } else if (status === "declined") {
-      return "Declined";
+      return "active";
+    } else if (status === "completed") {
+      return "completed";
     } else if (status === "expired") {
-      return "Expired";
+      return "expired";
     }
     return null;
   };
