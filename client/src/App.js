@@ -130,7 +130,7 @@ const App = () => {
                   element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route
-                  path="/history/requests-sent"
+                  path="/history/request-sent"
                   element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route

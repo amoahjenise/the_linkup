@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -72,7 +72,7 @@ const SendRequest = ({ linkupId, linkups }) => {
     if (response.success) {
       dispatch(addSentRequest(linkupId));
       addSnackbar("Request sent!");
-      navigate("/history/requests");
+      navigate("/history/request-sent");
     } else {
       addSnackbar("Request send failed. Please try again.");
     }
