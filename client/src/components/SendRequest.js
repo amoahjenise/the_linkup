@@ -72,7 +72,7 @@ const SendRequest = ({ linkupId, linkups }) => {
     if (response.success) {
       dispatch(addSentRequest(linkupId));
       addSnackbar("Request sent!");
-      navigate("/history/request-sent");
+      navigate("/history/requests-sent");
     } else {
       addSnackbar("Request send failed. Please try again.");
     }
