@@ -171,6 +171,75 @@ const getLinkupRequests = async (req, res) => {
   }
 };
 
+const getSentRequests = async (req, res) => {
+  const userId = req.params.userId;
+  const queryPath = path.join(__dirname, "../db/queries/getSentRequests.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [userId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    if (rows.length > 0) {
+      const linkupRequests = rows;
+      res.json({
+        success: true,
+        message: "Sent requests fetched successfully",
+        linkupRequestList: linkupRequests,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "No sent requests in the database",
+        linkupRequestList: [],
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching sent requests:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch sent requests",
+      error: error.message,
+    });
+  }
+};
+
+const getReceivedRequests = async (req, res) => {
+  const userId = req.params.userId;
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/getReceivedRequests.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [userId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    if (rows.length > 0) {
+      const linkupRequests = rows;
+      res.json({
+        success: true,
+        message: "Received requests fetched successfully",
+        linkupRequestList: linkupRequests,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "No received requests in the database",
+        linkupRequestList: [],
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching received requests:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch sent requests",
+      error: error.message,
+    });
+  }
+};
+
 const getRequestByLinkupidAndSenderid = async (req, res) => {
   const { linkupId, requesterId } = req.query;
   let queryPath = path.join(
@@ -208,4 +277,6 @@ module.exports = {
   getRequestByLinkupidAndSenderid,
   acceptRequest,
   declineRequest,
+  getSentRequests,
+  getReceivedRequests,
 };

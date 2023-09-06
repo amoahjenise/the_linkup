@@ -8,6 +8,14 @@ router.get(
   linkupRequestController.getLinkupRequests
 );
 router.get(
+  "/get-sent-requests/:userId",
+  linkupRequestController.getSentRequests
+);
+router.get(
+  "/get-received-requests/:userId",
+  linkupRequestController.getReceivedRequests
+);
+router.get(
   "/get-request-by-linkupid-and-senderid",
   linkupRequestController.getRequestByLinkupidAndSenderid
 );

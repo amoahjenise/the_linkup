@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import Cards from "../components/Cards";
+import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-import SaveIcon from "@material-ui/icons/Save";
-import CloseIcon from "@material-ui/icons/Close";
+import Cards from "../components/Cards";
 import EditIcon from "@material-ui/icons/Edit";
-import AvatarUpdate from "../components/AvatarUpdate";
 import Geocode from "react-geocode";
-import { getUserById, updateUserBio } from "../api/usersAPI";
+import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
+import { getUserImages } from "../api/imagesAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
-import Typography from "@material-ui/core/Typography";
+import UserProfileEditModal from "../components/UserProfileEditModal";
+import { useSnackbar } from "../contexts/SnackbarContext";
+import ImageUploadModal from "../components/ImageUploadModal";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -33,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
   },
   profileHeader: {
     display: "flex",
-    marginBottom: theme.spacing(8),
     [theme.breakpoints.down("sm")]: {
       marginBottom: theme.spacing(2),
     },
@@ -41,77 +41,81 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderBottom: "1px solid #e1e8ed",
   },
-  commentInput: {
-    width: "55vh",
-    resize: "none",
-    [theme.breakpoints.down("sm")]: {
-      width: "100%",
-    },
-  },
-  buttonsContainer: {
-    gap: theme.spacing(1),
-    marginLeft: "auto",
+  largeAvatar: {
+    width: "125px",
+    height: "125px",
   },
   centeredContent: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    height: "55%",
+    padding: theme.spacing(4),
     [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2),
     },
   },
-  editButton: {
-    marginLeft: "auto",
-    cursor: "pointer",
-  },
-  saveButton: {
-    width: "fit-content",
-    fontSize: "14px",
-  },
-  cancelButton: {
-    width: "fit-content",
-    fontSize: "14px",
+  uploadButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   leftMargin: {
     marginLeft: theme.spacing(4),
-  },
-  mobileTextArea: {
-    padding: theme.spacing(2),
   },
   mobileProfileHeader: {
     padding: theme.spacing(2),
     borderBottom: "1px solid #e1e8ed",
     backgroundColor: "rgba(207, 217, 222, 0.1)",
   },
+  editButton: {
+    width: "fit-content",
+    height: "fit-content",
+    marginLeft: "auto", // Add spacing to separate from name and age
+  },
 }));
 
 const UserProfilePage = ({ isMobile }) => {
-  let { id: userID } = useParams();
+  let { id: userId } = useParams();
   const classes = useStyles();
-  const [isBioEditMode, setIsEditMode] = useState(false);
-  const [updatedBio, setUpdatedBio] = useState("");
   const [userLocation, setUserLocation] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [isLoggedUserProfile, setIsLoggedUserProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileImages, setProfileImages] = useState([]);
+  const [isImageUploadModalOpen, setImageUploadModalOpen] = useState(false);
+  const { addSnackbar } = useSnackbar();
+
+  const openImageUploadModal = () => {
+    setImageUploadModalOpen(true);
+  };
+
+  const closeImageUploadModal = () => {
+    setImageUploadModalOpen(false);
+  };
+
+  // State for controlling the edit modal
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Check if userData is available before accessing its properties
+  const isUserDataAvailable = userData !== null;
 
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
 
-  if (userID === "me") {
-    userID = loggedUser.user.id;
+  const isLoggedUserProfile = userId === "me" || userId === loggedUser.user.id;
+
+  if (userId === "me") {
+    userId = loggedUser.user.id;
   }
 
   useEffect(() => {
-    setIsLoggedUserProfile(userID === "me" || userID === loggedUser.user.id);
     const fetchData = async () => {
       try {
-        const response = await getUserById(userID);
+        // Fetch user data
+        const userDataResponse = await getUserById(userId);
 
-        if (response.success) {
-          setUserData(response.user);
-          setUpdatedBio(response.user.bio);
+        if (userDataResponse.success) {
+          setUserData(userDataResponse.user);
         }
 
         navigator.geolocation.getCurrentPosition(
@@ -134,6 +138,17 @@ const UserProfilePage = ({ isMobile }) => {
             setUserLocation("Unknown Location");
           }
         );
+
+        // Fetch user images
+        const userImagesResponse = await getUserImages(userId);
+
+        if (userImagesResponse.success) {
+          // Extract and set the user's image URLs in state
+          const imageUrls = userImagesResponse.images.map(
+            (imageObj) => imageObj.image_url
+          );
+          setProfileImages(imageUrls);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -142,41 +157,31 @@ const UserProfilePage = ({ isMobile }) => {
         }, 300);
       }
     };
-    fetchData();
-  }, [loggedUser.user.id, userID, userData?.bio]);
 
-  const mockUserData = {
-    profileImages: [
-      "https://www.gstatic.com/webp/gallery/3.jpg",
-      "https://www.gstatic.com/webp/gallery/1.jpg",
-      "https://www.gstatic.com/webp/gallery/4.jpg",
-    ],
-  };
+    fetchData();
+  }, [loggedUser.user.id, userId]);
 
   const renderEditButton = () => {
     if (isLoggedUserProfile) {
-      if (isBioEditMode) {
-        return (
-          <div className={classes.buttonsContainer}>
-            <IconButton
-              className={classes.saveButton}
-              onClick={handleSaveChanges}
-            >
-              <SaveIcon />
-            </IconButton>
-            <IconButton
-              className={classes.cancelButton}
-              onClick={handleCancelChanges}
-            >
-              <CloseIcon />
-            </IconButton>
-          </div>
-        );
-      } else {
-        return (
-          <EditIcon className={classes.editButton} onClick={toggleEditMode} />
-        );
-      }
+      return (
+        <IconButton
+          className={classes.editButton}
+          onClick={() => setIsEditModalOpen(true)}
+        >
+          <EditIcon />
+        </IconButton>
+      );
+    }
+    return null;
+  };
+
+  const renderUploadPicturesButton = () => {
+    if (isLoggedUserProfile) {
+      return (
+        <div className={classes.uploadButton}>
+          <button onClick={openImageUploadModal}>Upload Pictures</button>
+        </div>
+      );
     }
     return null;
   };
@@ -190,37 +195,43 @@ const UserProfilePage = ({ isMobile }) => {
     }
   };
 
-  const toggleEditMode = () => {
-    setIsEditMode((prevEditMode) => !prevEditMode);
+  const toggleEditModal = () => {
+    setIsEditModalOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const handleSaveChanges = async () => {
-    // Make the API call to update the user profile
-    if (userData?.bio !== updatedBio) {
-      try {
-        const response = await updateUserBio(userData?.id, updatedBio);
+  const handleSaveChanges = async (editedBio, editedAvatar) => {
+    try {
+      let bioResponse = null;
+      let avatarResponse = null;
 
-        if (response.success) {
-          // After successful update, update userData with the new bio
-          setUserData((prevUserData) => ({
-            ...prevUserData,
-            bio: response.data.bio,
-          }));
-          // After successful update, exit edit mode
-
-          setIsEditMode(false);
-        }
-      } catch (error) {
-        console.log(error);
+      if (userData?.bio !== editedBio) {
+        // Update the bio if it has changed
+        bioResponse = await updateUserBio(userData?.id, editedBio);
       }
-    } else {
-      setIsEditMode(false);
-    }
-  };
 
-  const handleCancelChanges = () => {
-    setUpdatedBio(userData?.bio);
-    setIsEditMode(false);
+      if (userData?.avatar !== editedAvatar) {
+        // Update the avatar if it has changed
+        avatarResponse = await updateUserAvatar(userData?.id, editedAvatar);
+      }
+
+      if (
+        (bioResponse?.success || avatarResponse?.success) &&
+        bioResponse?.success !== false &&
+        avatarResponse?.success !== false
+      ) {
+        // After a successful update, update userData with the new bio and avatar
+        setUserData((prevUserData) => ({
+          ...prevUserData,
+          bio: bioResponse?.data?.bio || prevUserData.bio,
+          avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
+        }));
+        addSnackbar("Profile updated!");
+        setIsEditModalOpen(false);
+      }
+    } catch (error) {
+      console.error(error);
+      addSnackbar(error.message);
+    }
   };
 
   return (
@@ -230,145 +241,69 @@ const UserProfilePage = ({ isMobile }) => {
         <LoadingSpinner />
       ) : (
         <div className={classes.profileSection}>
-          {/* Mobile mode */}
-          {isMobile && (
-            <>
-              {/* Profile header */}
-              <div className={classes.mobileProfileHeader}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <AvatarUpdate
-                    userId={userData?.id}
-                    currentAvatarUrl={userData?.avatar}
-                    isLoggedUserProfile={isLoggedUserProfile}
-                  />
-                  <div className={classes.leftMargin}>
-                    {isMobile ? (
-                      <div>
-                        <h5>
-                          {userData?.name},{" "}
-                          {calculateAge(userData?.date_of_birth)}{" "}
-                        </h5>
-                        <span style={{ fontWeight: "normal" }}>
-                          <h6>{userLocation}</h6>
-                        </span>
-                      </div>
-                    ) : (
-                      <div>
-                        <h2>
-                          {userData?.name},{" "}
-                          {calculateAge(userData?.date_of_birth)}{" "}
-                        </h2>
-                        <span style={{ fontWeight: "normal" }}>
-                          <p>{userLocation}</p>
-                        </span>
-                      </div>
-                    )}
-                  </div>{" "}
-                  {renderEditButton()}
-                </div>
-                {/* Bio text area */}
-                <div className={classes.mobileTextArea}>
-                  {isBioEditMode ? (
-                    <Typography
-                      variant="subtitle2"
-                      value={updatedBio}
-                      onChange={(e) =>
-                        setUpdatedBio(e.target.value.slice(0, 160))
-                      }
-                      component="textarea"
-                    ></Typography>
-                  ) : (
-                    // <textarea
-                    //   autoCapitalize="sentences"
-                    //   autoComplete="on"
-                    //   autoCorrect="on"
-                    //   maxLength="160"
-                    //   name="description"
-                    //   spellCheck="true"
-                    //   dir="auto"
-                    //   style={{ height: "60px", width: "100%" }}
-                    //   value={updatedBio}
-                    //   onChange={(e) =>
-                    //     setUpdatedBio(e.target.value.slice(0, 160))
-                    //   }
-                    // />
-                    <div>
-                      <span style={{ fontWeight: "normal" }}>
-                        Bio: {userData?.bio}
-                      </span>
-                    </div>
-                  )}
+          {/* Profile header */}
+          <div
+            className={
+              isMobile ? classes.mobileProfileHeader : classes.profileHeader
+            }
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Avatar
+                alt={userData?.name}
+                src={userData?.avatar}
+                className={classes.largeAvatar}
+              />
+              <div className={classes.leftMargin}>
+                {isMobile ? (
+                  <h5>
+                    {userData?.name}, {calculateAge(userData?.date_of_birth)}
+                  </h5>
+                ) : (
+                  <h2>
+                    {userData?.name}, {calculateAge(userData?.date_of_birth)}
+                  </h2>
+                )}
+                <span style={{ fontWeight: "normal" }}>
+                  {isMobile ? <h6>{userLocation}</h6> : <p>{userLocation}</p>}
+                </span>
+                {/* Bio text */}
+                <div>
+                  <span style={{ fontWeight: "normal" }}>
+                    Bio: {userData?.bio}
+                  </span>
                 </div>
               </div>
-            </>
+            </div>
+            {renderEditButton()}
+          </div>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <div className={classes.centeredContent}>
+              <Cards images={profileImages || []} />
+              {renderUploadPicturesButton()}
+            </div>
           )}
+        </div>
+      )}
+      {/* Render the UserProfileEditModal only if userData is available */}
+      {isUserDataAvailable && (
+        <UserProfileEditModal
+          isOpen={isEditModalOpen}
+          onClose={toggleEditModal}
+          userData={userData}
+          onSave={handleSaveChanges}
+        />
+      )}
+      {/* Render the ImageUploadModal */}
 
-          {/* Desktop mode */}
-          {!isMobile && (
-            <>
-              {isLoading ? (
-                <LoadingSpinner />
-              ) : (
-                <div className={classes.profileHeader}>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <AvatarUpdate
-                      userId={userData?.id}
-                      currentAvatarUrl={userData?.avatar}
-                      isLoggedUserProfile={isLoggedUserProfile}
-                    />
-                    <div className={classes.leftMargin}>
-                      <h2>
-                        {userData?.name},{" "}
-                        {calculateAge(userData?.date_of_birth)}
-                      </h2>
-                      <span style={{ fontWeight: "normal" }}>
-                        <p>{userLocation}</p>
-                      </span>
-                      {isBioEditMode ? (
-                        <div
-                          style={{ display: "flex", flexDirection: "column" }}
-                        >
-                          <textarea
-                            autoCapitalize="sentences"
-                            autoComplete="on"
-                            autoCorrect="on"
-                            maxLength="160"
-                            name="description"
-                            spellCheck="true"
-                            dir="auto"
-                            style={{ height: "60px" }}
-                            value={updatedBio}
-                            onChange={(e) =>
-                              setUpdatedBio(e.target.value.slice(0, 160))
-                            }
-                            className={classes.commentInput}
-                            placeholder="Edit your bio (maximum of 160 characters)..."
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          {" "}
-                          <span style={{ fontWeight: "normal" }}>
-                            Bio: {userData?.bio}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {renderEditButton()}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <div className={classes.centeredContent}>
-          <Cards images={mockUserData.profileImages} />
-        </div>
-      )}
+      <ImageUploadModal
+        userId={userId}
+        isOpen={isImageUploadModalOpen}
+        onClose={closeImageUploadModal}
+        profileImages={profileImages}
+        setProfileImages={setProfileImages}
+      />
     </div>
   );
 };

@@ -62,6 +62,17 @@ export const markLinkupsAsExpired = async () => {
   }
 };
 
+export const markLinkupAsCompleted = async (linkupId) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/mark-linkup-as-completed/${linkupId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export const updateLinkup = async (linkupId, linkupData) => {
   try {
     const response = await axios.post(

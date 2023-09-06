@@ -197,6 +197,39 @@ const updateLinkup = async (req, res) => {
   }
 };
 
+markLinkupAsCompleted = async (req, res) => {
+  const { linkupId } = req.params;
+
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/markLinkupAsCompleted.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [linkupId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+    if (rows.length > 0) {
+      // Emit a real-time event to notify clients about the completed link-up
+      const completedLinkup = rows;
+      //  socketIo.emit("linkupCompleted", completedLinkup);
+
+      res.json({
+        success: true,
+        message: "Link-up completed successfully",
+        linkupList: rows,
+      });
+    }
+  } catch (error) {
+    console.error("Error completing the link-up:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to complete the link-up",
+      error: error.message,
+    });
+  }
+};
+
 const markLinkupsAsExpired = async (req, res) => {
   const queryPath = path.join(
     __dirname,
@@ -242,4 +275,5 @@ module.exports = {
   deleteLinkup,
   updateLinkup,
   markLinkupsAsExpired,
+  markLinkupAsCompleted,
 };

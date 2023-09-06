@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3000"],
+    origin: ["http://localhost:3000"],
     methods: ["POST", "GET", "PATCH"],
     optionsSuccessStatus: 200,
   })
@@ -33,5 +33,5 @@ app.use("/api", userRoutes);
 // Start the server
 const port = process.env.PORT || 3002;
 app.listen(port, () => {
-  console.log(`User management server is running on http://localhost:${port}`);
+  console.log(`User management server is running on port ${port}`);
 });

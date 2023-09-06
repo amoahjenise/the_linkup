@@ -19,7 +19,7 @@ import HorizontalMenu from "./HorizontalMenu";
 import EditLinkupForm from "./EditLinkupForm";
 import DeleteModal from "./DeleteModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { deleteLinkup } from "../api/linkupAPI";
+import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
 import nlp from "compromise";
 const compromise = nlp;
 
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#f1c40f", // Yellow
     color: theme.palette.text.secondary,
   },
-  acceptedChip: {
+  completedChip: {
     marginLeft: "auto",
     backgroundColor: "#2ecc71", // Green
     color: theme.palette.text.secondary,
@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
+const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -105,6 +105,24 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
     handleMenuClose();
   };
 
+  const handleCompleteClick = async () => {
+    try {
+      const response = await markLinkupAsCompleted(linkup.id);
+      if (response.success) {
+        addSnackbar("Link-up completed successfully!");
+        setShouldFetchLinkups(true);
+      } else {
+        console.error("Error completing link-up:", response.message);
+        addSnackbar("Error completing link-up: " + response.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      addSnackbar("An error occurred while completing the link-up");
+    } finally {
+      handleMenuClose();
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     try {
       const response = await deleteLinkup(linkup.id);
@@ -130,10 +148,8 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
   const renderStatusIcon = () => {
     if (status === "active") {
       return <QueryBuilderOutlined />;
-    } else if (status === "accepted") {
+    } else if (status === "completed") {
       return <CheckCircleOutlined />;
-    } else if (status === "declined") {
-      return <CloseOutlined />;
     } else if (status === "expired") {
       return <CloseOutlined />;
     }
@@ -154,8 +170,8 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
   const getStatusChipClass = () => {
     if (status === "active") {
       return classes.pendingChip;
-    } else if (status === "accepted") {
-      return classes.acceptedChip;
+    } else if (status === "completed") {
+      return classes.completedChip;
     } else if (status === "expired") {
       return classes.declinedChip;
     }
@@ -183,7 +199,11 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
       .toLowerCase()
       .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase());
 
-    if (status === "active" || status === "accepted" || status === "declined") {
+    if (
+      status === "active" ||
+      status === "completed" ||
+      status === "declined"
+    ) {
       linkupItemText = `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText}
       with a gender preference for ${gender_preference}.`;
     } else if (status === "expired") {
@@ -205,6 +225,7 @@ const LinkupHistoryItem = ({ linkup, userID, setShouldFetchLinkups }) => {
             <HorizontalMenu
               onEditClick={() => handleEditClick(linkup)}
               onDeleteClick={() => handleDeleteClick(linkup.id)}
+              onCompleteClick={() => handleCompleteClick(linkup.id)}
               menuAnchor={menuAnchor}
               setMenuAnchor={setMenuAnchor}
             />

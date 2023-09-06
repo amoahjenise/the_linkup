@@ -46,18 +46,13 @@ const App = () => {
   );
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
-  const [activeSection, setActiveSection] = useState("home"); // Manage active section here
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const PrivateRoutes = ({ path, element }) => {
     return isAuthenticated ? (
       <div className={classes.app}>
-        <LeftMenu
-          isMobile={isMobile}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
+        <LeftMenu isMobile={isMobile} />
         <Outlet />
       </div>
     ) : (
@@ -135,7 +130,11 @@ const App = () => {
                   element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route
-                  path="/history/requests"
+                  path="/history/requests-sent"
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/requests-received"
                   element={<LinkupHistoryPage isMobile={isMobile} />}
                 />
                 <Route

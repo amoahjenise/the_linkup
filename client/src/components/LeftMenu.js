@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
 import HomeIcon from "@material-ui/icons/Home";
@@ -34,30 +34,12 @@ const useStyles = makeStyles((theme) => ({
   menuItem: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(2),
+    listStyleType: "none",
   },
   menuItemLink: {
     color: "black",
     textDecoration: "none",
   },
-  logoContainer: {
-    [theme.breakpoints.down("sm")]: {
-      marginBottom: theme.spacing(2),
-    },
-  },
-  logo: {
-    height: "50px",
-    marginBottom: theme.spacing(2),
-  },
-  menuItemHover: {
-    "&:hover": {
-      backgroundColor: "#F5F8FA",
-      borderRadius: "100px",
-    },
-  },
-  badge: {
-    marginLeft: theme.spacing(2),
-  },
-
   mobileMenuContainer: {
     position: "fixed",
     bottom: 0,
@@ -70,6 +52,7 @@ const useStyles = makeStyles((theme) => ({
   mobileMenu: {
     display: "flex",
     justifyContent: "space-around",
+    alignItems: "center",
     padding: theme.spacing(1),
   },
   mobileMenuItem: {
@@ -82,182 +65,140 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#F5F8FA",
     borderRadius: "100px",
   },
+  badge: {
+    marginLeft: theme.spacing(2),
+  },
+  logoContainer: {
+    [theme.breakpoints.down("sm")]: {
+      marginBottom: theme.spacing(2),
+    },
+  },
+  logo: {
+    height: "50px",
+    marginBottom: theme.spacing(2),
+  },
 }));
 
-const LeftMenu = ({ isMobile, activeSection, setActiveSection }) => {
+const LeftMenu = ({ isMobile }) => {
   const classes = useStyles();
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
   );
-
-  const handleMenuItemClick = (section) => {
-    setActiveSection(section);
-  };
-
-  if (isMobile) {
-    return (
-      <div className={classes.mobileMenuContainer}>
-        <div className={classes.mobileMenu}>
-          <Link
-            to="/home"
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "home" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("home")}
-          >
-            <HomeIcon />
-          </Link>
-          <Link
-            to="/notifications"
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "notifications" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("notifications")}
-          >
-            <Badge badgeContent={unreadNotificationsCount} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </Link>
-          <Link
-            to="/profile/me"
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "profile" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("profile")}
-          >
-            <AccountCircleIcon />
-          </Link>
-          <Link
-            to="/history"
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "history" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("history")}
-          >
-            <HistoryIcon />
-          </Link>
-          <Link
-            to="/messages"
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "messages" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("messages")}
-          >
-            <MessageIcon />
-          </Link>
-          <div
-            className={`${classes.mobileMenuItem} ${
-              classes.mobileMenuItemHover
-            } ${activeSection === "settings" ? classes.active : ""}`}
-            onClick={() => handleMenuItemClick("settings")}
-          >
-            <Link to="/settings" className={classes.mobileMenuItemLink}>
-              <SettingsIcon />
-            </Link>
-          </div>
-          <LogoutButton />
-        </div>
-      </div>
-    );
-  }
+  const location = useLocation(); // Get the current route location
 
   return (
-    <div className={classes.main}>
-      <div className={classes.menu}>
-        <ul className={classes.menuList}>
-          <div className={classes.logoContainer}>
-            <img src={logo} alt="Logo" className={classes.logo} />
-          </div>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "home" ? classes.active : ""
-            }`}
-            // onClick={() => handleMenuItemClick("home")}
-          >
-            <Link
+    <div className={isMobile ? classes.mobileMenuContainer : classes.main}>
+      {isMobile ? (
+        <div className={classes.mobileMenuContainer}>
+          <div className={classes.mobileMenu}>
+            <MenuItem
               to="/home"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("home")}
-            >
-              <HomeIcon /> Home
-            </Link>
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "notifications" ? classes.active : ""
-            }`}
-          >
-            <Link
+              icon={<HomeIcon />}
+              location={location.pathname}
+            />
+            <MenuItem
               to="/notifications"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("notifications")}
-            >
-              <NotificationsIcon /> Notifications
-              <Badge
-                className={classes.badge}
-                badgeContent={parseInt(unreadNotificationsCount)}
-                color="secondary"
-              ></Badge>
-            </Link>
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "profile" ? classes.active : ""
-            }`}
-          >
-            <Link
+              icon={<NotificationsIcon />}
+              badgeContent={unreadNotificationsCount}
+              location={location.pathname}
+            />
+            <MenuItem
               to="/profile/me"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("profile")}
-            >
-              <AccountCircleIcon /> Profile
-            </Link>
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "history" ? classes.active : ""
-            }`}
-          >
-            <Link
+              icon={<AccountCircleIcon />}
+              location={location.pathname}
+            />
+            <MenuItem
               to="/history"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("history")}
-            >
-              <HistoryIcon /> Link Ups
-            </Link>
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "messages" ? classes.active : ""
-            }`}
-          >
-            <Link
+              icon={<HistoryIcon />}
+              location={location.pathname}
+            />
+            <MenuItem
               to="/messages"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("messages")}
-            >
-              <MessageIcon /> Messages
-            </Link>
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.menuItemHover} ${
-              activeSection === "settings" ? classes.active : ""
-            }`}
-          >
-            <Link
+              icon={<MessageIcon />}
+              location={location.pathname}
+            />
+            <MenuItem
               to="/settings"
-              className={classes.menuItemLink}
-              onClick={() => handleMenuItemClick("settings")}
-            >
-              <SettingsIcon /> Settings
-            </Link>
-          </li>
-          <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+              icon={<SettingsIcon />}
+              location={location.pathname}
+            />
             <LogoutButton />
-          </li>
-        </ul>
-      </div>
+          </div>
+        </div>
+      ) : (
+        <div className={classes.menu}>
+          <ul className={classes.menuList}>
+            <div className={classes.logoContainer}>
+              <img src={logo} alt="Logo" className={classes.logo} />
+            </div>
+            <MenuItem
+              to="/home"
+              icon={<HomeIcon />}
+              text="Home"
+              location={location.pathname}
+            />
+            <MenuItem
+              to="/notifications"
+              icon={<NotificationsIcon />}
+              text="Notifications"
+              badgeContent={unreadNotificationsCount}
+              location={location.pathname}
+            />
+            <MenuItem
+              to="/profile/me"
+              icon={<AccountCircleIcon />}
+              text="Profile"
+              location={location.pathname}
+            />
+            <MenuItem
+              to="/history"
+              icon={<HistoryIcon />}
+              text="Link Ups"
+              location={location.pathname}
+            />
+            <MenuItem
+              to="/messages"
+              icon={<MessageIcon />}
+              text="Messages"
+              location={location.pathname}
+            />
+            <MenuItem
+              to="/settings"
+              icon={<SettingsIcon />}
+              text="Settings"
+              location={location.pathname}
+            />
+            <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
+              <LogoutButton />
+            </li>
+          </ul>
+        </div>
+      )}
     </div>
+  );
+};
+
+// MenuItem component to simplify menu item rendering
+const MenuItem = ({ to, icon, text, badgeContent, location }) => {
+  const classes = useStyles();
+
+  return (
+    <li
+      className={`${classes.menuItem} ${classes.menuItemHover} ${
+        location.startsWith(to) ? classes.active : ""
+      }`}
+    >
+      <Link to={to} className={classes.menuItemLink}>
+        {icon} {text}
+        {badgeContent && (
+          <Badge
+            className={classes.badge}
+            badgeContent={parseInt(badgeContent)}
+            color="secondary"
+          ></Badge>
+        )}
+      </Link>
+    </li>
   );
 };
 

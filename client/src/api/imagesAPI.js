@@ -1,0 +1,68 @@
+import axios from "axios";
+
+// Define the base URL of your server API
+const BASE_URL = process.env.REACT_APP_IMAGE_SERVICE_URL;
+
+const handleError = (error) => {
+  console.error("Error:", error);
+  throw error;
+};
+
+// Function to fetch images from the server
+export async function getUserImages(userId) {
+  try {
+    // Make a GET request to the server endpoint for fetching images
+    const response = await axios.get(`${BASE_URL}/api/get-images`, {
+      params: {
+        userId: userId,
+      },
+    });
+
+    // Return the response data, which should contain the images
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Function to upload images to the server
+export async function uploadImages(userId, imageUrls) {
+  try {
+    const aImagesUrls = [];
+
+    // Append each image to the form data
+    imageUrls.forEach((imageUrl, index) => {
+      aImagesUrls.push(imageUrl);
+    });
+
+    // Make a POST request to the server endpoint for uploading images
+    const response = await axios.post(`${BASE_URL}/api/upload-images`, {
+      params: {
+        userId: userId,
+        imageUrls: aImagesUrls,
+      },
+    });
+
+    // Return the response data (which may include the image URLs after storage)
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// Function to delete images from the server
+export async function deleteImages(userId) {
+  try {
+    // Make a POST request to the server endpoint for deleting images
+    const response = await axios.post(`${BASE_URL}/api/delete-images`, {
+      params: {
+        userId: userId,
+      },
+    });
+
+    // Return the response data, which should indicate success or failure
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+}

@@ -58,7 +58,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         <FontAwesomeIcon icon={faEnvelope} className={classes.icon} />
         {disableRequest ? "Request Sent" : "Request"}
       </div>
-      <div
+      {/* <div
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Like"
@@ -79,7 +79,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
       >
         <FontAwesomeIcon icon={faShare} className={classes.icon} />
         Share Post
-      </div>
+      </div> */}
     </div>
   );
 };

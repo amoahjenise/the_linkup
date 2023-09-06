@@ -136,7 +136,11 @@ const updateUserAvatar = async (req, res) => {
 
     // Check if the user with the given userId exists and update the profile properties
     if (result.rows.length > 0) {
-      res.status(200).json(result.rows[0]);
+      res.json({
+        success: true,
+        message: "User avatar updated",
+        data: result.rows[0],
+      });
     } else {
       res.status(404).json({ message: "User not found" });
     }

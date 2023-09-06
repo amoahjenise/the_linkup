@@ -14,7 +14,7 @@ import {
 } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import Avatar from "@material-ui/core/Avatar";
-import { deleteLinkup } from "../api/linkupAPI";
+import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
 import PostActions from "./PostActions";
 import HorizontalMenu from "./HorizontalMenu";
 import EditLinkupForm from "./EditLinkupForm";
@@ -118,6 +118,24 @@ const LinkupItem = React.memo(
       setMenuAnchor(null);
     };
 
+    const handleCompleteClick = async () => {
+      try {
+        const response = await markLinkupAsCompleted(id);
+        if (response.success) {
+          addSnackbar("Link-up completed successfully!");
+          setShouldFetchLinkups(true);
+        } else {
+          console.error("Error completing link-up:", response.message);
+          addSnackbar("Error completing link-up: " + response.message);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        addSnackbar("An error occurred while completing the link-up");
+      } finally {
+        handleMenuClose();
+      }
+    };
+
     const handleEditClick = () => {
       // Open the edit modal when "Edit this linkup" is clicked
       setIsEditModalOpen(true);
@@ -126,16 +144,14 @@ const LinkupItem = React.memo(
     };
 
     // Function to handle the click on the linkup item and redirect to history page
-    const handleLinkupItemClick = () => {
+    const handleGoToLinkupClick = () => {
       // Use the navigate function to redirect to the history page
       navigate("/history"); // Change the path to the desired destination, in this case, "/"
     };
 
-    const handleCompleteClick = () => {};
-
     const handleRequestLinkup = () => {
       if (disableRequest) {
-        navigate(`/history/requests`);
+        navigate(`/history/requests-sent`);
       } else {
         navigate(`/send-request/${id}`);
       }
@@ -263,7 +279,7 @@ const LinkupItem = React.memo(
             {!editingLinkup.isEditing &&
               loggedUser.user.id === linkupItem.creator_id && (
                 <HorizontalMenu
-                  onLinkupItemClick={handleLinkupItemClick}
+                  onLinkupItemClick={handleGoToLinkupClick}
                   onEditClick={handleEditClick}
                   onDeleteClick={handleDeleteClick}
                   onCompleteClick={handleCompleteClick}

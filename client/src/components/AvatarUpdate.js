@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Resizer from "react-image-file-resizer";
-import { updateUserAvatar } from "../api/usersAPI";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
@@ -36,7 +35,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AvatarUpdate = ({ userId, currentAvatarUrl, isLoggedUserProfile }) => {
+const AvatarUpdate = ({
+  currentAvatarUrl,
+  isLoggedUserProfile,
+  onUpdateAvatar,
+}) => {
   const classes = useStyles({ isLoggedUserProfile });
   const [selectedImage, setSelectedImage] = useState(currentAvatarUrl);
   const inputRef = useRef(null);
@@ -59,7 +62,10 @@ const AvatarUpdate = ({ userId, currentAvatarUrl, isLoggedUserProfile }) => {
         0,
         (resizedImage) => {
           setSelectedImage(resizedImage);
-          handleUpload(resizedImage);
+          onUpdateAvatar(resizedImage);
+          {
+            /* Pass the updated avatar to the parent component */
+          }
         },
         "base64"
       );
@@ -68,12 +74,6 @@ const AvatarUpdate = ({ userId, currentAvatarUrl, isLoggedUserProfile }) => {
 
   const handleClick = () => {
     if (isLoggedUserProfile) inputRef.current.click();
-  };
-
-  const handleUpload = async (resizedImage) => {
-    if (selectedImage) {
-      await updateUserAvatar(userId, resizedImage);
-    }
   };
 
   return (

@@ -9,10 +9,10 @@ import FilterBar from "../components/FilterBar";
 import EditLinkupModal from "../components/EditLinkupModal";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
 import LinkupRequestItem from "../components/LinkupRequestItem";
-import { setIsLoading } from "../redux/actions/linkupActions";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { getUserLinkups } from "../api/linkupAPI";
-import { getLinkupRequests } from "../api/linkupRequestAPI";
+import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const useStyles = makeStyles((theme) => ({
   linkupHistoryPage: {
@@ -38,15 +38,21 @@ const LinkupHistoryPage = ({ isMobile }) => {
   const location = useLocation();
 
   const loggedUser = useSelector((state) => state.loggedUser);
-  const userID = loggedUser.user.id;
+  const userId = loggedUser.user.id;
 
-  // Combine related state into single objects
+  const [isLoading, setIsLoading] = useState(true);
+
   const [linkups, setLinkups] = useState({
     list: [],
     filteredList: [],
   });
 
-  const [requests, setRequests] = useState({
+  const [sentRequests, setSentRequests] = useState({
+    list: [],
+    filteredList: [],
+  });
+
+  const [receivedRequests, setReceivedRequests] = useState({
     list: [],
     filteredList: [],
   });
@@ -82,7 +88,8 @@ const LinkupHistoryPage = ({ isMobile }) => {
       id: 0,
       label: "My Link-Ups",
     },
-    { id: 1, label: "Requests" },
+    { id: 1, label: "Requests Sent" },
+    { id: 2, label: "Requests Received" },
   ];
 
   const handleTabChange = (event, newValue) => {
@@ -103,10 +110,8 @@ const LinkupHistoryPage = ({ isMobile }) => {
   };
 
   const fetchLinkups = useCallback(async () => {
-    dispatch(setIsLoading(true));
-
     try {
-      const userLinkupsResponse = await getUserLinkups(userID);
+      const userLinkupsResponse = await getUserLinkups(userId);
       if (userLinkupsResponse.success) {
         setLinkups({
           list: userLinkupsResponse.linkupList,
@@ -116,32 +121,50 @@ const LinkupHistoryPage = ({ isMobile }) => {
         console.error("Error fetching linkups:", userLinkupsResponse.message);
       }
 
-      const linkupRequestsResponse = await getLinkupRequests(userID);
-      if (linkupRequestsResponse.success) {
-        setRequests({
-          list: linkupRequestsResponse.linkupRequestList,
-          filteredList: linkupRequestsResponse.linkupRequestList,
+      const sentRequestsResponse = await getSentRequests(userId);
+      if (sentRequestsResponse.success) {
+        setSentRequests({
+          list: sentRequestsResponse.linkupRequestList,
+          filteredList: sentRequestsResponse.linkupRequestList,
         });
       } else {
         console.error(
           "Error fetching linkup requests:",
-          linkupRequestsResponse.message
+          sentRequestsResponse.message
+        );
+      }
+
+      const receivedRequestsResponse = await getReceivedRequests(userId);
+      if (receivedRequestsResponse.success) {
+        setReceivedRequests({
+          list: receivedRequestsResponse.linkupRequestList,
+          filteredList: receivedRequestsResponse.linkupRequestList,
+        });
+      } else {
+        console.error(
+          "Error fetching linkup requests:",
+          receivedRequestsResponse.message
         );
       }
     } catch (error) {
       console.error("An error occurred:", error);
     } finally {
-      dispatch(setIsLoading(false));
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
-  }, [dispatch, userID]);
+  }, [userId]);
 
   useEffect(() => {
     switch (location.pathname) {
       case "/history":
         setActiveTab(0);
         break;
-      case "/history/requests":
+      case "/history/requests-sent":
         setActiveTab(1);
+        break;
+      case "/history/requests-received":
+        setActiveTab(2);
         break;
       default:
         setActiveTab(0);
@@ -155,126 +178,194 @@ const LinkupHistoryPage = ({ isMobile }) => {
     }
   }, [dispatch, fetchLinkups, shouldFetchLinkups]);
 
-  useEffect(() => {
-    // Create a filtered array based on the filter criteria
-    const filteredLinkups = linkups.list.filter((linkup) => {
-      const createdAt = new Date(linkup.created_at);
-      const today = new Date();
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(today.getDate() - 30);
-
-      return (
-        (myLinkupsFilters.activeStatus === "All" ||
-          linkup.status.toLowerCase() ===
-            myLinkupsFilters.activeStatus.toLowerCase()) &&
-        (myLinkupsFilters.dateFilter === "All" ||
-          (myLinkupsFilters.dateFilter === "Today" &&
-            createdAt.getDate() === today.getDate() &&
-            createdAt.getMonth() === today.getMonth() &&
-            createdAt.getFullYear() === today.getFullYear()) ||
-          (myLinkupsFilters.dateFilter === "Last 7 days" &&
-            createdAt >= sevenDaysAgo) ||
-          (myLinkupsFilters.dateFilter === "Last 30 days" &&
-            createdAt >= thirtyDaysAgo))
-      );
-    });
-
-    // Update the filteredLinkupList state with the filtered array
-    setLinkups({ ...linkups, filteredList: filteredLinkups });
-  }, [linkups.list, myLinkupsFilters]);
+  // ...
 
   useEffect(() => {
     // Create a filtered array based on the filter criteria
-    const filteredRequests = requests.list.filter((request) => {
-      const createdAt = new Date(request.created_at);
-      const today = new Date();
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(today.getDate() - 7);
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(today.getDate() - 30);
+    if (activeTab === 0) {
+      // My Link-Ups
+      const filteredLinkups = linkups.list.filter((linkup) => {
+        const createdAt = new Date(linkup.created_at);
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
 
-      // Check if the request status matches the selected status filter
-      if (
-        requestsFilters.activeStatus === "All" ||
-        request.status.toLowerCase() ===
-          requestsFilters.activeStatus.toLowerCase()
-      ) {
-        // Check if the date filter matches
+        return (
+          (myLinkupsFilters.activeStatus === "All" ||
+            linkup.status.toLowerCase() ===
+              myLinkupsFilters.activeStatus.toLowerCase()) &&
+          (myLinkupsFilters.dateFilter === "All" ||
+            (myLinkupsFilters.dateFilter === "Today" &&
+              createdAt.getDate() === today.getDate() &&
+              createdAt.getMonth() === today.getMonth() &&
+              createdAt.getFullYear() === today.getFullYear()) ||
+            (myLinkupsFilters.dateFilter === "Last 7 days" &&
+              createdAt >= sevenDaysAgo) ||
+            (myLinkupsFilters.dateFilter === "Last 30 days" &&
+              createdAt >= thirtyDaysAgo))
+        );
+      });
+
+      // Update the filteredLinkupList state with the filtered array
+      setLinkups({ ...linkups, filteredList: filteredLinkups });
+    } else if (activeTab === 1) {
+      // Requests Sent
+      const filteredSentRequests = sentRequests.list.filter((request) => {
+        const createdAt = new Date(request.created_at);
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        // Check if the request status matches the selected status filter
         if (
-          requestsFilters.dateFilter === "All" ||
-          (requestsFilters.dateFilter === "Today" &&
-            createdAt.getDate() === today.getDate() &&
-            createdAt.getMonth() === today.getMonth() &&
-            createdAt.getFullYear() === today.getFullYear()) ||
-          (requestsFilters.dateFilter === "Last 7 days" &&
-            createdAt >= sevenDaysAgo) ||
-          (requestsFilters.dateFilter === "Last 30 days" &&
-            createdAt >= thirtyDaysAgo)
+          requestsFilters.activeStatus === "All" ||
+          request.status.toLowerCase() ===
+            requestsFilters.activeStatus.toLowerCase()
         ) {
-          return true;
+          // Check if the date filter matches
+          if (
+            requestsFilters.dateFilter === "All" ||
+            (requestsFilters.dateFilter === "Today" &&
+              createdAt.getDate() === today.getDate() &&
+              createdAt.getMonth() === today.getMonth() &&
+              createdAt.getFullYear() === today.getFullYear()) ||
+            (requestsFilters.dateFilter === "Last 7 days" &&
+              createdAt >= sevenDaysAgo) ||
+            (requestsFilters.dateFilter === "Last 30 days" &&
+              createdAt >= thirtyDaysAgo)
+          ) {
+            return true;
+          }
         }
-      }
-      return false;
-    });
+        return false;
+      });
+      setSentRequests({ ...sentRequests, filteredList: filteredSentRequests });
+    } else if (activeTab === 2) {
+      // Requests Received
+      const filteredReceivedRequests = receivedRequests.list.filter(
+        (request) => {
+          const createdAt = new Date(request.created_at);
+          const today = new Date();
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(today.getDate() - 7);
+          const thirtyDaysAgo = new Date(today);
+          thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    // Update the filteredRequestList state with the filtered array
-    setRequests({ ...requests, filteredList: filteredRequests });
-  }, [requests.list, requestsFilters]);
+          // Check if the request status matches the selected status filter
+          if (
+            requestsFilters.activeStatus === "All" ||
+            request.status.toLowerCase() ===
+              requestsFilters.activeStatus.toLowerCase()
+          ) {
+            // Check if the date filter matches
+            if (
+              requestsFilters.dateFilter === "All" ||
+              (requestsFilters.dateFilter === "Today" &&
+                createdAt.getDate() === today.getDate() &&
+                createdAt.getMonth() === today.getMonth() &&
+                createdAt.getFullYear() === today.getFullYear()) ||
+              (requestsFilters.dateFilter === "Last 7 days" &&
+                createdAt >= sevenDaysAgo) ||
+              (requestsFilters.dateFilter === "Last 30 days" &&
+                createdAt >= thirtyDaysAgo)
+            ) {
+              return true;
+            }
+          }
+          return false;
+        }
+      );
+      setReceivedRequests({
+        ...receivedRequests,
+        filteredList: filteredReceivedRequests,
+      });
+    }
+  }, [
+    activeTab,
+    myLinkupsFilters,
+    requestsFilters,
+    linkups.list,
+    sentRequests.list,
+    receivedRequests.list,
+  ]);
 
   return (
     <div className={classes.linkupHistoryPage}>
       <div className={classes.historySection}>
         <TopNavBar title="Link Ups" />
-        <Tabs
-          className={classes.tabBar}
-          value={activeTab}
-          onChange={handleTabChange}
-          variant={isMobile ? "scrollable" : "standard"}
-          indicatorColor="primary"
-          textColor="primary"
-          style={{ width: isMobile ? "100%" : "auto" }}
-        >
-          {tabs.map((tab) => (
-            <Tab
-              key={tab.id}
-              label={
-                tab.id === 0
-                  ? `My Link-Ups (${linkups.filteredList.length})`
-                  : `Requests (${requests.filteredList.length})`
-              }
-              style={{ width: "33%" }}
-            />
-          ))}
-        </Tabs>
-        {activeTab === 0 && (
-          <div>
-            {linkups.filteredList.map((linkup) => (
-              <LinkupHistoryItem
-                key={linkup.id}
-                linkup={linkup}
-                onEdit={() => {
-                  handleLinkupEdit(linkup);
-                  setIsEditModalOpen(true);
-                }}
-                setShouldFetchLinkups={setShouldFetchLinkups}
-              />
-            ))}
-          </div>
-        )}
-        {activeTab === 1 && (
-          <div>
-            <div>
-              {requests.filteredList.map((request) => (
-                <LinkupRequestItem
-                  key={request.id}
-                  post={request}
-                  setShouldFetchLinkups={setShouldFetchLinkups}
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <Tabs
+              className={classes.tabBar}
+              value={activeTab}
+              onChange={handleTabChange}
+              variant={isMobile ? "scrollable" : "standard"}
+              indicatorColor="primary"
+              textColor="primary"
+              style={{ width: isMobile ? "100%" : "auto" }}
+            >
+              {tabs.map((tab) => (
+                <Tab
+                  key={tab.id}
+                  label={
+                    tab.id === 0
+                      ? `My Link-Ups (${linkups.filteredList.length})`
+                      : tab.id === 1
+                      ? `Sent Requests (${sentRequests.filteredList.length})`
+                      : `Received Requests (${receivedRequests.filteredList.length})`
+                  }
+                  style={{ width: "33%" }}
                 />
               ))}
-            </div>
-          </div>
+            </Tabs>
+            {activeTab === 0 && (
+              <div>
+                {linkups.filteredList.map((linkup) => (
+                  <LinkupHistoryItem
+                    key={linkup.id}
+                    linkup={linkup}
+                    onEdit={() => {
+                      handleLinkupEdit(linkup);
+                      setIsEditModalOpen(true);
+                    }}
+                    setShouldFetchLinkups={setShouldFetchLinkups}
+                  />
+                ))}
+              </div>
+            )}
+            {activeTab === 1 && (
+              <div>
+                <div>
+                  {sentRequests.filteredList.map((request) => (
+                    <LinkupRequestItem
+                      key={request.id}
+                      post={request}
+                      setShouldFetchLinkups={setShouldFetchLinkups}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {activeTab === 2 && (
+              <div>
+                <div>
+                  {receivedRequests.filteredList.map((request) => (
+                    <LinkupRequestItem
+                      key={request.id}
+                      post={request}
+                      setShouldFetchLinkups={setShouldFetchLinkups}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
       <FilterBar
@@ -282,21 +373,34 @@ const LinkupHistoryPage = ({ isMobile }) => {
         activeStatus={
           activeTab === 0
             ? myLinkupsFilters.activeStatus
-            : requestsFilters.activeStatus
+            : activeTab === 1
+            ? requestsFilters.activeStatus
+            : requestsFilters.activeStatus // Handle the third tab's activeStatus similarly
         }
         onStatusChange={(newStatus) => {
-          updateFilters({ activeStatus: newStatus }, activeTab === 0);
+          if (activeTab === 0) {
+            updateFilters({ activeStatus: newStatus }, true);
+          } else {
+            updateFilters({ activeStatus: newStatus }, false);
+          }
         }}
         dateFilter={
           activeTab === 0
             ? myLinkupsFilters.dateFilter
+            : activeTab === 1
+            ? requestsFilters.dateFilter
             : requestsFilters.dateFilter
         }
         onDateFilterChange={(newDateFilter) => {
-          updateFilters({ dateFilter: newDateFilter }, activeTab === 0);
+          if (activeTab === 0) {
+            updateFilters({ dateFilter: newDateFilter }, true);
+          } else {
+            updateFilters({ dateFilter: newDateFilter }, false);
+          }
         }}
         statusOptions={activeTab === 0 ? statusOptions : requestsStatusOptions}
       />
+
       {isEditing && (
         <EditLinkupModal
           open={isEditModalOpen}

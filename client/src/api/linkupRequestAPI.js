@@ -50,6 +50,28 @@ export const declineLinkupRequest = async (linkupRequestId) => {
   }
 };
 
+export const getSentRequests = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/get-sent-requests/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getReceivedRequests = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/get-received-requests/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export const getLinkupRequests = async (userId) => {
   try {
     const response = await axios.get(

@@ -72,11 +72,7 @@ export const updateUserAvatar = async (userId, avatar) => {
         avatar,
       }
     );
-    return {
-      success: response.data.success,
-      message: response.data.message,
-      data: response.data,
-    };
+    return response.data;
   } catch (error) {
     return handleError(error, "Failed to update user avatar");
   }

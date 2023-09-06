@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const loggedUser = useSelector((state) => state.loggedUser);
-  const userID = loggedUser?.user?.id || "";
+  const userId = loggedUser?.user?.id || "";
   const [requestStatus, setRequestStatus] = React.useState(post.status);
   const [isMyLinkup, setIsMyLinkup] = useState(false);
 
@@ -162,7 +162,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
       ? `(${moment(link_up_date).format("h:mm A")})`
       : "";
 
-    if (userID === receiver_id) {
+    if (userId === receiver_id) {
       // If the logged user is the receiver of the request
       itemText = `You received a request from ${requester_name} ${activityText} scheduled for ${dateText} ${timeText}`;
     } else {
@@ -174,16 +174,16 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   };
 
   useEffect(() => {
-    if (userID === creator_id) {
+    if (userId === creator_id) {
       setIsMyLinkup(true);
     }
-  }, [creator_id, userID]);
+  }, [creator_id, userId]);
 
   return (
     <div className={classes.linkupRequestItem}>
       <Avatar
-        alt={userID === receiver_id ? requester_name : creator_name}
-        src={userID === receiver_id ? receiver_avatar : avatar}
+        alt={userId === receiver_id ? requester_name : creator_name}
+        src={userId === receiver_id ? receiver_avatar : avatar}
         className={classes.avatar}
       />
       <div className={classes.postDetails}>
@@ -195,7 +195,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
             </Typography>
           )}
         </div>
-        {userID === receiver_id ? (
+        {userId === receiver_id ? (
           <div>
             {requestStatus === "pending" ? ( // Display buttons only when status is pending
               <div className={classes.buttonGroup}>

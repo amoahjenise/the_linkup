@@ -49,13 +49,13 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
 
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
-  const userID = loggedUser.user.id;
+  const userId = loggedUser.user.id;
   const gender = loggedUser.user.gender;
 
   const fetchLinkups = useCallback(async () => {
     dispatch(setIsLoading(true));
     try {
-      const response = await getLinkups(userID, gender);
+      const response = await getLinkups(userId, gender);
       if (response.success) {
         const activeLinkups = response.linkupList.filter(
           (linkup) => linkup.status === "active"
@@ -69,12 +69,12 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch, gender, userID]);
+  }, [dispatch, gender, userId]);
 
   // Function to fetch linkup requests and set them in Redux store
   const fetchLinkupRequests = useCallback(async () => {
     try {
-      const response = await getLinkupRequests(userID); // Fetch linkup requests
+      const response = await getLinkupRequests(userId); // Fetch linkup requests
       if (response.success) {
         dispatch(fetchLinkupRequestsSuccess(response.linkupRequestList)); // Set linkup requests in Redux store
       } else {
@@ -83,7 +83,7 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
     } catch (error) {
       console.error("Error fetching linkup requests:", error);
     }
-  }, [dispatch, userID]);
+  }, [dispatch, userId]);
 
   const removeExpiredLinkups = useCallback(async () => {
     try {

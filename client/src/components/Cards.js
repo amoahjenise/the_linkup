@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     gap: "4px",
-    zIndex: 3, // Bring image stack above cards
   },
   imageStackItem: {
     width: "32px",
@@ -103,7 +102,6 @@ const Cards = ({ images }) => {
               className={classes.imageStackItem}
               onClick={() => handleClickAvatar(index)}
               style={{
-                zIndex: images.length - index,
                 border:
                   index === currentImageIndex
                     ? "2px solid #ff6b6b"
