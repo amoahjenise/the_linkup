@@ -190,7 +190,7 @@ const MenuItem = ({ to, icon, text, badgeContent, location }) => {
     >
       <Link to={to} className={classes.menuItemLink}>
         {icon} {text}
-        {badgeContent && (
+        {badgeContent > 0 && (
           <Badge
             className={classes.badge}
             badgeContent={parseInt(badgeContent)}
