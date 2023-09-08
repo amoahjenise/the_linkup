@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   acceptLinkupRequest,
@@ -14,10 +14,9 @@ import {
 } from "@material-ui/icons";
 import Button from "@material-ui/core/Button";
 import moment from "moment";
-import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import Typography from "@material-ui/core/Typography";
-
+import nlp from "compromise";
 const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
@@ -26,31 +25,39 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
     borderBottom: "1px solid lightgrey",
-  },
-  pendingChip: {
-    marginLeft: "auto",
-    backgroundColor: "#f1c40f", // Yellow
-    color: theme.palette.text.secondary,
-  },
-  acceptedChip: {
-    marginLeft: "auto",
-    backgroundColor: "#2ecc71", // Green
-    color: theme.palette.text.secondary,
-  },
-  declinedChip: {
-    marginLeft: "auto",
-    backgroundColor: "pink", // Pink
-    color: theme.palette.text.secondary,
-  },
-  postDetails: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
   },
+  chip: {
+    width: "110px",
+    marginLeft: "auto",
+  },
+  pendingChip: {
+    backgroundColor: "#f1c40f", // Yellow
+    color: theme.palette.text.secondary,
+  },
+  acceptedChip: {
+    backgroundColor: "#2ecc71", // Green
+    color: theme.palette.text.secondary,
+  },
+  declinedChip: {
+    backgroundColor: "pink", // Pink
+    color: theme.palette.text.secondary,
+  },
   requestText: {
-    marginRight: "auto",
     margin: 0,
     marginBottom: theme.spacing(1),
+  },
+  acceptButton: {
+    backgroundColor: "#00CFFF",
+    color: "white",
+    marginRight: theme.spacing(2),
+    cursor: "pointer",
+    transition: "background-color 0.3s ease", // Add transition for smooth color change
+    "&:hover": {
+      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
+    },
   },
   buttonGroup: {
     display: "flex",
@@ -63,30 +70,19 @@ const useStyles = makeStyles((theme) => ({
 
 const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id || "";
-  const [requestStatus, setRequestStatus] = React.useState(post.status);
-  const [isMyLinkup, setIsMyLinkup] = useState(false);
-
-  const {
-    id,
-    requester_id,
-    requester_name,
-    creator_id,
-    creator_name,
-    activity,
-    avatar,
-    location,
-    link_up_date,
-    receiver_avatar,
-    receiver_id,
-  } = post;
+  const [isMyLinkup, setIsMyLinkup] = useState(userId === post.creator_id);
   const { addSnackbar } = useSnackbar();
 
   const handleAcceptClick = async () => {
     try {
-      await acceptLinkupRequest(id);
-      setRequestStatus("accepted"); // Update the request status in state
+      await acceptLinkupRequest(post.id);
+      dispatch({
+        type: "UPDATE_REQUEST_STATUS",
+        payload: { id: post.id, status: "accepted" },
+      });
       setShouldFetchLinkups(true);
       addSnackbar("Link-up request accepted.");
     } catch (error) {
@@ -96,8 +92,11 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
 
   const handleDeclineClick = async () => {
     try {
-      await declineLinkupRequest(id);
-      setRequestStatus("declined"); // Update the request status in state
+      await declineLinkupRequest(post.id);
+      dispatch({
+        type: "UPDATE_REQUEST_STATUS",
+        payload: { id: post.id, status: "declined" },
+      });
       setShouldFetchLinkups(true);
       addSnackbar("Link-up request declined.");
     } catch (error) {
@@ -106,136 +105,133 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   };
 
   const renderStatusIcon = () => {
-    if (requestStatus === "pending") {
-      return <QueryBuilderOutlined />;
-    } else if (requestStatus === "accepted") {
-      return <CheckCircleOutlined />;
-    } else if (requestStatus === "declined") {
-      return <CloseOutlined />;
+    switch (post.status) {
+      case "pending":
+        return <QueryBuilderOutlined />;
+      case "accepted":
+        return <CheckCircleOutlined />;
+      case "declined":
+        return <CloseOutlined />;
+      default:
+        return null;
     }
-    return null;
   };
 
   const getStatusLabel = () => {
-    if (requestStatus === "pending") {
-      return "pending";
-    } else if (requestStatus === "accepted") {
-      return "accepted";
-    } else if (requestStatus === "declined") {
-      return "declined";
+    switch (post.status) {
+      case "pending":
+        return "pending";
+      case "accepted":
+        return "accepted";
+      case "declined":
+        return "declined";
+      default:
+        return null;
     }
-    return null;
   };
 
   const getStatusChipClass = () => {
-    if (requestStatus === "pending") {
-      return classes.pendingChip;
-    } else if (requestStatus === "accepted") {
-      return classes.acceptedChip;
-    } else if (requestStatus === "declined") {
-      return classes.declinedChip;
+    switch (post.status) {
+      case "pending":
+        return `${classes.chip} ${classes.pendingChip}`;
+      case "accepted":
+        return `${classes.chip} ${classes.acceptedChip}`;
+      case "declined":
+        return `${classes.chip} ${classes.declinedChip}`;
+      default:
+        return null;
     }
-    return null;
   };
 
   const renderLinkupItemText = () => {
-    let itemText = "";
-    const doc = compromise(activity);
+    const doc = compromise(post.activity);
     const startsWithVerb = doc.verbs().length > 0;
-    const isVerbEndingWithIng = activity.endsWith("ing");
+    const isVerbEndingWithIng = post.activity.endsWith("ing");
 
     let activityText = "";
-    if (activity) {
+    if (post.activity) {
       if (isVerbEndingWithIng) {
-        activityText = `for ${activity}`;
+        activityText = `for ${post.activity}`;
       } else {
-        activityText = `${startsWithVerb ? "to" : "for"} ${activity}`;
+        activityText = `${startsWithVerb ? "to" : "for"} ${post.activity}`;
       }
     }
 
-    const dateText = link_up_date
-      ? `${moment(link_up_date).format("MMM DD, YYYY")}`
-      : "";
-    const timeText = link_up_date
-      ? `(${moment(link_up_date).format("h:mm A")})`
+    const dateText = post.link_up_date
+      ? `${moment(post.link_up_date).format("MMM DD, YYYY")} (${moment(
+          post.link_up_date
+        ).format("h:mm A")})`
       : "";
 
-    if (userId === receiver_id) {
-      // If the logged user is the receiver of the request
-      itemText = `You received a request from ${requester_name} ${activityText} scheduled for ${dateText} ${timeText}`;
+    if (userId === post.receiver_id) {
+      return `You received a request from ${post.requester_name} ${activityText} scheduled for ${dateText}`;
     } else {
-      // If the logged user is not the receiver
-      itemText = `Request sent to ${creator_name} ${activityText} scheduled for ${dateText} ${timeText}`;
+      return `Request sent to ${post.creator_name} ${activityText} scheduled for ${dateText}`;
     }
-
-    return itemText;
   };
 
   useEffect(() => {
-    if (userId === creator_id) {
-      setIsMyLinkup(true);
-    }
-  }, [creator_id, userId]);
+    setIsMyLinkup(userId === post.creator_id);
+  }, [post.creator_id, userId]);
 
   return (
     <div className={classes.linkupRequestItem}>
       <UserAvatar
         userData={{
-          id: userId === receiver_id ? requester_id : creator_id,
-          name: userId === receiver_id ? requester_name : creator_name,
-          avatar: userId === receiver_id ? receiver_avatar : avatar,
+          id: isMyLinkup ? post.requester_id : post.creator_id,
+          name: isMyLinkup ? post.requester_name : post.creator_name,
+          avatar: isMyLinkup ? post.receiver_avatar : post.avatar,
         }}
         width="40px"
         height="40px"
       />
-      <div className={classes.postDetails}>
-        <div>
-          <p className={classes.requestText}>{renderLinkupItemText()}</p>
-          {isMyLinkup && (
-            <Typography variant="subtitle2" component="details">
-              <span>{location}</span>
-            </Typography>
-          )}
-        </div>
-        {userId === receiver_id ? (
-          <div>
-            {requestStatus === "pending" ? ( // Display buttons only when status is pending
-              <div className={classes.buttonGroup}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleAcceptClick}
-                >
-                  Accept
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={handleDeclineClick}
-                >
-                  Decline
-                </Button>
-              </div>
-            ) : (
-              <Chip
-                label={getStatusLabel()}
-                icon={renderStatusIcon()}
-                variant="outlined"
-                className={getStatusChipClass()}
-              />
-            )}
-          </div>
-        ) : (
-          <Chip
-            label={getStatusLabel()}
-            icon={renderStatusIcon()}
-            variant="outlined"
-            className={getStatusChipClass()}
-          />
+      <div>
+        <p className={classes.requestText}>{renderLinkupItemText()}</p>
+        {isMyLinkup && (
+          <Typography variant="subtitle2" component="details">
+            <span>{post.location}</span>
+          </Typography>
         )}
       </div>
+      {userId === post.receiver_id ? (
+        <div>
+          {post.status === "pending" ? (
+            <div className={classes.buttonGroup}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={handleAcceptClick}
+                className={classes.acceptButton}
+              >
+                Accept
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                size="small"
+                onClick={handleDeclineClick}
+              >
+                Decline
+              </Button>
+            </div>
+          ) : (
+            <Chip
+              label={getStatusLabel()}
+              icon={renderStatusIcon()}
+              variant="outlined"
+              className={getStatusChipClass()}
+            />
+          )}
+        </div>
+      ) : (
+        <Chip
+          label={getStatusLabel()}
+          icon={renderStatusIcon()}
+          variant="outlined"
+          className={getStatusChipClass()}
+        />
+      )}
     </div>
   );
 };

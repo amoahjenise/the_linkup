@@ -24,8 +24,7 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "auto",
     overflowX: "hidden",
     backgroundColor: theme.palette.background.default,
-    marginLeft: "auto",
-    marginRight: "auto",
+    margin: "0 auto",
   },
   tabBar: {
     borderBottom: "1px solid lightgrey",
@@ -67,18 +66,19 @@ const LinkupHistoryPage = ({ isMobile }) => {
     dateFilter: "All",
   };
 
-  const requestsFiltersInitialState = {
-    activeStatus: "Pending",
-    dateFilter: "All",
-  };
-
   const [myLinkupsFilters, setMyLinkupsFilters] = useState(
     myLinkupsFiltersInitialState
   );
 
-  const [requestsFilters, setRequestsFilters] = useState(
-    requestsFiltersInitialState
-  );
+  const [sentRequestsFilters, setSentRequestsFilters] = useState({
+    activeStatus: "Pending",
+    dateFilter: "All",
+  });
+
+  const [receivedRequestsFilters, setReceivedRequestsFilters] = useState({
+    activeStatus: "Pending",
+    dateFilter: "All",
+  });
 
   const statusOptions = ["Active", "Completed", "Expired", "All"];
   const requestsStatusOptions = ["All", "Pending", "Accepted", "Declined"];
@@ -103,9 +103,19 @@ const LinkupHistoryPage = ({ isMobile }) => {
 
   const updateFilters = (newFilters, isMyLinkups) => {
     if (isMyLinkups) {
-      setMyLinkupsFilters({ ...myLinkupsFilters, ...newFilters });
-    } else {
-      setRequestsFilters({ ...requestsFilters, ...newFilters });
+      setMyLinkupsFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
+    } else if (activeTab === 1) {
+      // Requests Sent
+      setSentRequestsFilters((prevFilters) => ({
+        ...prevFilters,
+        ...newFilters,
+      }));
+    } else if (activeTab === 2) {
+      // Requests Received
+      setReceivedRequestsFilters((prevFilters) => ({
+        ...prevFilters,
+        ...newFilters,
+      }));
     }
   };
 
@@ -178,8 +188,6 @@ const LinkupHistoryPage = ({ isMobile }) => {
     }
   }, [dispatch, fetchLinkups, shouldFetchLinkups]);
 
-  // ...
-
   useEffect(() => {
     // Create a filtered array based on the filter criteria
     if (activeTab === 0) {
@@ -209,7 +217,10 @@ const LinkupHistoryPage = ({ isMobile }) => {
       });
 
       // Update the filteredLinkupList state with the filtered array
-      setLinkups({ ...linkups, filteredList: filteredLinkups });
+      setLinkups((prevLinkups) => ({
+        ...prevLinkups,
+        filteredList: filteredLinkups,
+      }));
     } else if (activeTab === 1) {
       // Requests Sent
       const filteredSentRequests = sentRequests.list.filter((request) => {
@@ -222,20 +233,20 @@ const LinkupHistoryPage = ({ isMobile }) => {
 
         // Check if the request status matches the selected status filter
         if (
-          requestsFilters.activeStatus === "All" ||
+          sentRequestsFilters.activeStatus === "All" ||
           request.status.toLowerCase() ===
-            requestsFilters.activeStatus.toLowerCase()
+            sentRequestsFilters.activeStatus.toLowerCase()
         ) {
           // Check if the date filter matches
           if (
-            requestsFilters.dateFilter === "All" ||
-            (requestsFilters.dateFilter === "Today" &&
+            sentRequestsFilters.dateFilter === "All" ||
+            (sentRequestsFilters.dateFilter === "Today" &&
               createdAt.getDate() === today.getDate() &&
               createdAt.getMonth() === today.getMonth() &&
               createdAt.getFullYear() === today.getFullYear()) ||
-            (requestsFilters.dateFilter === "Last 7 days" &&
+            (sentRequestsFilters.dateFilter === "Last 7 days" &&
               createdAt >= sevenDaysAgo) ||
-            (requestsFilters.dateFilter === "Last 30 days" &&
+            (sentRequestsFilters.dateFilter === "Last 30 days" &&
               createdAt >= thirtyDaysAgo)
           ) {
             return true;
@@ -243,7 +254,10 @@ const LinkupHistoryPage = ({ isMobile }) => {
         }
         return false;
       });
-      setSentRequests({ ...sentRequests, filteredList: filteredSentRequests });
+      setSentRequests((prevSentRequests) => ({
+        ...prevSentRequests,
+        filteredList: filteredSentRequests,
+      }));
     } else if (activeTab === 2) {
       // Requests Received
       const filteredReceivedRequests = receivedRequests.list.filter(
@@ -257,20 +271,20 @@ const LinkupHistoryPage = ({ isMobile }) => {
 
           // Check if the request status matches the selected status filter
           if (
-            requestsFilters.activeStatus === "All" ||
+            receivedRequestsFilters.activeStatus === "All" ||
             request.status.toLowerCase() ===
-              requestsFilters.activeStatus.toLowerCase()
+              receivedRequestsFilters.activeStatus.toLowerCase()
           ) {
             // Check if the date filter matches
             if (
-              requestsFilters.dateFilter === "All" ||
-              (requestsFilters.dateFilter === "Today" &&
+              receivedRequestsFilters.dateFilter === "All" ||
+              (receivedRequestsFilters.dateFilter === "Today" &&
                 createdAt.getDate() === today.getDate() &&
                 createdAt.getMonth() === today.getMonth() &&
                 createdAt.getFullYear() === today.getFullYear()) ||
-              (requestsFilters.dateFilter === "Last 7 days" &&
+              (receivedRequestsFilters.dateFilter === "Last 7 days" &&
                 createdAt >= sevenDaysAgo) ||
-              (requestsFilters.dateFilter === "Last 30 days" &&
+              (receivedRequestsFilters.dateFilter === "Last 30 days" &&
                 createdAt >= thirtyDaysAgo)
             ) {
               return true;
@@ -279,15 +293,16 @@ const LinkupHistoryPage = ({ isMobile }) => {
           return false;
         }
       );
-      setReceivedRequests({
-        ...receivedRequests,
+      setReceivedRequests((prevReceivedRequests) => ({
+        ...prevReceivedRequests,
         filteredList: filteredReceivedRequests,
-      });
+      }));
     }
   }, [
     activeTab,
     myLinkupsFilters,
-    requestsFilters,
+    sentRequestsFilters,
+    receivedRequestsFilters,
     linkups.list,
     sentRequests.list,
     receivedRequests.list,
@@ -370,28 +385,44 @@ const LinkupHistoryPage = ({ isMobile }) => {
           activeTab === 0
             ? myLinkupsFilters.activeStatus
             : activeTab === 1
-            ? requestsFilters.activeStatus
-            : requestsFilters.activeStatus // Handle the third tab's activeStatus similarly
+            ? sentRequestsFilters.activeStatus
+            : receivedRequestsFilters.activeStatus
         }
         onStatusChange={(newStatus) => {
           if (activeTab === 0) {
             updateFilters({ activeStatus: newStatus }, true);
+          } else if (activeTab === 1) {
+            setSentRequestsFilters((prevFilters) => ({
+              ...prevFilters,
+              activeStatus: newStatus,
+            }));
           } else {
-            updateFilters({ activeStatus: newStatus }, false);
+            setReceivedRequestsFilters((prevFilters) => ({
+              ...prevFilters,
+              activeStatus: newStatus,
+            }));
           }
         }}
         dateFilter={
           activeTab === 0
             ? myLinkupsFilters.dateFilter
             : activeTab === 1
-            ? requestsFilters.dateFilter
-            : requestsFilters.dateFilter
+            ? sentRequestsFilters.dateFilter
+            : receivedRequestsFilters.dateFilter
         }
         onDateFilterChange={(newDateFilter) => {
           if (activeTab === 0) {
             updateFilters({ dateFilter: newDateFilter }, true);
+          } else if (activeTab === 1) {
+            setSentRequestsFilters((prevFilters) => ({
+              ...prevFilters,
+              dateFilter: newDateFilter,
+            }));
           } else {
-            updateFilters({ dateFilter: newDateFilter }, false);
+            setReceivedRequestsFilters((prevFilters) => ({
+              ...prevFilters,
+              dateFilter: newDateFilter,
+            }));
           }
         }}
         statusOptions={activeTab === 0 ? statusOptions : requestsStatusOptions}
