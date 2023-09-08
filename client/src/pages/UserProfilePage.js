@@ -14,7 +14,8 @@ import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera"; // Add this import
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import LocationOnIcon from "@material-ui/icons/LocationOn";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -39,6 +40,13 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(207, 217, 222, 0.1)",
     padding: theme.spacing(1),
     borderBottom: "1px solid #e1e8ed",
+  },
+  bioText: {
+    fontWeight: "normal",
+    fontSize: "14px",
+    color: "#555",
+    margin: "8px 0",
+    lineHeight: "1.4",
   },
   largeAvatar: {
     width: "125px",
@@ -283,11 +291,26 @@ const UserProfilePage = ({ isMobile }) => {
                   </h2>
                 )}
                 <span style={{ fontWeight: "normal" }}>
-                  {isMobile ? <h6>{userLocation}</h6> : <p>{userLocation}</p>}
+                  {isMobile ? (
+                    <>
+                      <h6>
+                        {" "}
+                        <LocationOnIcon style={{ fontSize: "16px" }} />{" "}
+                        {userLocation}
+                      </h6>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        <LocationOnIcon style={{ fontSize: "16px" }} />{" "}
+                        {userLocation}
+                      </p>
+                    </>
+                  )}
                 </span>
                 {/* Bio text */}
                 <div>
-                  <span style={{ fontWeight: "normal" }}>{userData?.bio}</span>
+                  <span className={classes.bioText}>{userData?.bio}</span>
                 </div>
               </div>
             </div>
