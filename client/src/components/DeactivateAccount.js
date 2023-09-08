@@ -35,10 +35,10 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1.5, 4),
     fontSize: "1rem",
     borderRadius: "10px",
-    backgroundColor: "#E0095E", // Primary color
+    backgroundColor: "#AD1C4F",
     color: "white",
     "&:hover": {
-      backgroundColor: "#AD1C4F", // Darker color on hover
+      backgroundColor: "#B71C1C",
     },
     "&:disabled": {
       backgroundColor: "#F5F8FA", // Light gray when disabled

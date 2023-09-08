@@ -52,20 +52,30 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     borderRadius: "24px",
   },
-  cancelLinkupButton: {
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(1),
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
+  buttonGroup: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: theme.spacing(3),
   },
   updateLinkupButton: {
-    padding: theme.spacing(1),
+    backgroundColor: "#00CFFF",
     color: "white",
-    border: "none",
-    borderRadius: "4px",
+    padding: theme.spacing(1.5, 3),
+    marginRight: theme.spacing(2),
     cursor: "pointer",
+    transition: "background-color 0.3s ease", // Add transition for smooth color change
+    "&:hover": {
+      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
+    },
+    cancelLinkupButton: {
+      marginTop: theme.spacing(2),
+      padding: theme.spacing(1),
+      color: "white",
+      border: "none",
+      borderRadius: "4px",
+      cursor: "pointer",
+      transition: "background-color 0.3s ease", // Add transition for smooth color change
+    },
   },
   // Define styles for the custom dropdown
   customDropdown: {
@@ -232,7 +242,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               <option value="any">Any</option>
             </select>
           </div>
-          <div className="cta-buttons">
+          <div className={classes.buttonGroup}>
             <Button
               type="submit"
               variant="contained"

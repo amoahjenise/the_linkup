@@ -60,6 +60,10 @@ const useStyles = makeStyles((theme) => ({
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
+    transition: "background-color 0.3s ease", // Add transition for smooth color change
+    "&:hover": {
+      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
+    },
   },
   // Define styles for the custom dropdown
   customDropdown: {

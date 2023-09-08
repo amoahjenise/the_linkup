@@ -27,7 +27,7 @@ const useStyles = makeStyles({
     "&:hover": {
       textDecoration: "underline",
     },
-    marginRight: "20px",
+    marginRight: "16px",
   },
   icon: {
     marginRight: "4px",
@@ -53,6 +53,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         tabIndex="0"
         className={classes.requestButton}
         onClick={handleRequestClick}
+        disable={disableRequest}
       >
         <FontAwesomeIcon icon={faEnvelope} className={classes.icon} />
         {disableRequest ? "Request Sent" : "Request"}
