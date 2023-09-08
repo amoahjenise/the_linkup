@@ -57,7 +57,7 @@ const Notifications = () => {
             updateUnreadNotificationsCount(unreadNotificationsCount - 1)
           );
         }
-        navigate("/history/requests");
+        navigate("/history/requests-received");
       } catch (error) {
         console.log("Error marking notification as read:", error);
       }
