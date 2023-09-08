@@ -116,6 +116,7 @@ const SendRequest = ({ linkupId, linkups }) => {
             color="primary"
             className={classes.sendButton}
             onClick={handleSendRequest}
+            disabled={!message} // Disable the button if message is empty
           >
             Send Request
           </Button>
