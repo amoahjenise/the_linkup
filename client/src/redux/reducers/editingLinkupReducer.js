@@ -7,7 +7,6 @@ import {
 
 const initialState = {
   linkup: null,
-  isEditing: false,
 };
 
 const editingLinkupReducer = (state = initialState, action) => {
@@ -15,7 +14,6 @@ const editingLinkupReducer = (state = initialState, action) => {
     case SET_EDITING_LINKUP:
       return {
         linkup: action.payload.linkup,
-        isEditing: action.payload.isEditing,
       };
     case CLEAR_EDITING_LINKUP:
       return initialState;

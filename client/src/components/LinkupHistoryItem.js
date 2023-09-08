@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4),
     outline: "none",
-    width: "300px",
+    width: "350px", // Adjust the width as needed
     textAlign: "center",
   },
 }));
@@ -96,7 +96,7 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
   const handleEditClick = () => {
     // Open the edit modal when "Edit this linkup" is clicked
     setIsEditModalOpen(true);
-    dispatch(setEditingLinkup(linkup, true));
+    dispatch(setEditingLinkup(linkup));
     handleMenuClose();
   };
 

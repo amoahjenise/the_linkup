@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import FeedSection from "../components/FeedSection";
 import CreateLinkupForm from "../components/CreateLinkupForm";
-import EditLinkupForm from "../components/EditLinkupForm";
 import {
   setIsLoading,
   fetchLinkupsSuccess,
@@ -42,7 +41,6 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
   const feedSectionRef = useRef(null);
-  const editingLinkup = useSelector((state) => state.editingLinkup);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
@@ -178,25 +176,16 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
   return (
     <div className={classes.homePage}>
       {isMobile ? (
-        editingLinkup.isEditing ? (
-          <EditLinkupForm setShouldFetchLinkups={setShouldFetchLinkups} />
-        ) : (
-          <div className={classes.feedSection}>
-            <FeedSection
-              linkupList={linkupList}
-              isLoading={isLoading}
-              setShouldFetchLinkups={setShouldFetchLinkups}
-            />
-          </div>
-        )
+        <div className={classes.feedSection}>
+          <FeedSection
+            linkupList={linkupList}
+            isLoading={isLoading}
+            setShouldFetchLinkups={setShouldFetchLinkups}
+          />
+        </div>
       ) : (
         <div className={classes.homePage}>
-          <div
-            className={`${classes.feedSection} ${
-              editingLinkup.isEditing ? classes.editingFeedSection : ""
-            }`}
-            ref={feedSectionRef}
-          >
+          <div className={classes.feedSection} ref={feedSectionRef}>
             <FeedSection
               linkupList={linkupList}
               isLoading={isLoading}

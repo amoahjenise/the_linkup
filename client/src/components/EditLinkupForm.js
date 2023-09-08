@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     overflowY: "auto",
+    width: "100%x",
   },
   editContainer: {
     flex: "1",
@@ -43,6 +44,11 @@ const useStyles = makeStyles((theme) => ({
   editLinkUpForm: {
     display: "flex",
     flexDirection: "column",
+  },
+  datePicker: {
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(1),
+    borderRadius: "24px",
   },
   editLinkUpInput: {
     marginBottom: theme.spacing(2),
@@ -119,7 +125,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
 
   useEffect(() => {
     // Set the editing linkup when the component mounts
-    setEditingLinkup(id, true);
+    setEditingLinkup(id);
 
     // Clear the editing linkup when the component unmounts
     return () => {
@@ -220,7 +226,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             minDate={new Date()} // Set the minimum date to the current date
             minTime={minTime} // Set the minimum time conditionally
             maxTime={maxTime}
-            className={classes.editLinkUpInput}
+            className={classes.datePicker} // Apply the datePicker style
             placeholderText="Select date and time"
             required
           />

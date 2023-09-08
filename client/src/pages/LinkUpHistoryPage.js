@@ -98,7 +98,7 @@ const LinkupHistoryPage = ({ isMobile }) => {
 
   const handleLinkupEdit = (linkup) => {
     setIsEditing(!!linkup);
-    dispatch(setEditingLinkup(linkup, !!linkup));
+    dispatch(setEditingLinkup(linkup));
   };
 
   const updateFilters = (newFilters, isMyLinkups) => {

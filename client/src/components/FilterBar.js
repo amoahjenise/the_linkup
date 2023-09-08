@@ -10,7 +10,6 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
     overflowY: "auto",
     backgroundColor: "white",
-    borderRadius: "10px", // Rounded corners
   },
   filterContainer: {
     flex: "1",

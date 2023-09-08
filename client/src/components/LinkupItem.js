@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4),
     outline: "none",
-    width: "300px", // Adjust the width as needed
+    width: "350px", // Adjust the width as needed
     textAlign: "center",
   },
 }));
@@ -139,7 +139,7 @@ const LinkupItem = React.memo(
     const handleEditClick = () => {
       // Open the edit modal when "Edit this linkup" is clicked
       setIsEditModalOpen(true);
-      dispatch(setEditingLinkup(linkupItem, true));
+      dispatch(setEditingLinkup(linkupItem));
       handleMenuClose();
     };
 
@@ -261,8 +261,7 @@ const LinkupItem = React.memo(
     return (
       <div
         className={`${classes.linkupItem} ${
-          isHovered ||
-          (editingLinkup.isEditing && linkupItem.id === editingLinkup.linkup.id)
+          isHovered || linkupItem.id === editingLinkup?.linkup?.id
             ? classes.highlightedLinkupItem
             : ""
         }`}
@@ -276,17 +275,16 @@ const LinkupItem = React.memo(
               <Avatar alt="Avatar" src={avatar} className={classes.avatar} />
               {renderLinkupItemText()}
             </div>
-            {!editingLinkup.isEditing &&
-              loggedUser.user.id === linkupItem.creator_id && (
-                <HorizontalMenu
-                  onLinkupItemClick={handleGoToLinkupClick}
-                  onEditClick={handleEditClick}
-                  onDeleteClick={handleDeleteClick}
-                  onCompleteClick={handleCompleteClick}
-                  menuAnchor={menuAnchor}
-                  setMenuAnchor={setMenuAnchor}
-                />
-              )}
+            {loggedUser.user.id === linkupItem.creator_id && (
+              <HorizontalMenu
+                onLinkupItemClick={handleGoToLinkupClick}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+                onCompleteClick={handleCompleteClick}
+                menuAnchor={menuAnchor}
+                setMenuAnchor={setMenuAnchor}
+              />
+            )}
           </div>
           <div className={classes.postActions}>
             {loggedUser.user.id !== linkupItem.creator_id ? (

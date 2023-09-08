@@ -89,6 +89,8 @@ const ImageUploadModal = ({
   onClose,
   profileImages,
   setProfileImages,
+  currentImageIndex,
+  setCurrentImageIndex,
 }) => {
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
@@ -155,7 +157,7 @@ const ImageUploadModal = ({
       await deleteImages(userId);
 
       const newProfileImages = tempProfileImages.filter(
-        (image) => image !== null
+        (image) => image !== null && image !== undefined
       );
 
       if (newProfileImages.length > 0) {
@@ -165,6 +167,9 @@ const ImageUploadModal = ({
 
       // Update the profileImages state with the new state
       setProfileImages(newProfileImages);
+
+      // Set the currentImageIndex to 0
+      setCurrentImageIndex(0); // Add this line
 
       // Close the modal and show a success message
       onClose();

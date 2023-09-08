@@ -14,6 +14,7 @@ import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera"; // Add this import
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -31,14 +32,12 @@ const useStyles = makeStyles((theme) => ({
   profileSection: {
     display: "flex",
     flexDirection: "column",
+    overflowX: "hidden",
   },
   profileHeader: {
     display: "flex",
-    [theme.breakpoints.down("sm")]: {
-      marginBottom: theme.spacing(2),
-    },
     backgroundColor: "rgba(207, 217, 222, 0.1)",
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
     borderBottom: "1px solid #e1e8ed",
   },
   largeAvatar: {
@@ -50,16 +49,30 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: theme.spacing(4),
+    padding: theme.spacing(3),
     [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2),
     },
   },
-  uploadButton: {
+  cameraIconContainer: {
+    position: "relative", // Make the container relative
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: "column",
+    marginTop: theme.spacing(2),
   },
+  cameraIcon: {
+    position: "absolute", // Position the camera icon absolutely
+    bottom: "89%", // Adjust bottom positioning as needed
+    right: "23%", // Adjust right positioning as needed
+    border: "1px solid #e1e8ed",
+    backgroundColor: theme.palette.primary.contrastText,
+    zIndex: 1,
+    transition: "background-color 0.4s ease",
+    "&:hover": {
+      backgroundColor: "lightgray",
+    },
+  },
+
   leftMargin: {
     marginLeft: theme.spacing(4),
   },
@@ -83,6 +96,7 @@ const UserProfilePage = ({ isMobile }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profileImages, setProfileImages] = useState([]);
   const [isImageUploadModalOpen, setImageUploadModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addSnackbar } = useSnackbar();
 
   const openImageUploadModal = () => {
@@ -176,11 +190,16 @@ const UserProfilePage = ({ isMobile }) => {
   };
 
   const renderUploadPicturesButton = () => {
-    if (isLoggedUserProfile) {
+    if (isLoggedUserProfile && !isImageUploadModalOpen) {
       return (
-        <div className={classes.uploadButton}>
-          <button onClick={openImageUploadModal}>Upload Pictures</button>
-        </div>
+        <IconButton
+          className={classes.cameraIcon}
+          component="span"
+          aria-label="Upload Avatar"
+          onClick={openImageUploadModal}
+        >
+          <PhotoCameraIcon />
+        </IconButton>
       );
     }
     return null;
@@ -268,9 +287,7 @@ const UserProfilePage = ({ isMobile }) => {
                 </span>
                 {/* Bio text */}
                 <div>
-                  <span style={{ fontWeight: "normal" }}>
-                    Bio: {userData?.bio}
-                  </span>
+                  <span style={{ fontWeight: "normal" }}>{userData?.bio}</span>
                 </div>
               </div>
             </div>
@@ -279,9 +296,15 @@ const UserProfilePage = ({ isMobile }) => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className={classes.centeredContent}>
-              <Cards images={profileImages || []} />
+            <div className={classes.cameraIconContainer}>
               {renderUploadPicturesButton()}
+              <div className={classes.centeredContent}>
+                <Cards
+                  images={profileImages || []}
+                  currentImageIndex={currentImageIndex}
+                  setCurrentImageIndex={setCurrentImageIndex}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -296,13 +319,14 @@ const UserProfilePage = ({ isMobile }) => {
         />
       )}
       {/* Render the ImageUploadModal */}
-
       <ImageUploadModal
         userId={userId}
         isOpen={isImageUploadModalOpen}
         onClose={closeImageUploadModal}
         profileImages={profileImages}
         setProfileImages={setProfileImages}
+        currentImageIndex={currentImageIndex}
+        setCurrentImageIndex={setCurrentImageIndex}
       />
     </div>
   );

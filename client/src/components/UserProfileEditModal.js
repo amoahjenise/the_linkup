@@ -26,12 +26,22 @@ const useStyles = makeStyles((theme) => ({
   bio: {
     marginTop: theme.spacing(2),
   },
+  charCount: {
+    marginTop: theme.spacing(1),
+    color: ({ charsRemaining }) => (charsRemaining <= 10 ? "red" : "inherit"),
+  },
 }));
 
+const MAX_BIO_LENGTH = 160;
+const MIN_CHARS_REMAINING_TO_DISPLAY = 10;
+
 const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
-  const classes = useStyles();
   const [editedBio, setEditedBio] = useState(userData.bio || "");
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null); // Initialize with the current avatar
+
+  const classes = useStyles({
+    charsRemaining: MAX_BIO_LENGTH - editedBio.length,
+  });
 
   const handleSave = () => {
     onSave(editedBio, updatedAvatar);
@@ -70,8 +80,19 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
           rows={4}
           variant="outlined"
           value={editedBio}
-          onChange={(e) => setEditedBio(e.target.value)}
+          onChange={(e) => {
+            const newBio = e.target.value;
+            if (newBio.length <= MAX_BIO_LENGTH) {
+              setEditedBio(newBio);
+            }
+          }}
         />
+        {MAX_BIO_LENGTH - editedBio.length <=
+          MIN_CHARS_REMAINING_TO_DISPLAY && (
+          <div className={classes.charCount}>
+            {MAX_BIO_LENGTH - editedBio.length} characters remaining
+          </div>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
