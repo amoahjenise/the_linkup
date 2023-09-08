@@ -107,12 +107,18 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
+
+  // State variables to track form changes
   const [selectedDate, setSelectedDate] = useState(editingLinkup?.linkup?.date);
   const [activity, setActivity] = useState(editingLinkup?.linkup?.activity);
   const [location, setLocation] = useState(editingLinkup?.linkup?.location);
   const [genderPreference, setGenderPreference] = useState(
     editingLinkup?.linkup?.gender_preference
   );
+
+  // State variable to track form modification
+  const [isFormModified, setIsFormModified] = useState(false);
+
   const { addSnackbar } = useSnackbar();
 
   const maxTime = new Date();
@@ -130,45 +136,72 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       : minTimeDefault
     : currentDate;
 
-  const performUpdateLinkup = useCallback(async () => {
-    const updatedLinkup = {
-      location,
-      activity,
-      date: selectedDate,
-      gender_preference: genderPreference,
-    };
+  // Event handlers to update form state and modification status
+  const handleActivityChange = (e) => {
+    setActivity(e.target.value);
+    setIsFormModified(true);
+  };
 
-    try {
-      const response = await updateLinkup(id, updatedLinkup);
+  const handleLocationChange = (e) => {
+    setLocation(e.target.value);
+    setIsFormModified(true);
+  };
 
-      if (response.success) {
-        setShouldFetchLinkups(true);
-        dispatch(updateLinkupSuccess(response.linkup));
-        onClose();
-        dispatch(clearEditingLinkup());
-        addSnackbar("Updated successfully!");
-      }
-    } catch (error) {
-      addSnackbar(error.message);
-    }
-  }, [
-    location,
-    activity,
-    selectedDate,
-    genderPreference,
-    id,
-    setShouldFetchLinkups,
-    dispatch,
-    onClose,
-    addSnackbar,
-  ]);
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setIsFormModified(true);
+  };
+
+  const handleGenderPreferenceChange = (e) => {
+    setGenderPreference(e.target.value);
+    setIsFormModified(true);
+  };
 
   const handleUpdateLinkup = useCallback(
     async (e) => {
       e.preventDefault();
-      performUpdateLinkup();
+
+      // Check if any changes were made in the form
+      if (!isFormModified) {
+        onClose();
+        dispatch(clearEditingLinkup());
+        addSnackbar("No changes were made.");
+        return; // Don't perform the update
+      }
+
+      const updatedLinkup = {
+        location,
+        activity,
+        date: selectedDate,
+        gender_preference: genderPreference,
+      };
+
+      try {
+        const response = await updateLinkup(id, updatedLinkup);
+
+        if (response.success) {
+          setShouldFetchLinkups(true);
+          dispatch(updateLinkupSuccess(response.linkup));
+          onClose();
+          dispatch(clearEditingLinkup());
+          addSnackbar("Updated successfully!");
+        }
+      } catch (error) {
+        addSnackbar(error.message);
+      }
     },
-    [performUpdateLinkup]
+    [
+      location,
+      activity,
+      selectedDate,
+      genderPreference,
+      id,
+      setShouldFetchLinkups,
+      dispatch,
+      onClose,
+      addSnackbar,
+      isFormModified, // Include isFormModified in the dependencies
+    ]
   );
 
   const handleCancelClick = useCallback(() => {
@@ -178,19 +211,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
 
   return (
     <div className={classes.editLinkUpContainer}>
-      {/* <div className={classes.searchInputContainer}>
-        <TextField
-          className={classes.editLinkUpInput}
-          placeholder="Search for Link Ups"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </div> */}
       <div className={classes.editContainer}>
         <h2 className={classes.editLinkUpTitle}>Edit Link-Up</h2>
         <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>
@@ -200,7 +220,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             placeholder="Activity"
             name="activity"
             value={activity}
-            onChange={(e) => setActivity(e.target.value)}
+            onChange={handleActivityChange}
             required
           />
           <input
@@ -209,12 +229,12 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             placeholder="Location"
             name="location"
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={handleLocationChange}
             required
           />
           <DatePicker
             selected={new Date(selectedDate)}
-            onChange={(date) => setSelectedDate(date)}
+            onChange={handleDateChange}
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={15}
@@ -230,7 +250,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
           <div className={classes.customDropdown}>
             <select
               value={genderPreference}
-              onChange={(e) => setGenderPreference(e.target.value)}
+              onChange={handleGenderPreferenceChange}
               aria-label="Gender Preference"
               required
             >
