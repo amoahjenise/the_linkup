@@ -1,13 +1,16 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { connect } from "react-redux";
 import LinkupItem from "./LinkupItem";
 import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { deleteLinkup } from "../api/linkupAPI";
+import LoadingSpinner from "./LoadingSpinner";
 
-const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
+const FeedSection = ({
+  linkupList,
+  isLoading,
+  setIsLoading,
+  setShouldFetchLinkups,
+}) => {
   const userSentRequests = useSelector((state) => state.userSentRequests);
 
   return (
@@ -19,17 +22,17 @@ const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: "100%",
+            minHeight: "100vh",
           }}
         >
-          <CircularProgress />
+          <LoadingSpinner />
         </div>
       ) : (
         <div>
           {linkupList.length === 0 ? (
             <EmptyFeedPlaceholder />
           ) : (
-            linkupList?.map((linkup) => (
+            linkupList.map((linkup) => (
               <LinkupItem
                 key={linkup.id}
                 linkupItem={linkup}
@@ -44,13 +47,4 @@ const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  linkupList: state.linkups.linkupList,
-  isLoading: state.linkups.isLoading,
-});
-
-const mapDispatchToProps = {
-  deleteLinkup,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(FeedSection);
+export default FeedSection;

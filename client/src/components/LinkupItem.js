@@ -3,21 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { LinkRounded, LinkTwoTone } from "@material-ui/icons";
-import { Modal } from "@material-ui/core";
 import DeleteModal from "./DeleteModal";
-
 import moment from "moment";
 import { Link } from "react-router-dom";
-import {
-  clearEditingLinkup,
-  setEditingLinkup,
-} from "../redux/actions/editingLinkupActions";
+import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import Avatar from "@material-ui/core/Avatar";
 import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
 import PostActions from "./PostActions";
 import HorizontalMenu from "./HorizontalMenu";
-import EditLinkupForm from "./EditLinkupForm";
+import EditLinkupModal from "./EditLinkupModal";
+import UserAvatar from "./UserAvatar";
+import PayIconWithTooltip from "./PaymentIcon";
+import SplitBillIcon from "./SplitBillIcon";
 import nlp from "compromise";
 
 const compromise = nlp;
@@ -50,14 +47,6 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  avatar: {
-    width: "50px",
-    height: "50px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    marginRight: theme.spacing(1),
-    border: "1px solid #e1e8ed",
   },
   usernameLink: {
     textDecoration: "none",
@@ -157,10 +146,6 @@ const LinkupItem = React.memo(
       }
     };
 
-    const handleCancelClick = () => {
-      dispatch(clearEditingLinkup());
-    };
-
     const handleDeleteConfirm = async () => {
       try {
         const response = await deleteLinkup(id);
@@ -204,21 +189,13 @@ const LinkupItem = React.memo(
       const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
       const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
 
-      // Capitalize the first letter of each word in the location
-      const formattedLocation = location
-        .toLowerCase() // Convert to lowercase
-        .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
-
       const linkupItemText = (
         <p>
           <Link to={`/profile/${creator_id}`} className={classes.usernameLink}>
-            <span className={classes.boldText}>
-              <u>{creator_name}</u>
-            </span>
+            <span className={classes.boldText}>@{creator_name}</span>
           </Link>{" "}
           is trying to link up{" "}
           <span className={classes.boldText}>{activityText.toLowerCase()}</span>{" "}
-          {/* at <span className={classes.boldText}>{formattedLocation}</span>  */}
           on{" "}
           <span className={classes.boldText}>
             {dateText} {timeText}
@@ -272,7 +249,16 @@ const LinkupItem = React.memo(
           <div className={classes.iconHeader}>
             <div className={classes.postHeaderContainer}>
               {renderPostIcon()}
-              <Avatar alt="Avatar" src={avatar} className={classes.avatar} />
+              <UserAvatar
+                userData={{
+                  id: creator_id,
+                  name: creator_name,
+                  avatar: avatar,
+                }}
+                width="50px"
+                height="50px"
+              />
+
               {renderLinkupItemText()}
             </div>
             {loggedUser.user.id === linkupItem.creator_id && (
@@ -293,6 +279,21 @@ const LinkupItem = React.memo(
                   onRequestClick={handleRequestLinkup}
                   disableRequest={disableRequest}
                 />
+                {/* <PayIconWithTooltip
+                  width="30px"
+                  height="30px"
+                  fontSize="24px"
+                  color="#007bff"
+                /> */}
+
+                {/* Use the SplitBillIcon component */}
+                {/* <SplitBillIcon
+                  person1Color="#007bff"
+                  person2Color="#ff4500"
+                  width={60}
+                  height={60}
+                /> */}
+
                 <p className={classes.postedTimeText}>
                   Posted {getTimeAgo(created_at)}
                 </p>
@@ -312,20 +313,13 @@ const LinkupItem = React.memo(
           onConfirm={handleDeleteConfirm}
         />
         {/* Render EditLinkupForm as a modal */}
-        <Modal
-          open={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          aria-labelledby="edit-modal-title"
-          aria-describedby="edit-modal-description"
-        >
-          <div className={classes.editModal}>
-            {/* Render EditLinkupForm component here */}
-            <EditLinkupForm
-              setShouldFetchLinkups={setShouldFetchLinkups}
-              onClose={() => setIsEditModalOpen(false)}
-            />
-          </div>
-        </Modal>
+        <EditLinkupModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+          }}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+        />
       </div>
     );
   }

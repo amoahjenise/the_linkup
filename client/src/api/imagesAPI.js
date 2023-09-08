@@ -30,10 +30,17 @@ export async function uploadImages(userId, imageUrls) {
   try {
     const aImagesUrls = [];
 
-    // Append each image to the form data
-    imageUrls.forEach((imageUrl, index) => {
-      aImagesUrls.push(imageUrl);
-    });
+    // Check if imageUrls is an array before using forEach
+    if (Array.isArray(imageUrls)) {
+      imageUrls.forEach((imageUrl, index) => {
+        aImagesUrls.push(imageUrl);
+      });
+    } else {
+      // Handle the case where imageUrls is not an array
+      console.error("Invalid imageUrls:", imageUrls);
+      // You can throw an error or handle it as needed
+      // throw new Error("Invalid imageUrls");
+    }
 
     // Make a POST request to the server endpoint for uploading images
     const response = await axios.post(`${BASE_URL}/api/upload-images`, {

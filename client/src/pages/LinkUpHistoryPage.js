@@ -330,10 +330,6 @@ const LinkupHistoryPage = ({ isMobile }) => {
                   <LinkupHistoryItem
                     key={linkup.id}
                     linkup={linkup}
-                    onEdit={() => {
-                      handleLinkupEdit(linkup);
-                      setIsEditModalOpen(true);
-                    }}
                     setShouldFetchLinkups={setShouldFetchLinkups}
                   />
                 ))}

@@ -194,6 +194,7 @@ const MenuItem = ({ to, icon, text, badgeContent, location }) => {
           <Badge
             className={classes.badge}
             badgeContent={parseInt(badgeContent)}
+            overlap="rectangular"
             color="secondary"
           ></Badge>
         )}

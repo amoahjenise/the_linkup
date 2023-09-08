@@ -5,10 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import FeedSection from "../components/FeedSection";
 import CreateLinkupForm from "../components/CreateLinkupForm";
-import {
-  setIsLoading,
-  fetchLinkupsSuccess,
-} from "../redux/actions/linkupActions";
+import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { getLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
@@ -37,21 +34,24 @@ const useStyles = makeStyles((theme) => ({
 
 const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
 
-const HomePage = ({ isMobile, linkupList, isLoading }) => {
+const HomePage = ({ isMobile }) => {
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
   const feedSectionRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
 
   // Access user data from Redux store
+  const linkupList = useSelector((state) => state.linkups.linkupList);
+
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
   const gender = loggedUser.user.gender;
 
   const fetchLinkups = useCallback(async () => {
-    dispatch(setIsLoading(true));
+    setIsLoading(true);
     try {
       const response = await getLinkups(userId, gender);
       if (response.success) {
@@ -65,7 +65,9 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
     } catch (error) {
       console.log("Error fetching linkups:", error);
     } finally {
-      dispatch(setIsLoading(false));
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   }, [dispatch, gender, userId]);
 
@@ -89,7 +91,6 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
       const result = await markLinkupsAsExpired();
 
       if (result.success) {
-        // dispatch(updateLinkupList(result.linkupList)); // Dispatch the updated linkupList to Redux store
         return result; // Return the result if needed
       } else {
         console.log("Error marking link-ups as expired:", result.message);
@@ -147,12 +148,17 @@ const HomePage = ({ isMobile, linkupList, isLoading }) => {
 
     // Listener for 'linkupsExpired' event
     const handleLinkupsExpired = (expiredLinkups) => {
-      const timeout = 7000; // Set the desired timeout in milliseconds
+      if (Array.isArray(expiredLinkups)) {
+        const timeout = 7000; // Set the desired timeout in milliseconds
 
-      console.log("Expired Link-Ups:", expiredLinkups);
-      expiredLinkups.forEach((expiredLinkup) => {
-        addSnackbar(renderLinkupItemText(expiredLinkup), { timeout });
-      });
+        console.log("Expired Link-Ups:", expiredLinkups);
+        expiredLinkups.forEach((expiredLinkup) => {
+          addSnackbar(renderLinkupItemText(expiredLinkup), { timeout });
+        });
+      } else {
+        // Handle the case where expiredLinkups is not an array or is undefined
+        console.error("Invalid expiredLinkups data:", expiredLinkups);
+      }
     };
 
     socket.on("linkupsExpired", (data) => {

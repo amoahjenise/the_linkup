@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "@material-ui/core/Modal";
-import EditLinkupForm from "./EditLinkupForm";
 import { makeStyles } from "@material-ui/core/styles";
+import EditLinkupForm from "./EditLinkupForm";
 
 const useStyles = makeStyles((theme) => ({
   editModal: {
@@ -13,21 +13,31 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4),
     outline: "none",
-    width: "350px", // Adjust the width as needed
+    width: "350px",
     textAlign: "center",
   },
 }));
 
-const EditLinkupModal = ({ open, onClose, setShouldFetchLinkups }) => {
+const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
   const classes = useStyles();
 
+  const handleModalClose = () => {
+    onClose();
+  };
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <EditLinkupForm
-        className={classes.modal}
-        onClose={onClose}
-        setShouldFetchLinkups={setShouldFetchLinkups}
-      />
+    <Modal
+      open={isOpen}
+      onClose={handleModalClose}
+      aria-labelledby="edit-modal-title"
+      aria-describedby="edit-modal-description"
+    >
+      <div className={classes.editModal}>
+        <EditLinkupForm
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          onClose={handleModalClose}
+        />
+      </div>
     </Modal>
   );
 };

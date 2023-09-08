@@ -5,7 +5,7 @@ import {
   acceptLinkupRequest,
   declineLinkupRequest,
 } from "../api/linkupRequestAPI";
-import Avatar from "@material-ui/core/Avatar";
+import UserAvatar from "./UserAvatar";
 import Chip from "@material-ui/core/Chip";
 import {
   CheckCircleOutlined,
@@ -26,9 +26,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
     borderBottom: "1px solid lightgrey",
-  },
-  avatar: {
-    marginRight: theme.spacing(2),
   },
   pendingChip: {
     marginLeft: "auto",
@@ -73,6 +70,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
 
   const {
     id,
+    requester_id,
     requester_name,
     creator_id,
     creator_name,
@@ -181,10 +179,14 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
 
   return (
     <div className={classes.linkupRequestItem}>
-      <Avatar
-        alt={userId === receiver_id ? requester_name : creator_name}
-        src={userId === receiver_id ? receiver_avatar : avatar}
-        className={classes.avatar}
+      <UserAvatar
+        userData={{
+          id: userId === receiver_id ? requester_id : creator_id,
+          name: userId === receiver_id ? requester_name : creator_name,
+          avatar: userId === receiver_id ? receiver_avatar : avatar,
+        }}
+        width="40px"
+        height="40px"
       />
       <div className={classes.postDetails}>
         <div>

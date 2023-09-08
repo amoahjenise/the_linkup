@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-import Cards from "../components/Cards";
 import EditIcon from "@material-ui/icons/Edit";
+import Cards from "../components/Cards";
+import UserAvatar from "../components/UserAvatar";
 import Geocode from "react-geocode";
 import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
 import { getUserImages } from "../api/imagesAPI";
@@ -47,10 +47,6 @@ const useStyles = makeStyles((theme) => ({
     color: "#555",
     margin: "8px 0",
     lineHeight: "1.4",
-  },
-  largeAvatar: {
-    width: "125px",
-    height: "125px",
   },
   centeredContent: {
     display: "flex",
@@ -275,11 +271,8 @@ const UserProfilePage = ({ isMobile }) => {
             }
           >
             <div style={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                alt={userData?.name}
-                src={userData?.avatar}
-                className={classes.largeAvatar}
-              />
+              <UserAvatar userData={userData} width="125px" height="125px" />
+
               <div className={classes.leftMargin}>
                 {isMobile ? (
                   <h5>

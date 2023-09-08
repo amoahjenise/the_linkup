@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Modal } from "@material-ui/core";
+import { useDispatch } from "react-redux";
+import UserAvatar from "./UserAvatar";
 import Typography from "@material-ui/core/Typography";
-import {
-  clearEditingLinkup,
-  setEditingLinkup,
-} from "../redux/actions/editingLinkupActions";
+import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { makeStyles } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
 import Chip from "@material-ui/core/Chip";
 import {
   CheckCircleOutlined,
@@ -16,7 +12,7 @@ import {
 } from "@material-ui/icons";
 import moment from "moment";
 import HorizontalMenu from "./HorizontalMenu";
-import EditLinkupForm from "./EditLinkupForm";
+import EditLinkupModal from "./EditLinkupModal";
 import DeleteModal from "./DeleteModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
@@ -38,9 +34,6 @@ const useStyles = makeStyles((theme) => ({
   linkupDetails: {
     display: "flex",
     alignItems: "center",
-  },
-  avatar: {
-    marginRight: theme.spacing(1),
   },
   pendingChip: {
     marginLeft: "auto",
@@ -71,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
+const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -80,6 +73,7 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
   const { addSnackbar } = useSnackbar();
 
   const {
+    creator_id,
     creator_name,
     avatar,
     gender_preference,
@@ -88,6 +82,11 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
     date,
     status,
   } = linkup;
+
+  // Capitalize the first letter of each word in the location
+  const formattedLocation = location
+    .toLowerCase() // Convert to lowercase
+    .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
 
   const handleMenuClose = () => {
     setMenuAnchor(null);
@@ -219,7 +218,15 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
   return (
     <div className={classes.linkupHistoryItem}>
       <div className={classes.itemHeader}>
-        <Avatar alt={creator_name} src={avatar} className={classes.avatar} />
+        <UserAvatar
+          userData={{
+            id: creator_id,
+            name: creator_name,
+            avatar: avatar,
+          }}
+          width="40px"
+          height="40px"
+        />
         {status === "active" && (
           <>
             <HorizontalMenu
@@ -244,7 +251,7 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
         />
       </div>
       <Typography variant="subtitle2" component="details">
-        <span>{location}</span>
+        <span>{formattedLocation}</span>
       </Typography>
       <DeleteModal
         open={showDeleteModal}
@@ -252,20 +259,13 @@ const LinkupHistoryItem = ({ linkup, userId, setShouldFetchLinkups }) => {
         onConfirm={handleDeleteConfirm}
       />
       {/* Render EditLinkupForm as a modal */}
-      <Modal
-        open={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        aria-labelledby="edit-modal-title"
-        aria-describedby="edit-modal-description"
-      >
-        <div className={classes.editModal}>
-          {/* Render EditLinkupForm component here */}
-          <EditLinkupForm
-            setShouldFetchLinkups={setShouldFetchLinkups}
-            onClose={() => setIsEditModalOpen(false)}
-          />
-        </div>
-      </Modal>
+      <EditLinkupModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+        }}
+        setShouldFetchLinkups={setShouldFetchLinkups}
+      />
     </div>
   );
 };

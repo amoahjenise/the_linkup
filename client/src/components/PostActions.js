@@ -53,7 +53,6 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         tabIndex="0"
         className={classes.requestButton}
         onClick={handleRequestClick}
-        disable={disableRequest}
       >
         <FontAwesomeIcon icon={faEnvelope} className={classes.icon} />
         {disableRequest ? "Request Sent" : "Request"}

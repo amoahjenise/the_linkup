@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -6,10 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateLinkup } from "../api/linkupAPI";
 import { updateLinkupSuccess } from "../redux/actions/linkupActions";
-import {
-  setEditingLinkup,
-  clearEditingLinkup,
-} from "../redux/actions/editingLinkupActions";
+import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
 const useStyles = makeStyles((theme) => ({
@@ -122,16 +119,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       ? currentDate
       : minTimeDefault
     : currentDate;
-
-  useEffect(() => {
-    // Set the editing linkup when the component mounts
-    setEditingLinkup(id);
-
-    // Clear the editing linkup when the component unmounts
-    return () => {
-      clearEditingLinkup();
-    };
-  }, [id]);
 
   const performUpdateLinkup = useCallback(async () => {
     const updatedLinkup = {
