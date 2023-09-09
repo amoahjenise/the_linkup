@@ -14,12 +14,8 @@ const handleError = (error, errorMessage) => {
 export const deleteUser = async (userId) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/delete-user/${userId}`);
-    console.log("RESPONSE", response);
-
-    return {
-      success: response.data.success,
-      message: response.data.message,
-    };
+    console.log("deleteUser", response);
+    return response;
   } catch (error) {
     return handleError(error, "Failed to delete user");
   }
@@ -28,13 +24,10 @@ export const deleteUser = async (userId) => {
 export const createUser = async (userData) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
-    return {
-      success: true,
-      message: "User created successfully",
-      data: response.data,
-    };
+    console.log("createUser", response);
+    return response;
   } catch (error) {
-    return handleError(error, "Failed to create user");
+    return handleError(error, "Failed to create new user.");
   }
 };
 
@@ -43,9 +36,10 @@ export const getUserById = async (userId) => {
     const response = await axios.get(`${BASE_URL}/api/get-user-by-id`, {
       params: { userId },
     });
-    return response.data;
+    console.log("getUserById", response);
+    return response;
   } catch (error) {
-    return handleError(error, "Failed to fetch user data");
+    return handleError(error, "Failed to fetch user data.");
   }
 };
 
@@ -57,10 +51,10 @@ export const updateUserBio = async (userId, bio) => {
         bio,
       }
     );
-    console.log(JSON.stringify(response));
-    return response.data;
+    console.log("updateUserBio", response);
+    return response;
   } catch (error) {
-    return handleError(error, "Failed to update user bio");
+    return handleError(error, "Failed to update the user's bio.");
   }
 };
 
@@ -72,9 +66,10 @@ export const updateUserAvatar = async (userId, avatar) => {
         avatar,
       }
     );
-    return response.data;
+    console.log("updateUserAvatar", response);
+    return response;
   } catch (error) {
-    return handleError(error, "Failed to update user avatar");
+    return handleError(error, "Failed to update the user's avatar.");
   }
 };
 
@@ -83,11 +78,12 @@ export const setUserStatusActive = async (userId) => {
     const response = await axios.patch(
       `${BASE_URL}/api/set-user-status-active/${userId}`
     );
-    return {
-      success: response.data.success,
-      message: response.data.message,
-    };
+    console.log("setUserStatusActive", response);
+    return response;
   } catch (error) {
-    return handleError(error, "Failed to update user status to 'active'");
+    return handleError(
+      error,
+      "Failed to update the user's status to 'active'."
+    );
   }
 };

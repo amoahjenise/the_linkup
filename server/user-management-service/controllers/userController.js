@@ -10,13 +10,12 @@ const deleteUser = async (req, res) => {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [userId];
-    console.log("DELETED", userId);
 
-    const { rows } = await pool.query(query, values);
-    if (rows.length > 0) {
+    const { rowCount } = await pool.query(query, values);
+    if (rowCount > 0) {
       res.json({
         success: true,
-        message: "User deleted successfully",
+        message: "User deleted successfully!",
       });
     } else {
       res
@@ -49,13 +48,12 @@ const createUser = async (req, res) => {
 
     const { rows, rowCount } = await pool.query(query, queryValues);
 
-    if (rows.length > 0) {
-      const user = rows[0];
+    if (rowCount > 0) {
       // Return the created user data in the response
       res.json({
         success: true,
-        message: "User created successfully",
-        user: user,
+        message: "New user created successfully!",
+        user: rows[0],
       });
     } else {
       res
@@ -75,13 +73,11 @@ const getUserById = async (req, res) => {
   const queryValues = [userId];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    const { rows, rowCount } = await pool.query(query, queryValues);
 
-    if (rows.length > 0) {
-      const user = rows[0];
-
+    if (rowCount > 0) {
       // User exists in the database
-      res.json({ success: true, message: "User exists", user: user });
+      res.json({ success: true, message: "User exists", user: rows[0] });
     } else {
       // User not found
       res.json({ success: false, message: "User not found", user: null });
@@ -97,25 +93,27 @@ const updateUserBio = async (req, res) => {
   const { bio } = req.body;
 
   try {
-    // Use the SQL query from the previous response to update the user profile properties
-
     const queryPath = path.join(__dirname, "../db/queries/updateUserBio.sql");
     const query = fs.readFileSync(queryPath, "utf8");
-    const values = [bio, userId];
-    const result = await pool.query(query, values);
+    const values = [userId, bio];
 
-    // Check if the user with the given userId exists and update the profile properties
-    if (result.rows.length > 0) {
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
       res.json({
         success: true,
-        message: "User bio updated",
-        data: result.rows[0],
+        message: "Bio updated successfully!",
+        bio: rows[0].bio,
       });
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        success: false,
+        message: "Could not update user's bio.",
+        bio: null,
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -124,25 +122,27 @@ const updateUserAvatar = async (req, res) => {
   const { avatar } = req.body;
 
   try {
-    // Use the SQL query from the previous response to update the user profile properties
-
     const queryPath = path.join(
       __dirname,
       "../db/queries/updateUserAvatar.sql"
     );
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [avatar, userId];
-    const result = await pool.query(query, values);
 
-    // Check if the user with the given userId exists and update the profile properties
-    if (result.rows.length > 0) {
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
       res.json({
         success: true,
-        message: "User avatar updated",
-        data: result.rows[0],
+        message: "Avatar updated successfully!",
+        avatar: rows[0].avatar,
       });
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        success: false,
+        message: "Could not update user's avatar.",
+        avatar: null,
+      });
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -153,28 +153,26 @@ const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    // Use the SQL query from the previous response to update the user profile properties
-
     const queryPath = path.join(
       __dirname,
       "../db/queries/setUserStatusActive.sql"
     );
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [userId];
-    const result = await pool.query(query, values);
 
-    if (result.rows.length > 0) {
-      const data = rows[0];
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
       res.json({
         success: true,
-        message: "User status set to 'active'",
-        data: data,
+        message: "User status set to 'active'.",
+        userId: rows[0].id,
       });
     } else {
       res.json({
         success: false,
-        message: "User status not updated to 'active'",
-        data: data,
+        message: "User status could not be updated to 'active'.",
+        userId: null,
       });
     }
   } catch (error) {

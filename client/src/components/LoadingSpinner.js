@@ -12,11 +12,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LoadingSpinner = () => {
+const LoadingSpinner = ({ marginTop }) => {
   const classes = useStyles();
 
+  const containerStyle = {
+    marginTop: marginTop || "0px", // Use the provided marginTop or default to "100px"
+  };
+
   return (
-    <div className={classes.loadingSpinnerContainer}>
+    <div className={classes.loadingSpinnerContainer} style={containerStyle}>
       <CircularProgress size={48} />
     </div>
   );

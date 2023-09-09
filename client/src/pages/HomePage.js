@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { connect } from "react-redux";
 import FeedSection from "../components/FeedSection";
 import CreateLinkupForm from "../components/CreateLinkupForm";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
@@ -101,31 +100,18 @@ const HomePage = ({ isMobile }) => {
   }, []);
 
   const renderLinkupItemText = (data) => {
-    const doc = compromise(data.activity);
-    const startsWithVerb = doc.verbs().length > 0;
-    const isVerbEndingWithIng = data.activity.endsWith("ing");
-
-    let activityText = "";
-    if (data.activity) {
-      if (isVerbEndingWithIng) {
-        activityText = `for ${data.activity}`;
-      } else {
-        activityText = `${startsWithVerb ? "to" : "for"} ${data.activity}`;
-      }
-    }
-    const dateText = data.date
-      ? `${moment(data.date).format("MMM DD, YYYY")}`
-      : "";
+    const verb = compromise(data.activity).verbs().length > 0;
+    const activityText = `The link up ${
+      verb ? "to" : "for"
+    } ${data.activity.toLowerCase()}`;
+    const dateText = data.date ? moment(data.date).format("MMM DD, YYYY") : "";
     const timeText = data.date ? `(${moment(data.date).format("h:mm A")})` : "";
-
-    // Capitalize the first letter of each word in the location
     const formattedLocation = data.location
-      .toLowerCase() // Convert to lowercase
-      .replace(/(?:^|\s)\S/g, (match) => match.toUpperCase()); // Capitalize first letter of each word
-
-    const text = `The link up for ${activityText.toLowerCase()} at ${formattedLocation} on ${dateText} ${timeText} has expired.`;
-
-    return text;
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    return `The link up ${activityText} at ${formattedLocation} on ${dateText} ${timeText} has expired.`;
   };
 
   useEffect(() => {
@@ -209,9 +195,4 @@ const HomePage = ({ isMobile }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-  linkupList: state.linkups.linkupList,
-  isLoading: state.linkups.isLoading,
-});
-
-export default connect(mapStateToProps)(HomePage);
+export default HomePage;

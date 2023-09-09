@@ -7,9 +7,9 @@ import { useDispatch } from "react-redux";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import DeleteModal from "./DeleteModal";
 import EditLinkupModal from "./EditLinkupModal";
-import ConfirmationModal from "./ConfirmationModal";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
+import ConfirmationModal from "./ConfirmationModal"; // Import the ConfirmationModal component
 
 const useStyles = makeStyles((theme) => ({
   moreIcon: {
@@ -169,6 +169,7 @@ const HorizontalMenu = ({
         onClose={() => closeModal("isEditModalOpen")}
         setShouldFetchLinkups={setShouldFetchLinkups}
       />
+      {/* Use the ConfirmationModal */}
       <ConfirmationModal
         open={modalState.isCompleteConfirmationOpen}
         onClose={() => closeModal("isCompleteConfirmationOpen")}

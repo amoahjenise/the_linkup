@@ -5,12 +5,7 @@ import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import LoadingSpinner from "./LoadingSpinner";
 
-const FeedSection = ({
-  linkupList,
-  isLoading,
-  setIsLoading,
-  setShouldFetchLinkups,
-}) => {
+const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
   const userSentRequests = useSelector((state) => state.userSentRequests);
 
   return (

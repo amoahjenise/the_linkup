@@ -19,7 +19,7 @@ export async function getUserImages(userId) {
     });
 
     // Return the response data, which should contain the images
-    return response.data;
+    return response;
   } catch (error) {
     handleError(error);
   }

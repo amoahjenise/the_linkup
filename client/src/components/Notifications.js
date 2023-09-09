@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import NotificationItem from "./NotificationItem";
+import LoadingSpinner from "./LoadingSpinner"; // Import the LoadingSpinner component
 import { updateUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   markNotificationAsRead,
@@ -14,10 +15,11 @@ const useStyles = makeStyles((theme) => ({
   mainContainer: {
     display: "flex",
     flexDirection: "column",
-    overflowY: "auto",
+    overflowY: "hidden",
     width: "100%",
   },
   notificationsList: {
+    overflowY: "auto",
     listStyle: "none",
     padding: 0,
     margin: 0,
@@ -34,6 +36,7 @@ const Notifications = () => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id } = loggedUser?.user || {};
   const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
   const fetchUnreadNotifications = useCallback(async () => {
     try {
@@ -41,6 +44,10 @@ const Notifications = () => {
       setNotifications(response);
     } catch (error) {
       console.log("Error fetching unread notifications:", error);
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }
   }, [id]);
 
@@ -67,16 +74,19 @@ const Notifications = () => {
   return (
     <div className={classes.mainContainer}>
       <TopNavBar title="Notifications" />
-
-      <ul className={classes.notificationsList}>
-        {notifications.map((notification) => (
-          <NotificationItem
-            key={notification.id}
-            notification={notification}
-            onClick={() => handleNotificationClick(notification)}
-          />
-        ))}
-      </ul>
+      {isLoading ? (
+        <LoadingSpinner marginTop="350px" />
+      ) : (
+        <ul className={classes.notificationsList}>
+          {notifications.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onClick={() => handleNotificationClick(notification)}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

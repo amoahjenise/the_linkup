@@ -132,8 +132,8 @@ const UserProfilePage = ({ isMobile }) => {
         // Fetch user data
         const userDataResponse = await getUserById(userId);
 
-        if (userDataResponse.success) {
-          setUserData(userDataResponse.user);
+        if (userDataResponse?.data?.success) {
+          setUserData(userDataResponse?.data?.user);
         }
 
         navigator.geolocation.getCurrentPosition(
@@ -160,9 +160,9 @@ const UserProfilePage = ({ isMobile }) => {
         // Fetch user images
         const userImagesResponse = await getUserImages(userId);
 
-        if (userImagesResponse.success) {
+        if (userImagesResponse.data.success) {
           // Extract and set the user's image URLs in state
-          const imageUrls = userImagesResponse.images.map(
+          const imageUrls = userImagesResponse.data.images.map(
             (imageObj) => imageObj.image_url
           );
           setProfileImages(imageUrls);
@@ -238,9 +238,9 @@ const UserProfilePage = ({ isMobile }) => {
       }
 
       if (
-        (bioResponse?.success || avatarResponse?.success) &&
-        bioResponse?.success !== false &&
-        avatarResponse?.success !== false
+        (bioResponse?.data?.success || avatarResponse?.data?.success) &&
+        bioResponse?.data?.success !== false &&
+        avatarResponse?.data?.success !== false
       ) {
         // After a successful update, update userData with the new bio and avatar
         setUserData((prevUserData) => ({

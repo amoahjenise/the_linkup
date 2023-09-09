@@ -64,7 +64,7 @@ const RegistrationProcess = () => {
 
       try {
         const response = await createUser({ newUser: newUser });
-        if (response.success) {
+        if (response.data.success) {
           // Set the user data in the Redux store
           dispatch(setCurrentUser(response.data.user));
           // Mark the user as logged in by dispatching the login action

@@ -241,9 +241,16 @@ const markLinkupsAsExpired = async (req, res) => {
   try {
     const { rows } = await pool.query(query, queryValues);
     if (rows.length > 0) {
-      // Emit a real-time event to notify clients about expired link-ups
       const expiredLinkups = rows;
-      socketIo.emit("linkupsExpired", expiredLinkups);
+
+      // Iterate through expiredLinkups and emit notifications to creators
+      expiredLinkups.forEach((expiredLinkup) => {
+        const { creator_id } = expiredLinkup;
+
+        // Emit a real-time event to notify the creator of the expired link-up
+        // You might want to include information like linkup ID or details here
+        socketIo.emit("linkupsExpired", { creator_id: creator_id });
+      });
 
       res.json({
         success: true,

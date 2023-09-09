@@ -60,11 +60,11 @@ const DeactivateAccount = () => {
     if (isConfirmValid) {
       try {
         const response = await deleteUser(loggedUser.user.id);
-        if (response.success) {
+        if (response.data.success) {
           dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
           navigate("/"); // Redirect to landing page
         }
-        addSnackbar(response.message);
+        addSnackbar(response.data.message);
       } catch (error) {
         addSnackbar(error.message);
       }

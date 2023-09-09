@@ -9,12 +9,20 @@ const getImages = async (req, res) => {
   const query = fs.readFileSync(queryPath, "utf8");
 
   try {
-    const { rows } = await pool.query(query, [userId]);
-    res.json({
-      success: true,
-      message: "Images fetched successfully",
-      images: rows,
-    });
+    const { rows, rowCount } = await pool.query(query, [userId]);
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "Images fetched successfully",
+        images: rows,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Failed to fetch user images.",
+        images: null,
+      });
+    }
   } catch (error) {
     console.error("Error fetching images", error);
     res.status(500).json({ error: "Internal Server Error" });
