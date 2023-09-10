@@ -28,6 +28,7 @@ import { useSelector } from "react-redux";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import ToggleColorMode from "./components/ToggleColorMode";
 import "./App.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -96,7 +97,8 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
-        <div className="app">
+        <div>
+          <ToggleColorMode />
           <Router>
             <Routes>
               <Route

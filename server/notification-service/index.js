@@ -3,7 +3,7 @@ const app = express();
 const router = require("./routes/notificationRoutes");
 const cors = require("cors");
 const http = require("http");
-const { initSocketServer } = require("./notificationService"); // Import the socket server initialization function
+const { initSocketServer } = require("./socket/notificationSocket"); // Import the socket server initialization function
 
 app.use(express.json());
 

@@ -15,14 +15,12 @@ const compromise = nlp;
 const useStyles = makeStyles((theme) => ({
   linkupItem: {
     position: "relative",
-    backgroundColor: "#fff",
     padding: theme.spacing(2),
     wordWrap: "break-word",
     borderBottom: "1px solid #ccc",
     alignItems: "flex-start",
   },
   postedTimeText: {
-    color: theme.palette.text.secondary,
     marginLeft: "auto",
   },
   postHeaderContainer: { display: "flex", alignItems: "center" },
@@ -34,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
   },
   boldText: {
     fontWeight: "bold",
-    color: theme.palette.text.primary,
   },
   iconHeader: {
     display: "flex",
@@ -43,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
   },
   usernameLink: {
     textDecoration: "none",
-    color: theme.palette.text.primary,
     fontWeight: "bold",
   },
   postActions: {
@@ -55,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
   highlightedLinkupItem: {
-    backgroundColor: "#f5f8fa",
-    transition: "background-color 0.3s ease",
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
+    transition: "background-color 0.2s ease",
   },
 }));
 
@@ -107,13 +103,13 @@ const LinkupItem = React.memo(
       return (
         <p>
           <Link to={`/profile/${creator_id}`} className={classes.usernameLink}>
-            <span className={classes.boldText}>@{creator_name}</span>
+            <strong>@{creator_name}</strong>
           </Link>{" "}
           is trying to link up{" "}
-          <span className={classes.boldText}>{activityText}</span> on{" "}
-          <span className={classes.boldText}>
+          <strong className={classes.boldText}>{activityText}</strong> on{" "}
+          <time className={classes.boldText}>
             {dateText} {timeText}
-          </span>
+          </time>
           .
         </p>
       );
@@ -191,15 +187,15 @@ const LinkupItem = React.memo(
                   onRequestClick={handleRequestLinkup}
                   disableRequest={disableRequest}
                 />
-                <p className={classes.postedTimeText}>
+                <span className={classes.postedTimeText}>
                   Posted {getTimeAgo(created_at)}
-                </p>
+                </span>
               </div>
             ) : (
               <div className={classes.buttonsContainer}>
-                <p className={classes.postedTimeText}>
+                <span className={classes.postedTimeText}>
                   Posted {getTimeAgo(created_at)}
-                </p>
+                </span>
               </div>
             )}
             {renderPostIcon()}

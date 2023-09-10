@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 const useStyles = makeStyles((theme) => ({
   section: {
     flex: "1",
-    color: "black",
     padding: theme.spacing(2),
     flexDirection: "column",
     justifyContent: "center",
@@ -40,14 +39,10 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: "#B71C1C",
     },
-    "&:disabled": {
-      backgroundColor: "#F5F8FA", // Light gray when disabled
-      color: "#AAB8C2",
-    },
   },
 }));
 
-const DeactivateAccount = () => {
+const DeactivateAccount = ({ colorMode }) => {
   const [confirmation, setConfirmation] = useState("");
   const isConfirmValid = confirmation === "CONFIRM";
   const classes = useStyles({ isConfirmValid });
@@ -55,6 +50,11 @@ const DeactivateAccount = () => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const inputTextColor =
+    colorMode === "dark"
+      ? "white" // Dark mode background color with no transparency
+      : "black";
 
   const handleDeactivate = async () => {
     if (isConfirmValid) {
@@ -86,6 +86,8 @@ const DeactivateAccount = () => {
         variant="outlined"
         value={confirmation}
         onChange={(e) => setConfirmation(e.target.value)}
+        InputProps={{ style: { color: inputTextColor } }}
+        InputLabelProps={{ style: { color: inputTextColor } }}
       />
       <Button
         variant="contained"

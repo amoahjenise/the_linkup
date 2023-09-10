@@ -21,7 +21,6 @@ const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
   linkupRequestItem: {
-    backgroundColor: "#fff",
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
     borderBottom: "1px solid lightgrey",

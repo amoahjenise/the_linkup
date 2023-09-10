@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   confirmModal: {
@@ -9,16 +10,18 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   modalContent: {
-    backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing(3),
     minWidth: "300px",
     textAlign: "center",
   },
+  modalTitle: {
+    fontSize: "24px",
+    marginBottom: theme.spacing(2),
+  },
   modalText: {
     fontSize: "16px",
     marginBottom: theme.spacing(3),
-    color: theme.palette.text.secondary,
     whiteSpace: "nowrap", // Allow text to wrap within
   },
   buttonGroup: {
@@ -48,6 +51,12 @@ const useStyles = makeStyles((theme) => ({
 
 const ConfirmationModal = ({ open, onClose, onConfirm, title, message }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
+  const modalBackgroundColor =
+    colorMode === "dark"
+      ? "#1e1e1e" // Dark mode background color with no transparency
+      : "white";
 
   return (
     <Modal
@@ -57,10 +66,15 @@ const ConfirmationModal = ({ open, onClose, onConfirm, title, message }) => {
       aria-labelledby="confirmation-modal-title"
       aria-describedby="confirmation-modal-description"
     >
-      <div className={classes.modalContent}>
-        <Typography variant="h6" id="confirmation-modal-title">
+      <div
+        className={classes.modalContent}
+        style={{
+          backgroundColor: modalBackgroundColor,
+        }}
+      >
+        <h2 className={classes.modalTitle} id="confirmation-modal-title">
           {title}
-        </Typography>
+        </h2>
         <Typography
           className={classes.modalText}
           id="confirmation-modal-description"

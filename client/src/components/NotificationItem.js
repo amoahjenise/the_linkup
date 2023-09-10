@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     height: "40px",
   },
-
   avatarContainer: {
     display: "flex",
     alignItems: "center",
@@ -22,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     transition: "background-color 0.3s ease-in-out", // Added transition for smooth effect
     "&:hover": {
-      backgroundColor: "#F5F8FA", // Change the background color on hover
+      backgroundColor: "rgba(200, 200, 200, 0.1)",
     },
   },
   unread: {
@@ -41,11 +40,9 @@ const useStyles = makeStyles((theme) => ({
   },
   message: {
     fontSize: theme.typography.body2.fontSize,
-    color: theme.palette.text.secondary,
   },
   time: {
     fontSize: theme.typography.caption.fontSize,
-    color: theme.palette.text.secondary,
   },
 }));
 
@@ -95,10 +92,10 @@ const NotificationItem = ({ notification, onClick }) => {
         <Typography variant="subtitle1">{notification.content}</Typography>
         <div className={classes.messageContainer}>
           <Typography variant="caption" className={classes.message}>
-            {notification.message}
+            <span>{notification.message}</span>
           </Typography>
           <Typography component="small" className={classes.time}>
-            {getTimeAgo()}
+            <span>{getTimeAgo()}</span>
           </Typography>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import TopNavBar from "./TopNavBar";
 
@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
   sectionItem: {
     cursor: "pointer",
     marginBottom: theme.spacing(2),
-    color: theme.palette.text.secondary,
     "&:hover": {
       color: theme.palette.primary.main,
     },
@@ -22,33 +21,46 @@ const useStyles = makeStyles((theme) => ({
   subSectionItem: {
     cursor: "pointer",
     marginBottom: theme.spacing(2),
-    color: theme.palette.text.secondary,
     "&:hover": {
       color: theme.palette.primary.main,
-      textDecoration: "underline", // Add underline on hover
+      textDecoration: "underline",
     },
   },
   activeSectionItem: {
     color: theme.palette.primary.main,
     fontWeight: "bold",
   },
+  activeSubSectionItem: {
+    color: theme.palette.primary.main,
+    fontWeight: "bold",
+  },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-    borderLeft: `1px solid ${theme.palette.divider}`,
   },
   title: {
     marginBottom: theme.spacing(3),
   },
 }));
 
-const Settings = ({ onSubSectionClick }) => {
+const Settings = ({
+  colorMode,
+  activeSubSection,
+  setActiveSubSection,
+  onSubSectionClick,
+}) => {
   const classes = useStyles();
   const [activeSection, setActiveSection] = useState("account");
+  const theme = useTheme();
 
   const handleSectionClick = (section) => {
     setActiveSection(section);
+    setActiveSubSection(null);
   };
+
+  // Determine the borderLeft color based on colorMode
+  const borderLeftColor =
+    colorMode === "dark" ? "white" : theme.palette.divider;
 
   return (
     <div>
@@ -83,20 +95,29 @@ const Settings = ({ onSubSectionClick }) => {
             Data
           </div>
         </div>
-        <div className={classes.content}>
+        <div
+          className={classes.content}
+          style={{ borderLeft: `1px solid ${borderLeftColor}` }}
+        >
           {activeSection === "account" && (
             <>
               <Typography
                 variant="h6"
                 onClick={() => onSubSectionClick("accountSettings")}
-                className={classes.subSectionItem}
+                className={`${classes.subSectionItem} ${
+                  activeSubSection === "accountSettings" &&
+                  classes.activeSubSectionItem
+                }`}
               >
                 Account settings
               </Typography>
               <Typography
                 variant="h6"
                 onClick={() => onSubSectionClick("deactivateAccount")}
-                className={classes.subSectionItem}
+                className={`${classes.subSectionItem} ${
+                  activeSubSection === "deactivateAccount" &&
+                  classes.activeSubSectionItem
+                }`}
               >
                 Deactivate account
               </Typography>
@@ -106,7 +127,10 @@ const Settings = ({ onSubSectionClick }) => {
             <Typography
               variant="h6"
               onClick={() => onSubSectionClick("securitySettings")}
-              className={classes.subSectionItem}
+              className={`${classes.subSectionItem} ${
+                activeSubSection === "securitySettings" &&
+                classes.activeSubSectionItem
+              }`}
             >
               Security settings
             </Typography>
@@ -115,7 +139,10 @@ const Settings = ({ onSubSectionClick }) => {
             <Typography
               variant="h6"
               onClick={() => onSubSectionClick("dataAndPermissions")}
-              className={classes.subSectionItem}
+              className={`${classes.subSectionItem} ${
+                activeSubSection === "dataAndPermissions" &&
+                classes.activeSubSectionItem
+              }`}
             >
               Data and permissions
             </Typography>

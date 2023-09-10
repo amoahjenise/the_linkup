@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Modal } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   deleteModal: {
@@ -8,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing(3),
     outline: "none",
@@ -18,12 +18,11 @@ const useStyles = makeStyles((theme) => ({
   modalTitle: {
     fontSize: "24px",
     marginBottom: theme.spacing(2),
-    color: theme.palette.text.primary,
   },
   modalText: {
     fontSize: "16px",
     marginBottom: theme.spacing(3),
-    color: theme.palette.text.secondary,
+    whiteSpace: "nowrap", // Allow text to wrap within
   },
   buttonGroup: {
     display: "flex",
@@ -51,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
 
 const DeleteModal = ({ open, onClose, onConfirm }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
+  const modalBackgroundColor =
+    colorMode === "dark"
+      ? "#1e1e1e" // Dark mode background color with no transparency
+      : "white";
 
   return (
     <Modal
@@ -59,7 +64,12 @@ const DeleteModal = ({ open, onClose, onConfirm }) => {
       aria-labelledby="delete-modal-title"
       aria-describedby="delete-modal-description"
     >
-      <div className={classes.deleteModal}>
+      <div
+        className={classes.deleteModal}
+        style={{
+          backgroundColor: modalBackgroundColor,
+        }}
+      >
         <h2 className={classes.modalTitle} id="delete-modal-title">
           Confirm Deletion
         </h2>
@@ -67,10 +77,18 @@ const DeleteModal = ({ open, onClose, onConfirm }) => {
           Are you sure you want to delete this link-up?
         </p>
         <div className={classes.buttonGroup}>
-          <Button className={classes.deleteButton} onClick={onConfirm}>
+          <Button
+            className={classes.deleteButton}
+            onClick={onConfirm}
+            color="secondary"
+          >
             Delete
           </Button>
-          <Button className={classes.cancelButton} onClick={onClose}>
+          <Button
+            className={classes.cancelButton}
+            onClick={onClose}
+            color="default"
+          >
             Cancel
           </Button>
         </div>

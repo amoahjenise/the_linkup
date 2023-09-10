@@ -25,18 +25,15 @@ const createLinkup = async (req, res) => {
   ];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
-
-    if (rows.length > 0) {
-      const linkup = rows[0];
-
+    const { rows, rowCount } = await pool.query(query, queryValues);
+    if (rowCount > 0) {
       // Emit a real-time event to notify clients about the new linkup
-      socketIo.emit("createLinkup", linkup);
+      socketIo.emit("linkupCreated", rows[0]);
 
       res.json({
         success: true,
         message: "Linkup created successfully",
-        newLinkup: linkup,
+        newLinkup: rows[0],
       });
     } else {
       res.status(500).json({

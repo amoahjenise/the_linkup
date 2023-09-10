@@ -13,6 +13,7 @@ import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { getUserLinkups } from "../api/linkupAPI";
 import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   linkupHistoryPage: {
@@ -23,11 +24,18 @@ const useStyles = makeStyles((theme) => ({
     flex: "2",
     overflowY: "auto",
     overflowX: "hidden",
-    backgroundColor: theme.palette.background.default,
     margin: "0 auto",
+  },
+  topBar: {
+    position: "sticky",
+    top: 0,
+    zIndex: 1,
   },
   tabBar: {
     borderBottom: "1px solid lightgrey",
+    position: "sticky", // Make the tabs bar sticky
+    top: 65, // Stick it bellow the top bar
+    zIndex: 1, // Ensure it's above other content
   },
 }));
 
@@ -35,10 +43,9 @@ const LinkupHistoryPage = ({ isMobile }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const location = useLocation();
-
+  const { colorMode } = useColorMode();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
-
   const [isLoading, setIsLoading] = useState(true);
 
   const [linkups, setLinkups] = useState({
@@ -91,6 +98,16 @@ const LinkupHistoryPage = ({ isMobile }) => {
     { id: 1, label: "Requests Sent" },
     { id: 2, label: "Requests Received" },
   ];
+
+  const color =
+    colorMode === "dark"
+      ? "white" // Dark mode text color white
+      : "black"; // Light mode text color black
+
+  const backgroundColor =
+    colorMode === "dark"
+      ? "rgba(18, 28, 38, 0.99)" // Dark mode background color with 90% transparency
+      : "rgba(255, 255, 255, 0.99)"; // Light mode background color
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -311,7 +328,7 @@ const LinkupHistoryPage = ({ isMobile }) => {
   return (
     <div className={classes.linkupHistoryPage}>
       <div className={classes.historySection}>
-        <TopNavBar title="Link Ups" />
+        <TopNavBar className={classes.topBar} title="Link Ups" />
         {isLoading ? (
           <LoadingSpinner />
         ) : (
@@ -323,7 +340,11 @@ const LinkupHistoryPage = ({ isMobile }) => {
               variant={isMobile ? "scrollable" : "standard"}
               indicatorColor="primary"
               textColor="primary"
-              style={{ width: isMobile ? "100%" : "auto" }}
+              style={{
+                width: isMobile ? "100%" : "auto",
+                color,
+                backgroundColor,
+              }}
             >
               {tabs.map((tab) => (
                 <Tab

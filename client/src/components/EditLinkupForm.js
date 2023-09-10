@@ -20,18 +20,15 @@ const useStyles = makeStyles((theme) => ({
     flex: "1",
     position: "sticky",
     top: 0,
-    overflowY: "auto",
     width: "100%x",
   },
   editContainer: {
     flex: "1",
-    color: "black",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     position: "sticky",
     top: 0,
-    overflowY: "auto",
   },
   editLinkUpTitle: {
     textAlign: "center",
@@ -53,29 +50,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "24px",
   },
   buttonGroup: {
+    marginTop: theme.spacing(2),
     display: "flex",
     justifyContent: "center",
-    marginTop: theme.spacing(3),
   },
-  updateLinkupButton: {
-    backgroundColor: "#00CFFF",
-    color: "white",
-    padding: theme.spacing(1.5, 3),
-    marginRight: theme.spacing(2),
-    cursor: "pointer",
-    transition: "background-color 0.3s ease", // Add transition for smooth color change
-    "&:hover": {
-      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
-    },
-    cancelLinkupButton: {
-      marginTop: theme.spacing(2),
-      padding: theme.spacing(1),
-      color: "white",
-      border: "none",
-      borderRadius: "4px",
-      cursor: "pointer",
-      transition: "background-color 0.3s ease", // Add transition for smooth color change
-    },
+  button: {
+    width: "140px",
+    border: "none",
+    borderRadius: "4px",
   },
   // Define styles for the custom dropdown
   customDropdown: {
@@ -88,7 +70,6 @@ const useStyles = makeStyles((theme) => ({
       border: "1px solid #ccc",
       marginTop: theme.spacing(1),
       appearance: "none",
-      background: "transparent",
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
       backgroundPosition: "right 12px center",
       backgroundRepeat: "no-repeat",
@@ -214,24 +195,29 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       <div className={classes.editContainer}>
         <h2 className={classes.editLinkUpTitle}>Edit Link-Up</h2>
         <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>
+          <label htmlFor="activity">Activity</label>
           <input
             className={classes.editLinkUpInput}
             type="text"
             placeholder="Activity"
             name="activity"
+            id="activity"
             value={activity}
             onChange={handleActivityChange}
             required
           />
+          <label htmlFor="location">Location</label>
           <input
             className={classes.editLinkUpInput}
             type="text"
             placeholder="Location"
             name="location"
+            id="location"
             value={location}
             onChange={handleLocationChange}
             required
           />
+          <label htmlFor="date">Date and Time</label>
           <DatePicker
             selected={new Date(selectedDate)}
             onChange={handleDateChange}
@@ -245,13 +231,16 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             maxTime={maxTime}
             className={classes.datePicker} // Apply the datePicker style
             placeholderText="Select date and time"
+            id="date"
             required
           />
+          <label htmlFor="genderPreference">Gender Preference</label>
           <div className={classes.customDropdown}>
             <select
               value={genderPreference}
               onChange={handleGenderPreferenceChange}
               aria-label="Gender Preference"
+              id="genderPreference"
               required
             >
               <option value="" disabled>
@@ -267,7 +256,11 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               type="submit"
               variant="contained"
               color="primary"
-              className={classes.updateLinkupButton}
+              className={classes.button}
+              style={{
+                marginRight: "10%",
+                backgroundColor: "#00CFFF",
+              }}
             >
               Update
             </Button>
@@ -275,7 +268,10 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               variant="contained"
               color="default"
               onClick={handleCancelClick}
-              className={classes.cancelLinkupButton}
+              className={classes.button}
+              style={{
+                backgroundColor: "#E0E0E0",
+              }}
             >
               Cancel
             </Button>

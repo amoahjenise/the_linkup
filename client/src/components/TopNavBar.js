@@ -5,6 +5,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -12,26 +13,35 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     zIndex: theme.zIndex.appBar,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderBottom: "1px solid #e1e8ed",
-  },
-  toolbar: {
-    display: "flex",
-    justifyContent: "center",
   },
   headerText: {
     fontSize: "20px",
     fontWeight: "bold",
-    color: theme.palette.text.primary,
   },
 }));
 
 const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
+  const color =
+    colorMode === "dark"
+      ? "white" // Dark mode text color white
+      : "black"; // Light mode text color
+
+  const backgroundColor =
+    colorMode === "dark"
+      ? "rgba(18, 28, 38, 0.99)" // Dark mode background color with 90% transparency
+      : "rgba(255, 255, 255, 0.99)"; // Light mode background color
 
   return (
-    <AppBar className={classes.appBar} elevation={0}>
-      <Toolbar className={classes.toolbar}>
+    <AppBar
+      className={classes.appBar}
+      elevation={0}
+      style={{ color, backgroundColor }}
+    >
+      <Toolbar>
         <Typography variant="h6" className={classes.headerText}>
           {title}
         </Typography>

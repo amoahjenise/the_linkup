@@ -7,7 +7,6 @@ import ImageIcon from "@material-ui/icons/Image";
 import PeopleIcon from "@material-ui/icons/People";
 import ExploreIcon from "@material-ui/icons/Explore";
 import logo from "../logo.png";
-import IphoneImage from "../assets/iphone-13.jpg";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -153,7 +152,7 @@ const useStyles = makeStyles((theme) => ({
   footer: {
     flexShrink: 0,
     color: "gray",
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     textAlign: "center",
     borderTop: "1px solid #f5f8fa",
     marginTop: theme.spacing(2),
@@ -249,13 +248,13 @@ function LandingPage({ isMobile }) {
             <Grid item xs={12} md={6} className={classes.leftColumn}>
               <div className={classes.leftContainer}>
                 <img
-                  src={IphoneImage}
+                  src="https://www.transparentpng.com/thumb/-iphone-x/v8dHCT-apple-iphone.png"
                   alt="Iphone"
                   style={{
                     maxWidth: "100%",
-                    height: isMobile ? "auto" : "620px",
+                    height: isMobile ? "auto" : "520px",
                   }}
-                />
+                ></img>
               </div>
             </Grid>
             <Grid item xs={12} md={6} className={classes.rightColumn}>

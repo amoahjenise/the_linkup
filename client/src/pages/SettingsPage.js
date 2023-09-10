@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import DeactivateAccount from "../components/DeactivateAccount";
 import Settings from "../components/Settings";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   settingsPage: {
@@ -19,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
 
 const SettingsPage = () => {
   const classes = useStyles();
-  const [activeSubSection, setActiveSubSection] = useState("");
+  const { colorMode } = useColorMode();
+  const [activeSubSection, setActiveSubSection] = useState("accountSettings");
 
   const handleSubSectionClick = (subSection) => {
     setActiveSubSection(subSection);
@@ -28,10 +30,19 @@ const SettingsPage = () => {
   return (
     <div className={classes.settingsPage}>
       <div className={classes.mainSection}>
-        <Settings onSubSectionClick={handleSubSectionClick} />
+        <Settings
+          colorMode={colorMode}
+          activeSubSection={activeSubSection}
+          setActiveSubSection={setActiveSubSection}
+          onSubSectionClick={handleSubSectionClick}
+        />
       </div>
       {/* Render the active section content based on activeSection and activeSubsection */}
-      {activeSubSection === "deactivateAccount" ? <DeactivateAccount /> : <></>}
+      {activeSubSection === "deactivateAccount" ? (
+        <DeactivateAccount colorMode={colorMode} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

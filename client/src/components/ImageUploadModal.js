@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import { makeStyles } from "@material-ui/core/styles";
 import { uploadImages, deleteImages } from "../api/imagesAPI"; // Adjust the import based on your API functions.
 import { useSnackbar } from "../contexts/SnackbarContext";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const MAX_IMAGES = 9; // Maximum number of images to display
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB (adjust the value as needed)
@@ -13,11 +14,28 @@ const useStyles = makeStyles((theme) => ({
     top: "55%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4),
     outline: "none",
     textAlign: "center",
+  },
+  title: {
+    fontSize: "18px",
+    marginBottom: theme.spacing(2),
+  },
+  uploadButton: {
+    // Standard button styles
+    width: "100%",
+    marginTop: theme.spacing(2),
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.dark,
+    },
+    // Stylish props
+    borderRadius: "8px", // Adjust as needed
+    padding: "10px 20px", // Adjust as needed
+    fontSize: "16px", // Adjust as needed
   },
   closeButton: {
     position: "absolute",
@@ -63,12 +81,18 @@ const useStyles = makeStyles((theme) => ({
     position: "absolute",
     top: "4px",
     right: "4px",
-    backgroundColor: "red",
-    color: "white",
+    backgroundColor: "rgba(100, 100, 100, 0.3)", // Light gray with 90% transparency
     border: "none",
+    borderRadius: "50%", // Makes it round
     cursor: "pointer",
     padding: "4px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "30px", // Adjust as needed
+    height: "30px", // Adjust as needed
   },
+
   emptyGridItem: {
     backgroundColor: theme.palette.background.paper,
     border: "1px solid #e1e8ed",
@@ -89,20 +113,30 @@ const ImageUploadModal = ({
   onClose,
   profileImages,
   setProfileImages,
-  currentImageIndex,
   setCurrentImageIndex,
+  colorMode,
 }) => {
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
+
   // Create a separate state to hold changes temporarily
   const [tempProfileImages, setTempProfileImages] = useState([
     ...profileImages,
   ]);
 
-  useEffect(() => {
-    // Update the tempProfileImages state whenever profileImages changes
-    setTempProfileImages([...profileImages]);
-  }, [profileImages]);
+  // Define text and background color based on color mode
+  const modalTextColor =
+    colorMode === "dark"
+      ? "white" // Dark mode background color with no transparency
+      : "black";
+
+  const modalBackgroundColor =
+    colorMode === "dark"
+      ? "rgba(86, 68, 68, 1)" // Dark mode background color with no transparency
+      : "white";
+
+  const overlayBackgroundColor =
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.5)" : "";
 
   // Utility function to convert a File object to a base64 URL
   const convertFileToBase64URL = (file) => {
@@ -179,17 +213,37 @@ const ImageUploadModal = ({
     }
   };
 
+  useEffect(() => {
+    // Update the tempProfileImages state whenever profileImages changes
+    setTempProfileImages([...profileImages]);
+  }, [profileImages]);
+
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={handleCloseModal}
       className={classes.imageUploadModal}
+      style={{
+        content: {
+          color: modalTextColor,
+          backgroundColor: modalBackgroundColor,
+        },
+        overlay: {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: overlayBackgroundColor,
+        },
+      }}
     >
       <button onClick={handleCloseModal} className={classes.closeButton}>
         &times;
       </button>
-      <h2>Upload Pictures</h2>
-
+      <div className={classes.title}>
+        <p>Upload Pictures</p>
+      </div>
       <div className={classes.imageGrid}>
         {Array.from({ length: MAX_IMAGES }).map((_, index) => (
           <div key={index} className={classes.imageGridItem}>
@@ -204,7 +258,7 @@ const ImageUploadModal = ({
                   onClick={() => handleRemove(index)}
                   className={classes.removeButton}
                 >
-                  Remove
+                  <DeleteIcon style={{ fontSize: 24, opacity: 0.9 }} />
                 </button>
               </>
             )}
@@ -227,7 +281,9 @@ const ImageUploadModal = ({
           </div>
         ))}
       </div>
-      <button onClick={handleUpload}>Upload</button>
+      <button className={classes.uploadButton} onClick={handleUpload}>
+        Upload
+      </button>
     </Modal>
   );
 };

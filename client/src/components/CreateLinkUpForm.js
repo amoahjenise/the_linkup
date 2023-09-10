@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
   createLinkUpContainer: {
     flex: "1",
     borderLeft: "0.1px solid lightgrey",
-    position: "sticky",
     top: 0,
     overflowY: "auto",
     justifyContent: "center",
@@ -30,13 +29,11 @@ const useStyles = makeStyles((theme) => ({
   },
   createContainer: {
     flex: "1",
-    color: "black",
     padding: theme.spacing(2),
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     height: "calc(100vh - 140px)",
-    position: "sticky",
     top: 0,
     overflowY: "auto",
   },
@@ -53,10 +50,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderRadius: "24px",
+    background: "transparent",
   },
   createLinkUpButton: {
     padding: theme.spacing(1),
-    color: "white",
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
@@ -64,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       backgroundColor: "#00BFFF", // Change to the darker blue color on hover
     },
+    width: "100%",
   },
   // Define styles for the custom dropdown
   customDropdown: {
@@ -76,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
       border: "1px solid #ccc",
       marginTop: theme.spacing(1),
       appearance: "none",
-      background: "transparent",
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
       backgroundPosition: "right 12px center",
       backgroundRepeat: "no-repeat",
@@ -137,8 +134,7 @@ const CreateLinkupForm = ({
       if (socket && response.success) {
         // Update linkupList state with the new linkup
         updateLinkupList(response.newLinkup);
-        // Emit the "createLinkup" event with the created linkup data
-        socket.emit("createLinkup", response.newLinkup);
+        // socket.emit("linkupCreated", response.newLinkup);
         addSnackbar("Link-up created successfully!");
         // Reset the form inputs
         e.target.reset();

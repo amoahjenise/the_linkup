@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
     flex: "2",
     overflowY: "auto",
     overflowX: "hidden",
-    backgroundColor: theme.palette.background.default,
     marginLeft: "auto",
     marginRight: "auto",
   },

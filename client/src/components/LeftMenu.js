@@ -10,6 +10,7 @@ import HistoryIcon from "@material-ui/icons/History";
 import MessageIcon from "@material-ui/icons/Message";
 import SettingsIcon from "@material-ui/icons/Settings";
 import LogoutButton from "./LogoutButton";
+import { useColorMode } from "@chakra-ui/react";
 import logo from "../logo.png";
 
 const drawerWidth = "20%";
@@ -17,14 +18,12 @@ const drawerWidth = "20%";
 const useStyles = makeStyles((theme) => ({
   main: {
     flex: "0 0 " + drawerWidth,
-    color: "black",
     padding: theme.spacing(2),
     borderRight: "0.1px solid lightgrey",
   },
   menu: {
     flex: "0 0 " + drawerWidth,
-    color: "black",
-    marginLeft: theme.spacing(16),
+    marginLeft: theme.spacing(12),
   },
   menuList: {
     listStyleType: "none",
@@ -32,12 +31,10 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
   },
   menuItem: {
-    marginBottom: theme.spacing(2),
     padding: theme.spacing(2),
     listStyleType: "none",
   },
   menuItemLink: {
-    color: "black",
     textDecoration: "none",
   },
   mobileMenuContainer: {
@@ -45,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
     bottom: 0,
     left: 0,
     width: "100%",
-    backgroundColor: "#fff",
     boxShadow: "0px -2px 4px rgba(0, 0, 0, 0.1)",
     zIndex: 1000,
   },
@@ -58,12 +54,7 @@ const useStyles = makeStyles((theme) => ({
   mobileMenuItem: {
     fontSize: "1.5rem",
     padding: theme.spacing(1),
-    color: "black",
     textDecoration: "none",
-  },
-  active: {
-    backgroundColor: "#F5F8FA",
-    borderRadius: "100px",
   },
   badge: {
     marginLeft: theme.spacing(2),
@@ -178,24 +169,43 @@ const LeftMenu = ({ isMobile }) => {
   );
 };
 
-// MenuItem component to simplify menu item rendering
 const MenuItem = ({ to, icon, text, badgeContent, location }) => {
   const classes = useStyles();
+
+  const { colorMode } = useColorMode(); // Get the current color mode
+
+  // Define the background color and border color based on colorMode
+  const activeTabBackgroundColor =
+    colorMode === "dark" ? "rgba(18, 28, 38, 0.9)" : "#F5F8FA";
+  const activeTabBorderColor = colorMode === "dark" ? "transparent" : "#F1F1FA";
+
+  const isItemActive = location.startsWith(to);
+
+  const menuItemStyle = {
+    borderRadius: "100px",
+    padding: "8px 16px",
+    backgroundColor: isItemActive ? activeTabBackgroundColor : "transparent",
+    display: "flex",
+    alignItems: "center",
+    border: isItemActive ? `2px solid ${activeTabBorderColor}` : "none",
+  };
 
   return (
     <li
       className={`${classes.menuItem} ${classes.menuItemHover} ${
-        location.startsWith(to) ? classes.active : ""
+        isItemActive ? classes.active : ""
       }`}
     >
-      <Link to={to} className={classes.menuItemLink}>
-        {icon} {text}
+      <Link to={to} className={classes.menuItemLink} style={menuItemStyle}>
+        {icon}
+        <div style={{ marginLeft: "8px" }}>{text}</div>{" "}
         {badgeContent > 0 && (
           <Badge
             className={classes.badge}
             badgeContent={parseInt(badgeContent)}
             overlap="rectangular"
             color="secondary"
+            style={{ marginLeft: "8px" }}
           ></Badge>
         )}
       </Link>

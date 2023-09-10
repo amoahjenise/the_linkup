@@ -16,6 +16,7 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
+import { useColorMode } from "@chakra-ui/react";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -42,11 +43,12 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "1px solid #e1e8ed",
   },
   bioText: {
-    fontWeight: "normal",
-    fontSize: "14px",
-    color: "#555",
+    marginTop: theme.spacing(1),
+    fontWeight: "bold",
+    fontSize: "16px",
     margin: "8px 0",
     lineHeight: "1.4",
+    marginLeft: "4px",
   },
   centeredContent: {
     display: "flex",
@@ -102,6 +104,7 @@ const UserProfilePage = ({ isMobile }) => {
   const [isImageUploadModalOpen, setImageUploadModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addSnackbar } = useSnackbar();
+  const { colorMode } = useColorMode();
 
   const openImageUploadModal = () => {
     setImageUploadModalOpen(true);
@@ -226,22 +229,26 @@ const UserProfilePage = ({ isMobile }) => {
     try {
       let bioResponse = null;
       let avatarResponse = null;
+      let changesMade = false; // Track whether any changes were made
 
       if (userData?.bio !== editedBio) {
         // Update the bio if it has changed
         bioResponse = await updateUserBio(userData?.id, editedBio);
+        if (bioResponse?.data?.success !== false) {
+          changesMade = true;
+        }
       }
 
       if (userData?.avatar !== editedAvatar) {
         // Update the avatar if it has changed
         avatarResponse = await updateUserAvatar(userData?.id, editedAvatar);
+        if (avatarResponse?.data?.success !== false) {
+          changesMade = true;
+        }
       }
 
-      if (
-        (bioResponse?.data?.success || avatarResponse?.data?.success) &&
-        bioResponse?.data?.success !== false &&
-        avatarResponse?.data?.success !== false
-      ) {
+      if (changesMade) {
+        // Check if any changes were made
         // After a successful update, update userData with the new bio and avatar
         setUserData((prevUserData) => ({
           ...prevUserData,
@@ -249,6 +256,10 @@ const UserProfilePage = ({ isMobile }) => {
           avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
         }));
         addSnackbar("Profile updated!");
+        setIsEditModalOpen(false);
+      } else {
+        // No changes were made, display a message and close the modal
+        addSnackbar("No changes were made.");
         setIsEditModalOpen(false);
       }
     } catch (error) {
@@ -275,35 +286,27 @@ const UserProfilePage = ({ isMobile }) => {
 
               <div className={classes.leftMargin}>
                 {isMobile ? (
-                  <h5>
+                  <h5 style={{ marginLeft: "4px" }}>
                     {userData?.name}, {calculateAge(userData?.date_of_birth)}
                   </h5>
                 ) : (
-                  <h2>
+                  <h2 style={{ marginLeft: "4px" }}>
                     {userData?.name}, {calculateAge(userData?.date_of_birth)}
                   </h2>
                 )}
                 <span style={{ fontWeight: "normal" }}>
-                  {isMobile ? (
-                    <>
-                      <h6>
-                        {" "}
-                        <LocationOnIcon style={{ fontSize: "16px" }} />{" "}
-                        {userLocation}
-                      </h6>
-                    </>
-                  ) : (
-                    <>
-                      <p>
-                        <LocationOnIcon style={{ fontSize: "16px" }} />{" "}
-                        {userLocation}
-                      </p>
-                    </>
-                  )}
+                  <>
+                    <h6>
+                      <LocationOnIcon
+                        style={{ fontSize: "16px", marginTop: "10px" }}
+                      />{" "}
+                      {userLocation}
+                    </h6>
+                  </>
                 </span>
                 {/* Bio text */}
-                <div>
-                  <span className={classes.bioText}>{userData?.bio}</span>
+                <div className={classes.bioText}>
+                  <span>{userData?.bio}</span>
                 </div>
               </div>
             </div>
@@ -332,6 +335,7 @@ const UserProfilePage = ({ isMobile }) => {
           onClose={toggleEditModal}
           userData={userData}
           onSave={handleSaveChanges}
+          colorMode={colorMode}
         />
       )}
       {/* Render the ImageUploadModal */}
@@ -343,6 +347,7 @@ const UserProfilePage = ({ isMobile }) => {
         setProfileImages={setProfileImages}
         currentImageIndex={currentImageIndex}
         setCurrentImageIndex={setCurrentImageIndex}
+        colorMode={colorMode}
       />
     </div>
   );
