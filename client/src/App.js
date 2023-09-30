@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import io from "socket.io-client";
 import {
   BrowserRouter as Router,
   Routes,
@@ -25,11 +24,13 @@ import LeftMenu from "./components/LeftMenu";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { useSelector } from "react-redux";
-import { SnackbarProvider } from "./contexts/SnackbarContext";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ToggleColorMode from "./components/ToggleColorMode";
 import "./App.css";
+
+// // Import the SocketProvider
+// import { SocketProvider } from "./SocketContext";
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -42,9 +43,6 @@ const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
-  const unreadNotificationsCount = useSelector(
-    (state) => state.notifications.unreadCount
-  );
   const authState = useSelector((state) => state.auth);
   const isAuthenticated = authState.isAuthenticated;
   const theme = useTheme();
@@ -57,7 +55,7 @@ const App = () => {
         <Outlet />
       </div>
     ) : (
-      <Navigate to="/login" />
+      <Navigate to="/" />
     );
   };
 
@@ -72,96 +70,71 @@ const App = () => {
       });
   }, [dispatch, loggedUser.user.id]);
 
-  useEffect(() => {
-    const socket = io(process.env.REACT_APP_NOTIFICATIONS_SERVICE_URL);
-
-    socket.on("connect", () => {
-      console.log("Client Connected to notification WebSocket server");
-
-      // Emit the user's ID to store the socket connection
-      socket.emit("store-user-id", loggedUser.user?.id);
-    });
-
-    socket.on("notification", (notification) => {
-      console.log("Received notification", notification);
-      // Handle the incoming notification and update UI
-      dispatch(updateUnreadNotificationsCount(unreadNotificationsCount + 1));
-      alert(`Received notification: ${notification.content}`);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [dispatch, loggedUser.user?.id, unreadNotificationsCount]);
-
   return (
     <ThemeProvider theme={theme}>
-      <SnackbarProvider>
-        <div>
-          <ToggleColorMode />
-          <Router>
-            <Routes>
+      {/* <SocketProvider isAuthenticated={isAuthenticated}> */}
+      <div>
+        <ToggleColorMode />
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              exact
+              element={<LandingPage isMobile={isMobile} />}
+            />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            {/* Protected routes */}
+            <Route element={<PrivateRoutes />}>
+              <Route path="/home" element={<HomePage isMobile={isMobile} />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route
-                path="/"
-                exact
-                element={<LandingPage isMobile={isMobile} />}
+                path="/profile/:id"
+                element={<UserProfilePage isMobile={isMobile} />}
               />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              {/* Protected routes */}
-              <Route element={<PrivateRoutes />}>
-                <Route
-                  path="/home"
-                  element={<HomePage isMobile={isMobile} />}
-                />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route
-                  path="/profile/:id"
-                  element={<UserProfilePage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/send-request/:linkupId"
-                  element={<SendRequestPage />}
-                />
-                <Route
-                  path="/history"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/expired"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/requests-sent"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/requests-received"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/messages"
-                  element={<MessagesPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/messages/:messageid/chat"
-                  element={<SelectedMessagePage />}
-                />
-                <Route
-                  path="/linkup-request/:id"
-                  element={<AcceptDeclinePage />}
-                />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Route>
+              <Route
+                path="/send-request/:linkupId"
+                element={<SendRequestPage />}
+              />
+              <Route
+                path="/history"
+                element={<LinkupHistoryPage isMobile={isMobile} />}
+              />
+              <Route
+                path="/history/expired"
+                element={<LinkupHistoryPage isMobile={isMobile} />}
+              />
+              <Route
+                path="/history/requests-sent"
+                element={<LinkupHistoryPage isMobile={isMobile} />}
+              />
+              <Route
+                path="/history/requests-received"
+                element={<LinkupHistoryPage isMobile={isMobile} />}
+              />
+              <Route
+                path="/messages"
+                element={<MessagesPage isMobile={isMobile} />}
+              />
+              <Route
+                path="/messages/:messageid/chat"
+                element={<SelectedMessagePage />}
+              />
+              <Route
+                path="/linkup-request/:id"
+                element={<AcceptDeclinePage />}
+              />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
 
-              <Route
-                path="/test-notifications"
-                element={<NotificationsTestPage />}
-              />
-            </Routes>
-          </Router>
-        </div>
-      </SnackbarProvider>
+            <Route
+              path="/test-notifications"
+              element={<NotificationsTestPage />}
+            />
+          </Routes>
+        </Router>
+      </div>
+      {/* </SocketProvider> */}
     </ThemeProvider>
   );
 };

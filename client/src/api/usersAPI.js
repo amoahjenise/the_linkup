@@ -1,34 +1,44 @@
 import axios from "axios";
 
+// Add this configuration globally for Axios to include credentials
+// axios.defaults.withCredentials = true;
+
 const BASE_URL = process.env.REACT_APP_USER_SERVICE_URL;
+const AUTH_SERVICE_URL = process.env.REACT_APP_AUTH_SERVICE_URL;
 
-const handleError = (error, errorMessage) => {
+const refreshToken = async () => {
+  try {
+    const response = await axios.post(`${AUTH_SERVICE_URL}/api/refresh-token`, {
+      refreshToken: localStorage.getItem("refresh_token"),
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to refresh access token", error);
+    return { success: false };
+  }
+};
+export const handleError = async (error, errorMessage) => {
   console.error(errorMessage, error);
-  return {
-    success: false,
-    message: errorMessage,
-    error: error.message,
-  };
-};
-
-export const deleteUser = async (userId) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/delete-user/${userId}`);
-    console.log("deleteUser", response);
-    return response;
-  } catch (error) {
-    return handleError(error, "Failed to delete user");
+  if (error.response && error.response.status === 401) {
+    // If the error is due to an expired token, attempt to refresh the token
+    const response = await refreshToken();
+    if (response.success) {
+      // If token refresh is successful, retry the original API call
+      const { accessToken } = response;
+      if (accessToken) {
+        error.config.headers.Authorization = `Bearer ${accessToken}`;
+        return axios.request(error.config); // Retry the original request
+      } else {
+        // If there's still no access token, consider it an unauthorized error
+        return { unauthorizedError: true };
+      }
+    } else {
+      // If there's still no access token, consider it an unauthorized error
+      return { unauthorizedError: true };
+    }
   }
-};
-
-export const createUser = async (userData) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
-    console.log("createUser", response);
-    return response;
-  } catch (error) {
-    return handleError(error, "Failed to create new user.");
-  }
+  // Re-throw the original error if it's not an unauthorized error
+  throw error;
 };
 
 export const getUserById = async (userId) => {
@@ -36,10 +46,71 @@ export const getUserById = async (userId) => {
     const response = await axios.get(`${BASE_URL}/api/get-user-by-id`, {
       params: { userId },
     });
-    console.log("getUserById", response);
     return response;
   } catch (error) {
-    return handleError(error, "Failed to fetch user data.");
+    try {
+      const errorResult = await handleError(
+        error,
+        "Failed to fetch user data."
+      );
+      if (errorResult.unauthorizedError) {
+        // Return an error object indicating unauthorized
+        return { unauthorizedError: true };
+      }
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    } catch (error) {
+      // Handle errors from the `handleError` function if needed
+      console.error("Error in handleError:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/delete-user/${userId}`);
+    return response;
+  } catch (error) {
+    try {
+      return await handleError(error, "Failed to delete user");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
+  }
+};
+
+export const createUser = async (userData) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
+    return response;
+  } catch (error) {
+    try {
+      return await handleError(error, "Failed to create new user");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
   }
 };
 
@@ -51,10 +122,19 @@ export const updateUserBio = async (userId, bio) => {
         bio,
       }
     );
-    console.log("updateUserBio", response);
     return response;
   } catch (error) {
-    return handleError(error, "Failed to update the user's bio.");
+    try {
+      return await handleError(error, "Failed to update the user's bio.");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
   }
 };
 
@@ -66,10 +146,19 @@ export const updateUserAvatar = async (userId, avatar) => {
         avatar,
       }
     );
-    console.log("updateUserAvatar", response);
     return response;
   } catch (error) {
-    return handleError(error, "Failed to update the user's avatar.");
+    try {
+      return await handleError(error, "Failed to update the user's avatar.");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
   }
 };
 
@@ -78,12 +167,21 @@ export const setUserStatusActive = async (userId) => {
     const response = await axios.patch(
       `${BASE_URL}/api/set-user-status-active/${userId}`
     );
-    console.log("setUserStatusActive", response);
     return response;
   } catch (error) {
-    return handleError(
-      error,
-      "Failed to update the user's status to 'active'."
-    );
+    try {
+      return await handleError(
+        error,
+        "Failed to update the user's status to 'active'."
+      );
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
   }
 };

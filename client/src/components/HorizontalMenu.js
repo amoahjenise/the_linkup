@@ -8,8 +8,9 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import DeleteModal from "./DeleteModal";
 import EditLinkupModal from "./EditLinkupModal";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
-import { markLinkupAsCompleted, deleteLinkup } from "../api/linkupAPI";
+import { closeLinkup, deleteLinkup } from "../api/linkupAPI";
 import ConfirmationModal from "./ConfirmationModal"; // Import the ConfirmationModal component
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   moreIcon: {
@@ -21,7 +22,7 @@ const HorizontalMenu = ({
   showGoToItem,
   showEditItem,
   showDeleteItem,
-  showCompleteItem,
+  showCloseItem,
   linkupItem,
   menuAnchor,
   setMenuAnchor,
@@ -31,12 +32,13 @@ const HorizontalMenu = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
+  const { colorMode } = useColorMode();
 
   // Define a single state for both modals
   const [modalState, setModalState] = useState({
     isEditModalOpen: false,
     isDeleteModalOpen: false,
-    isCompleteConfirmationOpen: false,
+    isCloseConfirmationOpen: false,
   });
 
   const openModal = (modalName) => {
@@ -58,17 +60,17 @@ const HorizontalMenu = ({
     handleMenuClose();
   };
 
-  const handleCompleteClick = async () => {
+  const handleCloseClick = async () => {
     // Open the completion confirmation dialog
-    openModal("isCompleteConfirmationOpen");
+    openModal("isCloseConfirmationOpen");
     handleMenuClose(); // Close the main menu
   };
 
-  const handleCompleteConfirm = async () => {
+  const handleCloseConfirm = async () => {
     try {
-      const response = await markLinkupAsCompleted(linkupItem.id);
+      const response = await closeLinkup(linkupItem.id);
       const message = response.success
-        ? "Link-up completed successfully!"
+        ? "Link-up closed successfully!"
         : `Error completing link-up: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
@@ -128,6 +130,12 @@ const HorizontalMenu = ({
           vertical: "top",
           horizontal: "right",
         }}
+        PaperProps={{
+          style: {
+            backgroundColor:
+              colorMode === "dark" ? "rgba(78, 78, 98)" : "white",
+          },
+        }}
       >
         {[
           {
@@ -146,9 +154,9 @@ const HorizontalMenu = ({
             action: handleDeleteClick,
           },
           {
-            condition: showCompleteItem,
-            label: "Mark as completed",
-            action: handleCompleteClick,
+            condition: showCloseItem,
+            label: "Close this linkup",
+            action: handleCloseClick,
           },
         ].map(
           (item, index) =>
@@ -171,11 +179,19 @@ const HorizontalMenu = ({
       />
       {/* Use the ConfirmationModal */}
       <ConfirmationModal
-        open={modalState.isCompleteConfirmationOpen}
-        onClose={() => closeModal("isCompleteConfirmationOpen")}
-        onConfirm={handleCompleteConfirm}
-        title="Confirm Completion"
-        message="You're about to complete and close this linkup."
+        open={modalState.isCloseConfirmationOpen}
+        onClose={() => closeModal("isCloseConfirmationOpen")}
+        onConfirm={handleCloseConfirm}
+        title="Confirm"
+        message={
+          <>
+            Are you sure you want to close this linkup?
+            <br />
+            Once closed, no more requests can be received.
+            <br />
+            This action cannot be undone.
+          </>
+        }
       />
     </div>
   );

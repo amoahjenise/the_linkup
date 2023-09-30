@@ -17,10 +17,10 @@ const getImages = async (req, res) => {
         images: rows,
       });
     } else {
-      res.status(404).json({
-        success: false,
-        message: "Failed to fetch user images.",
-        images: null,
+      res.json({
+        success: true,
+        message: "Usser has no images.",
+        images: [],
       });
     }
   } catch (error) {

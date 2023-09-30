@@ -6,6 +6,8 @@ import {
   faHeart,
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
+import SplitBillIcon from "./SplitBillIcon";
+import PaymentIcon from "./PaymentIcon";
 
 const useStyles = makeStyles({
   root: {
@@ -57,6 +59,13 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         <FontAwesomeIcon icon={faEnvelope} className={classes.icon} />
         {disableRequest ? "Request Sent" : "Request"}
       </div>
+      <SplitBillIcon
+        person1Color="pink"
+        person2Color="blue"
+        width="40px"
+        height="40px"
+      />
+      <PaymentIcon width="40px" height="40px" color="blue" fontSize="35px" />
       {/* <div
         aria-expanded="false"
         aria-haspopup="menu"

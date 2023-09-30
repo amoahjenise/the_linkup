@@ -17,6 +17,8 @@ import ImageUploadModal from "../components/ImageUploadModal";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import { useColorMode } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -106,6 +108,9 @@ const UserProfilePage = ({ isMobile }) => {
   const { addSnackbar } = useSnackbar();
   const { colorMode } = useColorMode();
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const openImageUploadModal = () => {
     setImageUploadModalOpen(true);
   };
@@ -134,6 +139,11 @@ const UserProfilePage = ({ isMobile }) => {
       try {
         // Fetch user data
         const userDataResponse = await getUserById(userId);
+
+        if (userDataResponse.unauthorizedError) {
+          dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
+          navigate("/"); // Redirect to landing page
+        }
 
         if (userDataResponse?.data?.success) {
           setUserData(userDataResponse?.data?.user);
@@ -286,11 +296,11 @@ const UserProfilePage = ({ isMobile }) => {
 
               <div className={classes.leftMargin}>
                 {isMobile ? (
-                  <h5 style={{ marginLeft: "4px" }}>
+                  <h5 style={{ fontSize: "26px", marginLeft: "4px" }}>
                     {userData?.name}, {calculateAge(userData?.date_of_birth)}
                   </h5>
                 ) : (
-                  <h2 style={{ marginLeft: "4px" }}>
+                  <h2 style={{ fontSize: "26px", marginLeft: "4px" }}>
                     {userData?.name}, {calculateAge(userData?.date_of_birth)}
                   </h2>
                 )}

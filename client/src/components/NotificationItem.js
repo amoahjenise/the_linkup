@@ -4,6 +4,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
 import logo from "../logo.png";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   logo: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   unread: {
-    backgroundColor: "#F5F8FA",
+    backgroundColor: "rgba(220, 200, 220, 0.1)",
   },
   avatar: {
     marginLeft: theme.spacing(2),
@@ -48,6 +49,10 @@ const useStyles = makeStyles((theme) => ({
 
 const NotificationItem = ({ notification, onClick }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
+  const filterStyle =
+    colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none"; // Set filter style based on colorMode
 
   const getTimeAgo = () => {
     const now = moment();
@@ -77,7 +82,12 @@ const NotificationItem = ({ notification, onClick }) => {
     >
       <div className={classes.avatarContainer}>
         {notification.notification_type === "linkup_request" ? (
-          <img src={logo} alt="Logo" className={classes.logo} />
+          <img
+            src={logo}
+            alt="Logo"
+            className={classes.logo}
+            style={{ filter: filterStyle }}
+          />
         ) : (
           <img src="" alt="Logo" className={classes.logo} />
         )}

@@ -6,9 +6,10 @@ import FeedSection from "../components/FeedSection";
 import CreateLinkupForm from "../components/CreateLinkupForm";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-import { getLinkups, markLinkupsAsExpired } from "../api/linkupAPI";
+import { getLinkups } from "../api/linkupAPI";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import { useSocket } from "../SocketContext";
 import moment from "moment";
 import nlp from "compromise";
 const compromise = nlp;
@@ -25,12 +26,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: "auto",
     marginRight: "auto",
   },
-  editingFeedSection: {
-    overflowY: "hidden",
-  },
 }));
-
-const linkupSocketUrl = process.env.REACT_APP_LINKUP_SOCKET_IO_URL;
 
 const HomePage = ({ isMobile }) => {
   const classes = useStyles();
@@ -38,7 +34,6 @@ const HomePage = ({ isMobile }) => {
   const feedSectionRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
-  const [socket, setSocket] = useState(null);
   const dispatch = useDispatch();
 
   // Access user data from Redux store
@@ -58,10 +53,10 @@ const HomePage = ({ isMobile }) => {
         );
         dispatch(fetchLinkupsSuccess(activeLinkups));
       } else {
-        console.log(response.message);
+        console.error("Error fetching linkups:", response.message); // Changed from console.log to console.error
       }
     } catch (error) {
-      console.log("Error fetching linkups:", error);
+      console.error("Error fetching linkups:", error);
     } finally {
       setTimeout(() => {
         setIsLoading(false);
@@ -83,21 +78,6 @@ const HomePage = ({ isMobile }) => {
     }
   }, [dispatch, userId]);
 
-  const removeExpiredLinkups = useCallback(async () => {
-    try {
-      // Perform the API call to mark link-ups as expired
-      const result = await markLinkupsAsExpired();
-
-      if (result.success) {
-        return result; // Return the result if needed
-      } else {
-        console.log("Error marking link-ups as expired:", result.message);
-      }
-    } catch (error) {
-      console.log("Error marking link-ups as expired:", error);
-    }
-  }, []);
-
   const renderLinkupItemText = (data) => {
     const verb = compromise(data.activity).verbs().length > 0;
     const activityText = `The link up ${
@@ -113,49 +93,66 @@ const HomePage = ({ isMobile }) => {
     return `The link up ${activityText} at ${formattedLocation} on ${dateText} ${timeText} has expired.`;
   };
 
+  // Use the useSocket hook to get the socket instance
+  const socket = useSocket();
+
   useEffect(() => {
     if (shouldFetchLinkups) {
-      removeExpiredLinkups();
       fetchLinkups();
       setShouldFetchLinkups(false);
     }
-  }, [dispatch, fetchLinkups, removeExpiredLinkups, shouldFetchLinkups]);
+  }, [dispatch, fetchLinkups, shouldFetchLinkups]);
 
   useEffect(() => {
     // Fetch linkup requests when the component mounts
     fetchLinkupRequests();
   }, [fetchLinkupRequests]);
 
-  useEffect(() => {
-    // Initialize socket connection
-    const socket = io(linkupSocketUrl);
-    setSocket(socket);
+  // useEffect(() => {
+  //   if (socket) {
+  //     // Check if the socket is connected when the component mounts
+  //     if (socket.connected) {
+  //       console.log("Socket is connected to the server.");
 
-    // Listener for 'linkupsExpired' event
-    const handleLinkupsExpired = (expiredLinkups) => {
-      if (Array.isArray(expiredLinkups)) {
-        const timeout = 7000; // Set the desired timeout in milliseconds
+  //       // Add event listeners here
+  //       socket.on("linkupsExpired", (data) => {
+  //         handleLinkupsExpired(data);
+  //       });
 
-        console.log("Expired Link-Ups:", expiredLinkups);
-        expiredLinkups.forEach((expiredLinkup) => {
-          addSnackbar(renderLinkupItemText(expiredLinkup), { timeout });
-        });
-      } else {
-        // Handle the case where expiredLinkups is not an array or is undefined
-        console.error("Invalid expiredLinkups data:", expiredLinkups);
-      }
-    };
+  //       socket.on("connect_error", (error) => {
+  //         console.error("Socket.IO connection error:", error);
+  //       });
 
-    socket.on("linkupsExpired", (data) => {
-      handleLinkupsExpired(data);
-    });
+  //       // Example: Emit an event to the server
+  //       socket.emit("someEventFromClient", {
+  //         message: "Hello from the client!",
+  //       });
+  //     } else {
+  //       console.log("Socket is not connected.");
+  //     }
 
-    return () => {
-      // Clean up by disconnecting the socket and removing the event listener
-      socket.off("linkupsExpired", handleLinkupsExpired);
-      socket.disconnect();
-    };
-  }, [addSnackbar]);
+  //     return () => {
+  //       // Clean up by removing the event listener
+  //       socket.off("linkupsExpired");
+  //     };
+  //   }
+  // }, []);
+
+  // Listener for 'linkupsExpired' event
+  // const handleLinkupsExpired = (expiredLinkups) => {
+  //   console.log("handleLinkupsExpired", expiredLinkups);
+
+  //   if (Array.isArray(expiredLinkups)) {
+  //     const timeout = 7000; // Set the desired timeout in milliseconds
+  //     console.log("Expired Link-Ups:", expiredLinkups);
+  //     expiredLinkups.forEach((expiredLinkup) => {
+  //       addSnackbar(renderLinkupItemText(expiredLinkup), { timeout });
+  //     });
+  //   } else {
+  //     // Handle the case where expiredLinkups is not an array or is undefined
+  //     console.error("Invalid expiredLinkups data:", expiredLinkups);
+  //   }
+  // };
 
   // Define the callback function for scrolling to the top
   const scrollToTop = () => {
@@ -166,29 +163,19 @@ const HomePage = ({ isMobile }) => {
 
   return (
     <div className={classes.homePage}>
-      {isMobile ? (
-        <div className={classes.feedSection}>
-          <FeedSection
-            linkupList={linkupList}
-            isLoading={isLoading}
-            setShouldFetchLinkups={setShouldFetchLinkups}
-          />
-        </div>
-      ) : (
-        <div className={classes.homePage}>
-          <div className={classes.feedSection} ref={feedSectionRef}>
-            <FeedSection
-              linkupList={linkupList}
-              isLoading={isLoading}
-              setShouldFetchLinkups={setShouldFetchLinkups}
-            />
-          </div>
-          <CreateLinkupForm
-            socket={socket}
-            setShouldFetchLinkups={setShouldFetchLinkups}
-            scrollToTopCallback={scrollToTop}
-          />
-        </div>
+      <div className={classes.feedSection} ref={feedSectionRef}>
+        <FeedSection
+          linkupList={linkupList}
+          isLoading={isLoading}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+        />
+      </div>
+      {!isMobile && (
+        <CreateLinkupForm
+          // socket={socket}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          scrollToTopCallback={scrollToTop}
+        />
       )}
     </div>
   );

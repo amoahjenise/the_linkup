@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
+const helmet = require("helmet");
 const router = require("./routes/notificationRoutes");
 const cors = require("cors");
 const http = require("http");
 const { initSocketServer } = require("./socket/notificationSocket"); // Import the socket server initialization function
 
+// Use helmet middleware to set security headers
+app.use(helmet());
 app.use(express.json());
 
 app.use(
@@ -12,6 +15,7 @@ app.use(
     origin: ["http://localhost:3000"],
     methods: ["POST", "PUT"],
     optionsSuccessStatus: 200,
+    credentials: true, // Enable credentials for all routes
   })
 );
 

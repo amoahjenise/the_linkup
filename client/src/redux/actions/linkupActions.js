@@ -1,20 +1,11 @@
-import {
-  markLinkupsAsExpired as markLinkupsAsExpiredAPI,
-  updateLinkup as updateLinkupAPI,
-} from "../../api/linkupAPI";
+import { updateLinkup as updateLinkupAPI } from "../../api/linkupAPI";
 
 import {
   FETCH_LINKUPS_SUCCESS,
   SET_IS_LOADING,
   UPDATE_LINKUP_SUCCESS,
   UPDATE_LINKUP_LIST,
-  MARK_LINKUPS_AS_EXPIRED_SUCCESS,
 } from "./actionTypes";
-
-export const markLinkupsAsExpiredSuccess = (updatedLinkupList) => ({
-  type: MARK_LINKUPS_AS_EXPIRED_SUCCESS,
-  payload: updatedLinkupList,
-});
 
 export const updateLinkupSuccess = (updatedLinkup) => ({
   type: UPDATE_LINKUP_SUCCESS,
@@ -49,24 +40,6 @@ export const updateLinkup = (linkupId, updatedLinkupData) => {
       }
     } catch (error) {
       console.log("Error updating linkup:", error);
-    }
-  };
-};
-
-// Create the action for marking link-ups as expired
-export const markLinkupsAsExpired = () => {
-  return async (dispatch) => {
-    try {
-      // Perform the API call to mark link-ups as expired
-      const result = await markLinkupsAsExpiredAPI();
-
-      if (result.success) {
-        return result; // Return the result if needed
-      } else {
-        console.log("Error marking link-ups as expired:", result.message);
-      }
-    } catch (error) {
-      console.log("Error marking link-ups as expired:", error);
     }
   };
 };

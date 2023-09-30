@@ -14,4 +14,6 @@ FROM
   INNER JOIN users ON link_up_requests.receiver_id = users.id
 WHERE
   link_up_requests.receiver_id = $1::uuid
-  AND link_up_requests.hidden <> true;
+  AND link_up_requests.hidden <> true
+  ORDER BY
+  link_up_requests.created_at DESC; 

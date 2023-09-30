@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 const app = express();
 const router = require("./routes/linkupRequestRoutes");
 const cors = require("cors");
@@ -6,13 +7,17 @@ const cors = require("cors");
 // const socketIo = require("socket.io");
 // const linkupRequestSocket = require("./socket/linkupRequestSocket");
 
+// Use helmet middleware to set security headers
+app.use(helmet());
+
 app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3000"],
+    origin: ["http://localhost:3000"],
     methods: ["POST"],
     optionsSuccessStatus: 200,
+    credentials: true, // Enable credentials for all routes
   })
 );
 

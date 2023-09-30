@@ -18,7 +18,7 @@ import SecondStep from "../components/ProgressBarSteps/SecondStep";
 import ThirdStep from "../components/ProgressBarSteps/ThirdStep";
 import LastStep from "../components/ProgressBarSteps/LastStep";
 // Import API functions
-import { createUser } from "../api/usersAPI";
+import { registerUser } from "../api/authenticationAPI";
 
 const useStyles = makeStyles((theme) => ({
   buttonContainer: {
@@ -63,7 +63,7 @@ const RegistrationProcess = () => {
       };
 
       try {
-        const response = await createUser({ newUser: newUser });
+        const response = await registerUser({ newUser: newUser });
         if (response.data.success) {
           // Set the user data in the Redux store
           dispatch(setCurrentUser(response.data.user));
@@ -72,6 +72,7 @@ const RegistrationProcess = () => {
           // Reset local states
           setPassword("");
           setIsPasswordValid(false);
+          navigate("/home");
           // setName("");
           // setDateOfBirth("");
           // setGender("");

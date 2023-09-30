@@ -5,8 +5,8 @@ import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import {
   CheckCircleOutlined,
-  CloseOutlined,
   QueryBuilderOutlined,
+  CancelOutlined,
 } from "@material-ui/icons";
 import moment from "moment";
 import HorizontalMenu from "./HorizontalMenu";
@@ -23,17 +23,23 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: theme.spacing(1),
   },
   linkupDetails: {
     display: "flex",
     alignItems: "center",
+    marginRight: theme.spacing(4),
   },
   chip: {
-    width: "120px",
+    width: "140px",
     marginLeft: "auto",
   },
   pendingChip: {
     backgroundColor: "#f1c40f", // Yellow
+    color: theme.palette.text.secondary,
+  },
+  closedChip: {
+    backgroundColor: "#FB8913", // orange
     color: theme.palette.text.secondary,
   },
   completedChip: {
@@ -70,6 +76,8 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     switch (status) {
       case "active":
         return "Active";
+      case "closed":
+        return "Closed";
       case "completed":
         return "Completed";
       case "expired":
@@ -83,6 +91,8 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     switch (status) {
       case "active":
         return `${classes.chip} ${classes.pendingChip}`;
+      case "closed":
+        return `${classes.chip} ${classes.closedChip}`;
       case "completed":
         return `${classes.chip} ${classes.completedChip}`;
       case "expired":
@@ -96,10 +106,13 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     switch (status) {
       case "active":
         return <QueryBuilderOutlined />;
+      case "closed":
+        return <CheckCircleOutlined />;
       case "completed":
         return <CheckCircleOutlined />;
       case "expired":
-        return <CloseOutlined />;
+        return <CancelOutlined />;
+
       default:
         return null;
     }
@@ -122,7 +135,12 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     const dateText = date ? moment(date).format("MMM DD, YYYY") : "";
     const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
 
-    if (status === "active" || status === "completed" || status === "expired") {
+    if (
+      status === "active" ||
+      status === "closed" ||
+      status === "completed" ||
+      status === "expired"
+    ) {
       return `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText} with a gender preference for ${gender_preference}.`;
     } else if (status === "expired") {
       return `Link up ${activityText.toLowerCase()} on ${dateText} ${timeText} has expired.`;
@@ -148,7 +166,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
             showGoToItem={false}
             showEditItem={true}
             showDeleteItem={true}
-            showCompleteItem={true}
+            showCloseItem={true}
             linkupItem={linkup}
             setShouldFetchLinkups={setShouldFetchLinkups}
             menuAnchor={menuAnchor}

@@ -16,6 +16,7 @@ import { LockOutlined as LockOutlinedIcon } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/core/styles";
 import LoadingSpinner from "./LoadingSpinner";
 import { useNavigate } from "react-router-dom";
+import AuthService from "../AuthService";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -78,7 +79,8 @@ const UserAuthentication = () => {
       const result = await authenticateUser(phoneNumber, password);
       if (result.success) {
         // Save the access token in an HttpOnly cookie
-        document.cookie = `accessToken=${result.token}; path=/; HttpOnly`;
+        AuthService.setAccessToken(result.accessToken);
+        AuthService.setRefreshToken(result.refreshToken);
         dispatch(login());
         dispatch(setCurrentUser(result.user));
         if (deactivatedUser) {

@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const CreateLinkupForm = ({
-  socket,
+  // socket,
   updateLinkupList,
   scrollToTopCallback,
 }) => {
@@ -131,7 +131,7 @@ const CreateLinkupForm = ({
         gender_preference: genderPreference,
       });
 
-      if (socket && response.success) {
+      if (response.success) {
         // Update linkupList state with the new linkup
         updateLinkupList(response.newLinkup);
         // socket.emit("linkupCreated", response.newLinkup);

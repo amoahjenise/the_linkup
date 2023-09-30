@@ -27,8 +27,26 @@ const createLinkup = async (req, res) => {
   try {
     const { rows, rowCount } = await pool.query(query, queryValues);
     if (rowCount > 0) {
-      // Emit a real-time event to notify clients about the new linkup
-      socketIo.emit("linkupCreated", rows[0]);
+      const linkupId = rows[0].id;
+
+      // // On the server side, when a linkup is created:
+      // // Emit a real-time event to notify the creator of the new linkup
+      // const socketsMap = socketIo.sockets.sockets; // Access the 'sockets' property
+      // const socketKey = Array.from(socketsMap.keys())[0]; // Get the first (and only) key in the Map
+      // const creatorSocket = socketsMap.get(socketKey); // Get the value associated with the key
+
+      // console.log("creatorSocket", socketKey);
+      if (socketIo) {
+        socketIo.emit("linkupCreated", { linkupId });
+
+        // Create a room for the linkup (if not already created) and add the creator to it
+        // const linkupRoom =
+        //   socketIo.of("/linkup").adapter.rooms[`linkup-${linkupId}`];
+
+        // if (!linkupRoom) {
+        //   creatorSocket.join(`linkup-${linkupId}`);
+        // }
+      }
 
       res.json({
         success: true,
@@ -194,13 +212,10 @@ const updateLinkup = async (req, res) => {
   }
 };
 
-markLinkupAsCompleted = async (req, res) => {
+closeLinkup = async (req, res) => {
   const { linkupId } = req.params;
 
-  const queryPath = path.join(
-    __dirname,
-    "../db/queries/markLinkupAsCompleted.sql"
-  );
+  const queryPath = path.join(__dirname, "../db/queries/closeLinkup.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [linkupId];
 
@@ -227,50 +242,6 @@ markLinkupAsCompleted = async (req, res) => {
   }
 };
 
-const markLinkupsAsExpired = async (req, res) => {
-  const queryPath = path.join(
-    __dirname,
-    "../db/queries/markLinkupsAsExpired.sql"
-  );
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [];
-
-  try {
-    const { rows } = await pool.query(query, queryValues);
-    if (rows.length > 0) {
-      const expiredLinkups = rows;
-
-      // Iterate through expiredLinkups and emit notifications to creators
-      expiredLinkups.forEach((expiredLinkup) => {
-        const { creator_id } = expiredLinkup;
-
-        // Emit a real-time event to notify the creator of the expired link-up
-        // You might want to include information like linkup ID or details here
-        socketIo.emit("linkupsExpired", { creator_id: creator_id });
-      });
-
-      res.json({
-        success: true,
-        message: "Link-ups updated successfully",
-        linkupList: rows,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No link-ups to update",
-        linkupList: [],
-      });
-    }
-  } catch (error) {
-    console.error("Error updating link-ups:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update link-ups",
-      error: error.message,
-    });
-  }
-};
-
 module.exports = {
   initializeSocket,
   createLinkup,
@@ -278,6 +249,5 @@ module.exports = {
   getUserLinkups,
   deleteLinkup,
   updateLinkup,
-  markLinkupsAsExpired,
-  markLinkupAsCompleted,
+  closeLinkup,
 };

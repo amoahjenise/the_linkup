@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// Add this configuration globally for Axios to include credentials
+// axios.defaults.withCredentials = true;
+
 // Define the base URL of your server API
 const BASE_URL = process.env.REACT_APP_IMAGE_SERVICE_URL;
 

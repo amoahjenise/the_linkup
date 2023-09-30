@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// Add this configuration globally for Axios to include credentials
+// axios.defaults.withCredentials = true;
+
 const BASE_URL = process.env.REACT_APP_LINKUP_SERVICE_URL;
 
 const handleError = (error) => {
@@ -53,19 +56,10 @@ export const deleteLinkup = async (linkupId) => {
   }
 };
 
-export const markLinkupsAsExpired = async () => {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/mark-expired-linkups`);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-export const markLinkupAsCompleted = async (linkupId) => {
+export const closeLinkup = async (linkupId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/mark-linkup-as-completed/${linkupId}`
+      `${BASE_URL}/api/close-linkup/${linkupId}`
     );
     return response.data;
   } catch (error) {

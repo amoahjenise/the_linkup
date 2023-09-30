@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const { verifyAccessToken } = require("../middlewares/userAuthMiddleware");
 
 // Define routes
+// router.get("/get-user-by-id", verifyAccessToken, userController.getUserById);
 router.get("/get-user-by-id", userController.getUserById);
-router.post("/create-user", userController.createUser);
 router.post("/delete-user/:userId", userController.deleteUser);
 router.patch(
   "/set-user-status-active/:userId",

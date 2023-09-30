@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// Add this configuration globally for Axios to include credentials
+// axios.defaults.withCredentials = true;
+
 const BASE_URL = process.env.REACT_APP_NOTIFICATIONS_SERVICE_URL;
 
 const handleError = (error) => {

@@ -18,12 +18,13 @@ const drawerWidth = "20%";
 const useStyles = makeStyles((theme) => ({
   main: {
     flex: "0 0 " + drawerWidth,
-    padding: theme.spacing(2),
+    padding: theme.spacing(4),
     borderRight: "0.1px solid lightgrey",
+    position: "sticky",
   },
   menu: {
     flex: "0 0 " + drawerWidth,
-    marginLeft: theme.spacing(12),
+    marginLeft: theme.spacing(10),
   },
   menuList: {
     listStyleType: "none",
@@ -56,9 +57,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     textDecoration: "none",
   },
-  badge: {
-    marginLeft: theme.spacing(2),
-  },
   logoContainer: {
     [theme.breakpoints.down("sm")]: {
       marginBottom: theme.spacing(2),
@@ -67,6 +65,7 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     height: "50px",
     marginBottom: theme.spacing(2),
+    backgroundColor: "#000", // Set the background color to black
   },
 }));
 
@@ -76,6 +75,10 @@ const LeftMenu = ({ isMobile }) => {
     (state) => state.notifications.unreadCount
   );
   const location = useLocation(); // Get the current route location
+  const { colorMode } = useColorMode();
+
+  const filterStyle =
+    colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none"; // Set filter style based on colorMode
 
   return (
     <div className={isMobile ? classes.mobileMenuContainer : classes.main}>
@@ -120,7 +123,12 @@ const LeftMenu = ({ isMobile }) => {
         <div className={classes.menu}>
           <ul className={classes.menuList}>
             <div className={classes.logoContainer}>
-              <img src={logo} alt="Logo" className={classes.logo} />
+              <img
+                src={logo}
+                alt="Logo"
+                className={classes.logo}
+                style={{ filter: filterStyle }}
+              />
             </div>
             <MenuItem
               to="/home"
@@ -178,7 +186,6 @@ const MenuItem = ({ to, icon, text, badgeContent, location }) => {
   const activeTabBackgroundColor =
     colorMode === "dark" ? "rgba(18, 28, 38, 0.9)" : "#F5F8FA";
   const activeTabBorderColor = colorMode === "dark" ? "transparent" : "#F1F1FA";
-
   const isItemActive = location.startsWith(to);
 
   const menuItemStyle = {
@@ -198,14 +205,13 @@ const MenuItem = ({ to, icon, text, badgeContent, location }) => {
     >
       <Link to={to} className={classes.menuItemLink} style={menuItemStyle}>
         {icon}
-        <div style={{ marginLeft: "8px" }}>{text}</div>{" "}
+        <div style={{ marginRight: "24px" }}>{text}</div>{" "}
         {badgeContent > 0 && (
           <Badge
             className={classes.badge}
             badgeContent={parseInt(badgeContent)}
             overlap="rectangular"
             color="secondary"
-            style={{ marginLeft: "8px" }}
           ></Badge>
         )}
       </Link>

@@ -27,45 +27,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  const { newUser } = req.body;
-
-  try {
-    // Hash the password before storing it in the database
-    const hashedPassword = await bcrypt.hash(newUser.password.trim(), 10);
-
-    // Insert the user into the database
-    const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
-    const query = fs.readFileSync(queryPath, "utf8");
-    const queryValues = [
-      newUser.phoneNumber,
-      hashedPassword,
-      newUser.name,
-      newUser.gender,
-      newUser.dateOfBirth,
-      newUser.avatarURL,
-    ];
-
-    const { rows, rowCount } = await pool.query(query, queryValues);
-
-    if (rowCount > 0) {
-      // Return the created user data in the response
-      res.json({
-        success: true,
-        message: "New user created successfully!",
-        user: rows[0],
-      });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: "Failed to create user" });
-    }
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ success: false, message: "Failed to create user" });
-  }
-};
-
 const getUserById = async (req, res) => {
   const { userId } = req.query;
   const queryPath = path.join(__dirname, "../db/queries/getUserById.sql");
@@ -80,7 +41,9 @@ const getUserById = async (req, res) => {
       res.json({ success: true, message: "User exists", user: rows[0] });
     } else {
       // User not found
-      res.json({ success: false, message: "User not found", user: null });
+      res
+        .status(404)
+        .json({ success: false, message: "User not found", user: null });
     }
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -181,7 +144,6 @@ const setUserStatusActive = async (req, res) => {
 };
 
 module.exports = {
-  createUser,
   deleteUser,
   getUserById,
   updateUserBio,

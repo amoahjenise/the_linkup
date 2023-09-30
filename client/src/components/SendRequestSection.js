@@ -20,14 +20,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SendRequestSection = ({ linkupId, linkups }) => {
+const SendRequestSection = ({ linkupId, linkups, colorMode }) => {
   const classes = useStyles();
 
   return (
     <div className={classes.container}>
       <TopNavBar title="Request a Link Up" />
       <div className={classes.messagesContainer}>
-        <SendRequest linkups={linkups} linkupId={linkupId} />
+        <SendRequest
+          linkups={linkups}
+          linkupId={linkupId}
+          colorMode={colorMode}
+        />
       </div>
     </div>
   );

@@ -1,34 +1,48 @@
 const express = require("express");
-const app = express();
-const router = require("./routes/linkupRoutes");
-const cors = require("cors");
+const helmet = require("helmet");
 const http = require("http");
 const socketIo = require("socket.io");
+const {
+  scheduleLinkupExpiryJob,
+} = require("./scheduled-jobs/linkup-expiry-job");
+const cors = require("cors");
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["POST", "GET", "PATCH", "DELETE"],
+  },
+});
+
+// Import your event handlers
 const linkupSocket = require("./socket/linkupSocket");
 
+// Use helmet middleware to set security headers
+app.use(helmet());
 app.use(express.json());
-
 app.use(
   cors({
     origin: ["http://localhost:3000"],
     methods: ["POST", "GET", "PATCH", "DELETE"],
-    optionsSuccessStatus: 200,
+    // credentials: true,
   })
 );
 
-app.use("/api", router);
+// Define and use the route files for linkups and users
+const linkupRoutes = require("./routes/linkupRoutes");
+app.use("/api", linkupRoutes);
 
-const server = http.createServer(app);
+// Initialize socket event handlers
+linkupSocket(io);
 
-// Configure CORS for Socket.IO
-const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:3000", // Allow connections from the frontend
-    methods: ["GET", "POST"],
-  },
-});
+// Call the initializeSocket function with the io object
+const { initializeSocket } = require("./controllers/linkupController");
+initializeSocket(io);
 
-linkupSocket(io); // Initialize socket.io with the server instance
+// Schedule the job to run every minute
+scheduleLinkupExpiryJob(io);
 
 const PORT = process.env.PORT || 3003;
 server.listen(PORT, () => {

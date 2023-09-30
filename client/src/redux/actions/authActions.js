@@ -1,4 +1,4 @@
-import { logout } from "../../api/authenticationAPI";
+import { clearAccessToken } from "../../api/authenticationAPI";
 import {
   LOGIN,
   LOGOUT,
@@ -24,15 +24,6 @@ export const updateDeactivatedUser = (user) => ({
 
 // Action creator for logout
 export const performLogout = () => async (dispatch) => {
-  try {
-    // Call your logout API function
-    const response = await logout();
-
-    if (response.success) {
-      // Dispatch the logout action to update the Redux state
-      dispatch({ type: LOGOUT });
-    }
-  } catch (error) {
-    console.error("Error during logout:", error);
-  }
+  // Dispatch the logout action to update the Redux state
+  dispatch({ type: LOGOUT });
 };

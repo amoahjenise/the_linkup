@@ -40,13 +40,13 @@ const useStyles = makeStyles((theme) => ({
   locationDetails: {
     display: "flex",
     fontSize: theme.typography.body2.fontSize,
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
     justifyContent: "center",
     alignItems: "center",
   },
 }));
 
-const SendRequest = ({ linkupId, linkups }) => {
+const SendRequest = ({ linkupId, linkups, colorMode }) => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
@@ -58,6 +58,11 @@ const SendRequest = ({ linkupId, linkups }) => {
   const classes = useStyles();
   const [message, setMessage] = useState("");
   const navigate = useNavigate(); // useNavigate hook for navigation
+
+  const textColor =
+    colorMode === "dark"
+      ? "white" // Dark mode background color with no transparency
+      : "black";
 
   const handleSendRequest = async () => {
     // Implement the logic to send the request with the message
@@ -97,9 +102,9 @@ const SendRequest = ({ linkupId, linkups }) => {
         />
         <div className={classes.linkUpInfo}>
           <div>{renderPostText()}</div>
-          <p className={classes.locationDetails}>
+          <span className={classes.locationDetails}>
             Location details will be provided if the request gets accepted.
-          </p>
+          </span>
         </div>
         <TextField
           className={classes.messageInput}
@@ -109,6 +114,8 @@ const SendRequest = ({ linkupId, linkups }) => {
           variant="outlined"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          InputProps={{ style: { color: textColor } }}
+          InputLabelProps={{ style: { color: textColor } }}
         />
         <div className="cta-buttons">
           <Button

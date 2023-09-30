@@ -31,8 +31,6 @@ const getNotifications = async (req, res) => {
 
   try {
     const { rows } = await pool.query(query, values);
-    console.log("ROWS", JSON.stringify(rows[5]));
-
     res.json(rows); // Send the response back to the client
   } catch (error) {
     console.error("Error fetching unread notifications:", error);

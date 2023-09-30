@@ -7,12 +7,25 @@ const handleError = (error, action) => {
   throw error;
 };
 
+export const registerUser = async (userData) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/register-user`,
+      userData
+    );
+    return response;
+  } catch (error) {
+    return handleError(error, "Failed to create new user.");
+  }
+};
+
 export const authenticateUser = async (phoneNumber, password) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/authenticate-user`, {
-      phoneNumber,
-      password,
-    });
+    const response = await axios.post(
+      `${BASE_URL}/api/authenticate-user`,
+      { phoneNumber, password },
+      { withCredentials: true } // Set withCredentials to true in the request config
+    );
     return response.data;
   } catch (error) {
     handleError(error, "authenticating user");
@@ -59,47 +72,22 @@ export const sendVerificationCode = async (phoneNumber) => {
   }
 };
 
-export const verifyRefreshToken = async (refreshToken) => {
+export const verifyRefreshToken = async (userId) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/verify-refresh-token`,
-      { refreshToken },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${refreshToken}`,
-        },
-      }
-    );
+    const response = await axios.post(`${BASE_URL}/api/verify-refresh-token`, {
+      userId,
+    });
     return response.data;
   } catch (error) {
     handleError(error, "verifying refresh token");
   }
 };
 
-export const verifyAccessToken = async (accessToken) => {
+export const clearAccessToken = async () => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/verify-access-token`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await axios.post(`${BASE_URL}/api/clear-access-token`);
     return response.data;
   } catch (error) {
-    handleError(error, "verifying access token");
-  }
-};
-
-export const logout = async () => {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/logout`);
-    return response.data;
-  } catch (error) {
-    handleError(error, "logging out");
+    handleError(error, "clearing access token");
   }
 };

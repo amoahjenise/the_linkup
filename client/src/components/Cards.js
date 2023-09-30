@@ -10,8 +10,8 @@ const useStyles = makeStyles((theme) => ({
   },
   cardsContainer: {
     position: "relative",
-    width: "400px",
-    height: "400px",
+    width: "410px",
+    height: "410px",
     overflow: "hidden",
     boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)",
     marginBottom: theme.spacing(1),
