@@ -32,7 +32,9 @@ const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
                 key={linkup.id}
                 linkupItem={linkup}
                 setShouldFetchLinkups={setShouldFetchLinkups}
-                disableRequest={userSentRequests.includes(linkup.id)}
+                disableRequest={userSentRequests.some(
+                  (request) => request.linkup_id === linkup.id
+                )}
               />
             ))
           )}
