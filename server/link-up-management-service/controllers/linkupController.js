@@ -142,6 +142,34 @@ const getUserLinkups = async (req, res) => {
   }
 };
 
+const getLinkupStatus = async (req, res) => {
+  const { linkupId } = req.params;
+  console.log("UO", linkupId);
+  const queryPath = path.join(__dirname, "../db/queries/getLinkupStatus.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [linkupId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    if (rows.length > 0) {
+      const status = rows[0].status;
+      res.json({
+        success: true,
+        message: "Linkup status fetched successfully",
+        linkupStatus: status,
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching linkup status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch linkup status",
+      error: error.message,
+    });
+  }
+};
+
 const deleteLinkup = async (req, res) => {
   const { id } = req.query;
 
@@ -213,31 +241,31 @@ const updateLinkup = async (req, res) => {
   }
 };
 
-closeLinkup = async (req, res) => {
+const closeLinkup = async (req, res) => {
   const { linkupId } = req.params;
-
   const queryPath = path.join(__dirname, "../db/queries/closeLinkup.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [linkupId];
 
   try {
     const { rows } = await pool.query(query, queryValues);
+    console.log("closeLinkup: ", rows);
+
     if (rows.length > 0) {
       // Emit a real-time event to notify clients about the completed link-up
-      const completedLinkup = rows;
-      //  socketIo.emit("linkupCompleted", completedLinkup);
+      const closedLinkup = rows;
 
       res.json({
         success: true,
-        message: "Link-up completed successfully",
-        linkupList: rows,
+        message: "Link-up closed.",
+        linkupList: rows[0],
       });
     }
   } catch (error) {
-    console.error("Error completing the link-up:", error);
+    console.error("Error closing the link-up:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to complete the link-up",
+      message: "Failed to close the link-up",
       error: error.message,
     });
   }
@@ -247,6 +275,7 @@ module.exports = {
   initializeSocket,
   createLinkup,
   getLinkups,
+  getLinkupStatus,
   getUserLinkups,
   deleteLinkup,
   updateLinkup,

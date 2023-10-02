@@ -34,6 +34,17 @@ export const getUserLinkups = async (userId) => {
   }
 };
 
+export const getLinkupStatus = async (linkupId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/get-linkup-status/${linkupId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export const createLinkup = async (linkUpData) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/create-linkup`, {

@@ -10,6 +10,9 @@ import PostActions from "./PostActions";
 import LinkRounded from "@material-ui/icons/LinkRounded";
 import LinkTwoTone from "@material-ui/icons/LinkTwoTone";
 import nlp from "compromise";
+import { useSnackbar } from "../contexts/SnackbarContext";
+import { getLinkupStatus } from "../api/linkupAPI";
+
 const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
@@ -74,8 +77,26 @@ const LinkupItem = React.memo(
       type,
     } = linkupItem;
     const [menuAnchor, setMenuAnchor] = useState(null);
+    const { addSnackbar } = useSnackbar();
 
-    const handleRequestLinkup = () => {
+    const handleRequestLinkup = async () => {
+      const response = await getLinkupStatus(id);
+      if (response.linkupStatus === "expired") {
+        setShouldFetchLinkups(true);
+
+        addSnackbar("This linkup has expired.", { timeout: 7000 });
+        return;
+      }
+
+      if (response.linkupStatus === "closed") {
+        setShouldFetchLinkups(true);
+        addSnackbar(
+          "This linkup was closed and can no longer receive requests.",
+          { timeout: 7000 }
+        );
+        return;
+      }
+
       const destination = disableRequest
         ? `/history/requests-sent`
         : `/send-request/${id}`;

@@ -47,6 +47,8 @@ const useStyles = makeStyles((theme) => ({
   requestText: {
     margin: 0,
     marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   acceptButton: {
     backgroundColor: "#00CFFF",

@@ -71,12 +71,12 @@ const HorizontalMenu = ({
       const response = await closeLinkup(linkupItem.id);
       const message = response.success
         ? "Link-up closed successfully!"
-        : `Error completing link-up: ${response.message}`;
+        : `Error closing the link-up: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
     } catch (error) {
       console.error("An error occurred:", error);
-      addSnackbar("An error occurred while completing the link-up", {
+      addSnackbar("An error occurred while closing the link-up", {
         variant: "error",
       });
     } finally {
