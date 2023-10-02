@@ -1,12 +1,9 @@
--- WITH updated_request AS (
+WITH updated_linkup_request AS (
   UPDATE link_up_requests
   SET status = 'declined'
   WHERE id = $1::uuid
-  RETURNING linkup_id
--- )
--- UPDATE link_ups AS lu
--- SET status = 'declined'
--- FROM updated_request ur
--- WHERE lu.id = ur.linkup_id
--- RETURNING lu.id, lu.creator_name, lu.activity, lu.location, lu.date AS link_up_date;
-
+  RETURNING *
+)
+SELECT lr.*, lu.activity, lu.creator_name
+FROM updated_linkup_request lr
+JOIN link_ups lu ON lr.linkup_id = lu.id;

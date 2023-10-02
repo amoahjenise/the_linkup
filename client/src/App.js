@@ -29,9 +29,6 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ToggleColorMode from "./components/ToggleColorMode";
 import "./App.css";
 
-// // Import the SocketProvider
-// import { SocketProvider } from "./SocketContext";
-
 const useStyles = makeStyles((theme) => ({
   app: {
     display: "flex",

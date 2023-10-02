@@ -1,42 +1,33 @@
 const express = require("express");
 const helmet = require("helmet");
-const app = express();
-const router = require("./routes/linkupRequestRoutes");
+const http = require("http");
 const cors = require("cors");
-// const http = require("http");
-// const socketIo = require("socket.io");
-// const linkupRequestSocket = require("./socket/linkupRequestSocket");
+const app = express();
+const server = http.createServer(app);
+
+// Import your event handlers
+const linkupRequestSocket = require("./socket/linkupRequestSocket");
 
 // Use helmet middleware to set security headers
 app.use(helmet());
-
 app.use(express.json());
-
 app.use(
   cors({
     origin: ["http://localhost:3000"],
-    methods: ["POST"],
-    optionsSuccessStatus: 200,
-    credentials: true, // Enable credentials for all routes
+    methods: ["POST", "GET", "PATCH", "DELETE"],
   })
 );
 
-app.use("/api", router);
+// Define and use the route files for linkups and users
+const linkupRequestRoutes = require("./routes/linkupRequestRoutes");
+app.use("/api", linkupRequestRoutes);
 
-// const server = http.createServer(app);
+// Initialize socket event handlers
+const { initializeSocket } = require("./controllers/linkupRequestController");
+const io = linkupRequestSocket(server);
+initializeSocket(io);
 
-// Configure CORS for Socket.IO
-// const io = socketIo(server, {
-//   cors: {
-//     origin: "http://localhost:3000", // Allow connections from the frontend
-//     methods: ["GET", "POST"],
-//   },
-// });
-
-// Pass the io instance to linkupRequestSocket module
-// linkupRequestSocket.initializeSocket(io);
-
-const PORT = process.env.PORT || 3004;
-app.listen(PORT, () => {
-  console.log(`Link-up request service running on port ${PORT}`);
+const PORT = process.env.PORT || 3003;
+server.listen(PORT, () => {
+  console.log(`Link-up service running on port ${PORT}`);
 });

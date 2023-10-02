@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
   chip: {
     width: "110px",
-    marginLeft: "auto",
+    marginR: "auto",
   },
   pendingChip: {
     backgroundColor: "#f1c40f", // Yellow
@@ -111,6 +111,8 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         return <CheckCircleOutlined />;
       case "declined":
         return <CloseOutlined />;
+      case "expired":
+        return <CloseOutlined />;
       default:
         return null;
     }
@@ -124,6 +126,8 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         return "accepted";
       case "declined":
         return "declined";
+      case "expired":
+        return "Expired";
       default:
         return null;
     }
@@ -136,6 +140,8 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
       case "accepted":
         return `${classes.chip} ${classes.acceptedChip}`;
       case "declined":
+        return `${classes.chip} ${classes.declinedChip}`;
+      case "expired":
         return `${classes.chip} ${classes.declinedChip}`;
       default:
         return null;
@@ -175,23 +181,27 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
 
   return (
     <div className={classes.linkupRequestItem}>
-      <UserAvatar
-        userData={{
-          id: isMyLinkup ? post.requester_id : post.creator_id,
-          name: isMyLinkup ? post.requester_name : post.creator_name,
-          avatar: isMyLinkup ? post.receiver_avatar : post.avatar,
-        }}
-        width="40px"
-        height="40px"
-      />
       <div>
-        <p className={classes.requestText}>{renderLinkupItemText()}</p>
-        {isMyLinkup && (
-          <Typography variant="subtitle2" component="details">
-            <span>{post.location}</span>
-          </Typography>
-        )}
+        <UserAvatar
+          userData={{
+            id: isMyLinkup ? post.requester_id : post.creator_id,
+            name: isMyLinkup ? post.requester_name : post.creator_name,
+            avatar: isMyLinkup ? post.receiver_avatar : post.avatar,
+          }}
+          width="40px"
+          height="40px"
+        />
+        <div>
+          <p className={classes.requestText}>{renderLinkupItemText()}</p>
+          {isMyLinkup ||
+            (post.status === "accepted" && (
+              <Typography variant="subtitle2" component="details">
+                <span>{post.location}</span>
+              </Typography>
+            ))}
+        </div>
       </div>
+
       {userId === post.receiver_id ? (
         <div>
           {post.status === "pending" ? (

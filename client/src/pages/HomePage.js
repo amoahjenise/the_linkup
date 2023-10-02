@@ -9,7 +9,7 @@ import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { getLinkups } from "../api/linkupAPI";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { useSocket } from "../SocketContext";
+// import { useSocket } from "../SocketContext";
 import moment from "moment";
 import nlp from "compromise";
 const compromise = nlp;
@@ -93,8 +93,8 @@ const HomePage = ({ isMobile }) => {
     return `The link up ${activityText} at ${formattedLocation} on ${dateText} ${timeText} has expired.`;
   };
 
-  // Use the useSocket hook to get the socket instance
-  const socket = useSocket();
+  // // Use the useSocket hook to get the socket instance
+  // const socket = useSocket();
 
   useEffect(() => {
     if (shouldFetchLinkups) {

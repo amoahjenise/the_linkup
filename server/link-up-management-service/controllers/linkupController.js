@@ -27,25 +27,26 @@ const createLinkup = async (req, res) => {
   try {
     const { rows, rowCount } = await pool.query(query, queryValues);
     if (rowCount > 0) {
-      const linkupId = rows[0].id;
-
+      const newLinkup = rows[0];
       // // On the server side, when a linkup is created:
       // // Emit a real-time event to notify the creator of the new linkup
-      // const socketsMap = socketIo.sockets.sockets; // Access the 'sockets' property
-      // const socketKey = Array.from(socketsMap.keys())[0]; // Get the first (and only) key in the Map
-      // const creatorSocket = socketsMap.get(socketKey); // Get the value associated with the key
+      const socketsMap = socketIo.sockets.sockets; // Access the 'sockets' property
+      const socketKey = Array.from(socketsMap.keys())[0]; // Get the first (and only) key in the Map
+      const socket = socketsMap.get(socketKey); // Get the value associated with the key
 
       // console.log("creatorSocket", socketKey);
-      if (socketIo) {
-        socketIo.emit("linkupCreated", { linkupId });
+      if (socket && socketIo) {
+        // Emit linkupCreated event to all connected users
+        // socketIo.emit("linkupCreated", { id: newLinkup.id });
 
-        // Create a room for the linkup (if not already created) and add the creator to it
-        // const linkupRoom =
-        //   socketIo.of("/linkup").adapter.rooms[`linkup-${linkupId}`];
+        // Emit linkupCreated event to creator of the linkup only
+        socketIo
+          .to(`user-${newLinkup.creator_id}`)
+          .emit("linkupCreated", { id: newLinkup.id });
 
-        // if (!linkupRoom) {
-        //   creatorSocket.join(`linkup-${linkupId}`);
-        // }
+        // Create a room for the linkup and add the creator to it
+        const linkupRoomName = `linkup-${newLinkup.id}`;
+        socket.join(linkupRoomName);
       }
 
       res.json({

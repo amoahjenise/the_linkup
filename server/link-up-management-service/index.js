@@ -1,20 +1,13 @@
 const express = require("express");
 const helmet = require("helmet");
 const http = require("http");
-const socketIo = require("socket.io");
+const cors = require("cors");
 const {
   scheduleLinkupExpiryJob,
 } = require("./scheduled-jobs/linkup-expiry-job");
-const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["POST", "GET", "PATCH", "DELETE"],
-  },
-});
 
 // Import your event handlers
 const linkupSocket = require("./socket/linkupSocket");
@@ -26,7 +19,6 @@ app.use(
   cors({
     origin: ["http://localhost:3000"],
     methods: ["POST", "GET", "PATCH", "DELETE"],
-    // credentials: true,
   })
 );
 
@@ -35,10 +27,8 @@ const linkupRoutes = require("./routes/linkupRoutes");
 app.use("/api", linkupRoutes);
 
 // Initialize socket event handlers
-linkupSocket(io);
-
-// Call the initializeSocket function with the io object
 const { initializeSocket } = require("./controllers/linkupController");
+const io = linkupSocket(server);
 initializeSocket(io);
 
 // Schedule the job to run every minute

@@ -38,6 +38,9 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
+  // Add a state to track changes in unreadCount
+  const [unreadCountChanged, setUnreadCountChanged] = useState(0);
+
   const fetchUnreadNotifications = useCallback(async () => {
     try {
       const response = await getNotifications(id);
@@ -55,19 +58,29 @@ const Notifications = () => {
     fetchUnreadNotifications();
   }, [fetchUnreadNotifications]);
 
+  // Update component when unreadNotificationsCount changes
+  useEffect(() => {
+    // Update unread count when it changes
+    if (unreadNotificationsCount !== unreadCountChanged) {
+      fetchUnreadNotifications();
+      setUnreadCountChanged(unreadNotificationsCount);
+    }
+  }, [unreadNotificationsCount, fetchUnreadNotifications, unreadCountChanged]);
+
   const handleNotificationClick = async (notification) => {
-    if (notification.notification_type === "linkup_request") {
-      try {
-        if (notification.is_read === false) {
-          markNotificationAsRead(notification.id);
-          dispatch(
-            updateUnreadNotificationsCount(unreadNotificationsCount - 1)
-          );
-        }
-        navigate("/history/requests-received");
-      } catch (error) {
-        console.log("Error marking notification as read:", error);
+    try {
+      if (notification.is_read === false) {
+        markNotificationAsRead(notification.id);
+        dispatch(updateUnreadNotificationsCount(unreadNotificationsCount - 1));
       }
+
+      if (notification.notification_type === "linkup_request") {
+        navigate("/history/requests-received");
+      } else if (notification.notification_type === "linkup_request_action") {
+        navigate("/history/requests-sent");
+      }
+    } catch (error) {
+      console.log("Error marking notification as read:", error);
     }
   };
 

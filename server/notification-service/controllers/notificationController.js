@@ -43,8 +43,6 @@ const createNotification = async (data) => {
 
   const { creatorId, requesterId, type, content, linkupId } = data;
 
-  console.log("TYPE:", data);
-
   const queryPath = path.join(
     __dirname,
     "../db/queries/createNotification.sql"

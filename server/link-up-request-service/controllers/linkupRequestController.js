@@ -5,8 +5,17 @@ const path = require("path");
 const { pool } = require("../db");
 const io = require("socket.io-client");
 const NOTIFICATION_SERVICE_URL = "http://localhost:3005";
+const LINKUP_MANAGEMENT_SERVICE_URL = "http://localhost:3003";
 
-const socket = io(NOTIFICATION_SERVICE_URL); // Initialize socket connection to notification service
+const notificationSocket = io(NOTIFICATION_SERVICE_URL); // Initialize socket connection to notification service
+const linkupSocket = io(LINKUP_MANAGEMENT_SERVICE_URL); // Initialize socket connection to notification service
+
+let linkupRequestSocket;
+
+// Function to initialize the Socket.IO instance
+const initializeSocket = (io) => {
+  linkupRequestSocket = io;
+};
 
 const {
   createNotification,
@@ -28,6 +37,10 @@ const sendRequest = async (req, res) => {
     var { rows } = await pool.query(query, queryValues);
 
     if (rows.length > 0) {
+      // Notify all users in the link-up room about a new link-up request
+      const roomName = `linkup-${linkupId}`;
+      // linkupSocket.to(roomName).emit("new-linkup-request", notificationData);
+
       // Create a new conversation
 
       // Post Notification
@@ -42,7 +55,6 @@ const sendRequest = async (req, res) => {
       // Post Notification
       const notificationData = {
         creatorId: creator_id,
-        requesterName: requesterName,
         requesterId: requesterId,
         type: "linkup_request",
         linkupId: linkupId,
@@ -53,11 +65,18 @@ const sendRequest = async (req, res) => {
 
       if (notificationID) {
         try {
-          // Emit the user ID to store the socket connection
-          socket.emit("store-user-id", requesterId);
+          // // Emit the user ID to store the socket connection
+          // socket.emit("store-user-id", requesterId);
 
           // Emit the new linkup request event
-          socket.emit("new-linkup-request", notificationData);
+          // notificationSocket.emit("new-linkup-request", notificationData);
+
+          linkupRequestSocket
+            .to(`user-${creator_id}`)
+            .emit("new-linkup-request", notificationData);
+
+          // Emit the "join-linkup-room" event to make the user join the room
+          linkupSocket.emit("join-linkup-room", linkupId);
 
           res.json({
             success: true,
@@ -90,14 +109,32 @@ const acceptRequest = async (req, res) => {
 
   try {
     const { rows } = await pool.query(query, queryValues);
-    console.log(rows);
     if (rows.length > 0) {
       const linkupRequest = rows[0];
-      res.json({
-        success: true,
-        message: "Approved request successfully",
-        linkupRequest: linkupRequest,
-      });
+
+      // Post Notification
+      const notificationData = {
+        creatorId: linkupRequest.requester_id,
+        requesterId: linkupRequest.requester_id,
+        type: "linkup_request_action",
+        linkupId: linkupRequest.linkup_id,
+        content: `${linkupRequest.creator_name} accepted your request for ${linkupRequest.activity}.`,
+      };
+
+      var notificationID = await createNotification(notificationData);
+
+      if (notificationID) {
+        // Emit request-accepted event to the requester of the linkup only
+        linkupRequestSocket
+          .to(`user-${linkupRequest.requester_id}`)
+          .emit("request-accepted", notificationData);
+
+        res.json({
+          success: true,
+          message: "Approved request successfully",
+          linkupRequest: linkupRequest,
+        });
+      }
     }
   } catch (error) {
     res.status(500).json({
@@ -120,11 +157,29 @@ const declineRequest = async (req, res) => {
 
     if (rows.length > 0) {
       const linkupRequest = rows[0];
-      res.json({
-        success: true,
-        message: "Decline request successfully",
-        linkupRequest: linkupRequest,
-      });
+
+      // Post Notification
+      const notificationData = {
+        creatorId: linkupRequest.requester_id,
+        requesterId: linkupRequest.requester_id,
+        type: "linkup_request_action",
+        linkupId: linkupRequest.linkup_id,
+        content: `${linkupRequest.creator_name} declined your request for ${linkupRequest.activity}.`,
+      };
+
+      var notificationID = await createNotification(notificationData);
+
+      if (notificationID) {
+        // Emit request-accepted event to the requester of the linkup only
+        linkupRequestSocket
+          .to(`user-${linkupRequest.requester_id}`)
+          .emit("request-declined", notificationData);
+        res.json({
+          success: true,
+          message: "Decline request successfully",
+          linkupRequest: linkupRequest,
+        });
+      }
     }
   } catch (error) {
     res.status(500).json({
@@ -182,6 +237,7 @@ const getSentRequests = async (req, res) => {
 
     if (rows.length > 0) {
       const linkupRequests = rows;
+
       res.json({
         success: true,
         message: "Sent requests fetched successfully",
@@ -253,8 +309,6 @@ const getRequestByLinkupidAndSenderid = async (req, res) => {
   try {
     const { rows } = await pool.query(query, queryValues);
 
-    console.log(rows);
-
     if (rows.length > 0) {
       res.json({
         success: true,
@@ -272,6 +326,7 @@ const getRequestByLinkupidAndSenderid = async (req, res) => {
 };
 
 module.exports = {
+  initializeSocket,
   sendRequest,
   getLinkupRequests,
   getRequestByLinkupidAndSenderid,

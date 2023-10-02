@@ -44,6 +44,10 @@ const updateExpiredLinkups = async (io) => {
             linkupId: id,
           });
         }
+
+        // io.to(`linkup-${id}`).emit("linkupExpired", {
+        //   linkup: expiredLinkup,
+        // });
       }
 
       console.log("Expired linkups updated successfully");
