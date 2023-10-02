@@ -81,14 +81,13 @@ const LinkupItem = React.memo(
 
     const handleRequestLinkup = async () => {
       const response = await getLinkupStatus(id);
-      if (response.linkupStatus === "expired") {
+      if (response.linkupStatus === "expired" && !disableRequest) {
         setShouldFetchLinkups(true);
-
         addSnackbar("This linkup has expired.", { timeout: 7000 });
         return;
       }
 
-      if (response.linkupStatus === "closed") {
+      if (response.linkupStatus === "closed" && !disableRequest) {
         setShouldFetchLinkups(true);
         addSnackbar(
           "This linkup was closed and can no longer receive requests.",
