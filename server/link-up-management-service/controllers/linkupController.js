@@ -10,12 +10,24 @@ const initializeSocket = (io) => {
   socketIo = io;
 };
 
+const readQueryFile = (queryPath) => {
+  return fs.readFileSync(queryPath, "utf8");
+};
+
+const handleDatabaseError = (res, error, errorMessage) => {
+  console.error(errorMessage, error);
+  res.status(500).json({
+    success: false,
+    message: errorMessage,
+    error: error.message,
+  });
+};
+
 const createLinkup = async (req, res) => {
   const { linkup } = req.body;
-
   const queryPath = path.join(__dirname, "../db/queries/createLinkup.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [
+  const query = readQueryFile(queryPath);
+  const linkupQueryValues = [
     linkup.creator_id,
     linkup.creator_name,
     linkup.location,
@@ -25,26 +37,17 @@ const createLinkup = async (req, res) => {
   ];
 
   try {
-    const { rows, rowCount } = await pool.query(query, queryValues);
+    const { rows, rowCount } = await pool.query(query, linkupQueryValues);
     if (rowCount > 0) {
       const newLinkup = rows[0];
-      // // On the server side, when a linkup is created:
-      // // Emit a real-time event to notify the creator of the new linkup
-      const socketsMap = socketIo.sockets.sockets; // Access the 'sockets' property
-      const socketKey = Array.from(socketsMap.keys())[0]; // Get the first (and only) key in the Map
-      const socket = socketsMap.get(socketKey); // Get the value associated with the key
+      const socketsMap = socketIo.sockets.sockets;
+      const socketKey = Array.from(socketsMap.keys())[0];
+      const socket = socketsMap.get(socketKey);
 
-      // console.log("creatorSocket", socketKey);
       if (socket && socketIo) {
-        // Emit linkupCreated event to all connected users
-        // socketIo.emit("linkupCreated", { id: newLinkup.id });
-
-        // Emit linkupCreated event to creator of the linkup only
         socketIo
           .to(`user-${newLinkup.creator_id}`)
           .emit("linkupCreated", { id: newLinkup.id });
-
-        // Create a room for the linkup and add the creator to it
         const linkupRoomName = `linkup-${newLinkup.id}`;
         socket.join(linkupRoomName);
       }
@@ -62,25 +65,20 @@ const createLinkup = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error creating linkup:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create linkup",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error creating linkup:");
   }
 };
 
 const getLinkups = async (req, res) => {
-  const userId = req.params.userId;
-  const gender = req.query.gender;
-
+  const { userId } = req.params;
+  const { gender, offset, pageSize } = req.query;
   const queryPath = path.join(__dirname, "../db/queries/getLinkups.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [userId, gender];
+  const query = readQueryFile(queryPath);
+  const linkupsQueryValues = [userId, gender, offset, pageSize];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    // Modify your SQL query to handle pagination
+    const { rows } = await pool.query(query, linkupsQueryValues);
 
     if (rows.length > 0) {
       const linkups = rows;
@@ -97,26 +95,21 @@ const getLinkups = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error fetching linkups:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch linkups",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error fetching linkups:");
   }
 };
 
 const getUserLinkups = async (req, res) => {
-  const userId = req.params.userId;
+  const { userId } = req.params;
   const queryPath = path.join(
     __dirname,
     "../db/queries/getLinkupsByUserId.sql"
   );
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [userId];
+  const query = readQueryFile(queryPath);
+  const userLinkupsQueryValues = [userId];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    const { rows } = await pool.query(query, userLinkupsQueryValues);
 
     if (rows.length > 0) {
       const linkups = rows;
@@ -133,24 +126,18 @@ const getUserLinkups = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error fetching linkups:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch linkups",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error fetching linkups:");
   }
 };
 
 const getLinkupStatus = async (req, res) => {
   const { linkupId } = req.params;
-  console.log("UO", linkupId);
   const queryPath = path.join(__dirname, "../db/queries/getLinkupStatus.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [linkupId];
+  const query = readQueryFile(queryPath);
+  const linkupStatusQueryValues = [linkupId];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    const { rows } = await pool.query(query, linkupStatusQueryValues);
 
     if (rows.length > 0) {
       const status = rows[0].status;
@@ -161,24 +148,18 @@ const getLinkupStatus = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error fetching linkup status:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch linkup status",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error fetching linkup status:");
   }
 };
 
 const deleteLinkup = async (req, res) => {
-  const { id } = req.query;
-
+  const { linkupId } = req.params;
   const queryPath = path.join(__dirname, "../db/queries/deleteLinkup.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [id];
+  const query = readQueryFile(queryPath);
+  const deleteLinkupQueryValues = [linkupId];
 
   try {
-    const response = await pool.query(query, queryValues);
+    const response = await pool.query(query, deleteLinkupQueryValues);
 
     if (response.rowCount > 0) {
       res.json({
@@ -192,30 +173,25 @@ const deleteLinkup = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error deleting linkup:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete linkup",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error deleting linkup:");
   }
 };
 
 const updateLinkup = async (req, res) => {
-  const { id } = req.query;
+  const { linkupId } = req.params;
   const { linkup } = req.body;
   const queryPath = path.join(__dirname, "../db/queries/updateLinkup.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [
+  const query = readQueryFile(queryPath);
+  const updateLinkupQueryValues = [
     linkup.location,
     linkup.activity,
     linkup.date,
     linkup.gender_preference,
-    id,
+    linkupId,
   ];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    const { rows } = await pool.query(query, updateLinkupQueryValues);
 
     if (rows.length > 0) {
       const linkup = rows[0];
@@ -232,27 +208,21 @@ const updateLinkup = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error updating linkup:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create linkup",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error updating linkup:");
   }
 };
 
 const closeLinkup = async (req, res) => {
   const { linkupId } = req.params;
   const queryPath = path.join(__dirname, "../db/queries/closeLinkup.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [linkupId];
+  const query = readQueryFile(queryPath);
+  const closeLinkupQueryValues = [linkupId];
 
   try {
-    const { rows } = await pool.query(query, queryValues);
+    const { rows } = await pool.query(query, closeLinkupQueryValues);
     console.log("closeLinkup: ", rows);
 
     if (rows.length > 0) {
-      // Emit a real-time event to notify clients about the completed link-up
       const closedLinkup = rows;
 
       res.json({
@@ -262,12 +232,7 @@ const closeLinkup = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error closing the link-up:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to close the link-up",
-      error: error.message,
-    });
+    handleDatabaseError(res, error, "Error closing the link-up:");
   }
 };
 

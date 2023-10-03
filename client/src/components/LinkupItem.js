@@ -81,25 +81,31 @@ const LinkupItem = React.memo(
 
     const handleRequestLinkup = async () => {
       const response = await getLinkupStatus(id);
-      if (response.linkupStatus === "expired" && !disableRequest) {
-        setShouldFetchLinkups(true);
-        addSnackbar("This linkup has expired.", { timeout: 7000 });
-        return;
+      let message = "";
+
+      switch (response.linkupStatus) {
+        case "expired":
+          message = "This linkup has expired.";
+          break;
+        case "closed":
+          message =
+            "This linkup was closed and can no longer receive requests.";
+          break;
+        case "inactive":
+          message = "This linkup was deleted.";
+          break;
+        default:
+          const destination = disableRequest
+            ? `/history/requests-sent`
+            : `/send-request/${id}`;
+          navigate(destination);
+          return;
       }
 
-      if (response.linkupStatus === "closed" && !disableRequest) {
+      if (!disableRequest) {
         setShouldFetchLinkups(true);
-        addSnackbar(
-          "This linkup was closed and can no longer receive requests.",
-          { timeout: 7000 }
-        );
-        return;
+        addSnackbar(message, { timeout: 7000 });
       }
-
-      const destination = disableRequest
-        ? `/history/requests-sent`
-        : `/send-request/${id}`;
-      navigate(destination);
     };
 
     const renderLinkupItemText = () => {

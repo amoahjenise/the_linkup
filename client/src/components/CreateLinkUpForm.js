@@ -87,11 +87,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CreateLinkupForm = ({
-  // socket,
-  updateLinkupList,
-  scrollToTopCallback,
-}) => {
+const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
   const classes = useStyles();

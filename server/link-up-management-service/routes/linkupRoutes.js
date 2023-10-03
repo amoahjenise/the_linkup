@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const linkupController = require("../controllers/linkupController");
 
-router.get("/get-linkups/:userId", linkupController.getLinkups);
-router.get("/get-user-linkups/:userId", linkupController.getUserLinkups);
-router.post("/update-linkup", linkupController.updateLinkup);
-router.post("/close-linkup/:linkupId", linkupController.closeLinkup);
-router.post("/create-linkup", linkupController.createLinkup);
-router.delete("/delete-linkup", linkupController.deleteLinkup);
-router.get("/get-linkup-status/:linkupId", linkupController.getLinkupStatus);
+router.get("/linkups/:userId", linkupController.getLinkups);
+router.get("/linkups/user/:userId", linkupController.getUserLinkups);
+router.post("/linkups/update/:linkupId", linkupController.updateLinkup);
+router.post("/linkups/close/:linkupId", linkupController.closeLinkup);
+router.post("/linkups/create", linkupController.createLinkup);
+router.delete("/linkups/:linkupId", linkupController.deleteLinkup);
+router.get("/linkups/status/:linkupId", linkupController.getLinkupStatus);
 
 module.exports = router;
