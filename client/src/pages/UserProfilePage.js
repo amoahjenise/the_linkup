@@ -14,7 +14,6 @@ import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import { useColorMode } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
@@ -57,30 +56,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: theme.spacing(3),
-    [theme.breakpoints.down("sm")]: {
-      padding: theme.spacing(2),
-    },
+    marginTop: "5%",
   },
-  cameraIconContainer: {
-    position: "relative", // Make the container relative
-    display: "flex",
-    flexDirection: "column",
-    marginTop: theme.spacing(2),
-  },
-  cameraIcon: {
-    position: "absolute", // Position the camera icon absolutely
-    bottom: "89%", // Adjust bottom positioning as needed
-    right: "23%", // Adjust right positioning as needed
-    border: "1px solid #e1e8ed",
-    backgroundColor: theme.palette.primary.contrastText,
-    zIndex: 1,
-    transition: "background-color 0.4s ease",
-    "&:hover": {
-      backgroundColor: "lightgray",
-    },
-  },
-
   leftMargin: {
     marginLeft: theme.spacing(4),
   },
@@ -190,7 +167,7 @@ const UserProfilePage = ({ isMobile }) => {
     };
 
     fetchData();
-  }, [loggedUser.user.id, userId]);
+  }, [dispatch, loggedUser.user.id, navigate, userId]);
 
   const renderEditButton = () => {
     if (isLoggedUserProfile) {
@@ -200,22 +177,6 @@ const UserProfilePage = ({ isMobile }) => {
           onClick={() => setIsEditModalOpen(true)}
         >
           <EditIcon />
-        </IconButton>
-      );
-    }
-    return null;
-  };
-
-  const renderUploadPicturesButton = () => {
-    if (isLoggedUserProfile && !isImageUploadModalOpen) {
-      return (
-        <IconButton
-          className={classes.cameraIcon}
-          component="span"
-          aria-label="Upload Avatar"
-          onClick={openImageUploadModal}
-        >
-          <PhotoCameraIcon />
         </IconButton>
       );
     }
@@ -325,15 +286,15 @@ const UserProfilePage = ({ isMobile }) => {
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className={classes.cameraIconContainer}>
-              {renderUploadPicturesButton()}
-              <div className={classes.centeredContent}>
-                <Cards
-                  images={profileImages || []}
-                  currentImageIndex={currentImageIndex}
-                  setCurrentImageIndex={setCurrentImageIndex}
-                />
-              </div>
+            <div className={classes.centeredContent}>
+              <Cards
+                images={profileImages || []}
+                currentImageIndex={currentImageIndex}
+                setCurrentImageIndex={setCurrentImageIndex}
+                isLoggedUserProfile={isLoggedUserProfile}
+                isImageUploadModalOpen={isImageUploadModalOpen}
+                openImageUploadModal={openImageUploadModal}
+              />
             </div>
           )}
         </div>
