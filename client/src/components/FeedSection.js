@@ -7,6 +7,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import IconButton from "@material-ui/core/IconButton";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { makeStyles } from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     position: "fixed", // Change to fixed to keep it in place
     bottom: "2%", // Adjust the vertical position as needed
     right: "28%",
-    backgroundColor: "rgba(120, 130, 225, 0.5)",
+    backgroundColor: "rgba(145, 233, 255, 0.8)",
     borderRadius: "50%",
     padding: theme.spacing(2),
     zIndex: 1, // Ensure it's above other content
@@ -64,13 +65,15 @@ const FeedSection = ({
       )}
       {/* Floating Refresh Icon */}
       <div className={classes.refreshButton}>
-        <IconButton
-          onClick={refreshLinkups}
-          color="primary"
-          aria-label="refresh"
-        >
-          <RefreshIcon />
-        </IconButton>
+        <Tooltip title="Refresh">
+          <IconButton
+            onClick={refreshLinkups}
+            color="primary"
+            aria-label="refresh"
+          >
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
       </div>
     </div>
   );

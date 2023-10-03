@@ -1,6 +1,7 @@
 import React from "react";
 import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   filterMain: {
@@ -39,6 +40,8 @@ const FilterBar = ({
   activeTab,
 }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
   let statusOptions = ["All", "Active", "Closed", "Completed", "Expired"];
 
   if (activeTab === 1 || activeTab === 2) {
@@ -48,16 +51,24 @@ const FilterBar = ({
 
   const dateOptions = ["All", "Today", "Last 7 days", "Last 30 days"];
 
+  const textColor =
+    colorMode === "dark"
+      ? "white" // Dark mode background color with no transparency
+      : "black";
+
+  const labelColor = colorMode === "dark" ? "#00CFFF" : undefined; // Use undefined to keep the default label color
+
   return (
     <div className={classes.filterMain} data-testid="sidebarColumn">
       <div className={classes.filterContainer}>
         <div className={classes.title}>Filters</div>
         <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel>Status</InputLabel>
+          <InputLabel style={{ color: labelColor }}>Status</InputLabel>
           <Select
             value={activeStatus}
             onChange={(event) => onStatusChange(event.target.value)}
             label="Status"
+            style={{ color: textColor }}
           >
             {statusOptions.map((status) => (
               <MenuItem key={status} value={status}>
@@ -67,11 +78,12 @@ const FilterBar = ({
           </Select>
         </FormControl>
         <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel>Date</InputLabel>
+          <InputLabel style={{ color: labelColor }}>Date</InputLabel>
           <Select
             value={dateFilter}
             onChange={(event) => onDateFilterChange(event.target.value)}
             label="Date"
+            style={{ color: textColor }}
           >
             {dateOptions.map((dateOption) => (
               <MenuItem key={dateOption} value={dateOption}>
