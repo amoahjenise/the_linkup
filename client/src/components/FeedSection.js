@@ -22,10 +22,10 @@ const useStyles = makeStyles((theme) => ({
   refreshButton: {
     position: "fixed", // Change to fixed to keep it in place
     bottom: "2%", // Adjust the vertical position as needed
-    right: "28%",
-    backgroundColor: "rgba(145, 233, 255, 0.8)",
+    right: "29%",
+    backgroundColor: "rgba(145, 233, 255, 0.9)",
     borderRadius: "50%",
-    padding: theme.spacing(2),
+    padding: theme.spacing(4),
     zIndex: 1, // Ensure it's above other content
     transform: "translateY(-50%)", // Center the button vertically
   },
