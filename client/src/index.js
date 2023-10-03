@@ -8,7 +8,7 @@ import { store, persistor } from "./redux/store";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import Modal from "react-modal";
-import { SocketProvider } from "./SocketContext";
+import { SocketProvider } from "./contexts/SocketContext";
 
 Modal.setAppElement("#root"); // Assuming your root element has an id of 'root'
 

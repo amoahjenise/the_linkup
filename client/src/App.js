@@ -69,69 +69,73 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* <SocketProvider isAuthenticated={isAuthenticated}> */}
-      <div>
-        <ToggleColorMode />
-        <Router>
-          <Routes>
-            <Route
-              path="/"
-              exact
-              element={<LandingPage isMobile={isMobile} />}
-            />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            {/* Protected routes */}
-            <Route element={<PrivateRoutes />}>
-              <Route path="/home" element={<HomePage isMobile={isMobile} />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
+      <ToggleColorMode>
+        {/* <SocketProvider isAuthenticated={isAuthenticated}> */}
+        <div>
+          <Router>
+            <Routes>
               <Route
-                path="/profile/:id"
-                element={<UserProfilePage isMobile={isMobile} />}
+                path="/"
+                exact
+                element={<LandingPage isMobile={isMobile} />}
               />
-              <Route
-                path="/send-request/:linkupId"
-                element={<SendRequestPage />}
-              />
-              <Route
-                path="/history"
-                element={<LinkupHistoryPage isMobile={isMobile} />}
-              />
-              <Route
-                path="/history/expired"
-                element={<LinkupHistoryPage isMobile={isMobile} />}
-              />
-              <Route
-                path="/history/requests-sent"
-                element={<LinkupHistoryPage isMobile={isMobile} />}
-              />
-              <Route
-                path="/history/requests-received"
-                element={<LinkupHistoryPage isMobile={isMobile} />}
-              />
-              <Route
-                path="/messages"
-                element={<MessagesPage isMobile={isMobile} />}
-              />
-              <Route
-                path="/messages/:messageid/chat"
-                element={<SelectedMessagePage />}
-              />
-              <Route
-                path="/linkup-request/:id"
-                element={<AcceptDeclinePage />}
-              />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Route>
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              {/* Protected routes */}
+              <Route element={<PrivateRoutes />}>
+                <Route
+                  path="/home"
+                  element={<HomePage isMobile={isMobile} />}
+                />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route
+                  path="/profile/:id"
+                  element={<UserProfilePage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/send-request/:linkupId"
+                  element={<SendRequestPage />}
+                />
+                <Route
+                  path="/history"
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/expired"
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/requests-sent"
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/history/requests-received"
+                  element={<LinkupHistoryPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/messages"
+                  element={<MessagesPage isMobile={isMobile} />}
+                />
+                <Route
+                  path="/messages/:messageid/chat"
+                  element={<SelectedMessagePage />}
+                />
+                <Route
+                  path="/linkup-request/:id"
+                  element={<AcceptDeclinePage />}
+                />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Route>
 
-            <Route
-              path="/test-notifications"
-              element={<NotificationsTestPage />}
-            />
-          </Routes>
-        </Router>
-      </div>
-      {/* </SocketProvider> */}
+              <Route
+                path="/test-notifications"
+                element={<NotificationsTestPage />}
+              />
+            </Routes>
+          </Router>
+        </div>
+        {/* </SocketProvider> */}
+      </ToggleColorMode>
     </ThemeProvider>
   );
 };

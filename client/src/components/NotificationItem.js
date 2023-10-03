@@ -58,6 +58,30 @@ const NotificationItem = ({ notification, onClick }) => {
     }
   };
 
+  const getDisplayName = () => {
+    switch (notification.notification_type) {
+      case "linkup_request":
+        return notification.requester_name;
+      case "linkup_request_action":
+        return notification.receiver_name;
+      // Add more cases for other notification types if needed
+      default:
+        return "";
+    }
+  };
+
+  const getDisplayAvatar = () => {
+    switch (notification.notification_type) {
+      case "linkup_request":
+        return notification.requester_avatar;
+      case "linkup_request_action":
+        return notification.receiver_avatar;
+      // Add more cases for other notification types if needed
+      default:
+        return "";
+    }
+  };
+
   return (
     <div
       className={`${classes.notificationItem} ${
@@ -67,10 +91,7 @@ const NotificationItem = ({ notification, onClick }) => {
     >
       <div>
         <div className={classes.avatarContainer}>
-          <Avatar
-            alt={notification.requester_name}
-            src={notification.requester_avatar}
-          />
+          <Avatar alt={getDisplayName()} src={getDisplayAvatar()} />
           <Typography variant="subtitle1">{notification.content}</Typography>
         </div>
         <div>

@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
-import { useSnackbar } from "./contexts/SnackbarContext";
+import { useSnackbar } from "./SnackbarContext";
 import { useDispatch } from "react-redux";
-import { incrementUnreadNotificationsCount } from "./redux/actions/notificationActions";
+import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
 
 const SocketContext = createContext();
 
