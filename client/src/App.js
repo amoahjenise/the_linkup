@@ -13,11 +13,11 @@ import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SendRequestPage from "./pages/SendRequestPage";
-import MessagesPage from "./pages/MessagesPage";
+import ConversationsPage from "./pages/ConversationsPage";
 import LinkupHistoryPage from "./pages/LinkupHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
-import SelectedMessagePage from "./pages/SelectedMessagePage";
+// import SelectedConversationPage from "./pages/SelectedConversationPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotificationsTestPage from "./__tests__/componentTests/NotificationTestPage";
 import LeftMenu from "./components/LeftMenu";
@@ -114,12 +114,12 @@ const App = () => {
                 />
                 <Route
                   path="/messages"
-                  element={<MessagesPage isMobile={isMobile} />}
+                  element={<ConversationsPage isMobile={isMobile} />}
                 />
-                <Route
+                {/* <Route
                   path="/messages/:messageid/chat"
-                  element={<SelectedMessagePage />}
-                />
+                  element={<SelectedConversationPage />}
+                /> */}
                 <Route
                   path="/linkup-request/:id"
                   element={<AcceptDeclinePage />}

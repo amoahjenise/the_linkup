@@ -30,8 +30,11 @@ export const MARK_LINKUPS_AS_EXPIRED_SUCCESS =
 export const SET_EDITING_LINKUP = "SET_EDITING_LINKUP";
 export const CLEAR_EDITING_LINKUP = "CLEAR_EDITING_LINKUP";
 
-// Messages action types
-export const SET_MESSAGES_DATA = "SET_MESSAGES_DATA";
+// Conversations action types
+export const SET_CONVERSATIONS = "SET_CONVERSATIONS";
+export const SET_SELECTED_CONVERSATION = "SET_SELECTED_CONVERSATION";
+export const SET_MESSAGES = "SET_MESSAGES";
+export const NEW_MESSAGE = "NEW_MESSAGE";
 
 // Notifications action types
 export const FETCH_UNREAD_NOTIFICATIONS_COUNT =

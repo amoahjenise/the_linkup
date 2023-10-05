@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useParams } from "react-router-dom";
 import LeftMenu from "../components/LeftMenu";
-import MessagesSection from "../components/MessagesSection";
+import ConversationsSection from "../components/ConversationsSection";
 import ChatComponent from "../components/ChatComponent";
 
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +49,7 @@ const SelectedMessagePage = ({ selectedMessage }) => {
     <div>
       <div className={classes.selectedMessagePage}>
         <div className={classes.messageSection}>
-          <MessagesSection />
+          <ConversationsSection />
         </div>
 
         <div className={classes.chatContainer}>

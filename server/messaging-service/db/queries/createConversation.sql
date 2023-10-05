@@ -1,7 +1,8 @@
+-- createConversation.sql
+
 WITH new_conversation AS (
-  INSERT INTO conversations (participants, last_message)
-  VALUES (ARRAY[$1::uuid, $2::uuid], $3) -- $1 = sender $2 = receiver
+  INSERT INTO conversations (last_message, linkup_id, unread_count)
+  VALUES ($1, $2::uuid, 1::int)
   RETURNING conversation_id
 )
-INSERT INTO messages (conversation_id, sender_id, content)
-VALUES ((SELECT conversation_id FROM new_conversation), $1::uuid, $3);
+SELECT conversation_id FROM new_conversation;

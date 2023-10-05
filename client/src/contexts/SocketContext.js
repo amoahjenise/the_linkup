@@ -4,6 +4,7 @@ import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { useDispatch } from "react-redux";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
+import { newMessage } from "../redux/actions/conversationActions";
 
 const SocketContext = createContext();
 
@@ -22,8 +23,50 @@ export const SocketProvider = ({ children }) => {
     query: { userId },
   });
 
+  const messagingSocket = io("http://localhost:3006", {
+    query: { userId },
+  });
+
   useEffect(() => {
     console.log(`Client side user ${userId} connected to linkupRequestSocket.`);
+
+    // Function to authenticate the user with the sockets
+    const authenticateUser = (socket) => {
+      socket.emit("authenticate", userId);
+    };
+
+    // Authenticate users with their respective sockets
+    // authenticateUser(linkupManagementSocket);
+    // authenticateUser(linkupRequestSocket);
+    authenticateUser(messagingSocket);
+
+    // Messaging Service Events
+
+    // Add a listener for the "new-message" event
+    messagingSocket.on("new-message", (data) => {
+      // Data contains the incoming message details, e.g., sender_id, message_content, conversation_id
+      const {
+        timestamp,
+        message_content,
+        sender_name,
+        sender_avatar,
+        conversation_id,
+      } = data;
+
+      // Dispatch the newMessage action to update the Redux store for both sender and receiver
+      dispatch(
+        newMessage({
+          conversation_id: conversation_id,
+          sender_name: sender_name,
+          content: message_content,
+          timestamp: timestamp,
+          sender_avatar: sender_avatar,
+        })
+      );
+
+      // Handle the incoming message, for example, by updating the UI
+      console.log(`New message from ${sender_name}: ${message_content}`);
+    });
 
     // Linkup Management Service Events
 
@@ -59,13 +102,22 @@ export const SocketProvider = ({ children }) => {
     return () => {
       linkupManagementSocket.disconnect();
       linkupRequestSocket.disconnect();
+      messagingSocket.disconnect();
       console.log("Client side disconnected from sockets.");
     };
-  }, [addSnackbar, linkupManagementSocket, linkupRequestSocket, userId]);
+  }, [
+    addSnackbar,
+    dispatch,
+    linkupManagementSocket,
+    linkupRequestSocket,
+    messagingSocket,
+    userId,
+  ]);
 
   const sockets = {
     linkupManagementSocket,
     linkupRequestSocket,
+    messagingSocket,
   };
 
   return (

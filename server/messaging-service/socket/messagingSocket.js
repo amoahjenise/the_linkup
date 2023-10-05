@@ -1,39 +1,54 @@
-// socket/messagingSocket.js
-const userSockets = {}; // Define the userSockets object
+const socketIo = require("socket.io");
 
-// Function to get socket instance by user ID
+const userSockets = {}; // Initialize an object to manage user sockets
+
 const getSocketByUserId = (userId) => {
   return userSockets[userId];
 };
 
-// Initialize the socket functionality
-const initializeSocket = (io, redisClient) => {
+const initializeSocket = (server) => {
+  const messagingController = require("../controllers/messagingController");
+
+  const io = socketIo(server, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["POST", "GET", "PATCH", "DELETE"],
+    },
+  });
+
   io.on("connection", (socket) => {
-    console.log("Messaging socket connected.");
+    console.log("A user connected to the messaging socket:", socket.id);
 
-    // Store the socket connection with the user ID
-    socket.on("store-user-id", (userId) => {
-      storeSocket(userId, socket.id, redisClient); // Call storeSocket function
+    // Handle user authentication and store sockets in userSockets object
+    socket.on("authenticate", (userId) => {
+      console.log("User authenticated:", userId);
+      userSockets[userId] = socket;
+      socket.userId = userId; // Store the user ID on the socket for reference
+      console.log(socket.id);
     });
 
-    // Handle real-time events here
-    socket.on("message-sent", async (data) => {
-      // Use getSocketByUserId and emit events based on Redis data
-    });
-
-    socket.on("marked-as-read", (data) => {
-      console.log("Notify user that a message was read.");
-    });
-
-    // Handle disconnect
+    // Handle disconnect and remove the socket from the userSockets object
     socket.on("disconnect", () => {
-      // Remove the socket from the userSockets object on disconnect
+      console.log("A user disconnected:", socket.id);
+      // Remove the socket from userSockets
+      delete userSockets[socket.userId];
+    });
+
+    // Handle message events
+    socket.on("send-message", async (data) => {
+      // Handle sending messages here
+      try {
+        await messagingController.sendMessage(data);
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
     });
   });
+
+  return io; // Export the io instance
 };
 
-// Export the functions
 module.exports = {
-  getSocketByUserId,
   initializeSocket,
+  getSocketByUserId,
 };

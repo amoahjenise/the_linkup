@@ -46,8 +46,9 @@ const sendRequest = async (req, res) => {
       // Post Notification
       const conversationData = {
         sender_id: requesterId,
-        recipient_id: creator_id,
+        receiver_id: creator_id,
         message_content: content,
+        linkup_id: linkupId,
       };
 
       await createNewConversation(conversationData);

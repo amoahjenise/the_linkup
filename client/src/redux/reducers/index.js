@@ -14,7 +14,7 @@ const appReducer = combineReducers({
   loggedUser: userReducer,
   linkups: linkupReducer,
   editingLinkup: editingLinkupReducer,
-  messagesData: conversationReducer,
+  conversation: conversationReducer,
   notifications: notificationReducer,
   userSentRequests: userSentRequestsReducer,
 });
