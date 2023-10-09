@@ -5,8 +5,14 @@ import {
   SET_SELECTED_CONVERSATION,
   SET_MESSAGES,
   NEW_MESSAGE,
+  UPDATE_CONVERSATION,
 } from "./actionTypes";
 
+// Action to update the selected conversation with new message content and timestamp
+export const updateConversation = (updatedConversation) => ({
+  type: UPDATE_CONVERSATION,
+  updatedConversation,
+});
 export const setConversations = (conversations) => ({
   type: SET_CONVERSATIONS,
   conversations,
@@ -17,17 +23,11 @@ export const setSelectedConversation = (conversation) => ({
   conversation,
 });
 
-export const setMessages = (
-  participants,
-  messages,
-  linkupId,
-  conversationId
-) => ({
+export const setMessages = (participants, messages, linkupId) => ({
   type: SET_MESSAGES,
   participants,
   messages,
   linkupId,
-  conversationId,
 });
 
 export const newMessage = (messageData) => ({

@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import ConversationsSection from "../components/ConversationsSection";
 import ChatComponent from "../components/ChatComponent";
 import { getConversations } from "../api/messagingAPI";
+import {
+  setSelectedConversation,
+  setConversations,
+} from "../redux/actions/conversationActions";
 
 const useStyles = makeStyles((theme) => ({
   conversationsPage: {
@@ -26,13 +30,11 @@ const useStyles = makeStyles((theme) => ({
 
 const ConversationsPage = ({ isMobile }) => {
   const classes = useStyles();
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+  const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -52,55 +54,39 @@ const ConversationsPage = ({ isMobile }) => {
           },
           []
         );
-        setConversations(uniqueConversations);
-        setLoading(false);
+        dispatch(setConversations(uniqueConversations));
       } catch (error) {
         console.error("Error fetching conversations:", error);
-        setError("Error fetching conversations");
-        setLoading(false);
+        // setError(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchConversations();
-  }, [userId]);
 
-  const handleOpenChat = (conversation) => {
-    setSelectedConversation(conversation);
-  };
+    // Cleanup function: Set selectedConversation to null on unmount
+    return () => {
+      dispatch(setSelectedConversation(null));
+      dispatch(setConversations(null));
+    };
+  }, [dispatch, userId]);
 
   return (
     <div className={classes.conversationsPage}>
-      {loading ? (
-        <div>Loading conversations...</div>
-      ) : error ? (
-        <div>Error: {error}</div>
+      {isMobile ? (
+        <div className={classes.conversationsSection}>
+          <ConversationsSection />
+        </div>
       ) : (
-        <>
-          {isMobile ? (
-            <div className={classes.conversationsSection}>
-              <ConversationsSection
-                conversations={conversations}
-                selectedConversation={selectedConversation}
-                onConversationClick={handleOpenChat}
-                userId={userId} // Pass the userId to determine the other participant's name and avatar
-              />
-            </div>
-          ) : (
-            <div className={classes.conversationsPage}>
-              <div className={classes.conversationsSection}>
-                <ConversationsSection
-                  conversations={conversations}
-                  selectedConversation={selectedConversation}
-                  onConversationClick={handleOpenChat}
-                  userId={userId} // Pass the userId to determine the other participant's name and avatar
-                />
-              </div>
-              <div className={classes.chatSection}>
-                <ChatComponent selectedConversation={selectedConversation} />
-              </div>
-            </div>
-          )}
-        </>
+        <div className={classes.conversationsPage}>
+          <div className={classes.conversationsSection}>
+            <ConversationsSection isLoading={isLoading} error={error} />
+          </div>
+          <div className={classes.chatSection}>
+            <ChatComponent />
+          </div>
+        </div>
       )}
     </div>
   );

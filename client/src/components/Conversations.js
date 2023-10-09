@@ -6,17 +6,23 @@ import {
   ListItemAvatar,
   Avatar,
   ListItemText,
-  Typography,
 } from "@material-ui/core";
 import { setSelectedConversation } from "../redux/actions/conversationActions";
 import { useSelector, useDispatch } from "react-redux";
+import LoadingSpinner from "./LoadingSpinner";
 
 const useStyles = makeStyles((theme) => ({
+  loadingSpinner: {
+    padding: theme.spacing(10),
+  },
   listItem: {
     borderBottom: "1px solid #e1e8ed",
     cursor: "pointer",
     "&.selected": {
       backgroundColor: "rgba(200, 200, 200, 0.1)",
+    },
+    "&:hover": {
+      backgroundColor: "rgba(200, 200, 200, 0.2)",
     },
   },
   messageText: {
@@ -26,9 +32,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Conversations = ({ conversations }) => {
+const Conversations = ({ isLoading, error }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const conversations = useSelector(
+    (state) => state.conversation.conversations
+  );
 
   const selectedConversation = useSelector(
     (state) => state.conversation.selectedConversation
@@ -59,68 +69,61 @@ const Conversations = ({ conversations }) => {
     }
   };
 
-  const getElapsedTime = (timestamp, isReceiver) => {
-    const formattedTimestamp = formatTimestamp(timestamp);
-
-    if (isReceiver) {
-      return `Received ${formattedTimestamp}`;
-    } else {
-      return `Sent ${formattedTimestamp}`;
-    }
-  };
-
   return (
-    <List>
-      {conversations.map((conversation) => {
-        // Determine which participant is the other user (not the connected user)
-        const otherParticipant =
-          conversation?.participant_id_1 === userId
-            ? {
-                id: conversation?.participant_id_2,
-                name: conversation?.participant_name_2,
-                avatar: conversation?.participant_avatar_2,
-              }
-            : {
-                id: conversation?.participant_id_1,
-                name: conversation?.participant_name_1,
-                avatar: conversation?.participant_avatar_1,
-              };
+    <>
+      {isLoading ? (
+        <div className={classes.loadingSpinner}>
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <List>
+          {conversations?.map((conversation) => {
+            // Determine if the logged-in user is the sender of the last message
+            const isCurrentUserSender =
+              conversation?.last_message_sender_id === userId;
 
-        // Determine if the conversation is on the receiver's side
-        const isReceiver = conversation?.participant_id_2 === userId;
-
-        return (
-          <ListItem
-            key={conversation?.conversation_id}
-            className={`${classes.listItem} ${
-              setSelectedConversation &&
-              selectedConversation?.id === conversation?.conversation_id
-                ? "selected"
-                : ""
-            }`}
-            onClick={() => dispatch(setSelectedConversation(conversation))}
-          >
-            <ListItemAvatar>
-              <Avatar
-                alt={otherParticipant.name}
-                src={otherParticipant.avatar}
-              />
-            </ListItemAvatar>
-            <ListItemText
-              primary={otherParticipant.name}
-              secondary={
-                <>
-                  <div className={classes.messageText}>
-                    <span>{conversation?.last_message}</span>
-                  </div>
-                </>
-              }
-            />
-            {getElapsedTime(conversation?.created_at, isReceiver)}
-          </ListItem>
-        );
-      })}
-    </List>
+            return (
+              <ListItem
+                key={conversation?.conversation_id}
+                className={`${classes.listItem} ${
+                  setSelectedConversation &&
+                  selectedConversation?.conversation_id ===
+                    conversation?.conversation_id
+                    ? "selected"
+                    : ""
+                }`}
+                onClick={() => dispatch(setSelectedConversation(conversation))}
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt={conversation.linkup_requester_name}
+                    src={conversation.linkup_requester_avatar}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={conversation.linkup_requester_name}
+                  secondary={
+                    <div className={classes.messageText}>
+                      <span>
+                        {isCurrentUserSender ? "You: " : ""}
+                        {conversation?.last_message}
+                      </span>
+                    </div>
+                  }
+                />
+                {isCurrentUserSender
+                  ? `Sent ${formatTimestamp(
+                      conversation?.last_message_timestamp
+                    )}`
+                  : `Received ${formatTimestamp(
+                      conversation?.last_message_timestamp
+                    )}`}
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
+    </>
   );
 };
 

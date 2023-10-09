@@ -78,6 +78,8 @@ const Notifications = () => {
         navigate("/history/requests-received");
       } else if (notification.notification_type === "linkup_request_action") {
         navigate("/history/requests-sent");
+      } else if (notification.notification_type === "new_message") {
+        navigate("/messages");
       }
     } catch (error) {
       console.log("Error marking notification as read:", error);

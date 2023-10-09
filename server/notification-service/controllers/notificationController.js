@@ -39,8 +39,6 @@ const getNotifications = async (req, res) => {
 };
 
 const createNotification = async (data) => {
-  console.log("DATA:", data);
-
   const { creatorId, requesterId, type, content, linkupId } = data;
 
   const queryPath = path.join(

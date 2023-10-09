@@ -4,6 +4,17 @@ const path = require("path");
 const { pool } = require("../db");
 const { getSocketByUserId } = require("../socket/messagingSocket");
 
+let messagingSocket;
+
+// Function to initialize the Socket.IO instance
+const initializeSocket = (io) => {
+  messagingSocket = io;
+};
+
+const {
+  createNotification,
+} = require("../../notification-service/controllers/notificationController");
+
 const getConversations = async (req, res) => {
   const queryPath = path.join(__dirname, "../db/queries/getConversations.sql");
   const { userId } = req.params;
@@ -47,14 +58,16 @@ const getMessagesForConversation = async (req, res) => {
       message_id: row.message_id,
       conversation_id: row.conversation_id,
       content: row.content,
-      is_read: row.is_read,
-      is_system_message: row.is_system_message,
       sender_id: row.sender_id,
-      timestamp: row.timestamp,
-      attachments: row.attachments,
       sender_name: row.sender_name,
       sender_avatar: row.sender_avatar,
       receiver_id: row.receiver_id,
+      receiver_name: row.receiver_name,
+      receiver_avatar: row.receiver_avatar,
+      attachments: row.attachments,
+      is_read: row.is_read,
+      is_system_message: row.is_system_message,
+      timestamp: row.timestamp,
     }));
 
     // Get the participants, linkup_id, and messages in the response
@@ -117,12 +130,13 @@ const sendMessage = async (data) => {
 
     // Merge message details and sender details into one object
     const messageData = {
-      sender_id: insertedRows[0].sender_id,
-      message_content: insertedRows[0].content,
+      message_id: insertedRows[0].message_id,
       conversation_id: insertedRows[0].conversation_id,
-      timestamp: insertedRows[0].timestamp,
+      message_content: insertedRows[0].content,
+      sender_id: insertedRows[0].sender_id,
       sender_name: senderDetailsRows[0].sender_name,
       sender_avatar: senderDetailsRows[0].sender_avatar,
+      timestamp: insertedRows[0].timestamp,
     };
 
     // Emit a real-time event to notify the recipient
@@ -130,8 +144,30 @@ const sendMessage = async (data) => {
     const senderSocket = getSocketByUserId(sender_id);
 
     if (recipientSocket && senderSocket) {
+      console.log("recipientSocket", recipientSocket);
+      console.log("senderSocket", senderSocket);
+
       senderSocket.emit("new-message", messageData);
       recipientSocket.emit("new-message", messageData);
+    } else {
+      // Post Notification
+      const notificationData = {
+        requesterId: insertedRows[0].sender_id,
+        creatorId: insertedRows[0].receiver_id,
+        type: "new_message",
+        linkupId: insertedRows[0].linkup_id,
+        content: `New message from ${senderDetailsRows[0].sender_name}`,
+      };
+
+      notificationID = await createNotification(notificationData);
+
+      if (notificationID) {
+        messagingSocket
+          .to(`user-${insertedRows[0].receiver_id}`)
+          .emit("new-message-notification", notificationData);
+      }
+
+      // Update conversation unread count
     }
   } catch (error) {
     console.error("Message send error:", error);
@@ -208,6 +244,7 @@ const createNewConversation = async (data) => {
 };
 
 module.exports = {
+  initializeSocket,
   sendMessage,
   createNewConversation,
   getConversations,

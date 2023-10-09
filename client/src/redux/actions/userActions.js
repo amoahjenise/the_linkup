@@ -1,6 +1,8 @@
 import { getUserById, deleteUser } from "../../api/usersAPI";
 
 import {
+  SET_LOADING,
+  SET_ERROR,
   DEACTIVATE_USER_REQUEST,
   DEACTIVATE_USER_SUCCESS,
   DEACTIVATE_USER_FAILURE,
@@ -10,6 +12,16 @@ import {
   FETCH_USER_DATA_FAILURE,
   LOGOUT,
 } from "./actionTypes";
+
+export const setLoading = (isLoading) => ({
+  type: SET_LOADING,
+  payload: isLoading,
+});
+
+export const setError = (errorMessage) => ({
+  type: SET_ERROR,
+  payload: errorMessage,
+});
 
 export const deactivateUserRequest = () => ({
   type: DEACTIVATE_USER_REQUEST,

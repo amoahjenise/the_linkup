@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import moment from "moment";
-import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   notificationItem: {
@@ -26,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
   message: {
     fontSize: theme.typography.body2.fontSize,
   },
+  content: {
+    marginTop: theme.spacing(2),
+  },
   time: {
     fontSize: theme.typography.caption.fontSize,
     marginLeft: "auto",
@@ -34,10 +36,6 @@ const useStyles = makeStyles((theme) => ({
 
 const NotificationItem = ({ notification, onClick }) => {
   const classes = useStyles();
-  const { colorMode } = useColorMode();
-
-  const filterStyle =
-    colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none";
 
   const getTimeAgo = () => {
     const now = moment();
@@ -64,7 +62,8 @@ const NotificationItem = ({ notification, onClick }) => {
         return notification.requester_name;
       case "linkup_request_action":
         return notification.receiver_name;
-      // Add more cases for other notification types if needed
+      case "new_message":
+        return notification.requester_name;
       default:
         return "";
     }
@@ -76,7 +75,8 @@ const NotificationItem = ({ notification, onClick }) => {
         return notification.requester_avatar;
       case "linkup_request_action":
         return notification.receiver_avatar;
-      // Add more cases for other notification types if needed
+      case "new_message":
+        return notification.requester_avatar;
       default:
         return "";
     }
@@ -92,7 +92,9 @@ const NotificationItem = ({ notification, onClick }) => {
       <div>
         <div className={classes.avatarContainer}>
           <Avatar alt={getDisplayName()} src={getDisplayAvatar()} />
-          <Typography variant="subtitle1">{notification.content}</Typography>
+          <Typography variant="subtitle1" className={classes.content}>
+            {notification.content}
+          </Typography>
         </div>
         <div>
           {notification.notification_type === "linkup_request" && (

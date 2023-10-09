@@ -1,36 +1,21 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
 import Conversations from "./Conversations";
 import TopNavBar from "./TopNavBar";
+import { useSelector } from "react-redux";
 
-const useStyles = makeStyles((theme) => ({
-  loadingText: {
-    padding: theme.spacing(2),
-  },
-}));
-
-const MessagesSection = ({
-  conversations,
-  selectedMessage,
-  onConversationClick,
-}) => {
-  const classes = useStyles();
+const MessagesSection = ({ isLoading, error }) => {
+  const conversations = useSelector(
+    (state) => state.conversation.conversations
+  );
 
   return (
     <div>
       <TopNavBar title="Messages" />
-      {conversations ? (
-        <Conversations
-          conversations={conversations}
-          selectedMessage={selectedMessage}
-          onConversationClick={onConversationClick}
-        />
-      ) : (
-        <Typography variant="body1" className={classes.loadingText}>
-          Loading conversations...
-        </Typography>
-      )}
+      <Conversations
+        conversations={conversations}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   );
 };

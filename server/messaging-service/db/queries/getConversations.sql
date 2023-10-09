@@ -5,8 +5,57 @@ SELECT DISTINCT
     u1.name AS participant_name_1,
     u2.name AS participant_name_2,
     u1.avatar AS participant_avatar_1,
-    u2.avatar AS participant_avatar_2,    
-    c.last_message,
+    u2.avatar AS participant_avatar_2,
+    (
+        SELECT m.content
+        FROM messages AS m
+        WHERE m.conversation_id = c.conversation_id
+        ORDER BY m.timestamp DESC
+        LIMIT 1
+    ) AS last_message,
+    (
+        SELECT m.timestamp
+        FROM messages AS m
+        WHERE m.conversation_id = c.conversation_id
+        ORDER BY m.timestamp DESC
+        LIMIT 1
+    ) AS last_message_timestamp,
+    (
+        SELECT m.sender_id
+        FROM messages AS m
+        WHERE m.conversation_id = c.conversation_id
+        ORDER BY m.timestamp DESC
+        LIMIT 1
+    ) AS last_message_sender_id,
+    (
+        SELECT u.name
+        FROM users AS u
+        WHERE u.id = (
+            SELECT m.sender_id
+            FROM messages AS m
+            WHERE m.conversation_id = c.conversation_id
+            ORDER BY m.timestamp DESC
+            LIMIT 1
+        )
+    ) AS last_message_sender_name,
+    (
+        SELECT u.avatar
+        FROM users AS u
+        WHERE u.id = (
+            SELECT lur.requester_id
+            FROM link_up_requests AS lur
+            WHERE lur.linkup_id = c.linkup_id
+        )
+    ) AS linkup_requester_avatar,
+    (
+        SELECT u.name
+        FROM users AS u
+        WHERE u.id = (
+            SELECT lur.requester_id
+            FROM link_up_requests AS lur
+            WHERE lur.linkup_id = c.linkup_id
+        )
+    ) AS linkup_requester_name,
     c.created_at
 FROM
     conversations AS c

@@ -4,13 +4,19 @@ import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { useDispatch } from "react-redux";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
-import { newMessage } from "../redux/actions/conversationActions";
+import {
+  updateConversation,
+  newMessage,
+} from "../redux/actions/conversationActions";
 
 const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
+  const conversations = useSelector(
+    (state) => state.conversation.conversations
+  );
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
 
@@ -28,8 +34,6 @@ export const SocketProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    console.log(`Client side user ${userId} connected to linkupRequestSocket.`);
-
     // Function to authenticate the user with the sockets
     const authenticateUser = (socket) => {
       socket.emit("authenticate", userId);
@@ -42,12 +46,13 @@ export const SocketProvider = ({ children }) => {
 
     // Messaging Service Events
 
-    // Add a listener for the "new-message" event
     messagingSocket.on("new-message", (data) => {
       // Data contains the incoming message details, e.g., sender_id, message_content, conversation_id
       const {
         timestamp,
+        message_id,
         message_content,
+        sender_id,
         sender_name,
         sender_avatar,
         conversation_id,
@@ -56,16 +61,41 @@ export const SocketProvider = ({ children }) => {
       // Dispatch the newMessage action to update the Redux store for both sender and receiver
       dispatch(
         newMessage({
+          message_id: message_id,
           conversation_id: conversation_id,
+          sender_id: sender_id,
           sender_name: sender_name,
+          sender_avatar: sender_avatar,
           content: message_content,
           timestamp: timestamp,
-          sender_avatar: sender_avatar,
         })
       );
 
-      // Handle the incoming message, for example, by updating the UI
-      console.log(`New message from ${sender_name}: ${message_content}`);
+      // Find the conversation with the matching conversation_id in the conversations array
+      if (conversations) {
+        const conversationToUpdate = conversations.find(
+          (conversation) => conversation.conversation_id === conversation_id
+        );
+
+        // Check if the conversation was found
+        if (conversationToUpdate) {
+          // Create an updated conversation object with the new last_message and last_message_timestamp
+          const updatedConversation = {
+            ...conversationToUpdate,
+            last_message: message_content,
+            last_message_timestamp: timestamp,
+          };
+
+          // Dispatch the updateConversation action to update the conversation in the Redux store
+          dispatch(updateConversation(updatedConversation));
+        }
+      }
+    });
+
+    messagingSocket.on("new-message-notification", (notification) => {
+      addSnackbar(notification.content, { timeout: 7000 });
+      dispatch(incrementUnreadNotificationsCount());
+      // dispatch(incrementConversationUnreadCount());
     });
 
     // Linkup Management Service Events
@@ -89,7 +119,6 @@ export const SocketProvider = ({ children }) => {
 
     linkupRequestSocket.on("request-accepted", (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
-
       dispatch(incrementUnreadNotificationsCount());
     });
 
@@ -102,16 +131,17 @@ export const SocketProvider = ({ children }) => {
     return () => {
       linkupManagementSocket.disconnect();
       linkupRequestSocket.disconnect();
-      messagingSocket.disconnect();
+      // messagingSocket.disconnect();
       console.log("Client side disconnected from sockets.");
     };
   }, [
     addSnackbar,
-    dispatch,
+    conversations,
     linkupManagementSocket,
     linkupRequestSocket,
     messagingSocket,
     userId,
+    dispatch,
   ]);
 
   const sockets = {

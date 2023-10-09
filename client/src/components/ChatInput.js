@@ -4,6 +4,7 @@ import TextField from "@material-ui/core/TextField";
 import Fab from "@material-ui/core/Fab";
 import SendIcon from "@material-ui/icons/Send";
 import { useSockets } from "../contexts/SocketContext";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   chatInput: {
@@ -18,16 +19,31 @@ const useStyles = makeStyles((theme) => ({
   sendButton: {
     minWidth: "unset",
   },
+  // Define custom styles for the input and label
+  input: {
+    color: "white", // Change the text color
+  },
+  label: {
+    color: "lightblue", // Change the label color
+  },
 }));
 
 const ChatInput = ({ senderId, receiverId, conversationId }) => {
   const classes = useStyles();
+  const { colorMode } = useColorMode(); // Get the color mode
+
   const { messagingSocket } = useSockets();
 
   const [messageContent, setMessageContent] = useState("");
 
   const handleSendMessage = () => {
-    if (messagingSocket && senderId && receiverId && conversationId) {
+    if (
+      messagingSocket &&
+      senderId &&
+      receiverId &&
+      conversationId &&
+      messageContent.length > 0
+    ) {
       // Emit a "send-message" event to the server with user input
       messagingSocket.emit("send-message", {
         sender_id: senderId,
@@ -41,6 +57,15 @@ const ChatInput = ({ senderId, receiverId, conversationId }) => {
     }
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      // Prevent the default behavior of the "Enter" key (e.g., line break in the text field)
+      event.preventDefault();
+      // Call the handleSendMessage function to send the message
+      handleSendMessage();
+    }
+  };
+
   return (
     <div className={classes.chatInput}>
       <TextField
@@ -49,6 +74,15 @@ const ChatInput = ({ senderId, receiverId, conversationId }) => {
         className={classes.textField}
         value={messageContent}
         onChange={(e) => setMessageContent(e.target.value)}
+        onKeyPress={handleKeyPress}
+        InputProps={{
+          // Conditionally apply custom input styles based on the colorMode
+          className: colorMode === "dark" ? classes.input : "",
+        }}
+        InputLabelProps={{
+          // Apply custom label styles
+          className: colorMode === "dark" ? classes.label : "",
+        }}
       />
       <Fab
         color="primary"
