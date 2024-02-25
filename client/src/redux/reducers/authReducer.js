@@ -1,5 +1,6 @@
 import {
   LOGIN,
+  LOGOUT,
   UPDATE_PHONE_NUMBER,
   UPDATE_DEACTIVATED_USER,
 } from "../actions/actionTypes";
@@ -17,6 +18,11 @@ const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isAuthenticated: true,
+      };
+    case LOGOUT:
+      return {
+        ...state,
+        isAuthenticated: false,
       };
     case UPDATE_PHONE_NUMBER:
       return {

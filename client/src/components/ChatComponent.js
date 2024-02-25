@@ -1,25 +1,58 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import Avatar from "@material-ui/core/Avatar";
-import { getConversationMessages } from "../api/messagingAPI";
+import {
+  markConversationMessagesAsRead,
+  getConversationMessages,
+} from "../api/messagingAPI";
 import { useSelector, useDispatch } from "react-redux";
-import { setMessages } from "../redux/actions/conversationActions";
+import { getUnreadMessagesCount } from "../api/messagingAPI";
+import {
+  updateConversation,
+  setMessages,
+} from "../redux/actions/conversationActions";
+import { setUnreadMessagesCount } from "../redux/actions/messageActions";
 import ChatInput from "./ChatInput";
+import HorizontalMenu from "./HorizontalMenu";
 
 const useStyles = makeStyles((theme) => ({
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingTop: theme.spacing(1.5),
+    paddingBottom: theme.spacing(1.5),
+    borderBottom: "1px solid #e1e8ed",
+  },
+  headerLeft: {
+    display: "flex",
+    alignItems: "center",
+  },
+  headerRight: {
+    display: "flex",
+    alignItems: "center",
+  },
+  headerAvatar: {
+    width: "40px",
+    height: "40px",
+    marginRight: theme.spacing(2),
+  },
+  headerName: {
+    fontWeight: "bold",
+  },
+  menu: {
+    marginLeft: "auto", // Push the menu to the right
+  },
   chatSection: {
     overflow: "auto",
     padding: theme.spacing(6),
-    height: "80%",
-    borderBottom: "1px solid #e1e8ed",
     display: "flex",
     flexDirection: "column",
     gap: "10px",
-    alignItems: "stretch", // Adjusted alignment
-  },
-  noAvatarMargin: {
-    margin: "25px",
+    alignItems: "stretch",
   },
   bubbleContainer: {
     display: "flex",
@@ -27,26 +60,26 @@ const useStyles = makeStyles((theme) => ({
     cursor: "default",
   },
   bubble: {
-    borderRadius: "10px", // Increased border radius
-    padding: "10px", // Increased padding
-    width: "70%",
+    borderRadius: "10px",
+    padding: "10px",
+    width: "65%",
     margin: "5px",
   },
   senderBubble: {
-    backgroundColor: "#0084ff", // Changed sender bubble color
+    backgroundColor: "#0084ff",
     color: "#fff",
     marginLeft: "auto",
-    borderTopRightRadius: "0px", // Adjusted border radius
+    borderTopRightRadius: "0px",
   },
   recipientBubble: {
-    backgroundColor: "#707070", // Changed recipient bubble color
-    color: "#fff", // Changed text color
-    borderTopLeftRadius: "0px", // Adjusted border radius
+    backgroundColor: "#707070",
+    color: "#fff",
+    borderTopLeftRadius: "0px",
     marginRight: "auto",
   },
   avatar: {
     marginRight: "8px",
-    alignSelf: "flex-end", // Adjusted avatar alignment
+    alignSelf: "flex-end",
   },
   chatContainer: {
     display: "flex",
@@ -54,27 +87,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     height: "100%",
     width: "500px",
-  },
-  sendContainer: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(2),
-    borderTop: "1px solid #e1e8ed", // Added border
-    background: "#fff", // Changed background color
-  },
-  textField: {
-    flex: 1,
-    marginRight: theme.spacing(1),
-  },
-  sendButton: {
-    flexShrink: 0,
-  },
-  elapsedTime: {
-    marginLeft: theme.spacing(2),
-    fontSize: "12px",
-    opacity: 1,
-    transition: "opacity 0.3s ease-in-out",
-    alignSelf: "center", // Adjusted alignment
   },
 }));
 
@@ -87,17 +99,32 @@ const ChatComponent = () => {
   const messages = useSelector((state) => state.conversation.messages);
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
-
-  const senderId = userId;
-  const receiverId =
-    selectedConversation?.participant_id_1 === userId
-      ? selectedConversation?.participant_id_2
-      : selectedConversation?.participant_id_1;
-
+  const [showElapsedTime, setShowElapsedTime] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  // const [messagesToMarkAsRead, setMessagesToMarkAsRead] = useState([]);
   const chatListRef = useRef(null);
 
-  const [showElapsedTime, setShowElapsedTime] = useState(false);
-  const elapsedTimeDisplayDuration = 3000;
+  const senderId = useMemo(() => {
+    return userId;
+  }, [userId]);
+
+  const receiverId = useMemo(() => {
+    return selectedConversation?.participant_id_1 === userId
+      ? selectedConversation?.participant_id_2
+      : selectedConversation?.participant_id_1;
+  }, [selectedConversation, userId]);
+
+  const receiverAvatar = useMemo(() => {
+    return selectedConversation?.participant_id_1 === userId
+      ? selectedConversation?.participant_avatar_2
+      : selectedConversation?.participant_avatar_1;
+  }, [selectedConversation, userId]);
+
+  const receiverName = useMemo(() => {
+    return selectedConversation?.participant_id_1 === userId
+      ? selectedConversation?.participant_name_2
+      : selectedConversation?.participant_name_1;
+  }, [selectedConversation, userId]);
 
   const scrollToBottom = () => {
     if (chatListRef.current && messages.length > 0) {
@@ -105,6 +132,69 @@ const ChatComponent = () => {
       lastMessage.scrollIntoView({ behavior: "auto" });
     }
   };
+
+  // const markMessageAsRead = (messageId) => {
+  //   setMessagesToMarkAsRead((prevMessages) => [...prevMessages, messageId]);
+  // };
+
+  // const markMessagesAsReadOnScroll = () => {
+  //   if (chatListRef.current && messages) {
+  //     const options = {
+  //       root: chatListRef.current,
+  //       rootMargin: "0px",
+  //       threshold: 0.1,
+  //     };
+
+  //     const callback = (entries) => {
+  //       entries.forEach((entry) => {
+  //         if (entry.isIntersecting) {
+  //           const messageId = entry.target.dataset.messageid; // Ensure consistent data attribute name
+  //           console.log("Marking message as read:", messageId);
+  //           markMessageAsRead(messageId);
+  //         }
+  //       });
+  //     };
+
+  //     const observer = new IntersectionObserver(callback, options);
+
+  //     messages.forEach((message) => {
+  //       const messageElement = document.getElementById(
+  //         `message-${message.message_id}`
+  //       );
+  //       if (messageElement) {
+  //         console.log("Observing message:", message.message_id);
+  //         observer.observe(messageElement);
+  //       }
+  //     });
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (messagesToMarkAsRead.length > 0) {
+  //     markMessagesAsReadBatch(messagesToMarkAsRead, receiverId)
+  //       .then((response) => {
+  //         const { unread_count } = response;
+
+  //         if (selectedConversation) {
+  //           const updatedConversation = {
+  //             ...selectedConversation,
+  //             unread_count: unread_count,
+  //           };
+
+  //           dispatch(updateConversation(updatedConversation));
+  //         }
+
+  //         setMessagesToMarkAsRead([]);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error marking messages as read:", error);
+  //       });
+  //   }
+  // }, [messagesToMarkAsRead, selectedConversation]);
+
+  // useEffect(() => {
+  //   markMessagesAsReadOnScroll();
+  // }, [selectedConversation]);
 
   const getElapsedTime = (timestamp) => {
     const currentTime = new Date();
@@ -133,7 +223,7 @@ const ChatComponent = () => {
 
     setTimeout(() => {
       setShowElapsedTime(false);
-    }, elapsedTimeDisplayDuration);
+    }, 3000);
   };
 
   useEffect(() => {
@@ -144,6 +234,33 @@ const ChatComponent = () => {
     const fetchMessages = async () => {
       if (selectedConversation?.conversation_id) {
         const conversationId = selectedConversation?.conversation_id;
+
+        if (selectedConversation.unread_count > 0) {
+          try {
+            await markConversationMessagesAsRead(
+              selectedConversation.conversation_id,
+              receiverId
+            );
+
+            const updatedConversation = {
+              ...selectedConversation,
+              unread_count: 0,
+            };
+
+            dispatch(updateConversation(updatedConversation));
+
+            // Fetch unread conversations count and update Redux state
+            getUnreadMessagesCount(loggedUser.user.id)
+              .then((data) => {
+                dispatch(setUnreadMessagesCount(Number(data.unread_count)));
+              })
+              .catch((error) => {
+                console.error("Error fetching unread messages count:", error);
+              });
+          } catch (error) {
+            console.error("Error marking messages as read:", error);
+          }
+        }
 
         if (conversationId && userId)
           try {
@@ -183,6 +300,32 @@ const ChatComponent = () => {
     <div className={classes.chatContainer}>
       {selectedConversation?.conversation_id && (
         <>
+          <div className={classes.header}>
+            <div className={classes.headerLeft}>
+              <Avatar
+                alt={receiverName}
+                src={receiverAvatar}
+                className={classes.headerAvatar}
+              />
+              <div className={classes.headerName}>{receiverName}</div>
+            </div>
+            <div className={classes.headerRight}>
+              {selectedConversation?.linkup_creator_id === userId ? (
+                <HorizontalMenu
+                  showGoToItem={false}
+                  showEditItem={false}
+                  showDeleteItem={false}
+                  showCloseItem={false}
+                  showCheckInLinkup={true}
+                  showAcceptLinkupRequest={true}
+                  menuAnchor={menuAnchor}
+                  setMenuAnchor={setMenuAnchor}
+                />
+              ) : (
+                <div />
+              )}
+            </div>
+          </div>
           <List className={classes.chatSection} ref={chatListRef}>
             {messages?.map((message, index) => {
               const isLastMessage =
@@ -195,8 +338,15 @@ const ChatComponent = () => {
 
               const isCurrentUserMessage = message.sender_id === userId;
 
+              const messageElementId = `message-${message.message_id}`;
+
               return (
-                <div key={message?.message_id} onClick={handleBubbleClick}>
+                <div
+                  id={messageElementId}
+                  key={message?.message_id}
+                  onClick={handleBubbleClick}
+                  data-messageid={message?.message_id}
+                >
                   <div className={classes.bubbleContainer}>
                     {!isCurrentUserMessage &&
                     (isNextMessageDifferentSender || isLastMessage) ? (
@@ -227,6 +377,7 @@ const ChatComponent = () => {
               );
             })}
           </List>
+
           <ChatInput
             senderId={senderId}
             receiverId={receiverId}

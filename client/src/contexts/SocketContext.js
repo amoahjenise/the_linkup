@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { useDispatch } from "react-redux";
+import { incrementUnreadMessagesCount } from "../redux/actions/messageActions";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   updateConversation,
@@ -19,6 +20,10 @@ export const SocketProvider = ({ children }) => {
   );
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
+
+  const selectedConversation = useSelector(
+    (state) => state.conversation.selectedConversation
+  );
 
   // Create Socket.IO instances for both services
   const linkupManagementSocket = io("http://localhost:3003", {
@@ -89,6 +94,11 @@ export const SocketProvider = ({ children }) => {
           // Dispatch the updateConversation action to update the conversation in the Redux store
           dispatch(updateConversation(updatedConversation));
         }
+      }
+
+      // Increment the unread messages count if the user is not in the current conversation
+      if (selectedConversation?.conversation_id !== conversation_id) {
+        dispatch(incrementUnreadMessagesCount());
       }
     });
 

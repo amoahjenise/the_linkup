@@ -10,6 +10,16 @@ router.get(
   messagingController.getMessagesForConversation
 );
 
+router.post(
+  "/mark-conversation-messages-as-read",
+  messagingController.markMessagesAsRead
+);
+
+router.get(
+  "/unread-messages-count/:userId",
+  messagingController.getUnreadMessagesCount
+);
+
 // router.post("/mark-as-read", messagingController.markAsRead);
 
 module.exports = router;

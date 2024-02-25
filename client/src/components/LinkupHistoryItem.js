@@ -167,6 +167,8 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
             showEditItem={true}
             showDeleteItem={true}
             showCloseItem={true}
+            showCheckInLinkup={false}
+            showAcceptLinkupRequest={false}
             linkupItem={linkup}
             setShouldFetchLinkups={setShouldFetchLinkups}
             menuAnchor={menuAnchor}

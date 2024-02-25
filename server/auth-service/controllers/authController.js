@@ -15,68 +15,95 @@ const authToken = process.env.AUTH_TOKEN;
 const verifySid = process.env.VERIFY_SID;
 const client = require("twilio")(accountSid, authToken);
 
-// Register a new user
-const registerUser = async (req, res) => {
+// Create a new user
+const createUser = async (req, res) => {
   // Validate user input
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { newUser } = req.body;
+  const { id, phoneNumber } = req;
 
   try {
-    // Hash the password before storing it in the database
-    const hashedPassword = await bcrypt.hash(newUser.password.trim(), 10);
-
-    // Insert the user into the database
-    const queryPath = path.join(__dirname, "../db/queries/registerUser.sql");
+    // Insert the new user into the database
+    const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
-    const queryValues = [
-      newUser.phoneNumber,
-      hashedPassword,
-      newUser.name,
-      newUser.gender,
-      newUser.dateOfBirth,
-      newUser.avatarURL,
-    ];
+    const queryValues = [id, phoneNumber];
 
     const { rows, rowCount } = await pool.query(query, queryValues);
 
     if (rowCount > 0) {
-      // Generate an access token
-      const accessToken = jwt.sign({ userId: rows[0].id }, secret, {
-        expiresIn: accessTokenExpiration,
-      });
-
-      // Store the access token in Cookies
-      res.cookie("access_token", accessToken, {
-        secure: process.env.ENVIRONMENT === "production",
-        httpOnly: true,
-        maxAge: 1 * 60 * 60 * 1000, // 1 hour
-        domain: "localhost",
-        path: "/",
-      });
-
-      // Generate a refresh token for the user and store it
-      const refreshToken = await generateRefreshToken(rows[0]);
-      res.status(200).json({
-        user: rows[0],
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        success: true,
-        message: "Registration successful",
-      });
-    } else {
-      res
-        .status(500)
-        .json({ success: false, message: "Failed to create user" });
+      return rows[0];
     }
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ success: false, message: "Failed to create user" });
   }
 };
+
+// // Register a new user
+// const registerUser = async (req, res) => {
+//   // Validate user input
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+
+//   const { newUser } = req.body;
+
+//   try {
+//     // Hash the password before storing it in the database
+//     const hashedPassword = await bcrypt.hash(newUser.password.trim(), 10);
+
+//     // Insert the user into the database
+//     const queryPath = path.join(__dirname, "../db/queries/registerUser.sql");
+//     const query = fs.readFileSync(queryPath, "utf8");
+//     const queryValues = [
+//       newUser.phoneNumber,
+//       hashedPassword,
+//       newUser.name,
+//       newUser.gender,
+//       newUser.dateOfBirth,
+//       newUser.avatarURL,
+//     ];
+
+//     const { rows, rowCount } = await pool.query(query, queryValues);
+
+//     if (rowCount > 0) {
+//       // Generate an access token
+//       const accessToken = jwt.sign({ userId: rows[0].id }, secret, {
+//         expiresIn: accessTokenExpiration,
+//       });
+
+//       // Store the access token in Cookies
+//       res.cookie("access_token", accessToken, {
+//         secure: process.env.ENVIRONMENT === "production",
+//         httpOnly: true,
+//         maxAge: 1 * 60 * 60 * 1000, // 1 hour
+//         domain: "localhost",
+//         path: "/",
+//       });
+
+//       // Generate a refresh token for the user and store it
+//       const refreshToken = await generateRefreshToken(rows[0]);
+//       res.status(200).json({
+//         user: rows[0],
+//         access_token: accessToken,
+//         refresh_token: refreshToken,
+//         success: true,
+//         message: "Registration successful",
+//       });
+//     } else {
+//       res
+//         .status(500)
+//         .json({ success: false, message: "Failed to create user" });
+//     }
+//   } catch (error) {
+//     console.error("Error creating user:", error);
+//     res.status(500).json({ success: false, message: "Failed to create user" });
+//   }
+// };
 
 // Login an existing user
 const loginUser = async (req, res) => {
@@ -100,40 +127,40 @@ const loginUser = async (req, res) => {
 
     const { rows, rowCount } = await pool.query(queryText, queryValues);
 
-    if (rowCount === 0) {
-      return res
-        .status(401)
-        .json({ message: "Invalid phone number or password" });
-    }
+    // if (rowCount === 0) {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Invalid phone number or password" });
+    // }
 
-    // Compare the provided password with the hashed password in the database
-    const isPasswordValid = await bcrypt.compare(password, rows[0].password);
+    // // Compare the provided password with the hashed password in the database
+    // const isPasswordValid = await bcrypt.compare(password, rows[0].password);
 
-    if (!isPasswordValid) {
-      return res
-        .status(401)
-        .json({ message: "Invalid phone number or password" });
-    }
+    // if (!isPasswordValid) {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Invalid phone number or password" });
+    // }
 
-    // Generate an access token
-    const accessToken = jwt.sign({ userId: rows[0].id }, secret, {
-      expiresIn: accessTokenExpiration,
-    });
+    // // Generate an access token
+    // const accessToken = jwt.sign({ userId: rows[0].id }, secret, {
+    //   expiresIn: accessTokenExpiration,
+    // });
 
-    res.cookie("access_token", accessToken, {
-      secure: process.env.ENVIRONMENT === "production",
-      httpOnly: true,
-      maxAge: 1 * 60 * 60 * 1000, // 1 hour
-      domain: "localhost",
-      path: "/",
-    });
+    // res.cookie("access_token", accessToken, {
+    //   secure: process.env.ENVIRONMENT === "production",
+    //   httpOnly: true,
+    //   maxAge: 1 * 60 * 60 * 1000, // 1 hour
+    //   domain: "localhost",
+    //   path: "/",
+    // });
 
-    const refreshToken = await generateRefreshToken(rows[0]);
+    // const refreshToken = await generateRefreshToken(rows[0]);
     res.status(200).json({
       success: true,
       user: rows[0],
-      accessToken,
-      refreshToken,
+      // accessToken,
+      // refreshToken,
       message: "Authentication successful",
     });
   } catch (error) {
@@ -296,7 +323,8 @@ const clearAccessToken = (req, res) => {
 };
 
 module.exports = {
-  registerUser,
+  createUser,
+  // registerUser,
   loginUser,
   getUserByPhoneNumber,
   verifyCode,

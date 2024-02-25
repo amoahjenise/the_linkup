@@ -14,4 +14,7 @@ router.patch(
 router.patch("/update-user-bio/:userId", userController.updateUserBio); // Use PATCH for partial updates
 router.patch("/update-user-avatar/:userId", userController.updateUserAvatar); // Use PATCH for partial updates
 
+// Route for update an existing user
+router.patch("/update-user", userController.updateUser);
+
 module.exports = router;

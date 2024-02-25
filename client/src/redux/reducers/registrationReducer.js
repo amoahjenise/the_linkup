@@ -7,7 +7,7 @@ import {
 
 const initialState = {
   currentStep: 0,
-  steps: ["User Info", "Avatar", "Password", "Launch"],
+  steps: ["User Info", "Avatar", "Launch"],
 };
 
 const registrationReducer = (state = initialState, action) => {

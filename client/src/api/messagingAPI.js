@@ -10,6 +10,32 @@ const handleError = (error) => {
   throw error;
 };
 
+export const markConversationMessagesAsRead = async (
+  conversationId,
+  receiverId
+) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/mark-conversation-messages-as-read`,
+      { conversationId, receiverId }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const updateUnreadConversationsCount = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/conversations/unread-count/${userId}`
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export const getConversations = async (userId) => {
   try {
     const response = await axios.get(`${BASE_URL}/api/conversations/${userId}`);
@@ -43,6 +69,18 @@ export const createNewConversation = async (
       message_content: message,
       linkup_id: linkupId,
     });
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// New function to fetch unread message count
+export const getUnreadMessagesCount = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/unread-messages-count/${userId}`
+    );
     return response.data;
   } catch (error) {
     handleError(error);

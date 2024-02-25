@@ -1,10 +1,14 @@
-// reducers/conversationReducer.js
+// conversationReducer.js
+
 import {
   NEW_MESSAGE,
   SET_CONVERSATIONS,
   SET_SELECTED_CONVERSATION,
   SET_MESSAGES,
   UPDATE_CONVERSATION,
+  INCREMENT_UNREAD_COUNT,
+  DECREMENT_UNREAD_COUNT,
+  RESET_UNREAD_COUNT,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -30,6 +34,7 @@ const conversationReducer = (state = initialState, action) => {
         last_message: action.updatedConversation.last_message,
         last_message_timestamp:
           action.updatedConversation.last_message_timestamp,
+        unread_count: action.updatedConversation.unread_count,
       };
 
       // Create a copy of the conversations array with the updated conversation
@@ -76,6 +81,85 @@ const conversationReducer = (state = initialState, action) => {
         ...state,
         messages: updatedMessages,
       };
+    case INCREMENT_UNREAD_COUNT:
+      // Find the index of the conversation to update
+      const conversationIndexToIncrement = state.conversations.findIndex(
+        (conversation) => conversation.conversation_id === action.conversationId
+      );
+
+      if (conversationIndexToIncrement !== -1) {
+        // Create a copy of the conversation with the incremented unread_count
+        const conversationToIncrement = {
+          ...state.conversations[conversationIndexToIncrement],
+          unread_count:
+            state.conversations[conversationIndexToIncrement].unread_count + 1,
+        };
+
+        // Create a copy of the conversations array with the updated conversation
+        const conversationsWithIncrement = [...state.conversations];
+        conversationsWithIncrement[conversationIndexToIncrement] =
+          conversationToIncrement;
+
+        return {
+          ...state,
+          conversations: conversationsWithIncrement,
+        };
+      }
+
+      return state;
+
+    case DECREMENT_UNREAD_COUNT:
+      // Find the index of the conversation to update
+      const conversationIndexToDecrement = state.conversations.findIndex(
+        (conversation) => conversation.conversation_id === action.conversationId
+      );
+
+      if (conversationIndexToDecrement !== -1) {
+        // Create a copy of the conversation with the decremented unread_count
+        const conversationToDecrement = {
+          ...state.conversations[conversationIndexToDecrement],
+          unread_count:
+            state.conversations[conversationIndexToDecrement].unread_count - 1,
+        };
+
+        // Create a copy of the conversations array with the updated conversation
+        const conversationsWithDecrement = [...state.conversations];
+        conversationsWithDecrement[conversationIndexToDecrement] =
+          conversationToDecrement;
+
+        return {
+          ...state,
+          conversations: conversationsWithDecrement,
+        };
+      }
+
+      return state;
+
+    case RESET_UNREAD_COUNT:
+      // Find the index of the conversation to update
+      const conversationIndexToReset = state.conversations.findIndex(
+        (conversation) => conversation.conversation_id === action.conversationId
+      );
+
+      if (conversationIndexToReset !== -1) {
+        // Create a copy of the conversation with the reset unread_count
+        const conversationToReset = {
+          ...state.conversations[conversationIndexToReset],
+          unread_count: 0, // Reset to 0
+        };
+
+        // Create a copy of the conversations array with the updated conversation
+        const conversationsWithReset = [...state.conversations];
+        conversationsWithReset[conversationIndexToReset] = conversationToReset;
+
+        return {
+          ...state,
+          conversations: conversationsWithReset,
+        };
+      }
+
+      return state;
+
     default:
       return state;
   }

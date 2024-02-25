@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { makeStyles } from "@material-ui/core/styles";
 import Resizer from "react-image-file-resizer";
@@ -42,14 +42,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AvatarUploadInput = ({ avatarURL, setAvatarURL }) => {
+const AvatarUploadInput = ({ userData, setUserData }) => {
   const classes = useStyles();
-  const [isImageUploaded, setIsImageUploaded] = useState(!!avatarURL);
+  const [isImageUploaded, setIsImageUploaded] = useState(!!userData.avatarURL);
 
   useEffect(() => {
     // Update 'isImageUploaded' state when 'avatarURL' changes
-    setIsImageUploaded(!!avatarURL);
-  }, [avatarURL]);
+    setIsImageUploaded(!!userData.avatarURL);
+  }, [userData.avatarURL]);
 
   const handleImageChange = (acceptedFiles) => {
     try {
@@ -66,7 +66,7 @@ const AvatarUploadInput = ({ avatarURL, setAvatarURL }) => {
           (resizedImage) => {
             // Update the registration with the data URL of the resized image
             // dispatch(updateRegistrationData({ avatarURL: resizedImage }));
-            setAvatarURL(resizedImage);
+            setUserData({ ...userData, avatarURL: resizedImage });
             // setIsImageUploaded(true);
           },
           "base64"
@@ -92,7 +92,11 @@ const AvatarUploadInput = ({ avatarURL, setAvatarURL }) => {
         <input {...getInputProps()} />
         <div className={classes.avatar}>
           {isImageUploaded ? (
-            <img src={avatarURL} alt="" className={classes.avatarImage} />
+            <img
+              src={userData.avatarURL}
+              alt=""
+              className={classes.avatarImage}
+            />
           ) : (
             <span className={classes.uploadText}>
               Upload Profile Picture. Drag and drop an image here

@@ -52,9 +52,9 @@ const SignupPage = () => {
           <Grid item xs={12} sm={6} md={4}>
             <div className={classes.content}>
               <LogoHeader />
-              {isNavigateToRegistration ? (
-                <RegistrationProcess />
-              ) : isNavigateToUserAuthentication ? (
+              {/* {isNavigateToRegistration ? ( */}
+              <RegistrationProcess />
+              {/* ) : isNavigateToUserAuthentication ? (
                 <UserAuthentication />
               ) : (
                 <PhoneVerification
@@ -64,7 +64,7 @@ const SignupPage = () => {
                     handleNavigateToUserAuthentication
                   }
                 />
-              )}
+              )} */}
             </div>
           </Grid>
         </Grid>

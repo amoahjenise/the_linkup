@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
@@ -12,6 +12,9 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import LogoutButton from "./LogoutButton";
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../logo.png";
+// import { useUser } from "@clerk/clerk-react";
+import CustomUserButton from "./UserButton";
+import { performLogout } from "../redux/actions/authActions";
 
 const drawerWidth = "20%";
 
@@ -67,20 +70,39 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     backgroundColor: "#000", // Set the background color to black
   },
+  messagingBadge: {
+    marginRight: theme.spacing(1),
+  },
 }));
 
 const LeftMenu = ({ isMobile }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  // const { isSignedIn } = useUser();
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const isAuthenticated = loggedUser.user.id;
+
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
   );
+
+  const unreadMessagesCount = useSelector(
+    (state) => state.messages.unreadMessagesCount
+  );
+
   const location = useLocation(); // Get the current route location
   const { colorMode } = useColorMode();
 
   const filterStyle =
     colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none"; // Set filter style based on colorMode
 
-  return (
+  const handleLogout = async () => {
+    // Dispatch the action to trigger state reset
+    // dispatch({ type: "LOGOUT" });
+    dispatch(performLogout());
+  };
+
+  return isAuthenticated ? (
     <div className={isMobile ? classes.mobileMenuContainer : classes.main}>
       {isMobile ? (
         <div className={classes.mobileMenuContainer}>
@@ -110,6 +132,7 @@ const LeftMenu = ({ isMobile }) => {
               to="/messages"
               icon={<MessageIcon />}
               location={location.pathname}
+              badgeContent={unreadMessagesCount} // Pass the count to the messaging icon
             />
             <MenuItem
               to="/settings"
@@ -160,6 +183,7 @@ const LeftMenu = ({ isMobile }) => {
               icon={<MessageIcon />}
               text="Messages"
               location={location.pathname}
+              badgeContent={unreadMessagesCount} // Pass the count to the messaging icon
             />
             <MenuItem
               to="/settings"
@@ -168,12 +192,14 @@ const LeftMenu = ({ isMobile }) => {
               location={location.pathname}
             />
             <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
-              <LogoutButton />
+              <CustomUserButton onSignOut={handleLogout} />
             </li>
           </ul>
         </div>
       )}
     </div>
+  ) : (
+    <></>
   );
 };
 

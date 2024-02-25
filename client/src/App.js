@@ -1,14 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-} from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
 import UserProfilePage from "./pages/UserProfilePage";
@@ -17,17 +10,26 @@ import ConversationsPage from "./pages/ConversationsPage";
 import LinkupHistoryPage from "./pages/LinkupHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
-// import SelectedConversationPage from "./pages/SelectedConversationPage";
 import SettingsPage from "./pages/SettingsPage";
-import NotificationsTestPage from "./__tests__/componentTests/NotificationTestPage";
 import LeftMenu from "./components/LeftMenu";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
+import { setUnreadMessagesCount } from "./redux/actions/messageActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
+import { getUnreadMessagesCount } from "./api/messagingAPI";
 import { useSelector } from "react-redux";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ToggleColorMode from "./components/ToggleColorMode";
 import "./App.css";
+import { ClerkProvider } from "@clerk/clerk-react";
+import ClerkCustomSignIn from "./sign-in/[[...index]]";
+import ClerkCustomSignUp from "./sign-up/[[...index]]";
+
+if (!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
+
+const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -40,103 +42,85 @@ const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
-  const authState = useSelector((state) => state.auth);
-  const isAuthenticated = authState.isAuthenticated;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const PrivateRoutes = ({ path, element }) => {
-    return isAuthenticated ? (
-      <div className={classes.app}>
-        <LeftMenu isMobile={isMobile} />
-        <Outlet />
-      </div>
-    ) : (
-      <Navigate to="/" />
+  useEffect(() => {
+    // Check if loggedUser.user.id exists before fetching data
+    if (loggedUser.user.id) {
+      // Fetch unread conversations count and update Redux state
+      getUnreadMessagesCount(loggedUser.user.id)
+        .then((data) => {
+          dispatch(setUnreadMessagesCount(Number(data.unread_count)));
+        })
+        .catch((error) => {
+          console.error("Error fetching unread messages count:", error);
+        });
+
+      // Fetch unread notifications count and update Redux state
+      getUnreadNotificationsCount(loggedUser.user.id)
+        .then((data) => {
+          dispatch(updateUnreadNotificationsCount(Number(data.unreadCount)));
+        })
+        .catch((error) => {
+          console.error("Error fetching unread notifications count:", error);
+        });
+    }
+  }, [dispatch, loggedUser.user.id]);
+
+  const RoutesComponent = () => {
+    return (
+      <Routes>
+        <Route path="/" exact element={<LandingPage isMobile={isMobile} />} />
+        <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
+        <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
+        <Route path="/registration" element={<SignupPage />} />
+        <Route path="/home" element={<HomePage isMobile={isMobile} />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route
+          path="/profile/:id"
+          element={<UserProfilePage isMobile={isMobile} />}
+        />
+        <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
+        <Route
+          path="/history"
+          element={<LinkupHistoryPage isMobile={isMobile} />}
+        />
+        <Route
+          path="/history/expired"
+          element={<LinkupHistoryPage isMobile={isMobile} />}
+        />
+        <Route
+          path="/history/requests-sent"
+          element={<LinkupHistoryPage isMobile={isMobile} />}
+        />
+        <Route
+          path="/history/requests-received"
+          element={<LinkupHistoryPage isMobile={isMobile} />}
+        />
+        <Route
+          path="/messages"
+          element={<ConversationsPage isMobile={isMobile} />}
+        />
+        <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
     );
   };
 
-  useEffect(() => {
-    // Fetch unread notifications count and update Redux state
-    getUnreadNotificationsCount(loggedUser.user.id)
-      .then((data) => {
-        dispatch(updateUnreadNotificationsCount(Number(data.unreadCount)));
-      })
-      .catch((error) => {
-        console.error("Error fetching unread notifications count:", error);
-      });
-  }, [dispatch, loggedUser.user.id]);
-
   return (
-    <ThemeProvider theme={theme}>
-      <ToggleColorMode>
-        {/* <SocketProvider isAuthenticated={isAuthenticated}> */}
-        <div>
-          <Router>
-            <Routes>
-              <Route
-                path="/"
-                exact
-                element={<LandingPage isMobile={isMobile} />}
-              />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              {/* Protected routes */}
-              <Route element={<PrivateRoutes />}>
-                <Route
-                  path="/home"
-                  element={<HomePage isMobile={isMobile} />}
-                />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route
-                  path="/profile/:id"
-                  element={<UserProfilePage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/send-request/:linkupId"
-                  element={<SendRequestPage />}
-                />
-                <Route
-                  path="/history"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/expired"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/requests-sent"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/history/requests-received"
-                  element={<LinkupHistoryPage isMobile={isMobile} />}
-                />
-                <Route
-                  path="/messages"
-                  element={<ConversationsPage isMobile={isMobile} />}
-                />
-                {/* <Route
-                  path="/messages/:messageid/chat"
-                  element={<SelectedConversationPage />}
-                /> */}
-                <Route
-                  path="/linkup-request/:id"
-                  element={<AcceptDeclinePage />}
-                />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Route>
-
-              <Route
-                path="/test-notifications"
-                element={<NotificationsTestPage />}
-              />
-            </Routes>
-          </Router>
-        </div>
-        {/* </SocketProvider> */}
-      </ToggleColorMode>
-    </ThemeProvider>
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <ThemeProvider theme={theme}>
+        <ToggleColorMode>
+          <BrowserRouter>
+            <div className={`${loggedUser.user.id ? classes.app : ""}`}>
+              {loggedUser.user.id && <LeftMenu isMobile={isMobile} />}
+              <RoutesComponent />
+            </div>
+          </BrowserRouter>
+        </ToggleColorMode>
+      </ThemeProvider>
+    </ClerkProvider>
   );
 };
 

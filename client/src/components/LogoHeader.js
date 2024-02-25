@@ -28,9 +28,9 @@ const LogoHeader = () => {
 
   return (
     <div className={classes.main}>
-      <div className={classes.logoContainer}>
+      {/* <div className={classes.logoContainer}>
         <img src={logo} alt="Logo" className={classes.logo} />
-      </div>
+      </div> */}
       <Typography variant="h4" component="h1" className={classes.title}>
         LUUL
       </Typography>

@@ -23,6 +23,8 @@ const HorizontalMenu = ({
   showEditItem,
   showDeleteItem,
   showCloseItem,
+  showCheckInLinkup, // Ation for checking in the linkup
+  showAcceptLinkupRequest, // Action for accepting linkup requests
   linkupItem,
   menuAnchor,
   setMenuAnchor,
@@ -47,6 +49,16 @@ const HorizontalMenu = ({
 
   const closeModal = (modalName) => {
     setModalState({ ...modalState, [modalName]: false });
+  };
+
+  const handleCheckInClick = () => {
+    // Add your logic for checking in the linkup here
+    handleMenuClose();
+  };
+
+  const handleAcceptRequestClick = () => {
+    // Add your logic for accepting linkup requests here
+    handleMenuClose();
   };
 
   const handleEditClick = () => {
@@ -147,6 +159,16 @@ const HorizontalMenu = ({
             condition: showEditItem,
             label: "Edit this linkup",
             action: handleEditClick,
+          },
+          {
+            condition: showAcceptLinkupRequest, // Show the Accept Request option conditionally
+            label: "Accept linkup request", // Label for the Accept Request action
+            action: handleAcceptRequestClick, // Action for Accept Request
+          },
+          {
+            condition: showCheckInLinkup, // Show the Check-In option conditionally
+            label: "Check-In", // Label for the Check-In action
+            action: handleCheckInClick, // Action for Check-In
           },
           {
             condition: showDeleteItem,

@@ -114,6 +114,16 @@ export const createUser = async (userData) => {
   }
 };
 
+export const updateUser = async (userData) => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/api/update-user`, userData);
+    console.log("Updated User: ", response);
+    return response;
+  } catch (error) {
+    return handleError(error, "Failed to update existing user.");
+  }
+};
+
 export const updateUserBio = async (userId, bio) => {
   try {
     const response = await axios.patch(

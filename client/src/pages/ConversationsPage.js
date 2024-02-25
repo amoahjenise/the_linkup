@@ -8,6 +8,7 @@ import {
   setSelectedConversation,
   setConversations,
 } from "../redux/actions/conversationActions";
+import ScrollableList from "../components/ScrollableList";
 
 const useStyles = makeStyles((theme) => ({
   conversationsPage: {
@@ -85,6 +86,7 @@ const ConversationsPage = ({ isMobile }) => {
           </div>
           <div className={classes.chatSection}>
             <ChatComponent />
+            {/* <ScrollableList /> */}
           </div>
         </div>
       )}

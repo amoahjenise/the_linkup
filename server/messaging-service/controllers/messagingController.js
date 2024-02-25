@@ -243,10 +243,75 @@ const createNewConversation = async (data) => {
   }
 };
 
+const getUnreadMessagesCount = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Use the SQL query to get the conversations' unread count for the specific user
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/getUnreadMessagesCount.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+
+    // Execute the query with parameterized values
+    const { rows } = await pool.query(query, [userId]);
+
+    // Extract the total unread count from the result
+    const totalUnreadCount = rows[0].total_unread_count;
+
+    console.log("totalUnreadCount", totalUnreadCount);
+    res.json({
+      success: true,
+      message: "Unread message count retrieved successfully",
+      unread_count: totalUnreadCount,
+    });
+  } catch (error) {
+    console.error("Error fetching unread message count:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch unread message count",
+      error: error.message,
+    });
+  }
+};
+
+const markMessagesAsRead = async (req, res) => {
+  const { conversationId, receiverId } = req.body;
+
+  try {
+    // Read the SQL query from the file
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/markConversationMessagesAsRead.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+
+    // Update the messages to mark them as read
+    const values = [conversationId, receiverId];
+
+    await pool.query(query, values);
+
+    res.json({
+      success: true,
+      message: "Messages marked as read successfully",
+    });
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to mark messages as read",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   initializeSocket,
   sendMessage,
   createNewConversation,
   getConversations,
   getMessagesForConversation,
+  getUnreadMessagesCount,
+  markMessagesAsRead,
 };

@@ -1,4 +1,3 @@
-import { clearAccessToken } from "../../api/authenticationAPI";
 import {
   LOGIN,
   LOGOUT,
@@ -23,7 +22,6 @@ export const updateDeactivatedUser = (user) => ({
 });
 
 // Action creator for logout
-export const performLogout = () => async (dispatch) => {
-  // Dispatch the logout action to update the Redux state
-  dispatch({ type: LOGOUT });
-};
+export const performLogout = () => ({
+  type: LOGOUT,
+});

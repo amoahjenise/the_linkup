@@ -17,11 +17,13 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.1",
+    "@clerk/clerk-react": "^4.27.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "framer-motion": "^10.16.4",
     "if-env": "^1.0.4",
-    "react-router-dom": "^6.14.2"
+    "react-router-dom": "^6.14.2",
+    "svix": "^1.17.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

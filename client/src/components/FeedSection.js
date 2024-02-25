@@ -65,7 +65,7 @@ const FeedSection = ({
           )}
         </div>
       )}
-      {/* Floating Refresh Icon */}
+      {/* Floating Refresh Icon
       <div className={classes.refreshButton}>
         <Tooltip title="Refresh">
           <IconButton
@@ -76,7 +76,7 @@ const FeedSection = ({
             <RefreshIcon />
           </IconButton>
         </Tooltip>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -13,15 +13,15 @@ const passwordValidationOptions = {
   minSymbols: 1,
 };
 
-// Route for user registration
-router.post(
-  "/register",
-  [
-    check("phoneNumber").isMobilePhone(),
-    check("password").isStrongPassword(passwordValidationOptions),
-  ],
-  authController.registerUser
-);
+// // Route for user registration
+// router.post(
+//   "/register",
+//   [
+//     check("phoneNumber").isMobilePhone(),
+//     check("password").isStrongPassword(passwordValidationOptions),
+//   ],
+//   authController.registerUser
+// );
 
 // Route for user login
 router.post(
@@ -49,6 +49,6 @@ router.post("/refresh-token", authController.refreshToken);
 router.post("/clear-access-token", authController.clearAccessToken);
 
 // Route for registering a new user
-router.post("/register-user", authController.registerUser);
+// router.post("/register-user", authController.registerUser);
 
 module.exports = router;

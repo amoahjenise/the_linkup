@@ -10,24 +10,25 @@ import { SnackbarProvider } from "./contexts/SnackbarContext";
 import Modal from "react-modal";
 import { SocketProvider } from "./contexts/SocketContext";
 
-Modal.setAppElement("#root"); // Assuming your root element has an id of 'root'
+Modal.setAppElement("#root");
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <SnackbarProvider>
-        <SocketProvider>
-          <React.StrictMode>
-            <ChakraProvider theme={theme}>
-              <ColorModeScript
-                initialColorMode={theme.config.initialColorMode}
-              />
-              <App />
-            </ChakraProvider>
-          </React.StrictMode>
-        </SocketProvider>
-      </SnackbarProvider>
+        <SnackbarProvider>
+          <SocketProvider>
+            <React.StrictMode>
+              <ChakraProvider theme={theme}>
+                <ColorModeScript
+                  initialColorMode={theme.config.initialColorMode}
+                />
+                <App />
+              </ChakraProvider>
+            </React.StrictMode>
+          </SocketProvider>
+        </SnackbarProvider>
     </PersistGate>
   </Provider>
 );

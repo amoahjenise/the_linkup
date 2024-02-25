@@ -1,10 +1,12 @@
 import React from "react";
 import AvatarUploadInput from "../AvatarUploadInput";
 
-const SecondStep = ({ avatarURL, setAvatarURL }) => {
+const SecondStep = ({ userData, setUserData }) => {
+  console.log("Second Step userData: ", userData);
+
   return (
     <div>
-      <AvatarUploadInput avatarURL={avatarURL} setAvatarURL={setAvatarURL} />
+      <AvatarUploadInput userData={userData} setUserData={setUserData} />
     </div>
   );
 };

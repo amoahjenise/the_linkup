@@ -2,12 +2,17 @@ import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import FeedSection from "../components/FeedSection";
-import CreateLinkupForm from "../components/CreateLinkupForm";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { getLinkups } from "../api/linkupAPI";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useUser } from "@clerk/clerk-react";
+import { getUserByPhoneNumber } from "../api/authenticationAPI";
+import { createUser } from "../api/usersAPI";
+import { setCurrentUser } from "../redux/actions/userActions";
+import WidgetSection from "../components/WidgetSection";
+import { login } from "../redux/actions/authActions";
 
 const useStyles = makeStyles((theme) => ({
   homePage: {
@@ -16,6 +21,14 @@ const useStyles = makeStyles((theme) => ({
   },
   feedSection: {
     flex: "2",
+    overflowY: "auto",
+    overflowX: "hidden",
+    marginLeft: "auto",
+    marginRight: "auto",
+    borderRight: "1px solid #ccc",
+  },
+  widgetSection: {
+    flex: "1",
     overflowY: "auto",
     overflowX: "hidden",
     marginLeft: "auto",
@@ -33,82 +46,94 @@ const PAGE_SIZE = 10;
 
 const HomePage = ({ isMobile }) => {
   const classes = useStyles();
+  const { user } = useUser();
   const feedSectionRef = useRef(null);
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
-  const [totalPages, setTotalPages] = useState(1); // Define and initialize totalPages
-
+  const [totalPages, setTotalPages] = useState(1);
   const linkupList = useSelector((state) => state.linkups.linkupList);
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
   const gender = loggedUser.user.gender;
+  const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
 
-  const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]); // Maintain a list of already fetched linkup IDs
-
-  const fetchLinkupsAndPoll = useCallback(
-    async (page) => {
-      setIsFetchingNextPage(true);
+  useEffect(() => {
+    async function fetchData() {
       try {
-        // Fetch linkups for the current page
-        const adjustedPage = page - 1;
-        const sqlOffset = adjustedPage * PAGE_SIZE;
-        const response = await getLinkups(userId, gender, sqlOffset, PAGE_SIZE);
-
-        if (response.success) {
-          const activeLinkups = response.linkupList.filter(
-            (linkup) => linkup.status === "active"
+        // You can await here for asynchronous operations
+        if (!userId && user?.primaryPhoneNumber?.phoneNumber) {
+          const result = await getUserByPhoneNumber(
+            user.primaryPhoneNumber.phoneNumber
           );
-
-          // Combine the existing linkupList and the newly fetched linkups
-          const updatedLinkupList =
-            page === 1 ? activeLinkups : [...linkupList, ...activeLinkups];
-
-          // Filter out linkups that have already been fetched
-          const newLinkups = updatedLinkupList.filter(
-            (newLinkup) =>
-              !fetchedLinkupIds.includes(newLinkup.id) ||
-              updatedLinkupList.some(
-                (existingLinkup) =>
-                  existingLinkup.id === newLinkup.id &&
-                  new Date(newLinkup.updated_at) >
-                    new Date(existingLinkup.updated_at)
-              )
-          );
-
-          // Sort the updated list by created_at in descending order
-          updatedLinkupList.sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-          );
-
-          // Dispatch the updated linkup list without blocking the UI
-          requestAnimationFrame(() => {
-            dispatch(fetchLinkupsSuccess(updatedLinkupList));
-          });
-
-          setCurrentPage(page);
-
-          // Add the IDs of the newly fetched linkups to the list of fetched IDs
-          const newFetchedLinkupIds = newLinkups.map((linkup) => linkup.id);
-          setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
-
-          // Calculate totalPages based on the total number of linkups and PAGE_SIZE
-          const totalLinkups = response.linkupList[0]?.total_active_linkups;
-          const totalPages = Math.ceil(totalLinkups / PAGE_SIZE);
-          setTotalPages(totalPages);
-        } else {
-          console.error("Error fetching linkups:", response.message);
+          if (result.success) {
+            dispatch(setCurrentUser(result.user));
+            dispatch(login());
+          } else {
+            createUser();
+          }
         }
-
-        setIsFetchingNextPage(false);
       } catch (error) {
-        console.error("Error fetching linkups:", error);
-        setIsFetchingNextPage(false);
+        console.error("Error during user data fetch:", error);
       }
-    },
-    [dispatch, fetchedLinkupIds, gender, linkupList, userId]
-  );
+    }
+
+    // Call the async function immediately
+    fetchData();
+  }, [dispatch, user, user?.primaryPhoneNumber?.phoneNumber, userId]);
+
+  const fetchLinkupsAndPoll = useCallback(async (page) => {
+    setIsFetchingNextPage(true);
+    try {
+      const adjustedPage = page - 1;
+      const sqlOffset = adjustedPage * PAGE_SIZE;
+      const response = await getLinkups(userId, gender, sqlOffset, PAGE_SIZE);
+
+      if (response.success) {
+        const activeLinkups = response.linkupList.filter(
+          (linkup) => linkup.status === "active"
+        );
+
+        const updatedLinkupList =
+          page === 1 ? activeLinkups : [...linkupList, ...activeLinkups];
+
+        const newLinkups = updatedLinkupList.filter(
+          (newLinkup) =>
+            !fetchedLinkupIds.includes(newLinkup.id) ||
+            updatedLinkupList.some(
+              (existingLinkup) =>
+                existingLinkup.id === newLinkup.id &&
+                new Date(newLinkup.updated_at) >
+                  new Date(existingLinkup.updated_at)
+            )
+        );
+
+        updatedLinkupList.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        requestAnimationFrame(() => {
+          dispatch(fetchLinkupsSuccess(updatedLinkupList));
+        });
+
+        setCurrentPage(page);
+
+        const newFetchedLinkupIds = newLinkups.map((linkup) => linkup.id);
+        setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
+
+        const totalLinkups = response.linkupList[0]?.total_active_linkups;
+        const totalPages = Math.ceil(totalLinkups / PAGE_SIZE);
+        setTotalPages(totalPages);
+      } else {
+        console.error("Error fetching linkups:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching linkups:", error);
+    } finally {
+      setIsFetchingNextPage(false);
+    }
+  }, []);
 
   const handleScroll = useCallback(() => {
     const threshold = 10;
@@ -123,12 +148,16 @@ const HomePage = ({ isMobile }) => {
     }
   }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
 
+  // useEffect(() => {
+  //   setAuthenticatedUser();
+  // }, []);
+
   useEffect(() => {
     if (shouldFetchLinkups) {
       fetchLinkupsAndPoll(1);
       setShouldFetchLinkups(false);
     }
-  }, [dispatch, fetchLinkupsAndPoll, shouldFetchLinkups]);
+  }, [fetchLinkupsAndPoll, shouldFetchLinkups]);
 
   useEffect(() => {
     const scrollContainer = feedSectionRef.current;
@@ -156,7 +185,6 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
-    // Manually trigger a refresh to get the latest linkups
     fetchLinkupsAndPoll(1);
     scrollToTop();
   }, [fetchLinkupsAndPoll]);
@@ -183,10 +211,13 @@ const HomePage = ({ isMobile }) => {
         )}
       </div>
       {!isMobile && (
-        <CreateLinkupForm
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          scrollToTopCallback={scrollToTop}
-        />
+        <div className={classes.widgetSection}>
+          <WidgetSection
+            setShouldFetchLinkups={setShouldFetchLinkups}
+            scrollToTopCallback={scrollToTop}
+            onRefreshClick={refreshLinkups}
+          />
+        </div>
       )}
     </div>
   );

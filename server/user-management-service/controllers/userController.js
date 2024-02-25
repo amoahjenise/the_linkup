@@ -51,6 +51,53 @@ const getUserById = async (req, res) => {
   }
 };
 
+// Update an existing user
+const updateUser = async (req, res) => {
+  const { user } = req.body;
+
+  try {
+    // Construct the SQL query
+    const queryPath = path.join(__dirname, "../db/queries/updateUser.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+
+    // Execute the SQL query to update the user
+    const queryValues = [
+      user.clerkUserId,
+      user.name,
+      user.gender,
+      user.dateOfBirth,
+      user.avatarURL,
+    ];
+
+    const { rows, rowCount } = await pool.query(query, queryValues);
+
+    // Check if the user was successfully updated
+    if (rowCount > 0) {
+      // Retrieve the updated user data from the database if needed
+      // Assuming your SQL query returns the updated user data, you can access it from 'rows'
+      // const updatedUser = rows[0];
+
+      return res.status(200).json({
+        success: true,
+        message: "Updated user successfully",
+        user: rows[0],
+      });
+    } else {
+      // If rowCount is 0, it means no user was updated (probably no user with the provided clerkUserId exists)
+      return res.status(404).json({
+        success: false,
+        message: "User not found or not updated",
+      });
+    }
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update user",
+    });
+  }
+};
+
 const updateUserBio = async (req, res) => {
   const userId = req.params.userId;
   const { bio } = req.body;
@@ -146,6 +193,7 @@ const setUserStatusActive = async (req, res) => {
 module.exports = {
   deleteUser,
   getUserById,
+  updateUser,
   updateUserBio,
   updateUserAvatar,
   setUserStatusActive,

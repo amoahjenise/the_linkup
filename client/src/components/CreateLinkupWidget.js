@@ -1,93 +1,86 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import SearchIcon from "@material-ui/icons/Search";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { connect } from "react-redux";
 import { createLinkup } from "../api/linkupAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
 const useStyles = makeStyles((theme) => ({
-  searchInputContainer: {
-    padding: theme.spacing(2),
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   createLinkUpContainer: {
-    flex: "1",
-    borderLeft: "0.1px solid lightgrey",
-    top: 0,
-    overflowY: "auto",
-    justifyContent: "center",
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
   },
   createContainer: {
-    flex: "1",
-    padding: theme.spacing(2),
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    height: "calc(100vh - 140px)",
-    top: 0,
-    overflowY: "auto",
+    alignItems: "center",
+    padding: theme.spacing(2),
+    background: "transparent",
+    borderRadius: "24px",
+    border: "1px solid #ccc",
+    overflow: "hidden",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+    transition: "box-shadow 0.3s ease",
+    "&:hover": {
+      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
+      cursor: "pointer",
+    },
+    width: "100%",
   },
   createLinkUpTitle: {
     textAlign: "center",
     fontSize: "20px",
     marginBottom: theme.spacing(2),
   },
-  createLinkUpForm: {
+  createLinkUpWidget: {
     display: "flex",
     flexDirection: "column",
+    alignItems: "center",
   },
   createLinkUpInput: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
-    borderRadius: "24px",
-    background: "transparent",
-  },
-  createLinkUpButton: {
-    padding: theme.spacing(1),
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease", // Add transition for smooth color change
-    "&:hover": {
-      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
-    },
+    borderRadius: "24px", // Rounded input fields
+    border: "1px solid #ccc",
     width: "100%",
   },
-  // Define styles for the custom dropdown
+  createLinkUpDatePicker: {
+    borderRadius: "24px", // Rounded input fields
+  },
+  createLinkUpButton: {
+    borderRadius: "40px", // Rounded border
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+    backgroundColor: "#0097A7",
+    fontSize: "16px",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#1097A7",
+    },
+    width: "200px",
+    height: "60px",
+  },
   customDropdown: {
-    position: "relative",
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(3),
+    width: "100%",
     "& select": {
       width: "100%",
-      padding: theme.spacing(1),
       borderRadius: "24px",
       border: "1px solid #ccc",
-      marginTop: theme.spacing(1),
       appearance: "none",
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
-      backgroundPosition: "right 12px center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "auto 20px",
-      paddingRight: "2.5rem", // Ensure room for the arrow icon
+      padding: theme.spacing(1),
       "&:focus": {
         outline: "none",
-        borderColor: theme.palette.primary.main,
+        borderColor: "#3498db",
       },
     },
   },
 }));
 
-const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
+const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
   const classes = useStyles();
@@ -136,10 +129,12 @@ const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
         e.target.reset();
         setSelectedDate(null);
         setGenderPreference("");
+        //
+        setShouldFetchLinkups(true);
         // Call the callback function - Scroll to top
         scrollToTopCallback();
       } else {
-        addSnackbar("An error occured. Please try again.");
+        addSnackbar("An error occurred. Please try again.");
       }
     } catch (error) {
       addSnackbar(error.message);
@@ -148,23 +143,10 @@ const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
 
   return (
     <div className={classes.createLinkUpContainer}>
-      {/* <div className={classes.searchInputContainer}>
-        <TextField
-          className={classes.createLinkUpInput}
-          placeholder="Search for Link-Ups"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </div> */}
       <div className={classes.createContainer}>
         <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
         <form
-          className={classes.createLinkUpForm}
+          className={classes.createLinkUpWidget}
           onSubmit={handleCreateLinkUp}
         >
           <input
@@ -193,7 +175,7 @@ const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
             minDate={new Date()} // Set the minimum date to the current date
             minTime={minTime} // Set the minimum time to the current time
             maxTime={maxTime}
-            className={classes.createLinkUpInput}
+            className={classes.createLinkUpDatePicker}
             placeholderText="Select date and time"
             required
           />
@@ -213,15 +195,10 @@ const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
               <option value="any">Any</option>
             </select>
           </div>
-          <div className="cta-buttons">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.createLinkUpButton}
-            >
+          <div>
+            <button type="submit" className={classes.createLinkUpButton}>
               Create
-            </Button>
+            </button>
           </div>
         </form>
       </div>
@@ -229,14 +206,4 @@ const CreateLinkupForm = ({ updateLinkupList, scrollToTopCallback }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    loggedUser: state.loggedUser,
-  };
-};
-
-const mapDispatchToProps = {
-  updateLinkupList,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(CreateLinkupForm);
+export default CreateLinkupWidget;

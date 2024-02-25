@@ -1,5 +1,11 @@
 SELECT DISTINCT
     c.conversation_id,
+    (
+        SELECT COUNT(*) FROM messages AS m
+        WHERE m.conversation_id = c.conversation_id
+        AND m.is_read = false
+        AND m.receiver_id = $1::uuid
+    ) AS unread_count,
     p1.user_id AS participant_id_1,
     p2.user_id AS participant_id_2,
     u1.name AS participant_name_1,
@@ -56,6 +62,42 @@ SELECT DISTINCT
             WHERE lur.linkup_id = c.linkup_id
         )
     ) AS linkup_requester_name,
+    (
+        SELECT u.id
+        FROM users AS u
+        WHERE u.id = (
+            SELECT lur.requester_id
+            FROM link_up_requests AS lur
+            WHERE lur.linkup_id = c.linkup_id
+        )
+    ) AS linkup_requester_id,
+    (
+        SELECT u.id
+        FROM users AS u
+        WHERE u.id = (
+            SELECT l.creator_id
+            FROM link_ups AS l
+            WHERE l.id = c.linkup_id
+        )
+    ) AS linkup_creator_id,
+    (
+        SELECT u.avatar
+        FROM users AS u
+        WHERE u.id = (
+           SELECT l.creator_id
+            FROM link_ups AS l
+            WHERE l.id = c.linkup_id
+        )
+    ) AS linkup_creator_avatar,
+    (
+        SELECT u.name
+        FROM users AS u
+        WHERE u.id = (
+          SELECT l.creator_id
+            FROM link_ups AS l
+            WHERE l.id = c.linkup_id
+        )
+    ) AS linkup_creator_name,
     c.created_at
 FROM
     conversations AS c
