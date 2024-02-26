@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
-import { deleteUser } from "../api/usersAPI";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { useNavigate } from "react-router-dom";
+import { useClerk, useSession } from "@clerk/clerk-react";
 
 const useStyles = makeStyles((theme) => ({
   section: {
@@ -51,6 +51,12 @@ const DeactivateAccount = ({ colorMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { client } = useClerk();
+  const { sessionId } = useSession();
+  // const clerkClient = Clerk({
+  //   secretKey: "sk_test_jUVModjUQoKlA7Hob0P6VT4GyId8FACHUY0g5xZD8P",
+  // });
+
   const inputTextColor =
     colorMode === "dark"
       ? "white" // Dark mode background color with no transparency
@@ -59,12 +65,13 @@ const DeactivateAccount = ({ colorMode }) => {
   const handleDeactivate = async () => {
     if (isConfirmValid) {
       try {
-        const response = await deleteUser(loggedUser.user.id);
-        if (response.data.success) {
+        if (loggedUser.user.clerk_user_id) {
+          console.log("clerkClient", client);
+          await client.sessions[0].user.delete(loggedUser.user.clerk_user_id); //client.users.deleteUser(loggedUser.user.clerk_user_id);
           dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
           navigate("/"); // Redirect to landing page
+          addSnackbar("Your account was deleted.");
         }
-        addSnackbar(response.data.message);
       } catch (error) {
         addSnackbar(error.message);
       }

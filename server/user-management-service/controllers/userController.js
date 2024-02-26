@@ -3,27 +3,30 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const { pool } = require("../db");
 
-const deleteUser = async (req, res) => {
-  const userId = req.params.userId;
-
+const deleteUser = async (id) => {
   try {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
-    const values = [userId];
+    const values = [id];
 
-    const { rowCount } = await pool.query(query, values);
+    console.log("id", id);
+
+    const { rows, rowCount } = await pool.query(query, values);
+
+    console.log("rows", rows);
     if (rowCount > 0) {
-      res.json({
+      return {
         success: true,
         message: "User deleted successfully!",
-      });
+      };
     } else {
-      res
-        .status(500)
-        .json({ success: false, message: "Failed to delete user" });
+      return {
+        success: false,
+        message: "User not found. Please contact support.",
+      };
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    throw new Error("Internal server error");
   }
 };
 

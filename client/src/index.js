@@ -17,18 +17,18 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-        <SnackbarProvider>
-          <SocketProvider>
-            <React.StrictMode>
-              <ChakraProvider theme={theme}>
-                <ColorModeScript
-                  initialColorMode={theme.config.initialColorMode}
-                />
-                <App />
-              </ChakraProvider>
-            </React.StrictMode>
-          </SocketProvider>
-        </SnackbarProvider>
+      <SnackbarProvider>
+        <SocketProvider>
+          <React.StrictMode>
+            <ChakraProvider theme={theme}>
+              <ColorModeScript
+                initialColorMode={theme.config.initialColorMode}
+              />
+              <App />
+            </ChakraProvider>
+          </React.StrictMode>
+        </SocketProvider>
+      </SnackbarProvider>
     </PersistGate>
   </Provider>
 );
