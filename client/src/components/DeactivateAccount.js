@@ -6,6 +6,7 @@ import TextField from "@material-ui/core/TextField";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { useNavigate } from "react-router-dom";
 import { useClerk, useSession } from "@clerk/clerk-react";
+import { deactivateUser } from "../api/usersAPI";
 
 const useStyles = makeStyles((theme) => ({
   section: {
@@ -51,7 +52,7 @@ const DeactivateAccount = ({ colorMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { client } = useClerk();
+  const { signOut, client } = useClerk();
   const { sessionId } = useSession();
   // const clerkClient = Clerk({
   //   secretKey: "sk_test_jUVModjUQoKlA7Hob0P6VT4GyId8FACHUY0g5xZD8P",
@@ -65,13 +66,22 @@ const DeactivateAccount = ({ colorMode }) => {
   const handleDeactivate = async () => {
     if (isConfirmValid) {
       try {
-        if (loggedUser.user.clerk_user_id) {
-          console.log("clerkClient", client);
-          await client.sessions[0].user.delete(loggedUser.user.clerk_user_id); //client.users.deleteUser(loggedUser.user.clerk_user_id);
+        const response = await deactivateUser(loggedUser.user.id);
+        if (response.data.success) {
+          //Clerk Sign Out
+          await signOut();
+          //App sign out
           dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
           navigate("/"); // Redirect to landing page
-          addSnackbar("Your account was deleted.");
         }
+        addSnackbar(response.data.message);
+        // if (loggedUser.user.clerk_user_id) {
+        //   console.log("clerkClient", client);
+        //   await client.sessions[0].user.delete(loggedUser.user.clerk_user_id); //client.users.deleteUser(loggedUser.user.clerk_user_id);
+        //   dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
+        //   navigate("/"); // Redirect to landing page
+        //   addSnackbar("Your account was deleted.");
+        // }
       } catch (error) {
         addSnackbar(error.message);
       }

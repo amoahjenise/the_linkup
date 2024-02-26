@@ -76,13 +76,15 @@ export const getUserById = async (userId) => {
   }
 };
 
-export const deleteUser = async (userId) => {
+export const deactivateUser = async (userId) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/delete-user/${userId}`);
+    const response = await axios.post(
+      `${BASE_URL}/api/deactivate-user/${userId}`
+    );
     return response;
   } catch (error) {
     try {
-      return await handleError(error, "Failed to delete user");
+      return await handleError(error, "Failed to deactivate user");
     } catch (error) {
       // Handle other errors as needed
       console.error("Error:", error);

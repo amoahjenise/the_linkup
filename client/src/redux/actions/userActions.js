@@ -1,4 +1,7 @@
-import { getUserById, deleteUser } from "../../api/usersAPI";
+import {
+  getUserById,
+  deactivateUser as deactivateUserAPI,
+} from "../../api/usersAPI";
 
 import {
   SET_LOADING,
@@ -61,7 +64,7 @@ export const deactivateUser = (userId) => async (dispatch) => {
   try {
     dispatch(deactivateUserRequest());
     // Use the deleteUser function from usersAPI.js
-    const response = await deleteUser(userId);
+    const response = await deactivateUserAPI(userId);
     dispatch(deactivateUserSuccess(response.data));
   } catch (error) {
     dispatch(deactivateUserFailure(error));

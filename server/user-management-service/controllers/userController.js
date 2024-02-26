@@ -3,6 +3,30 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const { pool } = require("../db");
 
+const deactivateUser = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const queryPath = path.join(__dirname, "../db/queries/deactivateUser.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId];
+    console.log("USER", userId);
+    const { rowCount } = await pool.query(query, values);
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "User deactivated successfully!",
+      });
+    } else {
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to deactivate user" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const deleteUser = async (id) => {
   try {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
@@ -194,6 +218,7 @@ const setUserStatusActive = async (req, res) => {
 };
 
 module.exports = {
+  deactivateUser,
   deleteUser,
   getUserById,
   updateUser,
