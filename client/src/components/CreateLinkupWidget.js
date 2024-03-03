@@ -48,6 +48,8 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   createLinkUpDatePicker: {
+    padding: theme.spacing(1),
+    border: "1px solid #ccc",
     borderRadius: "24px", // Rounded input fields
   },
   createLinkUpButton: {
@@ -64,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
     height: "60px",
   },
   customDropdown: {
+    marginTop: theme.spacing(2),
     marginBottom: theme.spacing(3),
     width: "100%",
     "& select": {

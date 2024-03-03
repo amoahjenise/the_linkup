@@ -9,26 +9,30 @@ import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { SnackbarProvider } from "./contexts/SnackbarContext";
 import Modal from "react-modal";
 import { SocketProvider } from "./contexts/SocketContext";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 Modal.setAppElement("#root");
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <SnackbarProvider>
-        <SocketProvider>
-          <React.StrictMode>
-            <ChakraProvider theme={theme}>
-              <ColorModeScript
-                initialColorMode={theme.config.initialColorMode}
-              />
-              <App />
-            </ChakraProvider>
-          </React.StrictMode>
-        </SocketProvider>
-      </SnackbarProvider>
+      <ClerkProvider publishableKey={clerkPubKey}>
+        <SnackbarProvider>
+          <SocketProvider>
+            <React.StrictMode>
+              <ChakraProvider theme={theme}>
+                <ColorModeScript
+                  initialColorMode={theme.config.initialColorMode}
+                />
+                <App />
+              </ChakraProvider>
+            </React.StrictMode>
+          </SocketProvider>
+        </SnackbarProvider>
+      </ClerkProvider>
     </PersistGate>
   </Provider>
 );

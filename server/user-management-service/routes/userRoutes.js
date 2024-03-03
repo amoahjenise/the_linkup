@@ -8,6 +8,7 @@ const { verifyAccessToken } = require("../middlewares/userAuthMiddleware");
 router.get("/get-user-by-id", userController.getUserById);
 router.post("/delete-user/:userId", userController.deleteUser);
 router.post("/deactivate-user/:userId", userController.deactivateUser);
+
 router.patch(
   "/set-user-status-active/:userId",
   userController.setUserStatusActive

@@ -4,20 +4,24 @@ const socketIo = require("socket.io");
 module.exports = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "*",
       methods: ["POST", "GET", "PATCH", "DELETE"],
     },
   });
 
   io.on("connection", (socket) => {
-    console.log("A user connected to the linkup service socket");
-
     // Get the user ID or any unique identifier for the user
     const userId = socket.handshake.query.userId;
+
     // Assign the user's socket ID as the unique identifier
     socket.userId = userId;
 
     socket.join(`user-${userId}`);
+
+    console.log(
+      "A user connected to the linkup service socket:",
+      JSON.stringify(socket.handshake.query)
+    );
 
     // Listen for "join-linkup-room" events
     socket.on("join-linkup-room", (linkupId) => {

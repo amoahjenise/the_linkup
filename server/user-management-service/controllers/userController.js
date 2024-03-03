@@ -10,8 +10,9 @@ const deactivateUser = async (req, res) => {
     const queryPath = path.join(__dirname, "../db/queries/deactivateUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [userId];
-    console.log("USER", userId);
+
     const { rowCount } = await pool.query(query, values);
+
     if (rowCount > 0) {
       res.json({
         success: true,

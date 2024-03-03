@@ -13,7 +13,7 @@ const middleware =
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["registration"], // Exclude the "auth" reducer from being persisted
+  blacklist: ["logout", "registration"], // Exclude the "registration" reducer from being persisted
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

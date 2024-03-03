@@ -12,10 +12,10 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: "*",
     methods: ["POST", "PUT"],
     optionsSuccessStatus: 200,
-    credentials: true, // Enable credentials for all routes
+    // credentials: true, // Enable credentials for all routes
   })
 );
 

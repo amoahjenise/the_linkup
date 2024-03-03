@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
+import { setUnreadMessagesCount } from "./redux/actions/messageActions";
+import { getUnreadNotificationsCount } from "./api/notificationAPI";
+import { getUnreadMessagesCount } from "./api/messagingAPI";
+import ClerkCustomSignIn from "./sign-in/[[...index]]";
+import ClerkCustomSignUp from "./sign-up/[[...index]]";
 import LandingPage from "./pages/LandingPage";
 import SignupPage from "./pages/SignupPage";
 import HomePage from "./pages/HomePage";
@@ -12,24 +19,13 @@ import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SettingsPage from "./pages/SettingsPage";
 import LeftMenu from "./components/LeftMenu";
-import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
-import { setUnreadMessagesCount } from "./redux/actions/messageActions";
-import { getUnreadNotificationsCount } from "./api/notificationAPI";
-import { getUnreadMessagesCount } from "./api/messagingAPI";
-import { useSelector } from "react-redux";
-import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import ToggleColorMode from "./components/ToggleColorMode";
-import "./App.css";
-import { ClerkProvider } from "@clerk/clerk-react";
-import ClerkCustomSignIn from "./sign-in/[[...index]]";
-import ClerkCustomSignUp from "./sign-up/[[...index]]";
-
-if (!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
-
-const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { authenticateUser } from "./api/authenticationAPI";
+import { setCurrentUser } from "./redux/actions/userActions";
+import { login } from "./redux/actions/authActions";
+import { useUser } from "@clerk/clerk-react";
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -38,89 +34,124 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const publicPages = ["/", "/sign-in", "/sign-up"];
+
 const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const loggedUser = useSelector((state) => state.loggedUser);
+  const userState = useSelector((state) => state.loggedUser);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isSigningOut } = useSelector((state) => state.logout);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { user } = useUser();
 
   useEffect(() => {
-    // Check if loggedUser.user.id exists before fetching data
-    if (loggedUser.user.id) {
-      // Fetch unread conversations count and update Redux state
-      getUnreadMessagesCount(loggedUser.user.id)
-        .then((data) => {
-          dispatch(setUnreadMessagesCount(Number(data.unread_count)));
-        })
-        .catch((error) => {
-          console.error("Error fetching unread messages count:", error);
-        });
+    async function fetchData() {
+      if (!user) return null;
+      const clerkUserId = user?.id;
 
-      // Fetch unread notifications count and update Redux state
-      getUnreadNotificationsCount(loggedUser.user.id)
-        .then((data) => {
-          dispatch(updateUnreadNotificationsCount(Number(data.unreadCount)));
-        })
-        .catch((error) => {
-          console.error("Error fetching unread notifications count:", error);
-        });
+      try {
+        if (!isAuthenticated && !isSigningOut && clerkUserId) {
+          const result = await authenticateUser(clerkUserId);
+          if (result.success) {
+            dispatch(setCurrentUser(result.user));
+            dispatch(login());
+          }
+        }
+      } catch (error) {
+        console.error("Error during user data fetch:", error);
+      }
     }
-  }, [dispatch, loggedUser.user.id]);
+    fetchData();
+  }, [user, isAuthenticated, isSigningOut, dispatch]);
 
-  const RoutesComponent = () => {
-    return (
-      <Routes>
-        <Route path="/" exact element={<LandingPage isMobile={isMobile} />} />
-        <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
-        <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
-        <Route path="/registration" element={<SignupPage />} />
-        <Route path="/home" element={<HomePage isMobile={isMobile} />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route
-          path="/profile/:id"
-          element={<UserProfilePage isMobile={isMobile} />}
-        />
-        <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
-        <Route
-          path="/history"
-          element={<LinkupHistoryPage isMobile={isMobile} />}
-        />
-        <Route
-          path="/history/expired"
-          element={<LinkupHistoryPage isMobile={isMobile} />}
-        />
-        <Route
-          path="/history/requests-sent"
-          element={<LinkupHistoryPage isMobile={isMobile} />}
-        />
-        <Route
-          path="/history/requests-received"
-          element={<LinkupHistoryPage isMobile={isMobile} />}
-        />
-        <Route
-          path="/messages"
-          element={<ConversationsPage isMobile={isMobile} />}
-        />
-        <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
-    );
-  };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!user) return null;
+
+        // Fetch unread messages count and update Redux state
+        const messagesCount = await getUnreadMessagesCount(userState?.user?.id);
+        dispatch(setUnreadMessagesCount(Number(messagesCount.unread_count)));
+
+        // Fetch unread notifications count and update Redux state
+        const notificationsCount = await getUnreadNotificationsCount(
+          userState?.user?.id
+        );
+        dispatch(
+          updateUnreadNotificationsCount(Number(notificationsCount.unreadCount))
+        );
+      } catch (error) {
+        console.error("Error during user data fetch:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const RoutesComponent = () => (
+    <Routes>
+      <Route path="/" exact element={<LandingPage isMobile={isMobile} />} />
+      <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
+      <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
+      <Route path="/registration" element={<SignupPage />} />
+      <Route path="/home" element={<HomePage isMobile={isMobile} />} />
+      <Route path="/notifications" element={<NotificationsPage />} />
+      <Route
+        path="/profile/:id"
+        element={<UserProfilePage isMobile={isMobile} />}
+      />
+      <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
+      <Route
+        path="/history"
+        element={<LinkupHistoryPage isMobile={isMobile} />}
+      />
+      <Route
+        path="/history/expired"
+        element={<LinkupHistoryPage isMobile={isMobile} />}
+      />
+      <Route
+        path="/history/requests-sent"
+        element={<LinkupHistoryPage isMobile={isMobile} />}
+      />
+      <Route
+        path="/history/requests-received"
+        element={<LinkupHistoryPage isMobile={isMobile} />}
+      />
+      <Route
+        path="/messages"
+        element={<ConversationsPage isMobile={isMobile} />}
+      />
+      <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+    </Routes>
+  );
 
   return (
-    <ClerkProvider publishableKey={clerkPubKey}>
-      <ThemeProvider theme={theme}>
-        <ToggleColorMode>
-          <BrowserRouter>
-            <div className={`${loggedUser.user.id ? classes.app : ""}`}>
-              {loggedUser.user.id && <LeftMenu isMobile={isMobile} />}
+    <ThemeProvider theme={theme}>
+      <ToggleColorMode>
+        <BrowserRouter>
+          <div className={`${isAuthenticated ? classes.app : ""}`}>
+            {isAuthenticated && <LeftMenu isMobile={isMobile} />}
+            {/* Conditional rendering based on authentication status */}
+            {publicPages.includes(window.location.pathname) ? (
               <RoutesComponent />
-            </div>
-          </BrowserRouter>
-        </ToggleColorMode>
-      </ThemeProvider>
-    </ClerkProvider>
+            ) : (
+              <>
+                <SignedIn>
+                  <RoutesComponent />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            )}
+          </div>
+        </BrowserRouter>
+      </ToggleColorMode>
+    </ThemeProvider>
   );
 };
 

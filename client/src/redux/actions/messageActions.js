@@ -1,15 +1,15 @@
-import { markMessagesAsReadBatch } from "../../api/messagingAPI";
+// import { markMessagesAsReadBatch } from "../../api/messagingAPI";
 
 import {
-  MARK_MESSAGES_AS_READ,
+  // MARK_MESSAGES_AS_READ,
   INCREMENT_UNREAD_MESSAGES_COUNT,
   SET_UNREAD_MESSAGES_COUNT,
 } from "./actionTypes";
 
 export const setUnreadMessagesCount = (count) => {
   return {
-    type: SET_UNREAD_MESSAGES_COUNT, // You can define the action type
-    payload: count, // The count you want to set in the state
+    type: SET_UNREAD_MESSAGES_COUNT,
+    payload: count,
   };
 };
 

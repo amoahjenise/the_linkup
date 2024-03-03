@@ -20,12 +20,7 @@ export default function ClerkCustomSignIn() {
   return (
     <section className={classes.section}>
       <div className={classes.container}>
-        <SignIn
-          path="/sign-in"
-          routing="path"
-          signUpUrl="/sign-up"
-          redirectUrl={"/home"}
-        />
+        <SignIn path="/sign-in" signUpUrl="/sign-up" redirectUrl={"/home"} />
       </div>
     </section>
   );

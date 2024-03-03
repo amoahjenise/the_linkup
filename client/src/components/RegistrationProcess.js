@@ -51,27 +51,24 @@ const RegistrationProcess = () => {
     avatarURL: "",
   });
 
-  const handleLaunchLuul = () => {
-    navigate(`/home`);
+  const handleLaunchLuul = async () => {
+    try {
+      const response = await updateUser({
+        user: { ...userData, clerkUserId: user.id },
+      });
+      if (response.data.success) {
+        dispatch(setCurrentUser(response.data.user));
+        dispatch(login());
+        navigate(`/home`);
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert("Failed to create user. Please try again.");
+    }
   };
 
   const handleNextStep = async () => {
     dispatch(nextStep());
-
-    if (registrationData.currentStep === 2) {
-      try {
-        const response = await updateUser({
-          user: { ...userData, clerkUserId: user.id },
-        });
-        if (response.data.success) {
-          dispatch(setCurrentUser(response.data.user));
-          dispatch(login());
-        }
-      } catch (error) {
-        console.error("Error creating user:", error);
-        alert("Failed to create user. Please try again.");
-      }
-    }
   };
 
   const handlePreviousStep = () => {

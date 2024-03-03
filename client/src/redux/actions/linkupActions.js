@@ -4,6 +4,7 @@ import {
   FETCH_LINKUPS_SUCCESS,
   SET_IS_LOADING,
   UPDATE_LINKUP_SUCCESS,
+  FETCH_LINKUPS_FAILURE,
   UPDATE_LINKUP_LIST,
 } from "./actionTypes";
 
@@ -16,6 +17,13 @@ export const fetchLinkupsSuccess = (linkups) => ({
   type: FETCH_LINKUPS_SUCCESS,
   payload: linkups,
 });
+
+export const fetchLinkupsFailure = (error) => {
+  return {
+    type: FETCH_LINKUPS_FAILURE,
+    payload: error,
+  };
+};
 
 export const setIsLoading = (isLoading) => ({
   type: SET_IS_LOADING,

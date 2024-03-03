@@ -152,6 +152,7 @@ export const SocketProvider = ({ children }) => {
     messagingSocket,
     userId,
     dispatch,
+    selectedConversation?.conversation_id,
   ]);
 
   const sockets = {

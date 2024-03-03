@@ -15,10 +15,10 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: "*",
     methods: ["POST", "GET", "PATCH"],
     optionsSuccessStatus: 200,
-    credentials: true, // Enable credentials for all routes
+    // credentials: true, // Enable credentials for all routes
   })
 );
 

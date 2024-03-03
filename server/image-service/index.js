@@ -7,7 +7,7 @@ const helmet = require("helmet");
 
 // Configuration using environment variables
 const PORT = process.env.PORT || 3007;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || ["http://localhost:3000"];
 
 // Increase the request payload size limit (e.g., 10MB)
 app.use(bodyParser.json({ limit: "10mb" }));
@@ -21,10 +21,11 @@ app.use(express.json());
 // Middleware
 app.use(
   cors({
-    origin: [ALLOWED_ORIGIN],
+    // origin: [ALLOWED_ORIGIN],
+    origin: "*",
     methods: ["POST", "GET"],
     optionsSuccessStatus: 200,
-    credentials: true, // Enable credentials for all routes
+    // credentials: true, // Enable credentials for all routes
   })
 );
 

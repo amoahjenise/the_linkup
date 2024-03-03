@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
@@ -9,12 +9,9 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import HistoryIcon from "@material-ui/icons/History";
 import MessageIcon from "@material-ui/icons/Message";
 import SettingsIcon from "@material-ui/icons/Settings";
-import LogoutButton from "./LogoutButton";
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../logo.png";
-// import { useUser } from "@clerk/clerk-react";
 import CustomUserButton from "./UserButton";
-import { performLogout } from "../redux/actions/authActions";
 
 const drawerWidth = "20%";
 
@@ -77,10 +74,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftMenu = ({ isMobile }) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  // const { isSignedIn } = useUser();
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const isAuthenticated = loggedUser.user.id;
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
@@ -95,12 +89,6 @@ const LeftMenu = ({ isMobile }) => {
 
   const filterStyle =
     colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none"; // Set filter style based on colorMode
-
-  const handleLogout = async () => {
-    // Dispatch the action to trigger state reset
-    // dispatch({ type: "LOGOUT" });
-    dispatch(performLogout());
-  };
 
   return isAuthenticated ? (
     <div className={isMobile ? classes.mobileMenuContainer : classes.main}>
@@ -139,7 +127,7 @@ const LeftMenu = ({ isMobile }) => {
               icon={<SettingsIcon />}
               location={location.pathname}
             />
-            <LogoutButton />
+            <CustomUserButton />
           </div>
         </div>
       ) : (
@@ -192,7 +180,7 @@ const LeftMenu = ({ isMobile }) => {
               location={location.pathname}
             />
             <li className={`${classes.menuItem} ${classes.menuItemHover}`}>
-              <CustomUserButton onSignOut={handleLogout} />
+              <CustomUserButton />
             </li>
           </ul>
         </div>
