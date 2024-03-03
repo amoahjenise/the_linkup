@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
     zIndex: theme.zIndex.appBar,
+    borderTop: "1px solid #e1e8ed",
     borderBottom: "1px solid #e1e8ed",
   },
   headerText: {

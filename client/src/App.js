@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
@@ -18,6 +18,7 @@ import LinkupHistoryPage from "./pages/LinkupHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SettingsPage from "./pages/SettingsPage";
+import ErrorPage from "./pages/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
 import ToggleColorMode from "./components/ToggleColorMode";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -42,10 +43,10 @@ const App = () => {
   const userState = useSelector((state) => state.loggedUser);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isSigningOut } = useSelector((state) => state.logout);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { user } = useUser();
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -58,10 +59,13 @@ const App = () => {
           if (result.success) {
             dispatch(setCurrentUser(result.user));
             dispatch(login());
+          } else {
+            setAuthError(true); // Set the authentication error state
           }
         }
       } catch (error) {
         console.error("Error during user data fetch:", error);
+        setAuthError(true); // Set the authentication error state
       }
     }
     fetchData();
@@ -141,7 +145,19 @@ const App = () => {
             ) : (
               <>
                 <SignedIn>
-                  <RoutesComponent />
+                  {authError ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <ErrorPage />
+                    </div>
+                  ) : (
+                    <RoutesComponent />
+                  )}
                 </SignedIn>
                 <SignedOut>
                   <RedirectToSignIn />

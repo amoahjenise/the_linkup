@@ -65,18 +65,6 @@ const FeedSection = ({
           )}
         </div>
       )}
-      {/* Floating Refresh Icon
-      <div className={classes.refreshButton}>
-        <Tooltip title="Refresh">
-          <IconButton
-            onClick={refreshLinkups}
-            color="primary"
-            aria-label="refresh"
-          >
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
-      </div> */}
     </div>
   );
 };
