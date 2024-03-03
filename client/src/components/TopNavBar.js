@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     width: "100%",
     position: "sticky",
+    // alignItems: "center",
     top: 0,
     zIndex: theme.zIndex.appBar,
     borderTop: "1px solid #e1e8ed",

@@ -8,10 +8,12 @@ import UserAvatar from "./UserAvatar";
 import HorizontalMenu from "./HorizontalMenu";
 import PostActions from "./PostActions";
 import LinkRounded from "@material-ui/icons/LinkRounded";
-import LinkTwoTone from "@material-ui/icons/LinkTwoTone";
+import LinkTwoTone from "@material-ui/icons/LinkOutlined";
 import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkupAPI";
+import SplitBillIcon from "./SplitBillIcon";
+import PaymentIcon from "./PaymentIcon";
 
 const compromise = nlp;
 
@@ -66,18 +68,47 @@ const LinkupItem = React.memo(
     const [isHovered, setIsHovered] = useState(false);
     const loggedUser = useSelector((state) => state.loggedUser);
     const editingLinkup = useSelector((state) => state.editingLinkup);
-    const {
-      id,
-      creator_id,
-      creator_name,
-      activity,
-      created_at,
-      date,
-      avatar,
-      type,
-    } = linkupItem;
+    const { id, creator_id, creator_name, activity, created_at, date, avatar } =
+      linkupItem;
     const [menuAnchor, setMenuAnchor] = useState(null);
     const { addSnackbar } = useSnackbar();
+
+    // Function to render the appropriate icon based on the payment option
+    const renderPaymentOptionIcon = () => {
+      switch (linkupItem.payment_option) {
+        case "split":
+          return (
+            <SplitBillIcon
+              person1Color="pink"
+              person2Color="blue"
+              width="40px"
+              height="40px"
+            />
+          );
+        case "iWillPay":
+          return (
+            <PaymentIcon
+              width="40px"
+              height="40px"
+              color="blue"
+              fontSize="35px"
+            />
+          );
+        case "pleasePay":
+          return (
+            <span
+              title="Please pay!"
+              role="img"
+              aria-label="watery eyes"
+              style={{ fontSize: "30px" }}
+            >
+              🥹
+            </span>
+          );
+        default:
+          return null;
+      }
+    };
 
     const handleRequestLinkup = async () => {
       const response = await getLinkupStatus(id);
@@ -141,14 +172,11 @@ const LinkupItem = React.memo(
       );
     };
 
-    const renderPostIcon = () => {
-      const icons = {
-        linkup: <LinkRounded />,
-        trylink: <LinkTwoTone />,
-      };
-
-      return icons[type] || null;
-    };
+    // const renderPostIcon = () => {
+    //   const linkupType =
+    //     loggedUser.user.id === linkupItem.creator_id ? "trylink" : "linkup";
+    //   return linkupType === "linkup" ? <LinkRounded /> : <LinkTwoTone />;
+    // };
 
     const getTimeAgo = (createdAt) => {
       const now = moment();
@@ -209,9 +237,12 @@ const LinkupItem = React.memo(
             )}
           </div>
           <div className={classes.postActions}>
+            {renderPaymentOptionIcon()}
+
             {loggedUser.user.id !== linkupItem.creator_id ? (
               <div className={classes.buttonsContainer}>
                 <PostActions
+                  paymentOption={linkupItem.payment_option}
                   onRequestClick={handleRequestLinkup}
                   disableRequest={disableRequest}
                 />
@@ -226,7 +257,7 @@ const LinkupItem = React.memo(
                 </span>
               </div>
             )}
-            {renderPostIcon()}
+            {/* {renderPostIcon()} */}
           </div>
         </div>
       </div>

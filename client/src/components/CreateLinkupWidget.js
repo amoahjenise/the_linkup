@@ -14,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
   },
   createContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
     padding: theme.spacing(2),
     background: "transparent",
     borderRadius: "24px",
@@ -40,20 +37,19 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
   },
-  createLinkUpInput: {
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(1),
-    borderRadius: "24px", // Rounded input fields
-    border: "1px solid #ccc",
+  createLinkUpDatePickerContainer: {
     width: "100%",
+    marginBottom: theme.spacing(2),
   },
   createLinkUpDatePicker: {
+    width: "100%",
     padding: theme.spacing(1),
     border: "1px solid #ccc",
-    borderRadius: "24px", // Rounded input fields
+    borderRadius: "24px",
+    boxSizing: "border-box",
   },
   createLinkUpButton: {
-    borderRadius: "40px", // Rounded border
+    borderRadius: "40px",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
     backgroundColor: "#0097A7",
@@ -65,40 +61,32 @@ const useStyles = makeStyles((theme) => ({
     width: "200px",
     height: "60px",
   },
-  customDropdown: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(3),
+  inputField: {
     width: "100%",
-    "& select": {
-      width: "100%",
-      borderRadius: "24px",
-      border: "1px solid #ccc",
-      appearance: "none",
-      padding: theme.spacing(1),
-      "&:focus": {
-        outline: "none",
-        borderColor: "#3498db",
-      },
-    },
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(1),
+    borderRadius: "24px",
+    border: "1px solid #ccc",
+    boxSizing: "border-box",
   },
 }));
 
 const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
-  // Access user data from Redux store
-  const loggedUser = useSelector((state) => state.loggedUser);
   const classes = useStyles();
-  const [selectedDate, setSelectedDate] = useState();
+  const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState("");
+  const [paymentOption, setPaymentOption] = useState("");
+  const loggedUser = useSelector((state) => state.loggedUser);
   const { id, name } = loggedUser?.user || {};
   const { addSnackbar } = useSnackbar();
 
   const maxTime = new Date();
-  maxTime.setHours(23); // Set hours to 11
-  maxTime.setMinutes(45); // Set minutes to 45
+  maxTime.setHours(23);
+  maxTime.setMinutes(45);
 
   const minTimeDefault = new Date();
-  minTimeDefault.setHours(0); // Set hours to 0 (midnight)
-  minTimeDefault.setMinutes(0); // Set minutes to 0
+  minTimeDefault.setHours(0);
+  minTimeDefault.setMinutes(0);
 
   const currentDate = new Date();
   const minTime = selectedDate
@@ -113,7 +101,6 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
     const location = e.target.location.value;
 
     try {
-      // Call the API to create the link-up
       const response = await createLinkup({
         creator_id: id,
         creator_name: name,
@@ -121,20 +108,17 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
         activity: activity,
         date: selectedDate,
         gender_preference: genderPreference,
+        payment_option: paymentOption,
       });
 
       if (response.success) {
-        // Update linkupList state with the new linkup
         updateLinkupList(response.newLinkup);
-        // socket.emit("linkupCreated", response.newLinkup);
         addSnackbar("Link-up created successfully!");
-        // Reset the form inputs
         e.target.reset();
         setSelectedDate(null);
         setGenderPreference("");
-        //
+        setPaymentOption("");
         setShouldFetchLinkups(true);
-        // Call the callback function - Scroll to top
         scrollToTopCallback();
       } else {
         addSnackbar("An error occurred. Please try again.");
@@ -153,56 +137,60 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           onSubmit={handleCreateLinkUp}
         >
           <input
-            className={classes.createLinkUpInput}
+            className={classes.inputField}
             type="text"
             placeholder="Activity"
             name="activity"
             required
           />
           <input
-            className={classes.createLinkUpInput}
+            className={classes.inputField}
             type="text"
             placeholder="Location"
             name="location"
             required
           />
-
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            showTimeSelect
-            timeFormat="HH:mm"
-            timeIntervals={15}
-            timeCaption="Time"
-            dateFormat="MMMM d, yyyy h:mm aa"
-            minDate={new Date()} // Set the minimum date to the current date
-            minTime={minTime} // Set the minimum time to the current time
-            maxTime={maxTime}
-            className={classes.createLinkUpDatePicker}
-            placeholderText="Select date and time"
-            required
-          />
-
-          <div className={classes.customDropdown}>
-            <select
-              value={genderPreference}
-              onChange={(e) => setGenderPreference(e.target.value)}
-              aria-label="Gender Preference"
+          <div className={classes.createLinkUpDatePickerContainer}>
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="MMMM d, yyyy h:mm aa"
+              minDate={new Date()} // Set the minimum date to the current date
+              minTime={minTime} // Set the minimum time to the current time
+              maxTime={maxTime}
+              className={classes.createLinkUpDatePicker}
+              placeholderText="Select date and time"
               required
-            >
-              <option value="" disabled>
-                Gender Preference
-              </option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="any">Any</option>
-            </select>
+            />
           </div>
-          <div>
-            <button type="submit" className={classes.createLinkUpButton}>
-              Create
-            </button>
-          </div>
+          <select
+            value={genderPreference}
+            onChange={(e) => setGenderPreference(e.target.value)}
+            className={classes.inputField}
+            required
+          >
+            <option value="">Gender Preference</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="any">Any</option>
+          </select>
+          <select
+            value={paymentOption}
+            onChange={(e) => setPaymentOption(e.target.value)}
+            className={classes.inputField}
+          >
+            <option value="">Payment Option (Optional)</option>
+            <option value="split">Split The Bill</option>
+            <option value="iWillPay">I Will Pay</option>
+            <option value="pleasePay">Please Pay</option>
+          </select>
+          <button type="submit" className={classes.createLinkUpButton}>
+            Create
+          </button>
         </form>
       </div>
     </div>

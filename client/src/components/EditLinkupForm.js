@@ -43,11 +43,15 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderRadius: "24px",
+    border: "1px solid #ccc", // Add border style
+    width: "100%",
   },
+  // Other styles remain the same
   editLinkUpInput: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(1),
     borderRadius: "24px",
+    border: "1px solid #ccc", // Add border style
   },
   buttonGroup: {
     marginTop: theme.spacing(2),
@@ -95,6 +99,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const [location, setLocation] = useState(editingLinkup?.linkup?.location);
   const [genderPreference, setGenderPreference] = useState(
     editingLinkup?.linkup?.gender_preference
+  );
+  const [paymentOption, setPaymentOption] = useState(
+    editingLinkup?.linkup?.payment_option || ""
   );
 
   // State variable to track form modification
@@ -155,6 +162,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
         activity,
         date: selectedDate,
         gender_preference: genderPreference,
+        payment_option: paymentOption,
       };
 
       try {
@@ -189,6 +197,11 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
     dispatch(clearEditingLinkup());
     onClose();
   }, [dispatch, onClose]);
+
+  const handlePaymentOptionChange = (e) => {
+    setPaymentOption(e.target.value);
+    setIsFormModified(true);
+  };
 
   return (
     <div className={classes.editLinkUpContainer}>
@@ -249,6 +262,22 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="any">Any</option>
+            </select>
+          </div>
+
+          {/* Payment Option */}
+          <label htmlFor="paymentOption">Payment Option</label>
+          <div className={classes.customDropdown}>
+            <select
+              value={paymentOption}
+              onChange={handlePaymentOptionChange}
+              aria-label="Payment Option"
+              id="paymentOption"
+            >
+              <option value="">Select Payment Option (Optional)</option>{" "}
+              <option value="split">Split The Bill</option>
+              <option value="iWillPay">I Will Pay</option>
+              <option value="pleasePay">Please Pay</option>
             </select>
           </div>
           <div className={classes.buttonGroup}>

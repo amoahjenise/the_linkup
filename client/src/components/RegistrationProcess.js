@@ -30,16 +30,38 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     display: "flex",
     alignContent: "center",
-    justifyContent: "space-between",
+    justifyContent: "center", // Center buttons horizontally
     marginTop: theme.spacing(2),
+  },
+  backButton: {
+    width: "50%",
+    border: "1px solid #ccc",
+    color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
+    marginRight: theme.spacing(2),
+    "&:hover": {
+      backgroundColor: (props) =>
+        props.colorMode === "dark" ? "#1976d2" : "#434EA5",
+    },
+  },
+  continueButton: {
+    width: "50%",
+    border: "1px solid #ccc",
+    color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
+    "&:hover": {
+      backgroundColor: (props) =>
+        props.colorMode === "dark" ? "#1976d2" : "#434EA5",
+    },
+    "&.Mui-disabled": {
+      color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
+    },
   },
 }));
 
 const RegistrationProcess = () => {
-  const classes = useStyles();
+  const { colorMode } = useColorMode();
+  const classes = useStyles({ colorMode });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { colorMode } = useColorMode();
   const { user } = useUser();
 
   const registrationData = useSelector((state) => state.registration);
@@ -121,7 +143,14 @@ const RegistrationProcess = () => {
         <div className={classes.buttonContainer}>
           {registrationData.currentStep > 0 &&
             registrationData.currentStep !== 2 && (
-              <Button onClick={handlePreviousStep}>Back</Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handlePreviousStep}
+                className={classes.backButton}
+              >
+                Back
+              </Button>
             )}
           <Button
             variant="contained"
@@ -136,6 +165,7 @@ const RegistrationProcess = () => {
               (registrationData.currentStep === 0 &&
                 (!userData.name || !userData.gender || !userData.dateOfBirth))
             }
+            className={classes.continueButton}
           >
             {registrationData.currentStep === 2 ? "Launch LUUL" : "Continue"}
           </Button>

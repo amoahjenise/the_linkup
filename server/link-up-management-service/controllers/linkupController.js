@@ -34,6 +34,7 @@ const createLinkup = async (req, res) => {
     linkup.activity,
     linkup.date,
     linkup.gender_preference,
+    linkup.payment_option
   ];
 
   try {
@@ -187,6 +188,7 @@ const updateLinkup = async (req, res) => {
     linkup.activity,
     linkup.date,
     linkup.gender_preference,
+    linkup.payment_option,
     linkupId,
   ];
 

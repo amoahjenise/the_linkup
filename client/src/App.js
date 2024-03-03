@@ -18,7 +18,7 @@ import LinkupHistoryPage from "./pages/LinkupHistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import AcceptDeclinePage from "./pages/AcceptDeclinePage";
 import SettingsPage from "./pages/SettingsPage";
-import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
 import ToggleColorMode from "./components/ToggleColorMode";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -93,7 +93,7 @@ const App = () => {
     }
 
     fetchData();
-  }, []);
+  }, [dispatch, user, userState?.user?.id]);
 
   const RoutesComponent = () => (
     <Routes>

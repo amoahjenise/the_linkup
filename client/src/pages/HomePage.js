@@ -8,10 +8,6 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkupAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-// import { authenticateUser } from "../api/authenticationAPI";
-// import { setCurrentUser } from "../redux/actions/userActions";
-// import { login } from "../redux/actions/authActions";
-// import { useUser } from "@clerk/clerk-react";
 
 const useStyles = makeStyles((theme) => ({
   homePage: {
@@ -21,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   feedSection: {
     flex: "2",
     overflowY: "auto",
-    overflowX: "hidden",
+    // overflowX: "hidden",
     marginLeft: "auto",
     marginRight: "auto",
     borderRight: "1px solid #ccc",
@@ -47,7 +43,6 @@ const HomePage = ({ isMobile }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const feedSectionRef = useRef(null);
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const linkupList = useSelector((state) => state.linkups.linkupList);
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
@@ -56,26 +51,7 @@ const HomePage = ({ isMobile }) => {
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
-  // const { user } = useUser();
-  // const clerkUserId = user?.id;
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       if (!isAuthenticated && clerkUserId) {
-  //         const result = await authenticateUser(clerkUserId);
-  //         if (result.success) {
-  //           dispatch(setCurrentUser(result.user));
-  //           dispatch(login());
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("Error during user data fetch:", error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [clerkUserId, dispatch, isAuthenticated, user, userId]);
 
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
