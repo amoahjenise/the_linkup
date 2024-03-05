@@ -9,5 +9,6 @@ router.post("/linkups/close/:linkupId", linkupController.closeLinkup);
 router.post("/linkups/create", linkupController.createLinkup);
 router.delete("/linkups/:linkupId", linkupController.deleteLinkup);
 router.get("/linkups/status/:linkupId", linkupController.getLinkupStatus);
+router.get("/linkups/search/:userId", linkupController.searchLinkups);
 
 module.exports = router;

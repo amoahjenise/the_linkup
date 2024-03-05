@@ -174,6 +174,8 @@ const HomePage = ({ isMobile }) => {
             setShouldFetchLinkups={setShouldFetchLinkups}
             scrollToTopCallback={scrollToTop}
             onRefreshClick={refreshLinkups}
+            userId={userId}
+            gender={gender}
           />
         </div>
       )}

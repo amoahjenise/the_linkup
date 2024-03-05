@@ -6,7 +6,6 @@ const useStyles = makeStyles((theme) => ({
   container: {
     border: "1px solid #ccc",
     width: "100%",
-    // maxWidth: "300px",
     padding: "6px 12px",
     borderRadius: "24px",
     boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
@@ -31,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     border: "none",
     fontSize: "14px",
     outline: "none",
-    color: "#333",
   },
   iconContainer: {
     display: "flex",
@@ -47,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchInput = () => {
+const SearchInput = ({ handleInputChange }) => {
   const classes = useStyles();
 
   return (
@@ -58,6 +56,7 @@ const SearchInput = () => {
           name="search"
           placeholder="Search Linkup"
           className={classes.input}
+          onChange={handleInputChange}
         />
         <div className={classes.iconContainer}>
           <BiSearch className={classes.icon} />

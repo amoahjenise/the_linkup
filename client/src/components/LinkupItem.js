@@ -10,7 +10,7 @@ import PostActions from "./PostActions";
 import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkupAPI";
-import ReceiptIcon from "@material-ui/icons/Receipt";
+import { IoReceipt } from "react-icons/io5";
 
 const compromise = nlp;
 
@@ -67,6 +67,10 @@ const useStyles = makeStyles((theme) => ({
   paymentOptionIcon: {
     cursor: "default", // Makes the emoji a pointer when hovered over
   },
+  splitBillContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
 }));
 
 const LinkupItem = React.memo(
@@ -89,11 +93,15 @@ const LinkupItem = React.memo(
             <span
               title="Lets split the bill!"
               role="img"
-              aria-label="watery eyes"
-              style={{ fontSize: "30px" }}
+              aria-label="split the bill"
+              style={{
+                fontSize: "30px",
+              }}
             >
-              <ReceiptIcon />
-              <ReceiptIcon />
+              <div className={classes.splitBillContainer}>
+                <IoReceipt />
+                <IoReceipt />
+              </div>
             </span>
           );
         case "iWillPay":
@@ -101,10 +109,10 @@ const LinkupItem = React.memo(
             <span
               title="I'll pay!"
               role="img"
-              aria-label="watery eyes"
+              aria-label="i'll pay"
               style={{ fontSize: "30px" }}
             >
-              <ReceiptIcon />
+              <IoReceipt />
             </span>
           );
         case "pleasePay":

@@ -1,15 +1,21 @@
 import { updateLinkup as updateLinkupAPI } from "../../api/linkupAPI";
 
 import {
-  FETCH_LINKUPS_SUCCESS,
   SET_IS_LOADING,
-  UPDATE_LINKUP_SUCCESS,
+  FETCH_LINKUPS_SUCCESS,
   FETCH_LINKUPS_FAILURE,
+  UPDATE_LINKUP_SUCCESS,
+  UPDATE_LINKUP_FAILURE,
   UPDATE_LINKUP_LIST,
 } from "./actionTypes";
 
 export const updateLinkupSuccess = (updatedLinkup) => ({
   type: UPDATE_LINKUP_SUCCESS,
+  payload: updatedLinkup,
+});
+
+export const updateLinkupFailure = (updatedLinkup) => ({
+  type: UPDATE_LINKUP_FAILURE,
   payload: updatedLinkup,
 });
 

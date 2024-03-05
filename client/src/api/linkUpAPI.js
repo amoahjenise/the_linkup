@@ -10,6 +10,29 @@ const handleError = (error) => {
   throw error;
 };
 
+export const searchLinkups = async (
+  searchTerm,
+  userId,
+  gender,
+  sqlOffset,
+  pageSize
+) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/linkups/search/${userId}`,
+      {
+        params: {
+          search_term: searchTerm,
+          gender: gender,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export const getLinkups = async (userId, gender, sqlOffset, pageSize) => {
   try {
     const response = await axios.get(`${BASE_URL}/api/linkups/${userId}`, {

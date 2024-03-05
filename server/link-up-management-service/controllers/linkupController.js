@@ -23,6 +23,42 @@ const handleDatabaseError = (res, error, errorMessage) => {
   });
 };
 
+const searchLinkups = async (req, res) => {
+  const { search_term, gender } = req.query; // Retrieve search_term and gender from query parameters
+  const { userId } = req.params; // Retrieve userId from URL parameters
+  const queryPath = path.join(__dirname, "../db/queries/searchLinkups.sql");
+  const query = readQueryFile(queryPath);
+  try {
+    // Execute the SQL query with the search term
+
+    console.log("search_term", search_term);
+    console.log("gender", gender);
+
+    const { rows } = await pool.query(query, [
+      `%${search_term}%`,
+      gender,
+      userId,
+    ]);
+
+    if (rows.length > 0) {
+      const linkups = rows;
+      res.json({
+        success: true,
+        message: "Linkups fetched successfully",
+        linkupList: linkups,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "No linkups found matching the search term",
+        linkupList: [],
+      });
+    }
+  } catch (error) {
+    handleDatabaseError(res, error, "Error searching linkups:");
+  }
+};
+
 const createLinkup = async (req, res) => {
   const { linkup } = req.body;
   const queryPath = path.join(__dirname, "../db/queries/createLinkup.sql");
@@ -34,7 +70,7 @@ const createLinkup = async (req, res) => {
     linkup.activity,
     linkup.date,
     linkup.gender_preference,
-    linkup.payment_option
+    linkup.payment_option,
   ];
 
   try {
@@ -240,6 +276,7 @@ const closeLinkup = async (req, res) => {
 
 module.exports = {
   initializeSocket,
+  searchLinkups,
   createLinkup,
   getLinkups,
   getLinkupStatus,
