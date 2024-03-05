@@ -1,3 +1,7 @@
+Certainly! Here's the updated documentation with the changes you requested:
+
+---
+
 # luul
 LUUL React App Repository
 
@@ -54,28 +58,55 @@ For any inquiries, contributions, or support requests, please refer to the docum
 
 # Linkup App Documentation
 
-## Introduction
-
-Welcome to the documentation for the Linkup app, a platform that enables users to create, manage, and participate in linkup events. Linkups are user-generated events for various activities, and this app facilitates communication and organization among participants.
-
 ## Table of Contents
 
-1. [Linkup Creation and Management](#linkup-creation-and-management)
-2. [Linkup Display and Filtering](#linkup-display-and-filtering)
-3. [Linkup Details and Messaging](#linkup-details-and-messaging)
-4. [Notification System](#notification-system)
-5. [Accepting and Initializing Linkups](#accepting-and-initializing-linkups)
-6. [State Management](#state-management)
-7. [Component Architecture](#component-architecture)
-8. [Styling and UI](#styling-and-ui)
-9. [Server and API Endpoints](#server-and-api-endpoints)
-10. [User Account Deactivation and Reactivation](#user-account-deactivation-and-reactivation)
+1. [Authentication](#authentication)
+2. [Linkup Creation and Management](#linkup-creation-and-management)
+3. [Linkup Display and Filtering](#linkup-display-and-filtering)
+4. [Linkup Details and Messaging](#linkup-details-and-messaging)
+5. [Notification System](#notification-system)
+6. [Accepting and Initializing Linkups](#accepting-and-initializing-linkups)
+7. [State Management](#state-management)
+8. [Component Architecture](#component-architecture)
+9. [Styling and UI](#styling-and-ui)
+10. [Server and API Endpoints](#server-and-api-endpoints)
+11. [User Account Deactivation and Reactivation](#user-account-deactivation-and-reactivation)
+
+## Authentication
+
+### Introduction
+The recent update to the LUUL React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
+
+### Integration with Clerk for Authentication
+The integration with Clerk for authentication enhances the user authentication process by providing secure and seamless authentication services. The integration involves:
+
+1. **Installation and Configuration**: Clerk components for sign-in and sign-up have been added to the application. These components are configured to work with Clerk's authentication service, enabling users to authenticate securely.
+
+2. **Routing**: Appropriate routing has been implemented to ensure users can access the sign-in and sign-up components seamlessly.
+
+3. **User Authentication**: Logic has been implemented to authenticate users using Clerk's authentication service. Upon successful authentication, users are redirected to the desired page within the application.
+
+### Webhooks for User Management
+Webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database. This ensures that user data remains consistent across the application. The webhook implementation involves:
+
+1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in luul/server/auth-service/index.js, while the implementation for managing user deletion can be found in luul/server/user-management-service/index.js.
+
+2. **Verification and Event Handling**: Upon receiving webhook payloads, the application verifies the authenticity of the payloads and handles user creation and deletion events accordingly. User data is stored or removed from the PostgreSQL database based on the received events.
+
+### Client-Side Integration
+The client-side of the application has been updated to handle user authentication status and redirect users accordingly. Additionally, logic has been implemented to fetch and display user-specific data based on authentication status.
+
+### Conclusion
+The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the LUUL React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
+
+For detailed implementation and code examples, please refer to the updated documentation and codebase available in the LUUL React App repository.
+
 
 ## Linkup Creation and Management
 
 The Linkup app provides users with the ability to create, edit, and delete linkup events. The process involves the following steps:
 
-- Users input activity, date/time, location, and gender preference in the CreateLinkupForm component (CreateLinkupForm.js).
+- Users input activity, date/time, location, gender preference, and payment option in the CreateLinkupForm component (CreateLinkupForm.js).
 - Data is sent to the server via an API call (linkupAPI.js) for storage.
 - Created linkups are displayed on the Home Page with an 'active' status.
 - Linkups can be edited through the EditCreateLinkupForm component (EditCreateLinkupForm.js).
@@ -149,7 +180,9 @@ The implemented solution for user account deactivation and reactivation enhances
 
 1. **User Request:** When a user requests to deactivate their account, their account status is changed to "inactive" in the database.
 
-2. **Data Soft Deletion:** To ensure user data is retained, we employ a soft deletion mechanism. We set the "hidden" column of the user's linkups, linkup requests, and notifications to true. This hides the data from user interfaces while keeping the data accessible for potential reactivation.
+2. **Data Soft Deletion:** To ensure user data is retained, we employ a soft deletion mechanism. We set the "hidden" column of the user's linkups, linkup requests, and notifications to true. This hides the data from user
+
+ interfaces while keeping the data accessible for potential reactivation.
 
 **Reactivation:**
 
@@ -173,15 +206,6 @@ The implemented solution for user account deactivation and reactivation enhances
 
 - To reactivate an account, users follow the reactivation process through the platform.
 
-
-## Conclusion
-
-This documentation provides a high-level overview of the Linkup app's features and functionalities. For detailed implementation and code examples, please refer to the app's source code.
-
----
-
----
-
 ## Database Tables Documentation
 
 ### Table: users
@@ -200,6 +224,7 @@ Columns:
 - `bio`: User's biography.
 - `status`: User's status.
 - `avatar`: User's avatar image URL.
+- `clerk_user_id`: ID of the Clerk user.
 
 ### Table: link_ups
 Stores details about created linkups, their creators, and associated information.
@@ -211,6 +236,7 @@ Columns:
 - `activity`: Activity of the linkup.
 - `date`: Date and time of the linkup.
 - `gender_preference`: Gender preference for the linkup.
+- `payment_option`: Payment option for the linkup ("split", "iWillPay", "pleasePay", "").
 - `created_at`: Timestamp of linkup creation.
 - `updated_at`: Timestamp of last linkup update.
 - `status`: Linkup status.
@@ -305,5 +331,3 @@ Columns:
 - `reason`: Rating reason.
 - `created_at`: Timestamp of rating creation.
 - `updated_at`: Timestamp of last rating update.
-
----
