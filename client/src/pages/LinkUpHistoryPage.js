@@ -344,8 +344,8 @@ const LinkupHistoryPage = ({ isMobile }) => {
               value={activeTab}
               onChange={handleTabChange}
               variant={isMobile ? "scrollable" : "standard"}
-              indicatorColor="primary"
-              textColor="primary"
+              // indicatorColor="primary"
+              // textColor="inherit"
               style={{
                 width: isMobile ? "100%" : "auto",
                 color,

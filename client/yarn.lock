@@ -4278,10 +4278,10 @@
     "safe-buffer" "5.1.2"
     "vary" "~1.1.2"
 
-"compromise@^14.9.0":
-  "integrity" "sha512-sQXVgbZkSIB3JWMFH4GUfAiiEWH8LIy7hoT9U+MB5E0EP22ayWuNRDrxyt+kUdzaQU19KOaCkTTRPzHCYeDylQ=="
-  "resolved" "https://registry.npmjs.org/compromise/-/compromise-14.9.0.tgz"
-  "version" "14.9.0"
+"compromise@^14.12.0":
+  "integrity" "sha512-IVJ+ZXgm7Nc9Zobgl8glEir9QYJUc241EggW0JjKBdpRXJjvKB2Y7F+tiJ+vrVk9RQkHoQH5QhPgFX5jX+qL7A=="
+  "resolved" "https://registry.npmjs.org/compromise/-/compromise-14.12.0.tgz"
+  "version" "14.12.0"
   dependencies:
     "efrt" "2.7.0"
     "grad-school" "0.0.5"

@@ -180,16 +180,17 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       }
     },
     [
+      isFormModified,
       location,
       activity,
       selectedDate,
       genderPreference,
+      paymentOption,
+      onClose,
+      dispatch,
+      addSnackbar,
       id,
       setShouldFetchLinkups,
-      dispatch,
-      onClose,
-      addSnackbar,
-      isFormModified, // Include isFormModified in the dependencies
     ]
   );
 

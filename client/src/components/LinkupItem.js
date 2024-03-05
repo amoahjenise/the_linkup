@@ -7,57 +7,65 @@ import moment from "moment";
 import UserAvatar from "./UserAvatar";
 import HorizontalMenu from "./HorizontalMenu";
 import PostActions from "./PostActions";
-import LinkRounded from "@material-ui/icons/LinkRounded";
-import LinkTwoTone from "@material-ui/icons/LinkOutlined";
 import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkupAPI";
-import SplitBillIcon from "./SplitBillIcon";
-import PaymentIcon from "./PaymentIcon";
+import ReceiptIcon from "@material-ui/icons/Receipt";
 
 const compromise = nlp;
 
 const useStyles = makeStyles((theme) => ({
-  linkupItem: {
-    position: "relative",
-    padding: theme.spacing(2),
-    wordWrap: "break-word",
-    borderBottom: "1px solid #ccc",
-    alignItems: "flex-start",
-  },
   postedTimeText: {
-    marginLeft: "auto",
-  },
-  postHeaderContainer: { display: "flex", alignItems: "center" },
-  linkupItemContent: {
-    display: "flex",
-    flexDirection: "column",
-    flexGrow: 1,
-    wordWrap: "break-word",
+    color: "#8e8e8e",
+    fontSize: "14px",
+    fontWeight: "normal",
+    marginTop: "5px",
+    letterSpacing: "0.5px",
   },
   boldText: {
     fontWeight: "bold",
-  },
-  iconHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   usernameLink: {
     textDecoration: "none",
     fontWeight: "bold",
   },
+  highlightedLinkupItem: {
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
+    transition: "background-color 0.2s ease",
+  },
+  menuContainer: {
+    padding: theme.spacing(3),
+    position: "absolute",
+    top: 0,
+    right: 0,
+  },
+  linkupItem: {
+    width: "100%",
+    position: "relative",
+    padding: theme.spacing(2),
+    wordWrap: "break-word",
+    borderBottom: "1px solid #ccc",
+    cursor: "pointer",
+  },
   postActions: {
     fontSize: "12px",
     marginTop: "25px",
   },
-  buttonsContainer: {
+  linkupInfo: {
+    margin: "10px",
     display: "flex",
-    alignItems: "center",
+    flexDirection: "column",
   },
-  highlightedLinkupItem: {
-    backgroundColor: "rgba(200, 200, 200, 0.1)",
-    transition: "background-color 0.2s ease",
+  itemFooter: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "end",
+  },
+  paymentOptionIconContainer: {
+    display: "inline-block", // Ensures the container wraps around the emoji
+  },
+  paymentOptionIcon: {
+    cursor: "default", // Makes the emoji a pointer when hovered over
   },
 }));
 
@@ -78,31 +86,39 @@ const LinkupItem = React.memo(
       switch (linkupItem.payment_option) {
         case "split":
           return (
-            <SplitBillIcon
-              person1Color="pink"
-              person2Color="blue"
-              width="40px"
-              height="40px"
-            />
-          );
-        case "iWillPay":
-          return (
-            <PaymentIcon
-              width="40px"
-              height="40px"
-              color="blue"
-              fontSize="35px"
-            />
-          );
-        case "pleasePay":
-          return (
             <span
-              title="Please pay!"
+              title="Lets split the bill!"
               role="img"
               aria-label="watery eyes"
               style={{ fontSize: "30px" }}
             >
-              🥹
+              <ReceiptIcon />
+              <ReceiptIcon />
+            </span>
+          );
+        case "iWillPay":
+          return (
+            <span
+              title="I'll pay!"
+              role="img"
+              aria-label="watery eyes"
+              style={{ fontSize: "30px" }}
+            >
+              <ReceiptIcon />
+            </span>
+          );
+        case "pleasePay":
+          return (
+            <span className={classes.paymentOptionIconContainer}>
+              <span
+                title="Please pay"
+                role="img"
+                aria-label="watery eyes"
+                style={{ fontSize: "30px" }}
+                className={classes.paymentOptionIcon}
+              >
+                🥹
+              </span>{" "}
             </span>
           );
         default:
@@ -160,7 +176,7 @@ const LinkupItem = React.memo(
       return (
         <p>
           <Link to={`/profile/${creator_id}`} className={classes.usernameLink}>
-            <strong>@{creator_name}</strong>
+            <strong>{creator_name}</strong>
           </Link>{" "}
           is trying to link up{" "}
           <strong className={classes.boldText}>{activityText}</strong> on{" "}
@@ -171,12 +187,6 @@ const LinkupItem = React.memo(
         </p>
       );
     };
-
-    // const renderPostIcon = () => {
-    //   const linkupType =
-    //     loggedUser.user.id === linkupItem.creator_id ? "trylink" : "linkup";
-    //   return linkupType === "linkup" ? <LinkRounded /> : <LinkTwoTone />;
-    // };
 
     const getTimeAgo = (createdAt) => {
       const now = moment();
@@ -199,7 +209,7 @@ const LinkupItem = React.memo(
 
     return (
       <div
-        className={`${classes.linkupItem} ${
+        className={`${
           isHovered || linkupItem.id === editingLinkup?.linkup?.id
             ? classes.highlightedLinkupItem
             : ""
@@ -207,20 +217,8 @@ const LinkupItem = React.memo(
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className={classes.linkupItemContent}>
-          <div className={classes.iconHeader}>
-            <div className={classes.postHeaderContainer}>
-              <UserAvatar
-                userData={{
-                  id: creator_id,
-                  name: creator_name,
-                  avatar: avatar,
-                }}
-                width="50px"
-                height="50px"
-              />
-              {renderLinkupItemText()}
-            </div>
+        <div className={classes.linkupItem}>
+          <div className={classes.menuContainer}>
             {loggedUser.user.id === linkupItem.creator_id && (
               <HorizontalMenu
                 showGoToItem={true}
@@ -236,28 +234,40 @@ const LinkupItem = React.memo(
               />
             )}
           </div>
-          <div className={classes.postActions}>
-            {renderPaymentOptionIcon()}
-
-            {loggedUser.user.id !== linkupItem.creator_id ? (
-              <div className={classes.buttonsContainer}>
-                <PostActions
-                  paymentOption={linkupItem.payment_option}
-                  onRequestClick={handleRequestLinkup}
-                  disableRequest={disableRequest}
-                />
-                <span className={classes.postedTimeText}>
-                  Posted {getTimeAgo(created_at)}
-                </span>
+          <div>
+            <UserAvatar
+              userData={{
+                id: creator_id,
+                name: creator_name,
+                avatar: avatar,
+              }}
+              width="50px"
+              height="50px"
+            />
+            <div className={classes.linkupInfo}>
+              <div>{renderLinkupItemText()}</div>
+              <div className={classes.itemFooter}>
+                <div>
+                  <span className={classes.postedTimeText}>
+                    Posted {getTimeAgo(created_at)}
+                  </span>
+                  <div className={classes.postActions}>
+                    {loggedUser.user.id !== linkupItem.creator_id && (
+                      <div>
+                        <div>
+                          <PostActions
+                            paymentOption={linkupItem.payment_option}
+                            onRequestClick={handleRequestLinkup}
+                            disableRequest={disableRequest}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div>{renderPaymentOptionIcon()}</div>
               </div>
-            ) : (
-              <div className={classes.buttonsContainer}>
-                <span className={classes.postedTimeText}>
-                  Posted {getTimeAgo(created_at)}
-                </span>
-              </div>
-            )}
-            {/* {renderPostIcon()} */}
+            </div>
           </div>
         </div>
       </div>
