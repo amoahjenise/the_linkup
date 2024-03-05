@@ -211,7 +211,7 @@ The implemented solution for user account deactivation and reactivation enhances
 
 ## Search Functionality
 
-The search functionality in the LUUL React App allows users to search for linkup events based on specific criteria such as activity type, location, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
+The search functionality in the LUUL React App allows users to search for linkup events based on specific criteria such as activity type, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
 
 Implementation Details
 Client-Side Integration:
@@ -227,7 +227,7 @@ The filtered linkup events are then returned to the client for display.
 
 **Search Criteria:**
 
-The search functionality supports searching for linkup events based on activity type, location, creator name, date/time, and payment option.
+The search functionality supports searching for linkup events based on activity type, creator name, date/time, and payment option.
 Users can enter partial or complete search queries to find relevant linkup events.
 
 **Debounce Functionality:**
@@ -237,7 +237,7 @@ The debounce function delays the execution of the search API request until a spe
 
 **Entering Search Queries:**
 
-Users can enter search queries in the SearchInput component, specifying criteria such as activity type, location, creator name, date/time, and payment option.
+Users can enter search queries in the SearchInput component, specifying criteria such as activity type, creator name, date/time, and payment option.
 Partial or complete search queries are supported, allowing for flexible search options.
 
 **Viewing Search Results:**
