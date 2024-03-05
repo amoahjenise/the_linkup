@@ -71,6 +71,8 @@ For any inquiries, contributions, or support requests, please refer to the docum
 9. [Styling and UI](#styling-and-ui)
 10. [Server and API Endpoints](#server-and-api-endpoints)
 11. [User Account Deactivation and Reactivation](#user-account-deactivation-and-reactivation)
+12. [Search Functionality](#search-functionality)
+13. [Database Tables Documentation](#database-tables-documentation)
 
 ## Authentication
 
@@ -205,6 +207,52 @@ The implemented solution for user account deactivation and reactivation enhances
 - To deactivate an account, the user initiates the process through the platform's interface.
 
 - To reactivate an account, users follow the reactivation process through the platform.
+
+
+## Search Functionality
+
+The search functionality in the LUUL React App allows users to search for linkup events based on specific criteria such as activity type, location, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
+
+Implementation Details
+Client-Side Integration:
+
+The search functionality is implemented on the client-side using React components.
+A SearchInput component allows users to input search queries.
+When users enter a search query, an API request is triggered to fetch linkup events matching the search criteria.
+Server-Side Handling:
+
+On the server-side, an API endpoint '${BASE_URL}/api/linkups/search/${userId}' is responsible for processing search requests.
+The server receives the search query and filters linkup events based on the specified criteria.
+The filtered linkup events are then returned to the client for display.
+
+**Search Criteria:**
+
+The search functionality supports searching for linkup events based on activity type, location, creator name, date/time, and payment option.
+Users can enter partial or complete search queries to find relevant linkup events.
+
+**Debounce Functionality:**
+
+To optimize performance and prevent excessive API requests, a debounce function is implemented on the client-side.
+The debounce function delays the execution of the search API request until a specified time has passed since the user's last input.
+
+**Entering Search Queries:**
+
+Users can enter search queries in the SearchInput component, specifying criteria such as activity type, location, creator name, date/time, and payment option.
+Partial or complete search queries are supported, allowing for flexible search options.
+
+**Viewing Search Results:**
+
+After entering a search query, users can view the search results displayed on the screen.
+The search results consist of linkup events that match the specified search criteria.
+
+**Refining Search Queries:**
+
+Users can refine their search queries by adjusting the input parameters in the SearchInput component.
+Refining search queries allows users to find more specific or relevant linkup events.
+
+Conclusion
+The search functionality in the LUUL React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
+
 
 ## Database Tables Documentation
 
