@@ -4,8 +4,7 @@ import { useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
-import Cards from "../components/Cards";
-import UserAvatar from "../components/UserAvatar";
+import ImageGrid from "../components/ImageGrid";
 import Geocode from "react-geocode";
 import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
 import { getUserImages } from "../api/imagesAPI";
@@ -14,10 +13,11 @@ import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
-import LocationOnIcon from "@material-ui/icons/LocationOn";
 import { useColorMode } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import ProfileHeaderCard from "../components/ProfileHeaderCard";
+import ImageGridHeader from "../components/ImageGridHeader";
 
 Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
@@ -25,51 +25,26 @@ const useStyles = makeStyles((theme) => ({
   userProfilePage: {
     display: "flex",
     flexDirection: "column",
-    width: "55%",
-    borderRight: "1px solid #e1e8ed",
-    overflowX: "hidden",
-    [theme.breakpoints.down("sm")]: {
-      width: "100%",
-    },
+    width: "100%",
+    overflowY: "hidden", // Make only the image section vertically scrollable
   },
   profileSection: {
     display: "flex",
     flexDirection: "column",
-    overflowX: "hidden",
   },
-  profileHeader: {
-    display: "flex",
-    backgroundColor: "rgba(207, 217, 222, 0.1)",
-    padding: theme.spacing(1),
-    borderBottom: "1px solid #e1e8ed",
-  },
-  bioText: {
-    marginTop: theme.spacing(1),
-    fontWeight: "bold",
-    fontSize: "16px",
-    margin: "8px 0",
-    lineHeight: "1.4",
-    marginLeft: "4px",
-  },
-  centeredContent: {
+  imageSection: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
     alignItems: "center",
-    // marginTop: "5%",
-  },
-  leftMargin: {
-    marginLeft: theme.spacing(4),
-  },
-  mobileProfileHeader: {
-    padding: theme.spacing(2),
-    borderBottom: "1px solid #e1e8ed",
-    backgroundColor: "rgba(207, 217, 222, 0.1)",
+    overflowY: "auto", // Make only the image section vertically scrollable
+    maxHeight: "60vh", // Limit the height of the image section to 60vh
   },
   editButton: {
-    width: "fit-content",
-    height: "fit-content",
-    marginLeft: "auto", // Add spacing to separate from name and age
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    color: theme.palette.primary.contrastText,
+    "&:hover": {
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
+    },
   },
 }));
 
@@ -84,6 +59,7 @@ const UserProfilePage = ({ isMobile }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addSnackbar } = useSnackbar();
   const { colorMode } = useColorMode();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -95,9 +71,6 @@ const UserProfilePage = ({ isMobile }) => {
   const closeImageUploadModal = () => {
     setImageUploadModalOpen(false);
   };
-
-  // State for controlling the edit modal
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Check if userData is available before accessing its properties
   const isUserDataAvailable = userData !== null;
@@ -223,7 +196,7 @@ const UserProfilePage = ({ isMobile }) => {
         // After a successful update, update userData with the new bio and avatar
         setUserData((prevUserData) => ({
           ...prevUserData,
-          bio: bioResponse?.data?.bio || prevUserData.bio,
+          bio: bioResponse?.data?.bio,
           avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
         }));
         addSnackbar("Profile updated!");
@@ -246,55 +219,29 @@ const UserProfilePage = ({ isMobile }) => {
         <LoadingSpinner />
       ) : (
         <div className={classes.profileSection}>
-          {/* Profile header */}
-          <div
-            className={
-              isMobile ? classes.mobileProfileHeader : classes.profileHeader
-            }
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <UserAvatar userData={userData} width="125px" height="125px" />
-
-              <div className={classes.leftMargin}>
-                {isMobile ? (
-                  <h5 style={{ fontSize: "26px", marginLeft: "4px" }}>
-                    {userData?.name}, {calculateAge(userData?.date_of_birth)}
-                  </h5>
-                ) : (
-                  <h2 style={{ fontSize: "26px", marginLeft: "4px" }}>
-                    {userData?.name}, {calculateAge(userData?.date_of_birth)}
-                  </h2>
-                )}
-                <span style={{ fontWeight: "normal" }}>
-                  <>
-                    <h6>
-                      <LocationOnIcon
-                        style={{ fontSize: "16px", marginTop: "10px" }}
-                      />{" "}
-                      {userLocation}
-                    </h6>
-                  </>
-                </span>
-                {/* Bio text */}
-                <div className={classes.bioText}>
-                  <span>{userData?.bio}</span>
-                </div>
-              </div>
-            </div>
-            {renderEditButton()}
-          </div>
+          <ProfileHeaderCard
+            isMobile={isMobile}
+            userData={userData}
+            userLocation={userLocation}
+            renderEditButton={renderEditButton}
+            calculateAge={calculateAge}
+          />
           {isLoading ? (
             <LoadingSpinner />
           ) : (
-            <div className={classes.centeredContent}>
-              <Cards
-                images={profileImages || []}
-                currentImageIndex={currentImageIndex}
-                setCurrentImageIndex={setCurrentImageIndex}
+            <div>
+              <ImageGridHeader
                 isLoggedUserProfile={isLoggedUserProfile}
                 isImageUploadModalOpen={isImageUploadModalOpen}
                 openImageUploadModal={openImageUploadModal}
               />
+              <div className={classes.imageSection}>
+                <ImageGrid
+                  images={profileImages || []}
+                  currentImageIndex={currentImageIndex}
+                  setCurrentImageIndex={setCurrentImageIndex}
+                />
+              </div>{" "}
             </div>
           )}
         </div>

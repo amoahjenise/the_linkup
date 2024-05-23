@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme) => ({
   },
   mainSection: {
     width: "65%",
-    borderRight: "1px solid #e1e8ed",
+    borderRightWidth: "1px",
+    borderRightColor: "1px solid #D3D3D3",
     [theme.breakpoints.down("sm")]: {
       width: "100%", // Set to 100% in mobile mode
     },

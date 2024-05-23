@@ -26,8 +26,14 @@ const {
 } = require("../../messaging-service/controllers/messagingController");
 
 const sendRequest = async (req, res) => {
-  const { requesterId, requesterName, creator_id, linkupId, content } =
-    req.body;
+  const {
+    requesterId,
+    requesterName,
+    creator_id,
+    linkupId,
+    content,
+    conversation_id,
+  } = req.body;
   const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [requesterId, creator_id, linkupId, content];
@@ -47,7 +53,7 @@ const sendRequest = async (req, res) => {
       const conversationData = {
         sender_id: requesterId,
         receiver_id: creator_id,
-        message_content: content,
+        conversation_id: conversation_id,
         linkup_id: linkupId,
       };
 
@@ -78,6 +84,8 @@ const sendRequest = async (req, res) => {
 
           // Emit the "join-linkup-room" event to make the user join the room
           linkupSocket.emit("join-linkup-room", linkupId);
+
+          console.log("EMIT JOIN LINKUP ROOM");
 
           res.json({
             success: true,

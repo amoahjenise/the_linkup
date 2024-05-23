@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { useDispatch } from "react-redux";
-import { incrementUnreadMessagesCount } from "../redux/actions/messageActions";
+// import { incrementUnreadMessagesCount } from "../redux/actions/messageActions";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   updateConversation,
@@ -34,9 +34,9 @@ export const SocketProvider = ({ children }) => {
     query: { userId },
   });
 
-  const messagingSocket = io("http://localhost:3006", {
-    query: { userId },
-  });
+  // const messagingSocket = io("http://localhost:3006", {
+  //   query: { userId },
+  // });
 
   useEffect(() => {
     // Function to authenticate the user with the sockets
@@ -47,77 +47,77 @@ export const SocketProvider = ({ children }) => {
     // Authenticate users with their respective sockets
     // authenticateUser(linkupManagementSocket);
     // authenticateUser(linkupRequestSocket);
-    authenticateUser(messagingSocket);
+    // authenticateUser(messagingSocket);
 
     // Messaging Service Events
 
-    messagingSocket.on("new-message", (data) => {
-      // Data contains the incoming message details, e.g., sender_id, message_content, conversation_id
-      const {
-        timestamp,
-        message_id,
-        message_content,
-        sender_id,
-        sender_name,
-        sender_avatar,
-        conversation_id,
-      } = data;
+    // messagingSocket.on("new-message", (data) => {
+    //   // Data contains the incoming message details, e.g., sender_id, message_content, conversation_id
+    //   const {
+    //     timestamp,
+    //     message_id,
+    //     message_content,
+    //     sender_id,
+    //     sender_name,
+    //     sender_avatar,
+    //     conversation_id,
+    //   } = data;
 
-      // Dispatch the newMessage action to update the Redux store for both sender and receiver
-      dispatch(
-        newMessage({
-          message_id: message_id,
-          conversation_id: conversation_id,
-          sender_id: sender_id,
-          sender_name: sender_name,
-          sender_avatar: sender_avatar,
-          content: message_content,
-          timestamp: timestamp,
-        })
-      );
+    //   // Dispatch the newMessage action to update the Redux store for both sender and receiver
+    //   dispatch(
+    //     newMessage({
+    //       message_id: message_id,
+    //       conversation_id: conversation_id,
+    //       sender_id: sender_id,
+    //       sender_name: sender_name,
+    //       sender_avatar: sender_avatar,
+    //       content: message_content,
+    //       timestamp: timestamp,
+    //     })
+    //   );
 
-      // Find the conversation with the matching conversation_id in the conversations array
-      if (conversations) {
-        const conversationToUpdate = conversations.find(
-          (conversation) => conversation.conversation_id === conversation_id
-        );
+    //   // Find the conversation with the matching conversation_id in the conversations array
+    //   if (conversations) {
+    //     const conversationToUpdate = conversations.find(
+    //       (conversation) => conversation.conversation_id === conversation_id
+    //     );
 
-        // Check if the conversation was found
-        if (conversationToUpdate) {
-          // Create an updated conversation object with the new last_message and last_message_timestamp
-          const updatedConversation = {
-            ...conversationToUpdate,
-            last_message: message_content,
-            last_message_timestamp: timestamp,
-          };
+    //     // Check if the conversation was found
+    //     if (conversationToUpdate) {
+    //       // Create an updated conversation object with the new last_message and last_message_timestamp
+    //       const updatedConversation = {
+    //         ...conversationToUpdate,
+    //         last_message: message_content,
+    //         last_message_timestamp: timestamp,
+    //       };
 
-          // Dispatch the updateConversation action to update the conversation in the Redux store
-          dispatch(updateConversation(updatedConversation));
-        }
-      }
+    //       // Dispatch the updateConversation action to update the conversation in the Redux store
+    //       dispatch(updateConversation(updatedConversation));
+    //     }
+    //   }
 
-      // Increment the unread messages count if the user is not in the current conversation
-      if (selectedConversation?.conversation_id !== conversation_id) {
-        dispatch(incrementUnreadMessagesCount());
-      }
-    });
+    //   // Increment the unread messages count if the user is not in the current conversation
+    //   if (selectedConversation?.conversation_id !== conversation_id) {
+    //     dispatch(incrementUnreadMessagesCount());
+    //   }
+    // });
 
-    messagingSocket.on("new-message-notification", (notification) => {
-      addSnackbar(notification.content, { timeout: 7000 });
-      dispatch(incrementUnreadNotificationsCount());
-      // dispatch(incrementConversationUnreadCount());
-    });
+    // messagingSocket.on("new-message-notification", (notification) => {
+    //   addSnackbar(notification.content, { timeout: 7000 });
+    //   dispatch(incrementUnreadNotificationsCount());
+    //   // dispatch(incrementConversationUnreadCount());
+    // });
 
     // Linkup Management Service Events
 
     linkupManagementSocket.on("linkupCreated", (newLinkup) => {
-      addSnackbar(
-        `Linkup ${newLinkup.id} created in Linkup Management Service.`
-      );
+      // addSnackbar(
+      //   `Linkup ${newLinkup.id} created in Linkup Management Service.`
+      // );
     });
 
     linkupManagementSocket.on("linkupExpired", (expiredLinkup) => {
-      addSnackbar(`Linkup ${expiredLinkup.linkupId} has expired!`);
+      addSnackbar(`You linkup has expired!`);
     });
 
     // Linkup Request Service Events
@@ -149,7 +149,7 @@ export const SocketProvider = ({ children }) => {
     conversations,
     linkupManagementSocket,
     linkupRequestSocket,
-    messagingSocket,
+    // messagingSocket,
     userId,
     dispatch,
     selectedConversation?.conversation_id,
@@ -158,7 +158,7 @@ export const SocketProvider = ({ children }) => {
   const sockets = {
     linkupManagementSocket,
     linkupRequestSocket,
-    messagingSocket,
+    // messagingSocket,
   };
 
   return (

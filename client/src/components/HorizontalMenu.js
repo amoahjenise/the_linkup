@@ -11,6 +11,10 @@ import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { closeLinkup, deleteLinkup } from "../api/linkupAPI";
 import ConfirmationModal from "./ConfirmationModal"; // Import the ConfirmationModal component
 import { useColorMode } from "@chakra-ui/react";
+import {
+  acceptLinkupRequest,
+  declineLinkupRequest,
+} from "../api/linkupRequestAPI";
 
 const useStyles = makeStyles((theme) => ({
   moreIcon: {
@@ -24,7 +28,8 @@ const HorizontalMenu = ({
   showDeleteItem,
   showCloseItem,
   showCheckInLinkup, // Ation for checking in the linkup
-  showAcceptLinkupRequest, // Action for accepting linkup requests
+  showAcceptLinkupRequest,
+  showDeclineLinkupRequest,
   linkupItem,
   menuAnchor,
   setMenuAnchor,
@@ -56,9 +61,33 @@ const HorizontalMenu = ({
     handleMenuClose();
   };
 
-  const handleAcceptRequestClick = () => {
-    // Add your logic for accepting linkup requests here
+  const handleAcceptRequestClick = async () => {
+    try {
+      await acceptLinkupRequest(linkupItem.request_id);
+      dispatch({
+        type: "UPDATE_REQUEST_STATUS",
+        payload: { id: linkupItem.request_id, status: "accepted" },
+      });
+      setShouldFetchLinkups(true);
+      addSnackbar("Link-up request accepted.");
+    } catch (error) {
+      addSnackbar(error.message);
+    }
     handleMenuClose();
+  };
+
+  const handleDeclineRequestClick = async () => {
+    try {
+      await declineLinkupRequest(linkupItem.request_id);
+      dispatch({
+        type: "UPDATE_REQUEST_STATUS",
+        payload: { id: linkupItem.request_id, status: "declined" },
+      });
+      setShouldFetchLinkups(true);
+      addSnackbar("Link-up request declined.");
+    } catch (error) {
+      addSnackbar(error.message);
+    }
   };
 
   const handleEditClick = () => {
@@ -164,6 +193,11 @@ const HorizontalMenu = ({
             condition: showAcceptLinkupRequest, // Show the Accept Request option conditionally
             label: "Accept linkup request", // Label for the Accept Request action
             action: handleAcceptRequestClick, // Action for Accept Request
+          },
+          {
+            condition: showDeclineLinkupRequest, // Show the Decline Request option conditionally
+            label: "Decline linkup request", // Label for the Decline Request action
+            action: handleDeclineRequestClick, // Action for Decline Request
           },
           {
             condition: showCheckInLinkup, // Show the Check-In option conditionally

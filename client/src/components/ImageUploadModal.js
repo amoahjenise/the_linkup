@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { uploadImages, deleteImages } from "../api/imagesAPI"; // Adjust the import based on your API functions.
 import { useSnackbar } from "../contexts/SnackbarContext";
 import DeleteIcon from "@material-ui/icons/Delete";
+import Resizer from "react-image-file-resizer";
 
 const MAX_IMAGES = 9; // Maximum number of images to display
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB (adjust the value as needed)
@@ -119,6 +120,23 @@ const ImageUploadModal = ({
   const classes = useStyles();
   const { addSnackbar } = useSnackbar();
 
+  // Utility function to resize images
+  const resizeImage = (file, outputType) =>
+    new Promise((resolve) => {
+      Resizer.imageFileResizer(
+        file,
+        1080, // Desired width
+        1080, // Desired height
+        outputType, // Output type (JPEG or PNG)
+        90, // Quality
+        0, // Rotation
+        (uri) => {
+          resolve(uri);
+        },
+        "base64"
+      );
+    });
+
   // Create a separate state to hold changes temporarily
   const [tempProfileImages, setTempProfileImages] = useState([
     ...profileImages,
@@ -138,16 +156,16 @@ const ImageUploadModal = ({
   const overlayBackgroundColor =
     colorMode === "dark" ? "rgba(0, 0, 0, 0.5)" : "";
 
-  // Utility function to convert a File object to a base64 URL
-  const convertFileToBase64URL = (file) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        resolve(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+  // // Utility function to convert a File object to a base64 URL
+  // const convertFileToBase64URL = (file) => {
+  //   return new Promise((resolve) => {
+  //     const reader = new FileReader();
+  //     reader.onload = (event) => {
+  //       resolve(event.target.result);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   });
+  // };
 
   const handleImageSelection = async (e, index) => {
     const file = e.target.files[0];
@@ -163,12 +181,17 @@ const ImageUploadModal = ({
       return;
     }
 
-    // Convert the selected file to a base64 URL
-    const base64URL = await convertFileToBase64URL(file);
+    // Resize the selected image to JPEG or PNG format based on its type
+    let resizedImage;
+    if (file.type === "image/jpeg") {
+      resizedImage = await resizeImage(file, "JPEG");
+    } else if (file.type === "image/png") {
+      resizedImage = await resizeImage(file, "PNG");
+    }
 
-    // Update profileImages state with the new image
+    // Update profileImages state with the new image URI
     const newProfileImages = [...tempProfileImages];
-    newProfileImages[index] = base64URL;
+    newProfileImages[index] = resizedImage;
     setTempProfileImages(newProfileImages);
   };
 

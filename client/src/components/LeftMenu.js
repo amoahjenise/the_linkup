@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Badge from "@material-ui/core/Badge";
@@ -12,6 +12,8 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../logo.png";
 import CustomUserButton from "./UserButton";
+import useSendbirdHandlers from "../handlers/useSendbirdHandlers";
+import { setUnreadMessagesCount } from "../redux/actions/messageActions";
 
 const drawerWidth = "20%";
 
@@ -19,7 +21,8 @@ const useStyles = makeStyles((theme) => ({
   main: {
     flex: "0 0 " + drawerWidth,
     padding: theme.spacing(4),
-    borderRight: "0.1px solid lightgrey",
+    borderRightWidth: "1px",
+    borderRightColor: "0.1px solid lightgrey",
     position: "sticky",
   },
   menu: {
@@ -74,6 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftMenu = ({ isMobile }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const unreadNotificationsCount = useSelector(
@@ -83,6 +87,13 @@ const LeftMenu = ({ isMobile }) => {
   const unreadMessagesCount = useSelector(
     (state) => state.messages.unreadMessagesCount
   );
+
+  const handleUnreadMessageCountUpdate = (channel) => {
+    const unreadMessageCount = channel.unreadMessageCount;
+    dispatch(setUnreadMessagesCount(unreadMessageCount));
+  };
+
+  useSendbirdHandlers(handleUnreadMessageCountUpdate);
 
   const location = useLocation(); // Get the current route location
   const { colorMode } = useColorMode();

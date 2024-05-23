@@ -93,7 +93,7 @@ const DeactivateAccount = ({ colorMode }) => {
       <h2 className={classes.sectionTitle}>Deactivate Your Account</h2>
       <p className={classes.sectionContent}>
         We are sorry to see you leave. Are you sure you want to deactivate your
-        account? This action cannot be undone.
+        account?
       </p>
       <p className={classes.sectionContent}>
         To confirm, type "CONFIRM" below:
@@ -108,7 +108,6 @@ const DeactivateAccount = ({ colorMode }) => {
       />
       <Button
         variant="contained"
-        color="primary"
         className={classes.button}
         onClick={handleDeactivate}
         disabled={!isConfirmValid}

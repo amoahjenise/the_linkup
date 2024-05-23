@@ -10,14 +10,10 @@ const handleError = (error) => {
   throw error;
 };
 
-export const markConversationMessagesAsRead = async (
-  conversationId,
-  receiverId
-) => {
+export const getConversationByChannelUrl = async (channelUrl) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/mark-conversation-messages-as-read`,
-      { conversationId, receiverId }
+    const response = await axios.get(
+      `${BASE_URL}/api/conversation/channel/${channelUrl}`
     );
     return response.data;
   } catch (error) {
@@ -25,61 +21,10 @@ export const markConversationMessagesAsRead = async (
   }
 };
 
-export const updateUnreadConversationsCount = async (userId) => {
+export const getLinkupByConversation = async (channelUrl) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/conversations/unread-count/${userId}`
-    );
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-export const getConversations = async (userId) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/api/conversations/${userId}`);
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-export const getConversationMessages = async (conversationId, userId) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/api/conversation/messages/${conversationId}/${userId}`
-    );
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-export const createNewConversation = async (
-  requesterId,
-  receiverId,
-  message,
-  linkupId
-) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/create-conversation`, {
-      sender_id: requesterId,
-      receiver_id: receiverId,
-      message_content: message,
-      linkup_id: linkupId,
-    });
-    return response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// New function to fetch unread message count
-export const getUnreadMessagesCount = async (userId) => {
-  try {
-    const response = await axios.get(
-      `${BASE_URL}/api/unread-messages-count/${userId}`
+      `${BASE_URL}/api/linkup-by-conversation/${channelUrl}`
     );
     return response.data;
   } catch (error) {

@@ -5,7 +5,7 @@ import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
 import { setUnreadMessagesCount } from "./redux/actions/messageActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
-import { getUnreadMessagesCount } from "./api/messagingAPI";
+import { getUnreadMessagesCount } from "./api/sendbirdAPI";
 import ClerkCustomSignIn from "./sign-in/[[...index]]";
 import ClerkCustomSignUp from "./sign-up/[[...index]]";
 import LandingPage from "./pages/LandingPage";
@@ -27,6 +27,10 @@ import { authenticateUser } from "./api/authenticationAPI";
 import { setCurrentUser } from "./redux/actions/userActions";
 import { login } from "./redux/actions/authActions";
 import { useUser } from "@clerk/clerk-react";
+import "@sendbird/uikit-react/dist/index.css";
+import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
+import { TypingIndicatorType } from "@sendbird/uikit-react";
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -47,6 +51,30 @@ const App = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { user } = useUser();
   const [authError, setAuthError] = useState(false);
+  const { colorMode } = useColorMode();
+
+  const myColorSet = {
+    "--sendbird-light-primary-500": "#00487c",
+    "--sendbird-light-primary-400": "#346382",
+    "--sendbird-light-primary-300": "#3e6680",
+    "--sendbird-light-primary-200": "#0496ff",
+    "--sendbird-light-primary-100": "#BEBEBE",
+    "--sendbird-dark-primary-500": "#00487c", //
+    "--sendbird-dark-primary-400": "#00487c", // On hover color
+    "--sendbird-dark-primary-300": "#7cd6c9", // Left border plus chat bubble on hover color
+    "--sendbird-dark-primary-200": "#92d4ca", // Chat bubble color
+    "--sendbird-dark-primary-100": "#00487c", // Color on selection
+    "--sendbird-dark-background-600": "#1f2733",
+  };
+
+  const myStringSet = {
+    MESSAGE_INPUT__PLACE_HOLDER__DISABLED:
+      "Chat is temporarily disabled until the recipient responds.",
+  };
+
+  const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
+  const REACT_APP_SENDBIRD_APP_ACCESS_TOKEN =
+    process.env.REACT_APP_SENDBIRD_APP_ACCESS_TOKEN;
 
   useEffect(() => {
     async function fetchData() {
@@ -136,36 +164,57 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <ToggleColorMode>
-        <BrowserRouter>
-          <div className={`${isAuthenticated ? classes.app : ""}`}>
-            {isAuthenticated && <LeftMenu isMobile={isMobile} />}
-            {/* Conditional rendering based on authentication status */}
-            {publicPages.includes(window.location.pathname) ? (
-              <RoutesComponent />
-            ) : (
-              <>
-                <SignedIn>
-                  {authError ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ErrorPage />
-                    </div>
-                  ) : (
-                    <RoutesComponent />
-                  )}
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            )}
-          </div>
-        </BrowserRouter>
+        <SendbirdProvider
+          appId={REACT_APP_SENDBIRD_APP_ID}
+          userId={userState?.user?.id}
+          accessToken={REACT_APP_SENDBIRD_APP_ACCESS_TOKEN}
+          theme={colorMode === "light" ? "light" : "dark"}
+          colorSet={myColorSet}
+          stringSet={myStringSet}
+          uikitOptions={{
+            groupChannel: {
+              // Below controls the toggling of the typing indicator in the group channel. The default is `true`.
+              enableTypingIndicator: true,
+
+              // Below turns on both bubble and text typing indicators. Default is `Text` only.
+              typingIndicatorTypes: new Set([
+                TypingIndicatorType.Bubble,
+                TypingIndicatorType.Text,
+              ]),
+            },
+          }}
+        >
+          <BrowserRouter>
+            <div className={`${isAuthenticated ? classes.app : ""}`}>
+              {isAuthenticated && <LeftMenu isMobile={isMobile} />}
+              {/* Conditional rendering based on authentication status */}
+              {publicPages.includes(window.location.pathname) ? (
+                <RoutesComponent />
+              ) : (
+                <>
+                  <SignedIn>
+                    {authError ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <ErrorPage />
+                      </div>
+                    ) : (
+                      <RoutesComponent />
+                    )}
+                  </SignedIn>
+                  <SignedOut>
+                    <RedirectToSignIn />
+                  </SignedOut>
+                </>
+              )}
+            </div>
+          </BrowserRouter>
+        </SendbirdProvider>
       </ToggleColorMode>
     </ThemeProvider>
   );

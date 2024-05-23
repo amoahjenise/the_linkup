@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
     // overflowX: "hidden",
     marginLeft: "auto",
     marginRight: "auto",
-    borderRight: "1px solid #ccc",
+    borderRightWidth: "1px",
+    borderRightColor: "1px solid #D3D3D3",
   },
   widgetSection: {
     flex: "1",

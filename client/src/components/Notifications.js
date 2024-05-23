@@ -10,6 +10,8 @@ import {
 } from "../api/notificationAPI";
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
+import { Typography } from "@material-ui/core";
+import { NotificationsNoneOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -24,6 +26,23 @@ const useStyles = makeStyles((theme) => ({
     padding: 0,
     margin: 0,
   },
+  noNotificationsContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "80vh", // Adjust height as needed
+  },
+  noNotificationsText: {
+    fontSize: "1.2rem",
+    fontWeight: "bold",
+    // color: "#666",
+    textAlign: "center",
+    padding: "1rem",
+    borderRadius: "8px",
+    backgroundColor: "rgba(200, 200, 200, 0.2)", // Change to your desired darker color
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
+  },
 }));
 
 const Notifications = () => {
@@ -36,9 +55,7 @@ const Notifications = () => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id } = loggedUser?.user || {};
   const [notifications, setNotifications] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
-
-  // Add a state to track changes in unreadCount
+  const [isLoading, setIsLoading] = useState(true);
   const [unreadCountChanged, setUnreadCountChanged] = useState(0);
 
   const fetchUnreadNotifications = useCallback(async () => {
@@ -58,9 +75,7 @@ const Notifications = () => {
     fetchUnreadNotifications();
   }, [fetchUnreadNotifications]);
 
-  // Update component when unreadNotificationsCount changes
   useEffect(() => {
-    // Update unread count when it changes
     if (unreadNotificationsCount !== unreadCountChanged) {
       fetchUnreadNotifications();
       setUnreadCountChanged(unreadNotificationsCount);
@@ -91,6 +106,13 @@ const Notifications = () => {
       <TopNavBar title="Notifications" />
       {isLoading ? (
         <LoadingSpinner marginTop="350px" />
+      ) : notifications.length === 0 ? ( // Check if notifications array is empty
+        <div className={classes.noNotificationsContainer}>
+          <Typography variant="body1" className={classes.noNotificationsText}>
+            <NotificationsNoneOutlined className={classes.icon} />
+            No notifications to show here
+          </Typography>
+        </div>
       ) : (
         <ul className={classes.notificationsList}>
           {notifications.map((notification) => (

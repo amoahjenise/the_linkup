@@ -6,7 +6,8 @@ import { useColorMode } from "@chakra-ui/react";
 const useStyles = makeStyles((theme) => ({
   filterMain: {
     flex: "1",
-    borderLeft: "1px solid lightgrey",
+    borderLeftWidth: "1px",
+    borderLeftColor: "1px solid #D3D3D3",
     top: 0,
     overflowY: "auto",
   },

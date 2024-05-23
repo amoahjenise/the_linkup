@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 1,
   },
   tabBar: {
-    borderBottom: "1px solid lightgrey",
+    borderBottomWidth: "1px",
+    borderBottomColor: "1px solid #D3D3D3",
     position: "sticky", // Make the tabs bar sticky
     top: 65, // Stick it bellow the top bar
     zIndex: 1, // Ensure it's above other content
@@ -344,7 +345,7 @@ const LinkupHistoryPage = ({ isMobile }) => {
               value={activeTab}
               onChange={handleTabChange}
               variant={isMobile ? "scrollable" : "standard"}
-              // indicatorColor="primary"
+              indicatorColor="primary"
               // textColor="inherit"
               style={{
                 width: isMobile ? "100%" : "auto",

@@ -17,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
   linkupHistoryItem: {
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
-    borderBottom: "1px solid lightgrey",
+    borderBottomWidth: "1px",
+    borderBottomColor: "1px solid #D3D3D3",
   },
   itemHeader: {
     display: "flex",

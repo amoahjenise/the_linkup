@@ -15,7 +15,8 @@ export const sendRequest = async (
   requester_name,
   creator_id,
   linkupId,
-  content
+  content,
+  channel_url
 ) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/send-request`, {
@@ -24,6 +25,7 @@ export const sendRequest = async (
       creator_id: creator_id,
       linkupId: linkupId,
       content: content,
+      conversation_id: channel_url,
     });
     return response.data;
   } catch (error) {

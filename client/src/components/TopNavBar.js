@@ -11,11 +11,9 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     width: "100%",
     position: "sticky",
-    // alignItems: "center",
     top: 0,
     zIndex: theme.zIndex.appBar,
-    borderTop: "1px solid #e1e8ed",
-    borderBottom: "1px solid #e1e8ed",
+    borderBottomWidth: "1px",
   },
   headerText: {
     fontSize: "20px",
@@ -47,7 +45,7 @@ const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
         <Typography variant="h6" className={classes.headerText}>
           {title}
         </Typography>
-      </Toolbar>{" "}
+      </Toolbar>
       {tabs && tabs.length > 0 && (
         <Tabs value={selectedTab} onChange={onChangeTab}>
           {tabs.map((tab) => (

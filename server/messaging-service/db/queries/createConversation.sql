@@ -1,8 +1,8 @@
 -- createConversation.sql
 
 WITH new_conversation AS (
-  INSERT INTO conversations (last_message, linkup_id, unread_count)
-  VALUES ($1, $2::uuid, 1::int)
-  RETURNING conversation_id
+  INSERT INTO conversations (conversation_id, linkup_id, operator_id, requester_id)
+  VALUES ($1, $2, $3, $4)
+  RETURNING *
 )
-SELECT conversation_id FROM new_conversation;
+SELECT * FROM new_conversation;

@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    borderLeftWidth: "1px",
+    borderLeftColor: "1px solid #D3D3D3",
   },
   title: {
     marginBottom: theme.spacing(3),
@@ -97,7 +99,7 @@ const Settings = ({
         </div>
         <div
           className={classes.content}
-          style={{ borderLeft: `1px solid ${borderLeftColor}` }}
+          // style={{ borderLeft: `1px solid ${borderLeftColor}` }}
         >
           {activeSection === "account" && (
             <>

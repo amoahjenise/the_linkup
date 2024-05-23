@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
   linkupRequestItem: {
     padding: theme.spacing(2),
     marginBottom: theme.spacing(1),
-    borderBottom: "1px solid lightgrey",
+    borderBottomWidth: "1px",
+    borderBottomColor: "1px solid #D3D3D3",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",

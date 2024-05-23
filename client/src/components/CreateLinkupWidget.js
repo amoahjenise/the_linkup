@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
   },
   createContainer: {
     padding: theme.spacing(2),
-    background: "transparent",
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
     borderRadius: "24px",
     border: "1px solid #ccc",
     overflow: "hidden",
@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
     transition: "box-shadow 0.3s ease",
     "&:hover": {
       boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-      cursor: "pointer",
     },
     width: "100%",
   },
@@ -56,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "white",
     "&:hover": {
-      backgroundColor: "#1097A7",
+      backgroundColor: "#007b86", // Slightly darker color on hover
     },
     width: "200px",
     height: "60px",

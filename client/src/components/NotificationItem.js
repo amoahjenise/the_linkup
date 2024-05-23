@@ -11,8 +11,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     minHeight: "120px", // Set a fixed height for each notification item
     padding: theme.spacing(2),
-    borderTop: "1px solid #e1e8ed",
-    borderBottom: "1px solid #e1e8ed",
+    borderBottomWidth: "1px",
+    borderBottomColor: "1px solid #D3D3D3",
     cursor: "pointer",
     transition: "background-color 0.3s ease-in-out",
     "&:hover": {

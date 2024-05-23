@@ -5,25 +5,27 @@ import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { makeStyles } from "@material-ui/core/styles";
+import { useColorMode } from "@chakra-ui/react"; // Import useColorMode here
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center", // Center elements horizontally
-    justifyContent: "center", // Center elements vertically
+    alignItems: "center",
+    justifyContent: "center",
     maxWidth: "sm",
     borderRadius: "24px",
-    background: "bluie",
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
     border: "1px solid #ccc",
     overflow: "hidden",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
     transition: "box-shadow 0.3s ease",
-    "&:hover": {
-      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-      cursor: "pointer",
-    },
     padding: theme.spacing(2),
+    "&:hover": {
+      boxShadow:
+        useColorMode().colorMode === "light"
+          ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
+          : "0 3px 6px rgba(255, 255, 255, 0.16), 0 3px 6px rgba(255, 255, 255, 0.23)", // Use useColorMode() to access color mode
+    },
   },
   header: {
     display: "flex",
@@ -35,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
   },
   refreshButton: {
     backgroundColor: "#0097A7",
+    "&:hover": {
+      backgroundColor: "#007b86", // Slightly darker color on hover
+    },
   },
 }));
 

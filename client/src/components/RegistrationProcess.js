@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
 import { useColorMode } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
+import { createUser } from "../api/sendbirdAPI";
 
 // Import Redux Actions
 import {
@@ -75,6 +76,13 @@ const RegistrationProcess = () => {
 
   const handleLaunchLuul = async () => {
     try {
+      // Create the user in Sendbird
+      const sendbirdUser = await createUser(
+        user.id,
+        userData.name
+        // userData.avatarURL
+      );
+
       const response = await updateUser({
         user: { ...userData, clerkUserId: user.id },
       });

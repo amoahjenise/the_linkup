@@ -12,8 +12,8 @@ const useStyles = makeStyles((theme) => ({
     transition: "box-shadow 0.3s ease",
     "&:hover": {
       boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-      cursor: "pointer",
     },
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
   },
   inputContainer: {
     display: "flex",

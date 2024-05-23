@@ -9,6 +9,11 @@ import moment from "moment";
 import { sendRequest } from "../api/linkupRequestAPI";
 import { addSentRequest } from "../redux/actions/userSentRequestsActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import {
+  createGroupChannel,
+  sendMessage,
+  sendInvitation,
+} from "../api/sendbirdAPI";
 
 const useStyles = makeStyles((theme) => ({
   sendRequest: {
@@ -65,21 +70,48 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
       : "black";
 
   const handleSendRequest = async () => {
-    // Implement the logic to send the request with the message
-    const response = await sendRequest(
-      requesterId,
-      requesterName,
-      post.creator_id,
-      linkupId,
-      message
-    );
+    const aUsers = [requesterId, post.creator_id];
 
-    if (response.success) {
-      dispatch(addSentRequest(linkupId));
-      addSnackbar("Request sent!");
-      navigate("/history/requests-sent");
-    } else {
-      addSnackbar("Request send failed. Please try again.");
+    try {
+      // Create the group channel and wait for its response
+      const channelResponse = await createGroupChannel(
+        // post.avatar,
+        aUsers,
+        post.creator_id,
+        requesterId
+      );
+
+      // Extract the channel URL from the response
+      const channelUrl = channelResponse.channel_url;
+
+      await sendInvitation(channelUrl, [requesterId], post.creator_id);
+
+      // Call the sendMessage function with the channel URL and the message
+      const sendMessageResponse = await sendMessage(
+        requesterId,
+        channelUrl,
+        message
+      );
+
+      await sendRequest(
+        requesterId,
+        requesterName,
+        post.creator_id,
+        linkupId,
+        message,
+        channelUrl
+      );
+
+      if (sendMessageResponse.message_id) {
+        dispatch(addSentRequest(linkupId));
+        addSnackbar("Request sent!");
+        navigate("/history/requests-sent");
+      } else {
+        addSnackbar("Request send failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error sending request:", error);
+      addSnackbar("Failed to send request. Please try again.");
     }
   };
 

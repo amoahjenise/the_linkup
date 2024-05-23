@@ -15,174 +15,21 @@ const {
   createNotification,
 } = require("../../notification-service/controllers/notificationController");
 
-const getConversations = async (req, res) => {
-  const queryPath = path.join(__dirname, "../db/queries/getConversations.sql");
-  const { userId } = req.params;
-  try {
-    // Read the SQL query from the file
-    const query = fs.readFileSync(queryPath, "utf8");
-
-    // Execute the query to fetch conversations for the specified user_id
-    const { rows } = await pool.query(query, [userId]);
-
-    res.json({
-      success: true,
-      message: "Conversations retrieved successfully",
-      data: rows,
-    });
-  } catch (error) {
-    console.error("Error fetching conversations:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch conversations",
-      error: error.message,
-    });
-  }
-};
-
-const getMessagesForConversation = async (req, res) => {
-  const queryPath = path.join(
-    __dirname,
-    "../db/queries/getMessagesForConversation.sql"
-  );
-  const { conversationId, userId } = req.params; // Assuming you have parameters for conversationId and userId
-
-  try {
-    // Read the SQL query from the file
-    const query = fs.readFileSync(queryPath, "utf8");
-
-    const { rows } = await pool.query(query, [conversationId, userId]);
-
-    // Extract the messages into a separate 'messages' array in the response
-    const messages = rows.map((row) => ({
-      message_id: row.message_id,
-      conversation_id: row.conversation_id,
-      content: row.content,
-      sender_id: row.sender_id,
-      sender_name: row.sender_name,
-      sender_avatar: row.sender_avatar,
-      receiver_id: row.receiver_id,
-      receiver_name: row.receiver_name,
-      receiver_avatar: row.receiver_avatar,
-      attachments: row.attachments,
-      is_read: row.is_read,
-      is_system_message: row.is_system_message,
-      timestamp: row.timestamp,
-    }));
-
-    // Get the participants, linkup_id, and messages in the response
-    const participants = rows.map((row) => row.participant_id);
-    const linkupId = rows.length > 0 ? rows[0].linkup_id : null;
-
-    res.json({
-      success: true,
-      message: "Messages retrieved successfully",
-      data: {
-        participants,
-        linkup_id: linkupId,
-        messages,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch messages",
-      error: error.message,
-    });
-  }
-};
-
-const sendMessage = async (data) => {
-  const { sender_id, receiver_id, conversation_id, message_content } = data;
-
-  try {
-    // Insert the message into the messages table
-    const insertQueryPath = path.join(
-      __dirname,
-      "../db/queries/sendMessage.sql"
-    );
-    const insertQuery = fs.readFileSync(insertQueryPath, "utf8");
-    const insertQueryValues = [
-      sender_id,
-      receiver_id,
-      message_content,
-      conversation_id,
-    ];
-
-    const { rows: insertedRows } = await pool.query(
-      insertQuery,
-      insertQueryValues
-    );
-
-    // Retrieve sender details using a separate query
-    const senderDetailsQueryPath = path.join(
-      __dirname,
-      "../db/queries/getSenderDetails.sql"
-    );
-    const senderDetailsQuery = fs.readFileSync(senderDetailsQueryPath, "utf8");
-    const senderDetailsQueryValues = [sender_id];
-
-    const { rows: senderDetailsRows } = await pool.query(
-      senderDetailsQuery,
-      senderDetailsQueryValues
-    );
-
-    // Merge message details and sender details into one object
-    const messageData = {
-      message_id: insertedRows[0].message_id,
-      conversation_id: insertedRows[0].conversation_id,
-      message_content: insertedRows[0].content,
-      sender_id: insertedRows[0].sender_id,
-      sender_name: senderDetailsRows[0].sender_name,
-      sender_avatar: senderDetailsRows[0].sender_avatar,
-      timestamp: insertedRows[0].timestamp,
-    };
-
-    // Emit a real-time event to notify the recipient
-    const recipientSocket = getSocketByUserId(receiver_id);
-    const senderSocket = getSocketByUserId(sender_id);
-
-    if (recipientSocket && senderSocket) {
-      console.log("recipientSocket", recipientSocket);
-      console.log("senderSocket", senderSocket);
-
-      senderSocket.emit("new-message", messageData);
-      recipientSocket.emit("new-message", messageData);
-    } else {
-      // Post Notification
-      const notificationData = {
-        requesterId: insertedRows[0].sender_id,
-        creatorId: insertedRows[0].receiver_id,
-        type: "new_message",
-        linkupId: insertedRows[0].linkup_id,
-        content: `New message from ${senderDetailsRows[0].sender_name}`,
-      };
-
-      notificationID = await createNotification(notificationData);
-
-      if (notificationID) {
-        messagingSocket
-          .to(`user-${insertedRows[0].receiver_id}`)
-          .emit("new-message-notification", notificationData);
-      }
-
-      // Update conversation unread count
-    }
-  } catch (error) {
-    console.error("Message send error:", error);
-  }
-};
-
 const createNewConversation = async (data) => {
-  const { sender_id, receiver_id, message_content, linkup_id } = data;
+  const { sender_id, receiver_id, conversation_id, linkup_id } = data;
 
   const queryPathConversation = path.join(
     __dirname,
     "../db/queries/createConversation.sql"
   );
+
   const queryConversation = fs.readFileSync(queryPathConversation, "utf8");
-  const queryValuesConversation = [message_content, linkup_id];
+  const queryValuesConversation = [
+    conversation_id,
+    linkup_id,
+    receiver_id,
+    sender_id,
+  ];
 
   try {
     // Insert into conversations and get the conversation_id
@@ -190,51 +37,6 @@ const createNewConversation = async (data) => {
       queryConversation,
       queryValuesConversation
     );
-    const conversationId = rows[0].conversation_id;
-
-    // Insert into participants for sender
-    const queryPathParticipantsSender = path.join(
-      __dirname,
-      "../db/queries/insertParticipants.sql"
-    );
-    const queryParticipantsSender = fs.readFileSync(
-      queryPathParticipantsSender,
-      "utf8"
-    );
-    const queryValuesParticipantsSender = [conversationId, sender_id];
-
-    await pool.query(queryParticipantsSender, queryValuesParticipantsSender);
-
-    // Insert into participants for receiver
-    const queryPathParticipantsReceiver = path.join(
-      __dirname,
-      "../db/queries/insertParticipants.sql"
-    );
-    const queryParticipantsReceiver = fs.readFileSync(
-      queryPathParticipantsReceiver,
-      "utf8"
-    );
-    const queryValuesParticipantsReceiver = [conversationId, receiver_id];
-
-    await pool.query(
-      queryParticipantsReceiver,
-      queryValuesParticipantsReceiver
-    );
-
-    // Insert into messages
-    const queryPathMessages = path.join(
-      __dirname,
-      "../db/queries/insertMessage.sql"
-    ); // Create a separate SQL file for this
-    const queryMessages = fs.readFileSync(queryPathMessages, "utf8");
-    const queryValuesMessages = [
-      conversationId,
-      sender_id,
-      receiver_id,
-      message_content,
-    ];
-
-    await pool.query(queryMessages, queryValuesMessages);
 
     return rows[0];
   } catch (error) {
@@ -243,64 +45,54 @@ const createNewConversation = async (data) => {
   }
 };
 
-const getUnreadMessagesCount = async (req, res) => {
-  const { userId } = req.params;
+const getConversationByChannelUrl = async (channelUrl) => {
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/getConversationByChannelUrl.sql"
+  );
+
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [channelUrl];
 
   try {
-    // Use the SQL query to get the conversations' unread count for the specific user
-    const queryPath = path.join(
-      __dirname,
-      "../db/queries/getUnreadMessagesCount.sql"
-    );
-    const query = fs.readFileSync(queryPath, "utf8");
-
-    // Execute the query with parameterized values
-    const { rows } = await pool.query(query, [userId]);
-
-    // Extract the total unread count from the result
-    const totalUnreadCount = rows[0].total_unread_count;
-
-    console.log("totalUnreadCount", totalUnreadCount);
-    res.json({
-      success: true,
-      message: "Unread message count retrieved successfully",
-      unread_count: totalUnreadCount,
-    });
+    const { rows } = await pool.query(query, queryValues);
+    return rows[0];
   } catch (error) {
-    console.error("Error fetching unread message count:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch unread message count",
-      error: error.message,
-    });
+    console.error("Error fetching conversation by channel URL:", error);
+    throw error;
   }
 };
-
-const markMessagesAsRead = async (req, res) => {
-  const { conversationId, receiverId } = req.body;
-
+const getLinkupByConversation = async (req, res) => {
   try {
-    // Read the SQL query from the file
+    const { channelUrl } = req.params;
     const queryPath = path.join(
       __dirname,
-      "../db/queries/markConversationMessagesAsRead.sql"
+      "../db/queries/getLinkupByConversationId.sql"
     );
+
     const query = fs.readFileSync(queryPath, "utf8");
+    const queryValues = [channelUrl];
 
-    // Update the messages to mark them as read
-    const values = [conversationId, receiverId];
+    // Execute the SQL query using your database connection pool
+    const { rows } = await pool.query(query, queryValues);
 
-    await pool.query(query, values);
-
-    res.json({
-      success: true,
-      message: "Messages marked as read successfully",
-    });
+    if (rows.length > 0) {
+      res.json({
+        success: true,
+        message: "Linkup by conversation fetched successfully",
+        linkup: rows[0],
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Linkup by conversation not found",
+      });
+    }
   } catch (error) {
-    console.error("Error marking messages as read:", error);
+    console.error("Error fetching linkup by conversation:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to mark messages as read",
+      message: "Error fetching linkup by conversation",
       error: error.message,
     });
   }
@@ -308,10 +100,7 @@ const markMessagesAsRead = async (req, res) => {
 
 module.exports = {
   initializeSocket,
-  sendMessage,
   createNewConversation,
-  getConversations,
-  getMessagesForConversation,
-  getUnreadMessagesCount,
-  markMessagesAsRead,
+  getConversationByChannelUrl,
+  getLinkupByConversation,
 };
