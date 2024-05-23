@@ -63,7 +63,7 @@ For any inquiries, contributions, or support requests, please refer to the docum
 1. [Authentication](#authentication)
 2. [Linkup Creation and Management](#linkup-creation-and-management)
 3. [Linkup Display and Filtering](#linkup-display-and-filtering)
-4. [Linkup Details and Messaging](#linkup-details-and-messaging)
+4. [Linkup Details and Messaging Integration with Sendbird](#linkup-details-and-messaging-integration-with-sendbird)
 5. [Notification System](#notification-system)
 6. [Accepting and Initializing Linkups](#accepting-and-initializing-linkups)
 7. [State Management](#state-management)
