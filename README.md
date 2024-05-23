@@ -23,7 +23,7 @@ This React web application aims to provide users with a platform to create, brow
   
 - **Messaging System:**
   - Users can exchange messages related to specific linkup events.
-  - Conversations are organized and linked to the relevant linkup events.
+  - Sendbird SDK Integration
   
 - **Notification System:**
   - Creators of linkup events receive notifications for new messages and participation requests.
@@ -122,13 +122,46 @@ The Home Page (HomePage.js) displays linkups based on the user's gender preferen
 - Applying gender-based filtering to show relevant linkups.
 - Ensuring gender-neutral linkups are displayed to all users.
 
-## Linkup Details and Messaging
+## Linkup Details and Messaging Integration with Sendbird
 
-Users can view and interact with linkup details via the SendRequestPage (SendRequestPage.js). This component allows:
+**Overview**
 
-- Viewing linkup information and sending a message to the linkup creator.
-- API calls (messagingAPI.js) for sending and receiving messages.
-- Linking conversations to specific linkups.
+We integrated our application with Sendbird, a powerful messaging platform, to enable real-time communication between users. This integration enhances the user experience by providing a seamless and feature-rich chat environment. Users can send a request to a specific linkup via the SendRequestPage (SendRequestPage.js). This component allows:
+Viewing public linkup information and initiating a conversation with the linkup creator.
+
+**Sendbird Integration Details**
+
+- The Sendbird UIKit React library was utilized to integrate Sendbird's messaging features into our application.
+- The library provided components such as SBConversation, SBChannelList, and SBChannelSettings, which we used to manage conversations, display channel lists, and configure channel settings, respectively.
+
+**Channel Management**
+
+- Channels are managed using the GroupChannel functionality provided by Sendbird. Each channel represents a conversation between users.
+- The GroupChannelList component is used to display a list of channels, allowing users to select and navigate to specific conversations.
+
+**Channel Data Handling**
+
+- The Sendbird channels were associated with conversations in our application. The Sendbird channel URL (_url) is stored in the conversations table.
+- The conversations table schema includes fields for conversation_id (Sendbird channel URL), created_at, updated_at, operator_id, request_id, and linkup_id.
+
+**Linkup Integration**
+
+- We integrated linkup functionalities into the conversation flow.
+- Linkup data is retrieved based on the conversation's Sendbird channel URL.
+- Once a linkup is associated with a conversation, its details are displayed in the conversation header.
+  
+**User Role Detection**
+
+- User roles, specifically the operator role, are detected within the Sendbird channel members. The isOperator state is set based on whether the current user has the operator role in the conversation.
+
+**Message Input Handling**
+
+- Message input was disabled under specific conditions, such as when the linkup request was declined or when the conversation involved only one message and the linkup request was not yet accepted.
+The isMessageInputDisabled state controlled the message input component's disabled state based on these conditions.
+
+**Error Handling**
+
+- We implemented error handling for network requests and data retrieval processes, logging any encountered errors to the console for debugging purposes.
 
 ## Notification System
 
@@ -319,28 +352,11 @@ Stores information about conversations, such as participants, unread counts, and
 
 Columns:
 - `conversation_id`: Unique identifier for each conversation.
-- `participants`: Array of participant IDs.
 - `created_at`: Timestamp of conversation creation.
 - `updated_at`: Timestamp of last conversation update.
-- `last_message`: Content of the last message.
-- `unread_count`: Count of unread messages.
-- `archived`: Indicates if the conversation is archived.
-- `muted`: Indicates if the conversation is muted.
-- `pinned`: Indicates if the conversation is pinned.
-- `notifications_enabled`: Indicates if notifications are enabled for the conversation.
-
-### Table: messages
-Stores individual messages within conversations.
-
-Columns:
-- `message_id`: Unique identifier for each message.
-- `conversation_id`: ID of the conversation the message belongs to.
-- `sender_id`: ID of the message sender.
-- `content`: Content of the message.
-- `timestamp`: Timestamp of message creation.
-- `is_read`: Indicates if the message is read.
-- `is_system_message`: Indicates if the message is a system message.
-- `attachments`: JSON array of message attachments.
+- `operator_id`: Unique identifier for the Sendbird Group Channel operator.
+- `request_id`: Unique identifier for the requester.
+- `linkup_id`: Unique identifier for the linkup associated to the conversation.
 
 ### Table: notifications
 Manages notifications for users.
@@ -355,18 +371,6 @@ Columns:
 - `updated_at`: Timestamp of last notification update.
 - `requester_id`: ID of the request sender (if applicable).
 - `link_up_id`: ID of the related linkup (if applicable).
-
-### Table: participants
-Manages participants in conversations, including their status and join time.
-
-Columns:
-- `participant_id`: Unique identifier for each participant.
-- `user_id`: ID of the participant user.
-- `conversation_id`: ID of the related conversation.
-- `last_read_message_id`: ID of the last read message.
-- `is_muted`: Indicates if the participant is muted.
-- `is_blocked`: Indicates if the participant is blocked.
-- `joined_at`: Timestamp of participant join time.
 
 ### Table: ratings
 Stores ratings provided by users for linkups.
