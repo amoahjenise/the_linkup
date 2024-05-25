@@ -40,11 +40,11 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.secondary,
   },
   closedChip: {
-    backgroundColor: "#FB8913", // orange
+    backgroundColor: "#F0F7F8", // Lightblue-gray
     color: theme.palette.text.secondary,
   },
   completedChip: {
-    backgroundColor: "#2ecc71", // Green
+    backgroundColor: "rgb(115, 255, 174, 0.9)", // Green
     color: theme.palette.text.secondary,
   },
   declinedChip: {

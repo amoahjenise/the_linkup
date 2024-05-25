@@ -126,8 +126,3 @@ span {
   font-weight: bold;
   color: "green";
 }
-
-.sendbird-app__border {
-  height: 100vh;
-  border: 1px solid #d3d3d3;
-}

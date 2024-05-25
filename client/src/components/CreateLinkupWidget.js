@@ -6,67 +6,99 @@ import "react-datepicker/dist/react-datepicker.css";
 import { createLinkup } from "../api/linkupAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import InfoIcon from "@mui/icons-material/Info";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
-  createLinkUpContainer: {
+  widgetContainer: {
+    flex: "1",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-  },
-  createContainer: {
+    justifyContent: "center",
     padding: theme.spacing(2),
     backgroundColor: "rgba(200, 200, 200, 0.1)",
     borderRadius: "24px",
-    border: "1px solid #ccc",
+    borderWidth: "1px",
+    border: "0.1px solid #lightgray",
     overflow: "hidden",
     boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
     transition: "box-shadow 0.3s ease",
     "&:hover": {
       boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
     },
-    width: "100%",
   },
+  centerElement: { textAlign: "center" },
   createLinkUpTitle: {
     textAlign: "center",
-    fontSize: "20px",
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(3),
   },
-  createLinkUpWidget: {
+  form: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    padding: theme.spacing(1, 4),
   },
-  createLinkUpDatePickerContainer: {
-    width: "100%",
+  datePicker: {
     marginBottom: theme.spacing(2),
-  },
-  createLinkUpDatePicker: {
-    width: "100%",
     padding: theme.spacing(1),
-    border: "1px solid #ccc",
     borderRadius: "24px",
-    boxSizing: "border-box",
+    border: "1px solid #ccc", // Add border style
+    width: "100%",
   },
   createLinkUpButton: {
     borderRadius: "40px",
     cursor: "pointer",
     transition: "background-color 0.3s ease",
     backgroundColor: "#0097A7",
-    fontSize: "16px",
+    fontWeight: "bold",
     color: "white",
     "&:hover": {
       backgroundColor: "#007b86", // Slightly darker color on hover
     },
     width: "200px",
     height: "60px",
+    marginTop: theme.spacing(2),
   },
   inputField: {
     width: "100%",
-    marginBottom: theme.spacing(2),
+    fontSize: "14px",
     padding: theme.spacing(1),
-    borderRadius: "24px",
-    border: "1px solid #ccc",
-    boxSizing: "border-box",
+    marginBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    border: `1px solid ${theme.palette.divider}`,
+    "&:focus": {
+      borderColor: theme.palette.primary.main,
+    },
+    backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+  },
+  inputWithIcon: {
+    position: "relative",
+    display: "flex",
+  },
+  infoIcon: {
+    width: "0%",
+    height: "50%",
+    position: "absolute",
+    right: theme.spacing(1),
+    top: theme.spacing(0.8),
+    pointerEvents: "auto", // Allow clicking on the icon
+    color: "lightgray",
+  },
+  // Define styles for the custom dropdown
+  customDropdown: {
+    fontSize: "14px",
+    position: "relative",
+    "& select": {
+      width: "100%",
+      padding: theme.spacing(1),
+      backgroundSize: "auto 20px",
+      paddingRight: "2.5rem", // Ensure room for the arrow icon
+    },
+    "& option": {
+      backgroundColor: "rgba(64, 64, 64, 2)", // Darker color for the options
+      color: "#FFFFFF", // Ensure text is readable
+    },
   },
 }));
 
@@ -128,20 +160,18 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   };
 
   return (
-    <div className={classes.createLinkUpContainer}>
-      <div className={classes.createContainer}>
-        <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
-        <form
-          className={classes.createLinkUpWidget}
-          onSubmit={handleCreateLinkUp}
-        >
-          <input
-            className={classes.inputField}
-            type="text"
-            placeholder="Activity"
-            name="activity"
-            required
-          />
+    <div className={classes.widgetContainer}>
+      <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
+      <form className={classes.form} onSubmit={handleCreateLinkUp}>
+        <input
+          className={classes.inputField}
+          type="text"
+          placeholder="Activity"
+          name="activity"
+          required
+        />
+
+        <div className={classes.inputWithIcon}>
           <input
             className={classes.inputField}
             type="text"
@@ -149,34 +179,53 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             name="location"
             required
           />
-          <div className={classes.createLinkUpDatePickerContainer}>
-            <DatePicker
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              showTimeSelect
-              timeFormat="HH:mm"
-              timeIntervals={15}
-              timeCaption="Time"
-              dateFormat="MMMM d, yyyy h:mm aa"
-              minDate={new Date()} // Set the minimum date to the current date
-              minTime={minTime} // Set the minimum time to the current time
-              maxTime={maxTime}
-              className={classes.createLinkUpDatePicker}
-              placeholderText="Select date and time"
-              required
-            />
-          </div>
+          <Tooltip
+            title={
+              <Typography fontSize={30}>
+                The location of your linkup event will be visible to users whose
+                requests you have accepted.
+              </Typography>
+            }
+            arrow
+            PopperProps={{}}
+          >
+            <IconButton className={classes.infoIcon}>
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          showTimeSelect
+          timeFormat="HH:mm"
+          timeIntervals={15}
+          timeCaption="Time"
+          dateFormat="MMMM d, yyyy h:mm aa"
+          minDate={new Date()} // Set the minimum date to the current date
+          minTime={minTime} // Set the minimum time to the current time
+          maxTime={maxTime}
+          className={`${classes.inputField} ${classes.datePicker}`} // Apply styles
+          placeholderText="Select date and time"
+          required
+        />
+        <div className={classes.customDropdown}>
           <select
             value={genderPreference}
             onChange={(e) => setGenderPreference(e.target.value)}
             className={classes.inputField}
             required
           >
-            <option value="">Gender Preference</option>
+            <option value="" disabled>
+              Gender Preference
+            </option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="any">Any</option>
           </select>
+        </div>
+        <div className={classes.customDropdown}>
           <select
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
@@ -187,11 +236,13 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <option value="iWillPay">I Will Pay</option>
             <option value="pleasePay">Please Pay</option>
           </select>
+        </div>
+        <div className={classes.centerElement}>
           <button type="submit" className={classes.createLinkUpButton}>
             Create
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 };

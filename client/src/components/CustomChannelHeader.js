@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
 import HorizontalMenu from "./HorizontalMenu"; // Adjust the path as necessary
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
-import {
-  acceptLinkupRequest,
-  declineLinkupRequest,
-} from "../api/linkupRequestAPI";
-import { useColorMode } from "@chakra-ui/react";
+import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 import nlp from "compromise";
 
 const compromise = nlp;
@@ -70,10 +66,37 @@ const CustomChannelHeader = ({
 }) => {
   const classes = useStyles();
   const [menuAnchor, setMenuAnchor] = useState(null);
+  const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
-  const { colorMode } = useColorMode();
 
   const operator = channel.members.find((member) => member.role === "operator");
+
+  const fetchLinkupRequest = useCallback(async () => {
+    try {
+      if (linkup && shouldFetchLinkups) {
+        // Fetch the linkup request by linkup id and sender id
+        const response = await getRequestByLinkupIdAndSenderId(
+          linkup.id,
+          linkup.requester_id
+        );
+        setLinkupRequestStatus(response.linkupRequest.status); // Update the status using linkupRequest.status
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }, [linkup, shouldFetchLinkups]);
+
+  // useEffect to set initial linkup request status on mount
+  useEffect(() => {
+    if (linkup) setLinkupRequestStatus(linkup.request_status);
+  }, [linkup]);
+
+  useEffect(() => {
+    if (shouldFetchLinkups) {
+      fetchLinkupRequest();
+      setShouldFetchLinkups(false);
+    }
+  }, [fetchLinkupRequest, shouldFetchLinkups]);
 
   const renderLinkupItemText = () => {
     if (linkup) {
@@ -95,7 +118,21 @@ const CustomChannelHeader = ({
             linkup.date
           ).format("h:mm A")})`
         : "";
-      return `Link up ${activityText} scheduled for ${dateText}`;
+
+      if (isOperator) {
+        return `Would like to join you ${activityText} scheduled for ${dateText}`;
+      } else {
+        return `You sent a request for the linkup event: ${linkup.activity} scheduled for ${dateText}`;
+      }
+    }
+    return "";
+  };
+
+  const renderAvatar = () => {
+    if (isOperator) {
+      return linkup?.requester_avatar;
+    } else {
+      return linkup?.avatar;
     }
   };
 
@@ -109,20 +146,22 @@ const CustomChannelHeader = ({
             {operator && (
               <>
                 <Avatar
-                  src={linkup?.avatar || operator.plainProfileUrl}
+                  src={renderAvatar()}
                   alt={operator.nickname}
                   className={classes.avatar}
                 />
                 <div>
-                  <div className={classes.nickname}>{operator.nickname}</div>
+                  <div className={classes.nickname}>
+                    {linkup?.requester_name}
+                  </div>
                   <div>{renderLinkupItemText()}</div>
                   {linkup?.request_status && (
                     <div
                       className={`${classes.status} ${
-                        classes[linkup.request_status]
+                        classes[linkupRequestStatus] // Change this line
                       }`}
                     >
-                      {linkup.request_status}
+                      {linkupRequestStatus}
                     </div>
                   )}
                 </div>
@@ -137,12 +176,13 @@ const CustomChannelHeader = ({
       {isOperator && (
         <HorizontalMenu
           showGoToItem={true}
-          showEditItem={true}
+          showGoToRequest={true}
+          showEditItem={false}
           showDeleteItem={false}
           showCloseItem={false}
           showCheckInLinkup={false}
-          showAcceptLinkupRequest={true}
-          showDeclineLinkupRequest={true}
+          showAcceptLinkupRequest={false}
+          showDeclineLinkupRequest={false}
           linkupItem={linkup}
           menuAnchor={menuAnchor}
           setMenuAnchor={setMenuAnchor}

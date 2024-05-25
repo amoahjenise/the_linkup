@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import ImageGrid from "../components/ImageGrid";
-import Geocode from "react-geocode";
 import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
 import { getUserImages } from "../api/imagesAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -18,8 +17,6 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProfileHeaderCard from "../components/ProfileHeaderCard";
 import ImageGridHeader from "../components/ImageGridHeader";
-
-Geocode.setApiKey(process.env.GOOGLE_MAPS_API_KEY);
 
 const useStyles = makeStyles((theme) => ({
   userProfilePage: {
@@ -51,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
 const UserProfilePage = ({ isMobile }) => {
   let { id: userId } = useParams();
   const classes = useStyles();
-  const [userLocation, setUserLocation] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [profileImages, setProfileImages] = useState([]);
@@ -77,6 +73,7 @@ const UserProfilePage = ({ isMobile }) => {
 
   // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
+  const locationState = useSelector((state) => state.location);
 
   const isLoggedUserProfile = userId === "me" || userId === loggedUser.user.id;
 
@@ -87,60 +84,39 @@ const UserProfilePage = ({ isMobile }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user data
         const userDataResponse = await getUserById(userId);
 
         if (userDataResponse.unauthorizedError) {
-          dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
-          navigate("/"); // Redirect to landing page
+          dispatch({ type: "LOGOUT" });
+          navigate("/");
+          return;
         }
 
-        if (userDataResponse?.data?.success) {
-          setUserData(userDataResponse?.data?.user);
+        const newUserData = userDataResponse?.data?.user;
+
+        if (newUserData) {
+          setUserData(newUserData);
         }
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
+        if (!profileImages.length) {
+          const userImagesResponse = await getUserImages(userId);
 
-            Geocode.fromLatLng(latitude, longitude).then(
-              (response) => {
-                const address = response.results[0].formatted_address;
-                setUserLocation(address);
-              },
-              (error) => {
-                console.error(error);
-                setUserLocation("Unknown Location");
-              }
+          if (userImagesResponse.data.success) {
+            const imageUrls = userImagesResponse.data.images.map(
+              (imageObj) => imageObj.image_url
             );
-          },
-          (error) => {
-            console.error(error);
-            setUserLocation("Unknown Location");
+            setProfileImages(imageUrls);
           }
-        );
-
-        // Fetch user images
-        const userImagesResponse = await getUserImages(userId);
-
-        if (userImagesResponse.data.success) {
-          // Extract and set the user's image URLs in state
-          const imageUrls = userImagesResponse.data.images.map(
-            (imageObj) => imageObj.image_url
-          );
-          setProfileImages(imageUrls);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 300);
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [dispatch, loggedUser.user.id, navigate, userId]);
+  }, [dispatch, navigate, userId, profileImages.length]);
 
   const renderEditButton = () => {
     if (isLoggedUserProfile) {
@@ -222,7 +198,11 @@ const UserProfilePage = ({ isMobile }) => {
           <ProfileHeaderCard
             isMobile={isMobile}
             userData={userData}
-            userLocation={userLocation}
+            userLocation={
+              locationState.city && locationState.country
+                ? `${locationState.city}, ${locationState.country}`
+                : "Unknown Location"
+            }
             renderEditButton={renderEditButton}
             calculateAge={calculateAge}
           />

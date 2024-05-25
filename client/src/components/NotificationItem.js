@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(220, 200, 220, 0.1)",
   },
   message: {
-    fontSize: theme.typography.body2.fontSize,
+    fontSize: theme.typography.caption.fontSize,
   },
   content: {
     marginTop: theme.spacing(2),
@@ -31,6 +31,11 @@ const useStyles = makeStyles((theme) => ({
   time: {
     fontSize: theme.typography.caption.fontSize,
     marginLeft: "auto",
+  },
+  avatar: {
+    marginRight: theme.spacing(2),
+    width: theme.spacing(7),
+    height: theme.spacing(7),
   },
 }));
 
@@ -91,7 +96,11 @@ const NotificationItem = ({ notification, onClick }) => {
     >
       <div>
         <div className={classes.avatarContainer}>
-          <Avatar alt={getDisplayName()} src={getDisplayAvatar()} />
+          <Avatar
+            alt={getDisplayName()}
+            src={getDisplayAvatar()}
+            className={classes.avatar}
+          />
           <Typography variant="subtitle1" className={classes.content}>
             {notification.content}
           </Typography>
@@ -104,10 +113,10 @@ const NotificationItem = ({ notification, onClick }) => {
           )}
         </div>
       </div>
-      <div className={classes.time}>
-        <Typography component="small">
+      <div>
+        <div className={classes.time}>
           <span>{getTimeAgo()}</span>
-        </Typography>
+        </div>
       </div>
     </div>
   );

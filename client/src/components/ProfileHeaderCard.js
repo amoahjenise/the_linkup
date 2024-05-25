@@ -137,7 +137,7 @@ const ProfileHeaderCard = ({
   // Define background color based on color mode
   const backgroundColor =
     colorMode === "dark"
-      ? "rgba(18, 28, 38, 0.99)" // Dark mode background color with 90% transparency
+      ? "rgba(18, 28, 38, 0.19)" // Dark mode background color with 90% transparency
       : "rgba(255, 255, 255, 0.99)"; // Light mode background color
 
   return (
@@ -181,7 +181,7 @@ const ProfileHeaderCard = ({
           <Box className={classes.statisticsContainer}>
             <div className={classes.statisticsItem}>
               <p className={classes.icon} style={{ color: "#C13584" }}>
-                -
+                ...
               </p>
               <Typography
                 variant="body2"
@@ -193,7 +193,7 @@ const ProfileHeaderCard = ({
             </div>
             <div className={classes.statisticsItem}>
               <p className={classes.icon} style={{ color: "#833AB4" }}>
-                -
+                ...
               </p>
               <Typography
                 variant="body2"
@@ -205,7 +205,7 @@ const ProfileHeaderCard = ({
             </div>
             <div className={classes.statisticsItem}>
               <p className={classes.icon} style={{ color: "#1DA1F2" }}>
-                -
+                ...
               </p>
               <Typography
                 variant="body2"

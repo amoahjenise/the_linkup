@@ -15,17 +15,16 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     maxWidth: "sm",
     borderRadius: "24px",
-    backgroundColor: "rgba(200, 200, 200, 0.1)",
-    border: "1px solid #ccc",
+    borderWidth: "1px",
+    border: "0.1px solid #lightgray",
     overflow: "hidden",
-    transition: "box-shadow 0.3s ease",
     padding: theme.spacing(2),
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+    transition: "box-shadow 0.3s ease",
     "&:hover": {
-      boxShadow:
-        useColorMode().colorMode === "light"
-          ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
-          : "0 3px 6px rgba(255, 255, 255, 0.16), 0 3px 6px rgba(255, 255, 255, 0.23)", // Use useColorMode() to access color mode
+      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
     },
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
   },
   header: {
     display: "flex",

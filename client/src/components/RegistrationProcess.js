@@ -72,25 +72,26 @@ const RegistrationProcess = () => {
     dateOfBirth: "",
     gender: "",
     avatarURL: "",
+    clerkUserId: "",
   });
 
   const handleLaunchLuul = async () => {
     try {
-      // Create the user in Sendbird
-      const sendbirdUser = await createUser(
-        user.id,
-        userData.name
-        // userData.avatarURL
-      );
-
+      // Create a new user in posgresql and store: name, birthday, gender, avatar, clerk user id
       const response = await updateUser({
         user: { ...userData, clerkUserId: user.id },
       });
-      if (response.data.success) {
-        dispatch(setCurrentUser(response.data.user));
-        dispatch(login());
-        navigate(`/home`);
-      }
+
+      // Create the user in Sendbird
+      await createUser(
+        response.data.user.id,
+        response.data.user.name,
+        response.data.user.avatar
+      );
+
+      dispatch(setCurrentUser(response.data.user));
+      dispatch(login());
+      navigate(`/home`);
     } catch (error) {
       console.error("Error creating user:", error);
       alert("Failed to create user. Please try again.");

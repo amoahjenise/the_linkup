@@ -323,6 +323,7 @@ const getRequestByLinkupidAndSenderid = async (req, res) => {
         success: true,
         message: "Linkup request fetched successfully",
         linkupRequestId: rows[0].id,
+        linkupRequest: rows[0],
       });
     }
   } catch (error) {

@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.secondary,
   },
   acceptedChip: {
-    backgroundColor: "#2ecc71", // Green
+    backgroundColor: "rgb(115, 255, 174, 0.9)", // Green
     color: theme.palette.text.secondary,
   },
   declinedChip: {
@@ -52,13 +52,33 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   acceptButton: {
-    backgroundColor: "#00CFFF",
-    color: "white",
+    backgroundColor: "transparent",
+    color: "#00BFFF",
+    borderColor: "#00BFFF",
+    borderWidth: "1px",
+    border: "0.1px solid #ccc", // Add border style
+
     marginRight: theme.spacing(2),
     cursor: "pointer",
     transition: "background-color 0.3s ease", // Add transition for smooth color change
     "&:hover": {
-      backgroundColor: "#00BFFF", // Change to the darker blue color on hover
+      color: "#00BFFF",
+      backgroundColor: "rgb(0, 191, 255, 0.1)", // Change to the darker blue color on hover
+    },
+  },
+  declineButton: {
+    backgroundColor: "transparent",
+    color: "#FF0000",
+    borderColor: "#FF0000",
+    borderWidth: "1px",
+    border: "0.1px solid #ccc", // Add border style
+
+    marginRight: theme.spacing(2),
+    cursor: "pointer",
+    transition: "background-color 0.3s ease", // Add transition for smooth color change
+    "&:hover": {
+      color: "#FF0000",
+      backgroundColor: "rgb(255, 0, 67, 0.2)", // Change to the darker blue color on hover
     },
   },
   buttonGroup: {
@@ -124,11 +144,11 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const getStatusLabel = () => {
     switch (post.status) {
       case "pending":
-        return "pending";
+        return "Pending";
       case "accepted":
-        return "accepted";
+        return "Accepted";
       case "declined":
-        return "declined";
+        return "Declined";
       case "expired":
         return "Expired";
       default:
@@ -219,10 +239,11 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
                 Accept
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 color="secondary"
                 size="small"
                 onClick={handleDeclineClick}
+                className={classes.declineButton}
               >
                 Decline
               </Button>

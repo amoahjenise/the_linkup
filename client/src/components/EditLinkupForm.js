@@ -16,13 +16,13 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
-  editLinkUpContainer: {
+  modalOverlay: {
     flex: "1",
     position: "sticky",
     top: 0,
     width: "100%x",
   },
-  editContainer: {
+  modalContainer: {
     flex: "1",
     display: "flex",
     flexDirection: "column",
@@ -30,12 +30,11 @@ const useStyles = makeStyles((theme) => ({
     position: "sticky",
     top: 0,
   },
-  editLinkUpTitle: {
-    textAlign: "center",
-    fontSize: "20px",
-    marginBottom: theme.spacing(2),
+  modalTitle: {
+    fontWeight: "bold",
+    marginBottom: theme.spacing(3),
   },
-  editLinkUpForm: {
+  modalForm: {
     display: "flex",
     flexDirection: "column",
   },
@@ -46,17 +45,29 @@ const useStyles = makeStyles((theme) => ({
     border: "1px solid #ccc", // Add border style
     width: "100%",
   },
-  // Other styles remain the same
-  editLinkUpInput: {
-    marginBottom: theme.spacing(2),
+  modalLabel: {
+    fontSize: "13px",
+    display: "flex",
+    justifyContent: "start",
+    fontWeight: "bold",
+    color: "#6B7280", // Adjust color to your preference
+  },
+  modalInput: {
+    width: "100%",
+    fontSize: "14px",
     padding: theme.spacing(1),
-    borderRadius: "24px",
-    border: "1px solid #ccc", // Add border style
+    marginBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    border: `1px solid ${theme.palette.divider}`,
+    "&:focus": {
+      borderColor: theme.palette.primary.main,
+    },
   },
   buttonGroup: {
     marginTop: theme.spacing(2),
     display: "flex",
     justifyContent: "center",
+    height: "40px",
   },
   button: {
     width: "140px",
@@ -65,14 +76,13 @@ const useStyles = makeStyles((theme) => ({
   },
   // Define styles for the custom dropdown
   customDropdown: {
+    fontSize: "14px",
     position: "relative",
     marginBottom: theme.spacing(2),
     "& select": {
       width: "100%",
       padding: theme.spacing(1),
-      borderRadius: "24px",
       border: "1px solid #ccc",
-      marginTop: theme.spacing(1),
       appearance: "none",
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
       backgroundPosition: "right 12px center",
@@ -205,13 +215,15 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   };
 
   return (
-    <div className={classes.editLinkUpContainer}>
-      <div className={classes.editContainer}>
-        <h2 className={classes.editLinkUpTitle}>Edit Link-Up</h2>
-        <form className={classes.editLinkUpForm} onSubmit={handleUpdateLinkup}>
-          <label htmlFor="activity">Activity</label>
+    <div className={classes.modalOverlay}>
+      <div className={classes.modalContainer}>
+        <h2 className={classes.modalTitle}>Edit Link-Up</h2>
+        <form className={classes.modalForm} onSubmit={handleUpdateLinkup}>
+          <label htmlFor="activity" className={classes.modalLabel}>
+            Activity
+          </label>
           <input
-            className={classes.editLinkUpInput}
+            className={classes.modalInput}
             type="text"
             placeholder="Activity"
             name="activity"
@@ -220,9 +232,11 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             onChange={handleActivityChange}
             required
           />
-          <label htmlFor="location">Location</label>
+          <label htmlFor="location" className={classes.modalLabel}>
+            Location
+          </label>
           <input
-            className={classes.editLinkUpInput}
+            className={classes.modalInput}
             type="text"
             placeholder="Location"
             name="location"
@@ -231,7 +245,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             onChange={handleLocationChange}
             required
           />
-          <label htmlFor="date">Date and Time</label>
+          <label htmlFor="date" className={classes.modalLabel}>
+            Date and Time
+          </label>
           <DatePicker
             selected={new Date(selectedDate)}
             onChange={handleDateChange}
@@ -243,12 +259,14 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             minDate={new Date()} // Set the minimum date to the current date
             minTime={minTime} // Set the minimum time conditionally
             maxTime={maxTime}
-            className={classes.datePicker} // Apply the datePicker style
+            className={`${classes.modalInput} ${classes.datePicker}`} // Apply styles
             placeholderText="Select date and time"
             id="date"
             required
           />
-          <label htmlFor="genderPreference">Gender Preference</label>
+          <label htmlFor="genderPreference" className={classes.modalLabel}>
+            Gender Preference
+          </label>
           <div className={classes.customDropdown}>
             <select
               value={genderPreference}
@@ -267,7 +285,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
           </div>
 
           {/* Payment Option */}
-          <label htmlFor="paymentOption">Payment Option</label>
+          <label htmlFor="paymentOption" className={classes.modalLabel}>
+            Payment Option
+          </label>
           <div className={classes.customDropdown}>
             <select
               value={paymentOption}
@@ -289,7 +309,13 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               className={classes.button}
               style={{
                 marginRight: "10%",
-                backgroundColor: "#00CFFF",
+                cursor: "pointer",
+                transition: "background-color 0.3s ease",
+                backgroundColor: "#0097A7",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#007b86", // Slightly darker color on hover
+                },
               }}
             >
               Update

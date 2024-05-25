@@ -2,6 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faClock,
   faEnvelope,
   faHeart,
   faShare,
@@ -54,17 +55,14 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         className={classes.requestButton}
         onClick={handleRequestClick}
       >
-        <FontAwesomeIcon icon={faEnvelope} className={classes.icon} />
-        {disableRequest ? "Request Sent" : "Request"}
-      </div>
+        <FontAwesomeIcon
+          icon={disableRequest ? faClock : faEnvelope}
+          className={classes.icon}
+          style={{ color: disableRequest ? "#A4B96B" : "#2DBFBF" }}
+        />
 
-      {/* <SplitBillIcon
-        person1Color="pink"
-        person2Color="blue"
-        width="40px"
-        height="40px"
-      /> */}
-      {/* <PaymentIcon width="40px" height="40px" color="blue" fontSize="35px" /> */}
+        {disableRequest ? "Sent" : "Join"}
+      </div>
       {/* <div
         aria-expanded="false"
         aria-haspopup="menu"
@@ -73,7 +71,11 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         tabIndex="1"
         className={classes.actionButton}
       >
-        <FontAwesomeIcon icon={faHeart} className={classes.icon} />
+        <FontAwesomeIcon
+          icon={faHeart}
+          className={classes.icon}
+          style={{ color: "red" }}
+        />
         Like
       </div>
       <div
@@ -84,7 +86,11 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         tabIndex="2"
         className={classes.actionButton}
       >
-        <FontAwesomeIcon icon={faShare} className={classes.icon} />
+        <FontAwesomeIcon
+          icon={faShare}
+          className={classes.icon}
+          style={{ color: "blue" }}
+        />
         Share Post
       </div> */}
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import TopNavBar from "./TopNavBar";
 
@@ -46,23 +46,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Settings = ({
-  colorMode,
   activeSubSection,
   setActiveSubSection,
   onSubSectionClick,
 }) => {
   const classes = useStyles();
   const [activeSection, setActiveSection] = useState("account");
-  const theme = useTheme();
 
   const handleSectionClick = (section) => {
     setActiveSection(section);
     setActiveSubSection(null);
   };
-
-  // Determine the borderLeft color based on colorMode
-  const borderLeftColor =
-    colorMode === "dark" ? "white" : theme.palette.divider;
 
   return (
     <div>
@@ -95,6 +89,14 @@ const Settings = ({
             onClick={() => handleSectionClick("data")}
           >
             Data
+          </div>
+          <div
+            className={`${classes.sectionItem} ${
+              activeSection === "location" && classes.activeSectionItem
+            }`}
+            onClick={() => handleSectionClick("location")}
+          >
+            Location Sharing
           </div>
         </div>
         <div
@@ -147,6 +149,18 @@ const Settings = ({
               }`}
             >
               Data and permissions
+            </Typography>
+          )}
+          {activeSection === "location" && (
+            <Typography
+              variant="h6"
+              onClick={() => onSubSectionClick("locationSharing")}
+              className={`${classes.subSectionItem} ${
+                activeSubSection === "locationSharing" &&
+                classes.activeSubSectionItem
+              }`}
+            >
+              Control location sharing
             </Typography>
           )}
         </div>

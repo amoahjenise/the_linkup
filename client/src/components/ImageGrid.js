@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Modal from "@material-ui/core/Modal";
+import { makeStyles } from "@material-ui/core/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useColorMode } from "@chakra-ui/react";
+import { Dialog } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -47,22 +47,23 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
   },
   modalContent: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: theme.palette.background.paper,
     outline: "none",
     padding: theme.spacing(2),
     borderRadius: theme.spacing(1),
     boxShadow: theme.shadows[5],
-    maxWidth: "90vw",
-    maxHeight: "90vh",
+    maxWidth: "80vw", // Adjust maximum width as needed
+    maxHeight: "80vh", // Adjust maximum height as needed
     overflow: "auto",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
   },
+
   modalImage: {
     maxWidth: "100%",
     maxHeight: "100%",
-    objectFit: "contain",
+    objectFit: "contain", // Ensure the image fits inside the Dialog
   },
   closeIcon: {
     position: "absolute",
@@ -141,12 +142,12 @@ const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
           </div>
         ))}
       </div>
-      <Modal
+      <Dialog
         open={openModal}
         onClose={handleCloseModal}
         className={classes.modal}
       >
-        <div className={classes.modalContent}>
+        <div className="dialog">
           <CloseIcon className={classes.closeIcon} onClick={handleCloseModal} />
           <img
             src={images[currentImageIndex]}
@@ -154,7 +155,7 @@ const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
             className={classes.modalImage}
           />
         </div>
-      </Modal>
+      </Dialog>
     </div>
   );
 };

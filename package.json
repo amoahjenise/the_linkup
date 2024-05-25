@@ -11,8 +11,9 @@
     "start:notification-service": "cd server/notification-service && npm start -- --reset-cache",
     "start:messaging-service": "cd server/messaging-service && npm start -- --reset-cache",
     "start:image-service": "cd server/image-service && npm start -- --reset-cache",
+    "start:location-service": "cd server/location-service && npm start -- --reset-cache",
     "start:client": "cd client && npm start -- --reset-cache",
-    "start:all": "concurrently \"npm run start:auth-service\" \"npm run start:user-management-service\" \"npm run start:link-up-management-service\" \"npm run start:link-up-request-service\" \"npm run start:notification-service\" \"npm run start:messaging-service\" \"npm run start:client\" \"npm run start:image-service\""
+    "start:all": "concurrently \"npm run start:auth-service\" \"npm run start:user-management-service\" \"npm run start:link-up-management-service\" \"npm run start:link-up-request-service\" \"npm run start:notification-service\" \"npm run start:messaging-service\" \"npm run start:location-service\" \"npm run start:image-service\" \"npm run start:client\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -24,6 +25,7 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@mui/styles": "^5.15.18",
+    "@reduxjs/toolkit": "^2.2.5",
     "@sendbird/uikit-react": "^3.14.6",
     "compromise": "^14.12.0",
     "framer-motion": "^10.16.4",

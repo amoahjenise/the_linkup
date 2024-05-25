@@ -15,7 +15,8 @@ export const createUser = async (userId, name, profileImageUrl) => {
       {
         user_id: userId,
         nickname: name,
-        profile_url: profileImageUrl,
+        profile_url: "",
+        profile_file: profileImageUrl,
         issue_access_token: true, // Generate access token for the user
       },
       {

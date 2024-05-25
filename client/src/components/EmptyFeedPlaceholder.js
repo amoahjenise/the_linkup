@@ -41,10 +41,10 @@ const EmptyFeedPlaceholder = () => {
       />
 
       <Typography variant="h5" className={classes.message}>
-        There are no link-ups available at the moment.
+        There are no linkups available at the moment.
       </Typography>
       <Typography variant="body1">
-        Start by creating a Link Up to connect with others.
+        Start by creating a linkup to connect with others.
       </Typography>
     </div>
   );

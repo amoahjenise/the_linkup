@@ -26,22 +26,22 @@ const useStyles = makeStyles((theme) => ({
     padding: 0,
     margin: 0,
   },
+
   noNotificationsContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "80vh", // Adjust height as needed
+    padding: theme.spacing(4),
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[3],
   },
   noNotificationsText: {
     fontSize: "1.2rem",
-    fontWeight: "bold",
-    // color: "#666",
     textAlign: "center",
-    padding: "1rem",
+    padding: "10px",
+    backgroundColor: "rgba(200, 200, 200, 0.1)",
     borderRadius: "8px",
-    backgroundColor: "rgba(200, 200, 200, 0.2)", // Change to your desired darker color
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    cursor: "pointer",
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  icon: {
+    marginRight: "4px",
   },
 }));
 

@@ -9,6 +9,7 @@ import notificationReducer from "./notificationReducer";
 import userSentRequestsReducer from "./userSentRequestsReducer";
 import messageReducer from "./messageReducer";
 import logoutReducer from "./logoutReducer";
+import locationReducer from "./locationSlice";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -21,6 +22,7 @@ const appReducer = combineReducers({
   messages: messageReducer,
   notifications: notificationReducer,
   userSentRequests: userSentRequestsReducer,
+  location: locationReducer,
 });
 
 const rootReducer = (state, action) => {

@@ -1,8 +1,10 @@
+// SettingsPage.js
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import DeactivateAccount from "../components/DeactivateAccount";
 import Settings from "../components/Settings";
 import { useColorMode } from "@chakra-ui/react";
+import LocationSharingSetting from "../components/LocationSharingSetting";
 
 const useStyles = makeStyles((theme) => ({
   settingsPage: {
@@ -22,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 const SettingsPage = () => {
   const classes = useStyles();
   const { colorMode } = useColorMode();
-  const [activeSubSection, setActiveSubSection] = useState("accountSettings");
+  const [activeSubSection, setActiveSubSection] = useState("accountSettings"); // Lift state up here
 
   const handleSubSectionClick = (subSection) => {
     setActiveSubSection(subSection);
@@ -41,6 +43,15 @@ const SettingsPage = () => {
       {/* Render the active section content based on activeSection and activeSubsection */}
       {activeSubSection === "deactivateAccount" ? (
         <DeactivateAccount colorMode={colorMode} />
+      ) : (
+        <></>
+      )}
+
+      {activeSubSection === "locationSharing" ? (
+        <LocationSharingSetting
+          activeSubSection={activeSubSection}
+          setActiveSubSection={setActiveSubSection}
+        />
       ) : (
         <></>
       )}

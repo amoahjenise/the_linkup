@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useRef } from "react";
 import { BiSearch } from "react-icons/bi";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    border: "1px solid #ccc",
+    borderWidth: "1px",
+    border: "0.1px solid #lightgray",
     width: "100%",
     padding: "6px 12px",
     borderRadius: "24px",
@@ -47,11 +48,18 @@ const useStyles = makeStyles((theme) => ({
 
 const SearchInput = ({ handleInputChange }) => {
   const classes = useStyles();
+  const inputRef = useRef(null); // Create a reference to the input element
+
+  const handleClick = () => {
+    // Programmatically focus on the input element when clicked
+    inputRef.current.focus();
+  };
 
   return (
     <div className={classes.container}>
-      <div className={classes.inputContainer}>
+      <div className={classes.inputContainer} onClick={handleClick}>
         <input
+          ref={inputRef} // Attach the ref to the input element
           type="search"
           name="search"
           placeholder="Search Linkup"

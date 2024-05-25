@@ -38,7 +38,7 @@ const ImageGridHeader = ({ isLoggedUserProfile, openImageUploadModal }) => {
 
   const backgroundColor =
     colorMode === "dark"
-      ? "rgba(18, 28, 38, 0.99)" // Dark mode background color with 90% transparency
+      ? "rgba(18, 28, 38, 0.19)" // Dark mode background color with 90% transparency
       : "rgba(255, 255, 255, 0.99)"; // Light mode background color
 
   return (

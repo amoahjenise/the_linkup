@@ -33,13 +33,22 @@ export const searchLinkups = async (
   }
 };
 
-export const getLinkups = async (userId, gender, sqlOffset, pageSize) => {
+export const getLinkups = async (
+  userId,
+  gender,
+  sqlOffset,
+  pageSize,
+  latitude,
+  longitude
+) => {
   try {
     const response = await axios.get(`${BASE_URL}/api/linkups/${userId}`, {
       params: {
         gender: gender,
         offset: sqlOffset,
         pageSize: pageSize,
+        latitude: latitude,
+        longitude: longitude,
       },
     });
     return response.data;

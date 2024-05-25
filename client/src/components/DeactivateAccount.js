@@ -30,6 +30,23 @@ const useStyles = makeStyles((theme) => ({
   input: {
     width: "100%",
     marginBottom: theme.spacing(2),
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#D3D3D3",
+      },
+      "&:hover fieldset": {
+        borderColor: "#D3D3D3",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#AD1C4F",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: (props) => props.textColor,
+    },
+    "& .MuiInputBase-input": {
+      color: (props) => props.textColor,
+    },
   },
   button: {
     padding: theme.spacing(1.5, 4),
@@ -62,6 +79,11 @@ const DeactivateAccount = ({ colorMode }) => {
     colorMode === "dark"
       ? "white" // Dark mode background color with no transparency
       : "black";
+
+  const disabledStyle = {
+    color:
+      colorMode === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
+  };
 
   const handleDeactivate = async () => {
     if (isConfirmValid) {
@@ -111,6 +133,7 @@ const DeactivateAccount = ({ colorMode }) => {
         className={classes.button}
         onClick={handleDeactivate}
         disabled={!isConfirmValid}
+        style={!isConfirmValid ? disabledStyle : {}}
       >
         Deactivate Account
       </Button>

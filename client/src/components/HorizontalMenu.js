@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 const HorizontalMenu = ({
   showGoToItem,
+  showGoToRequest,
   showEditItem,
   showDeleteItem,
   showCloseItem,
@@ -143,6 +144,11 @@ const HorizontalMenu = ({
     }
   };
 
+  const handleLinkupRequestClick = () => {
+    navigate("/history/requests-received");
+    handleMenuClose();
+  };
+
   const handleLinkupItemClick = () => {
     navigate("/history");
     handleMenuClose();
@@ -169,12 +175,16 @@ const HorizontalMenu = ({
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "right",
+          horizontal: "left",
         }}
         PaperProps={{
           style: {
+            color: "white",
             backgroundColor:
-              colorMode === "dark" ? "rgba(78, 78, 98)" : "white",
+              colorMode === "dark"
+                ? "rgba(18, 78, 88, 0.95)"
+                : "rgba(8, 98, 110, 0.75)",
+            boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.5)",
           },
         }}
       >
@@ -185,24 +195,47 @@ const HorizontalMenu = ({
             action: handleLinkupItemClick,
           },
           {
-            condition: showEditItem,
+            condition: showGoToRequest,
+            label: "Go to linkup request",
+            action: handleLinkupRequestClick,
+          },
+          {
+            condition:
+              showEditItem &&
+              linkupItem.status !== "expired" &&
+              linkupItem.status !== "closed",
             label: "Edit this linkup",
             action: handleEditClick,
           },
           {
-            condition: showAcceptLinkupRequest, // Show the Accept Request option conditionally
-            label: "Accept linkup request", // Label for the Accept Request action
-            action: handleAcceptRequestClick, // Action for Accept Request
+            condition:
+              showAcceptLinkupRequest &&
+              linkupItem.status !== "expired" &&
+              linkupItem.request_status !== "accepted" &&
+              linkupItem.request_status !== "declined" &&
+              linkupItem.request_status !== "closed",
+            label: "Accept linkup request",
+            action: handleAcceptRequestClick,
           },
           {
-            condition: showDeclineLinkupRequest, // Show the Decline Request option conditionally
-            label: "Decline linkup request", // Label for the Decline Request action
-            action: handleDeclineRequestClick, // Action for Decline Request
+            condition:
+              showDeclineLinkupRequest &&
+              linkupItem.status !== "expired" &&
+              linkupItem.request_status !== "accepted" &&
+              linkupItem.request_status !== "declined" &&
+              linkupItem.request_status !== "closed",
+            label: "Decline linkup request",
+            action: handleDeclineRequestClick,
           },
           {
-            condition: showCheckInLinkup, // Show the Check-In option conditionally
-            label: "Check-In", // Label for the Check-In action
-            action: handleCheckInClick, // Action for Check-In
+            condition:
+              showCheckInLinkup &&
+              linkupItem.status !== "expired" &&
+              linkupItem.request_status !== "accepted" &&
+              linkupItem.request_status !== "declined" &&
+              linkupItem.request_status !== "closed",
+            label: "Check-In",
+            action: handleCheckInClick,
           },
           {
             condition: showDeleteItem,

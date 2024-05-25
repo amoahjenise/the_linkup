@@ -59,10 +59,7 @@ export default function SendbirdChat() {
             channel.createdAt
           );
 
-          if (
-            !isOperatorValue &&
-            linkupResponse.linkup.request_status === "declined"
-          ) {
+          if (linkupResponse.linkup.request_status === "declined") {
             setMessageInputDisabled(true);
           } else if (
             !isOperatorValue &&
@@ -85,10 +82,7 @@ export default function SendbirdChat() {
   return (
     <div className={classes.SendbirdChat}>
       <div className="sendbird-app__wrap">
-        <div
-          className="sendbird-app__channellist-wrap"
-          style={{ borderWidth: "0px" }}
-        >
+        <div className="" style={{ borderWidth: "0px" }}>
           <SBChannelList
             allowProfileEdit={false}
             isMessageReceiptStatusEnabled={true}
@@ -97,11 +91,6 @@ export default function SendbirdChat() {
             onChannelCreated={(channel) => setCurrentChannel(channel)}
             onChannelSelect={(channel) => setCurrentChannel(channel)}
             renderHeader={() => <ChannelListHeader />}
-            // renderChannelPreview={() => {
-            //   <div>
-            //     <p>Hello world</p>
-            //   </div>;
-            // }}
           />
         </div>
         <div

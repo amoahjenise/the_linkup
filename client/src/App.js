@@ -31,6 +31,7 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
+import Geolocation from "./components/Geolocation";
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -45,6 +46,7 @@ const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const userState = useSelector((state) => state.loggedUser);
+  const locationState = useSelector((state) => state.location);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isSigningOut } = useSelector((state) => state.logout);
   const theme = useTheme();
@@ -58,18 +60,27 @@ const App = () => {
     "--sendbird-light-primary-400": "#346382",
     "--sendbird-light-primary-300": "#3e6680",
     "--sendbird-light-primary-200": "#0496ff",
-    "--sendbird-light-primary-100": "#BEBEBE",
+    "--sendbird-light-primary-100": "#f2f5f7", // Selected conversation color
+    // Dark theme primary colors
     "--sendbird-dark-primary-500": "#00487c", //
     "--sendbird-dark-primary-400": "#00487c", // On hover color
     "--sendbird-dark-primary-300": "#7cd6c9", // Left border plus chat bubble on hover color
     "--sendbird-dark-primary-200": "#92d4ca", // Chat bubble color
-    "--sendbird-dark-primary-100": "#00487c", // Color on selection
-    "--sendbird-dark-background-600": "#1f2733",
+    "--sendbird-dark-primary-100": "#dbd1ff", // Color on selection
+    // Dark theme secondary colors
+    "--sendbird-dark-secondary-100": "#a8e2ab", // Dark secondary color (highest brightness)
+    "--sendbird-dark-secondary-200": "#69c085", // Dark secondary color
+    "--sendbird-dark-secondary-300": "#259c72", // Dark secondary color
+    "--sendbird-dark-secondary-400": "#027d69", // Dark secondary color
+    "--sendbird-dark-secondary-500": "#066858", // Dark secondary color (lowest brightness)
+    // Dark theme background colors
+    "--sendbird-dark-background-600": "#1f2733", // Background
+    "--sendbird-dark-background-700": "#1b2330", // Selected conversation color
   };
 
   const myStringSet = {
     MESSAGE_INPUT__PLACE_HOLDER__DISABLED:
-      "Chat is temporarily disabled until the recipient responds.",
+      "This chat is temporarily disabled until the recipient responds or accepts the request.",
   };
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
@@ -129,7 +140,18 @@ const App = () => {
       <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
       <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
       <Route path="/registration" element={<SignupPage />} />
-      <Route path="/home" element={<HomePage isMobile={isMobile} />} />
+      <Route
+        path="/home"
+        element={
+          locationState.allow_location &&
+          locationState.city &&
+          locationState.country ? (
+            <HomePage isMobile={isMobile} />
+          ) : (
+            <Geolocation />
+          )
+        }
+      />
       <Route path="/notifications" element={<NotificationsPage />} />
       <Route
         path="/profile/:id"

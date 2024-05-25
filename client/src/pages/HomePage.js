@@ -17,11 +17,10 @@ const useStyles = makeStyles((theme) => ({
   feedSection: {
     flex: "2",
     overflowY: "auto",
-    // overflowX: "hidden",
     marginLeft: "auto",
     marginRight: "auto",
     borderRightWidth: "1px",
-    borderRightColor: "1px solid #D3D3D3",
+    borderRightColor: "0.1px solid #D3D3D3",
   },
   widgetSection: {
     flex: "1",
@@ -48,6 +47,8 @@ const HomePage = ({ isMobile }) => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser.user.id;
   const gender = loggedUser.user.gender;
+  const latitude = loggedUser.user.latitude;
+  const longitude = loggedUser.user.longitude;
   const [currentPage, setCurrentPage] = useState(1);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
@@ -61,7 +62,14 @@ const HomePage = ({ isMobile }) => {
         if (!userId) return;
         const adjustedPage = page - 1;
         const sqlOffset = adjustedPage * PAGE_SIZE;
-        const response = await getLinkups(userId, gender, sqlOffset, PAGE_SIZE);
+        const response = await getLinkups(
+          userId,
+          gender,
+          sqlOffset,
+          PAGE_SIZE,
+          latitude,
+          longitude
+        );
         if (response.success) {
           const activeLinkups = response.linkupList.filter(
             (linkup) => linkup.status === "active"
@@ -94,7 +102,15 @@ const HomePage = ({ isMobile }) => {
         setIsFetchingNextPage(false);
       }
     },
-    [dispatch, fetchedLinkupIds, gender, linkupList, userId]
+    [
+      dispatch,
+      fetchedLinkupIds,
+      gender,
+      latitude,
+      linkupList,
+      longitude,
+      userId,
+    ]
   );
 
   const handleScroll = useCallback(() => {

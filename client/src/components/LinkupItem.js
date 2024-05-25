@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
 import HorizontalMenu from "./HorizontalMenu";
 import PostActions from "./PostActions";
-import nlp from "compromise";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkupAPI";
 import { IoReceipt } from "react-icons/io5";
+import nlp from "compromise";
 
 const compromise = nlp;
 
@@ -33,13 +32,17 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     border: "1px solid #d2d6dc",
-    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
     padding: "1rem",
     borderRadius: "0.375rem",
     width: "32rem",
     backgroundColor: "rgba(200, 200, 200, 0.1)",
     cursor: "pointer",
-    transition: "background-color 0.2s ease",
+    overflow: "hidden",
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
+    transition: "box-shadow 0.2s ease",
+    "&:hover": {
+      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
+    },
   },
   highlightedCard: {
     backgroundColor: "rgba(200, 200, 200, 0.2)", // Change to your desired darker color
@@ -63,6 +66,14 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     marginTop: "0.5rem",
+  },
+  distanceInfo: {
+    display: "flex",
+    alignItems: "center",
+    fontSize: "0.9rem",
+    color: "#718096",
+    marginTop: "0.25rem",
+    marginLeft: "4px", // Added
   },
   postContent: {
     fontSize: "0.95rem",
@@ -95,12 +106,63 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const classes = useStyles();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [distance, setDistance] = useState(null);
   const loggedUser = useSelector((state) => state.loggedUser);
   const editingLinkup = useSelector((state) => state.editingLinkup);
-  const { id, creator_id, creator_name, activity, created_at, date, avatar } =
-    linkupItem;
+  const {
+    id,
+    creator_id,
+    creator_name,
+    activity,
+    created_at,
+    date,
+    avatar,
+    latitude,
+    longitude,
+  } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const toRadians = (degrees) => (degrees * Math.PI) / 180;
+
+      const R = 6371; // Radius of the Earth in kilometers
+      const dLat = toRadians(lat2 - lat1);
+      const dLon = toRadians(lon2 - lon1);
+      const a =
+        Math.sin(dLat) * Math.sin(dLat) +
+        Math.cos(toRadians(lat1)) *
+          Math.cos(toRadians(lat2)) *
+          Math.sin(dLon) *
+          Math.sin(dLon);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    };
+
+    const fetchUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            const dist = calculateDistance(
+              userLat,
+              userLon,
+              latitude,
+              longitude
+            );
+            setDistance(dist.toFixed(0)); // Set distance with 2 decimal places
+          },
+          (error) => {
+            console.error("Error fetching user's location:", error);
+          }
+        );
+      }
+    };
+
+    fetchUserLocation();
+  }, [latitude, longitude]);
 
   // Function to render the appropriate icon based on the payment option
   const renderPaymentOptionIcon = () => {
@@ -204,9 +266,9 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
         </Link>{" "}
         is trying to link up{" "}
         <strong className={classes.boldText}>{activityText}</strong> on{" "}
-        <time className={classes.boldText}>
+        <strong className={classes.boldText}>
           {dateText} {timeText}
-        </time>
+        </strong>
         .
       </span>
     );
@@ -244,39 +306,46 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             : ""
         }`}
       >
-        <div className={classes.horizontalMenu}>
-          {loggedUser.user.id === linkupItem.creator_id && (
-            <HorizontalMenu
-              showGoToItem={true}
-              showEditItem={true}
-              showDeleteItem={true}
-              showCloseItem={true}
-              showCheckInLinkup={false}
-              showAcceptLinkupRequest={false}
-              linkupItem={linkupItem}
-              setShouldFetchLinkups={setShouldFetchLinkups}
-              menuAnchor={menuAnchor}
-              setMenuAnchor={setMenuAnchor}
-            />
-          )}
-        </div>
         <div className={classes.userInfo}>
-          <UserAvatar
-            userData={{
-              id: creator_id,
-              name: creator_name,
-              avatar: avatar,
-            }}
-            width="50px"
-            height="50px"
-          />
-          <div className={classes.userDetail}>
-            <div className={classes.userName}>{creator_name}</div>
-            <div className={classes.postInfo}>
-              <span>{getTimeAgo(created_at)}</span>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <UserAvatar
+              userData={{
+                id: creator_id,
+                name: creator_name,
+                avatar: avatar,
+              }}
+              width="50px"
+              height="50px"
+            />
+            <div>
+              <div className={classes.userName}>{creator_name}</div>
+              <div className={classes.postInfo}>
+                <span>{getTimeAgo(created_at)}</span>
+              </div>
             </div>
           </div>
+          <div className={classes.horizontalMenu}>
+            {loggedUser.user.id === linkupItem.creator_id ? (
+              <HorizontalMenu
+                showGoToItem={true}
+                showEditItem={true}
+                showDeleteItem={true}
+                showCloseItem={true}
+                showCheckInLinkup={false}
+                showAcceptLinkupRequest={false}
+                linkupItem={linkupItem}
+                setShouldFetchLinkups={setShouldFetchLinkups}
+                menuAnchor={menuAnchor}
+                setMenuAnchor={setMenuAnchor}
+              />
+            ) : (
+              <div className={classes.distanceInfo}>
+                {distance && <span>{`${distance} km away`}</span>}
+              </div>
+            )}
+          </div>
         </div>
+
         <p className={classes.postContent}>{renderLinkupItemText()}</p>
         <div className={classes.postActions}>
           {loggedUser.user.id !== linkupItem.creator_id && (
@@ -290,7 +359,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               </div>
             </div>
           )}
-          <span> {renderPaymentOptionIcon()}</span>
+          <span>{renderPaymentOptionIcon()}</span>
         </div>
       </div>
     </div>

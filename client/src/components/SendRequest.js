@@ -30,22 +30,51 @@ const useStyles = makeStyles((theme) => ({
   },
   linkUpInfo: {
     marginBottom: theme.spacing(2),
+    fontSize: "20px",
   },
   messageInput: {
     marginBottom: theme.spacing(2),
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "#D3D3D3",
+      },
+      "&:hover fieldset": {
+        borderColor: "#D3D3D3",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#0097A7",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: (props) => props.textColor,
+    },
+    "& .MuiInputBase-input": {
+      color: (props) => props.textColor,
+    },
   },
   sendButton: {
     marginBottom: theme.spacing(2),
+    borderRadius: "40px",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+    backgroundColor: "#0097A7",
+    fontWeight: "bold",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#007b86", // Slightly darker color on hover
+    },
+    width: "200px",
+    height: "60px",
+    marginTop: theme.spacing(2),
   },
   avatar: {
-    width: theme.spacing(10),
-    height: theme.spacing(10),
+    width: theme.spacing(20),
+    height: theme.spacing(20),
     marginBottom: theme.spacing(2),
   },
   locationDetails: {
     display: "flex",
-    fontSize: theme.typography.body2.fontSize,
-    // color: theme.palette.text.secondary,
+    fontSize: "16px",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -68,6 +97,11 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
     colorMode === "dark"
       ? "white" // Dark mode background color with no transparency
       : "black";
+
+  const disabledStyle = {
+    color:
+      colorMode === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
+  };
 
   const handleSendRequest = async () => {
     const aUsers = [requesterId, post.creator_id];
@@ -156,6 +190,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
             className={classes.sendButton}
             onClick={handleSendRequest}
             disabled={!message} // Disable the button if message is empty
+            style={!message ? disabledStyle : {}}
           >
             Send Request
           </Button>

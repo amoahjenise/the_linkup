@@ -108,10 +108,17 @@ const createLinkup = async (req, res) => {
 
 const getLinkups = async (req, res) => {
   const { userId } = req.params;
-  const { gender, offset, pageSize } = req.query;
+  const { gender, offset, pageSize, latitude, longitude } = req.query;
   const queryPath = path.join(__dirname, "../db/queries/getLinkups.sql");
   const query = readQueryFile(queryPath);
-  const linkupsQueryValues = [userId, gender, offset, pageSize];
+  const linkupsQueryValues = [
+    userId,
+    gender,
+    offset,
+    pageSize,
+    latitude,
+    longitude,
+  ];
 
   try {
     // Modify your SQL query to handle pagination
