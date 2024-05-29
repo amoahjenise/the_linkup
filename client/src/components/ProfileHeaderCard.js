@@ -140,6 +140,11 @@ const ProfileHeaderCard = ({
       ? "rgba(18, 28, 38, 0.19)" // Dark mode background color with 90% transparency
       : "rgba(255, 255, 255, 0.99)"; // Light mode background color
 
+  const capitalizeFirstLetter = (string) => {
+    if (typeof string !== "string") return "";
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
   return (
     <div className={classes.container}>
       <Card className={classes.card} style={{ backgroundColor }}>
@@ -151,7 +156,8 @@ const ProfileHeaderCard = ({
                   variant="h5"
                   style={{ color: textColor, fontWeight: "bold" }}
                 >
-                  {userData?.name}, {calculateAge(userData?.date_of_birth)}
+                  {capitalizeFirstLetter(userData?.name)},{" "}
+                  {calculateAge(userData?.date_of_birth)}
                 </Typography>
                 <Box className={classes.locationSection}>
                   <LocationOnIcon style={{ color: "#FF3348" }} />

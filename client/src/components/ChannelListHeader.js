@@ -42,7 +42,7 @@ const ChannelListHeader = () => {
         <ChatBubbleIcon />
       </div>
       <Box className={classes.textWrapper}>
-        <p className={classes.title}>Discover New Linkups</p>
+        <p className={classes.title}>Discover New Link-ups</p>
         <p className={classes.subtitle}>
           Check the feed to link up with people!
         </p>

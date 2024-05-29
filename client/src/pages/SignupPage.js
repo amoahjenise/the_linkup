@@ -6,26 +6,15 @@ import RegistrationProcess from "../components/RegistrationProcess";
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    minHeight: "90vh",
+    flex: "2",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    overflowY: "auto",
+    marginLeft: "auto",
+    marginRight: "auto",
+    minHeight: "100vh", // Set the minimum height of the container to cover the entire viewport height
     padding: theme.spacing(2),
-  },
-  content: {
-    textAlign: "center",
-  },
-  title: {
-    fontWeight: "bold",
-    marginBottom: theme.spacing(4),
-  },
-  logoContainer: {
-    [theme.breakpoints.down("sm")]: {
-      marginBottom: theme.spacing(2),
-    },
-  },
-  logo: {
-    height: "50px",
   },
 }));
 
@@ -33,17 +22,15 @@ const SignupPage = () => {
   const classes = useStyles();
 
   return (
-    <div>
-      <div className={classes.container}>
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} sm={6} md={4}>
-            <div className={classes.content}>
-              <LogoHeader />
-              <RegistrationProcess />
-            </div>
-          </Grid>
+    <div className={classes.container}>
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12} sm={6} md={4}>
+          <div>
+            <LogoHeader />
+            <RegistrationProcess />
+          </div>
         </Grid>
-      </div>
+      </Grid>
     </div>
   );
 };

@@ -28,12 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FeedSection = ({
-  linkupList,
-  isLoading,
-  setShouldFetchLinkups,
-  refreshLinkups,
-}) => {
+const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
   const classes = useStyles();
   const userSentRequests = useSelector((state) => state.userSentRequests);
 

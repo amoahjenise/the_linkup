@@ -16,13 +16,11 @@ export const createUser = async (userId, name, profileImageUrl) => {
         user_id: userId,
         nickname: name,
         profile_url: "",
-        profile_file: profileImageUrl,
         issue_access_token: true, // Generate access token for the user
       },
       {
         headers: {
           "Api-Token": API_TOKEN,
-          "Content-Type": "application/json",
         },
       }
     );
@@ -106,6 +104,7 @@ export const sendMessage = async (requesterId, channelUrl, message) => {
         message_type: "MESG",
         user_id: requesterId,
         message: message,
+        mark_as_read: true,
       },
       {
         headers: {

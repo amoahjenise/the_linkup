@@ -174,7 +174,7 @@ const LeftMenu = ({ isMobile }) => {
             <MenuItem
               to="/history"
               icon={<HistoryIcon />}
-              text="Linkups"
+              text="Link-Ups"
               location={location.pathname}
             />
             <MenuItem

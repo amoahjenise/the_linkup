@@ -151,9 +151,7 @@ const CustomChannelHeader = ({
                   className={classes.avatar}
                 />
                 <div>
-                  <div className={classes.nickname}>
-                    {linkup?.requester_name}
-                  </div>
+                  <div className={classes.nickname}>{operator.nickname}</div>
                   <div>{renderLinkupItemText()}</div>
                   {linkup?.request_status && (
                     <div

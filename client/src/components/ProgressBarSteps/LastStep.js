@@ -1,22 +1,30 @@
 import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
 
-const LastStep = ({ userData }) => {
-  console.log("Last Step userData: ", userData);
+const useStyles = makeStyles((theme) => ({
+  root: {
+    textAlign: "center",
+    padding: theme.spacing(2),
+    width: "100%",
+  },
+  message: {
+    fontSize: "1.5rem",
+    margin: theme.spacing(2, 0),
+  },
+}));
 
-  // Extract the name from the userData object
-  const name = userData.name;
+const LastStep = ({ clerkUser }) => {
+  const classes = useStyles();
 
-  // Convert the first character to uppercase and the rest to lowercase
+  const name = clerkUser.firstName;
   const formattedName =
     name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-
-  // Personalized welcome message using the formatted first name
   const welcomeMessage = `Let's get started, ${formattedName}!`;
 
   return (
-    <>
-      <h2>{welcomeMessage}</h2>
-    </>
+    <div className={classes.root}>
+      <h2 className={classes.message}>{welcomeMessage}</h2>
+    </div>
   );
 };
 

@@ -8,16 +8,21 @@ import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { getUnreadMessagesCount } from "./api/sendbirdAPI";
 import ClerkCustomSignIn from "./sign-in/[[...index]]";
 import ClerkCustomSignUp from "./sign-up/[[...index]]";
-import LandingPage from "./pages/LandingPage";
-import SignupPage from "./pages/SignupPage";
-import HomePage from "./pages/HomePage";
-import UserProfilePage from "./pages/UserProfilePage";
-import SendRequestPage from "./pages/SendRequestPage";
-import ConversationsPage from "./pages/ConversationsPage";
-import LinkupHistoryPage from "./pages/LinkupHistoryPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import AcceptDeclinePage from "./pages/AcceptDeclinePage";
-import SettingsPage from "./pages/SettingsPage";
+import {
+  LandingPage,
+  SignupPage,
+  HomePage,
+  UserProfilePage,
+  SendRequestPage,
+  ConversationsPage,
+  LinkupHistoryPage,
+  NotificationsPage,
+  AcceptDeclinePage,
+  TermsOfServicePage,
+  SettingsPage,
+  PrivacyPolicyPage,
+  CookieUsePage,
+} from "./pages";
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
 import ToggleColorMode from "./components/ToggleColorMode";
@@ -31,7 +36,17 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
+// import useLocationUpdate from "./utils/useLocationUpdate";
 import Geolocation from "./components/Geolocation";
+
+const publicPages = [
+  "/",
+  "/sign-in",
+  "/sign-up",
+  "/terms-of-service",
+  "/privacy-policy",
+  "/cookie-use",
+];
 
 const useStyles = makeStyles((theme) => ({
   app: {
@@ -40,13 +55,66 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const publicPages = ["/", "/sign-in", "/sign-up"];
+const RoutesComponent = ({ isMobile, locationState }) => (
+  <Routes>
+    <Route path="/" exact element={<LandingPage />} />
+    <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
+    <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
+    <Route path="/registration" element={<SignupPage />} />
+    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+    <Route path="/cookie-use" element={<CookieUsePage />} />
+    <Route
+      path="/home"
+      element={
+        locationState.allow_location &&
+        locationState.city &&
+        locationState.country ? (
+          <HomePage isMobile={isMobile} />
+        ) : locationState ? (
+          <Geolocation />
+        ) : (
+          <></>
+        )
+      }
+    />
+    <Route path="/notifications" element={<NotificationsPage />} />
+    <Route
+      path="/profile/:id"
+      element={<UserProfilePage isMobile={isMobile} />}
+    />
+    <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
+    <Route
+      path="/history"
+      element={<LinkupHistoryPage isMobile={isMobile} />}
+    />
+    <Route
+      path="/history/expired"
+      element={<LinkupHistoryPage isMobile={isMobile} />}
+    />
+    <Route
+      path="/history/requests-sent"
+      element={<LinkupHistoryPage isMobile={isMobile} />}
+    />
+    <Route
+      path="/history/requests-received"
+      element={<LinkupHistoryPage isMobile={isMobile} />}
+    />
+    <Route
+      path="/messages"
+      element={<ConversationsPage isMobile={isMobile} />}
+    />
+    <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
+    <Route path="/settings" element={<SettingsPage />} />
+  </Routes>
+);
 
 const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const userState = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
+  const { isRegistering } = useSelector((state) => state.registration);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isSigningOut } = useSelector((state) => state.logout);
   const theme = useTheme();
@@ -54,28 +122,26 @@ const App = () => {
   const { user } = useUser();
   const [authError, setAuthError] = useState(false);
   const { colorMode } = useColorMode();
+  // const { updateLocation } = useLocationUpdate();
 
   const myColorSet = {
     "--sendbird-light-primary-500": "#00487c",
     "--sendbird-light-primary-400": "#346382",
     "--sendbird-light-primary-300": "#3e6680",
     "--sendbird-light-primary-200": "#0496ff",
-    "--sendbird-light-primary-100": "#f2f5f7", // Selected conversation color
-    // Dark theme primary colors
-    "--sendbird-dark-primary-500": "#00487c", //
-    "--sendbird-dark-primary-400": "#00487c", // On hover color
-    "--sendbird-dark-primary-300": "#7cd6c9", // Left border plus chat bubble on hover color
-    "--sendbird-dark-primary-200": "#92d4ca", // Chat bubble color
-    "--sendbird-dark-primary-100": "#dbd1ff", // Color on selection
-    // Dark theme secondary colors
-    "--sendbird-dark-secondary-100": "#a8e2ab", // Dark secondary color (highest brightness)
-    "--sendbird-dark-secondary-200": "#69c085", // Dark secondary color
-    "--sendbird-dark-secondary-300": "#259c72", // Dark secondary color
-    "--sendbird-dark-secondary-400": "#027d69", // Dark secondary color
-    "--sendbird-dark-secondary-500": "#066858", // Dark secondary color (lowest brightness)
-    // Dark theme background colors
-    "--sendbird-dark-background-600": "#1f2733", // Background
-    "--sendbird-dark-background-700": "#1b2330", // Selected conversation color
+    "--sendbird-light-primary-100": "#f2f5f7",
+    "--sendbird-dark-primary-500": "#00487c",
+    "--sendbird-dark-primary-400": "#00487c",
+    "--sendbird-dark-primary-300": "#7cd6c9",
+    "--sendbird-dark-primary-200": "#92d4ca",
+    "--sendbird-dark-primary-100": "#dbd1ff",
+    "--sendbird-dark-secondary-100": "#a8e2ab",
+    "--sendbird-dark-secondary-200": "#69c085",
+    "--sendbird-dark-secondary-300": "#259c72",
+    "--sendbird-dark-secondary-400": "#027d69",
+    "--sendbird-dark-secondary-500": "#066858",
+    "--sendbird-dark-background-600": "#1f2733",
+    "--sendbird-dark-background-700": "#1b2330",
   };
 
   const myStringSet = {
@@ -87,39 +153,41 @@ const App = () => {
   const REACT_APP_SENDBIRD_APP_ACCESS_TOKEN =
     process.env.REACT_APP_SENDBIRD_APP_ACCESS_TOKEN;
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (
+  //       !user ||
+  //       !isAuthenticated ||
+  //       isSigningOut ||
+  //       !user?.id ||
+  //       isRegistering
+  //     )
+  //       return;
+  //     try {
+  //       const result = await authenticateUser(user.id);
+  //       if (result.success) {
+  //         console.log("App.js Fetch Data executed", isRegistering);
+  //         dispatch(setCurrentUser(result.user));
+  //         // updateLocation(true);
+  //         dispatch(login());
+  //       } else {
+  //         setAuthError(true);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error during user data fetch:", error);
+  //       setAuthError(true);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [user, isAuthenticated, isSigningOut, dispatch, isRegistering]);
+
   useEffect(() => {
-    async function fetchData() {
-      if (!user) return null;
-      const clerkUserId = user?.id;
-
+    const fetchData = async () => {
+      // if (!user || !isAuthenticated) return;
+      if (!user || !isAuthenticated || isSigningOut || isRegistering) return;
       try {
-        if (!isAuthenticated && !isSigningOut && clerkUserId) {
-          const result = await authenticateUser(clerkUserId);
-          if (result.success) {
-            dispatch(setCurrentUser(result.user));
-            dispatch(login());
-          } else {
-            setAuthError(true); // Set the authentication error state
-          }
-        }
-      } catch (error) {
-        console.error("Error during user data fetch:", error);
-        setAuthError(true); // Set the authentication error state
-      }
-    }
-    fetchData();
-  }, [user, isAuthenticated, isSigningOut, dispatch]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        if (!user) return null;
-
-        // Fetch unread messages count and update Redux state
         const messagesCount = await getUnreadMessagesCount(userState?.user?.id);
         dispatch(setUnreadMessagesCount(Number(messagesCount.unread_count)));
-
-        // Fetch unread notifications count and update Redux state
         const notificationsCount = await getUnreadNotificationsCount(
           userState?.user?.id
         );
@@ -129,59 +197,16 @@ const App = () => {
       } catch (error) {
         console.error("Error during user data fetch:", error);
       }
-    }
-
+    };
     fetchData();
-  }, [dispatch, user, userState?.user?.id]);
-
-  const RoutesComponent = () => (
-    <Routes>
-      <Route path="/" exact element={<LandingPage isMobile={isMobile} />} />
-      <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
-      <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
-      <Route path="/registration" element={<SignupPage />} />
-      <Route
-        path="/home"
-        element={
-          locationState.allow_location &&
-          locationState.city &&
-          locationState.country ? (
-            <HomePage isMobile={isMobile} />
-          ) : (
-            <Geolocation />
-          )
-        }
-      />
-      <Route path="/notifications" element={<NotificationsPage />} />
-      <Route
-        path="/profile/:id"
-        element={<UserProfilePage isMobile={isMobile} />}
-      />
-      <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
-      <Route
-        path="/history"
-        element={<LinkupHistoryPage isMobile={isMobile} />}
-      />
-      <Route
-        path="/history/expired"
-        element={<LinkupHistoryPage isMobile={isMobile} />}
-      />
-      <Route
-        path="/history/requests-sent"
-        element={<LinkupHistoryPage isMobile={isMobile} />}
-      />
-      <Route
-        path="/history/requests-received"
-        element={<LinkupHistoryPage isMobile={isMobile} />}
-      />
-      <Route
-        path="/messages"
-        element={<ConversationsPage isMobile={isMobile} />}
-      />
-      <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-    </Routes>
-  );
+  }, [
+    dispatch,
+    user,
+    userState?.user?.id,
+    isAuthenticated,
+    isSigningOut,
+    isRegistering,
+  ]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -195,10 +220,7 @@ const App = () => {
           stringSet={myStringSet}
           uikitOptions={{
             groupChannel: {
-              // Below controls the toggling of the typing indicator in the group channel. The default is `true`.
               enableTypingIndicator: true,
-
-              // Below turns on both bubble and text typing indicators. Default is `Text` only.
               typingIndicatorTypes: new Set([
                 TypingIndicatorType.Bubble,
                 TypingIndicatorType.Text,
@@ -208,10 +230,14 @@ const App = () => {
         >
           <BrowserRouter>
             <div className={`${isAuthenticated ? classes.app : ""}`}>
-              {isAuthenticated && <LeftMenu isMobile={isMobile} />}
-              {/* Conditional rendering based on authentication status */}
+              {isAuthenticated && !isRegistering && (
+                <LeftMenu isMobile={isMobile} />
+              )}
               {publicPages.includes(window.location.pathname) ? (
-                <RoutesComponent />
+                <RoutesComponent
+                  isMobile={isMobile}
+                  locationState={locationState}
+                />
               ) : (
                 <>
                   <SignedIn>
@@ -226,7 +252,10 @@ const App = () => {
                         <ErrorPage />
                       </div>
                     ) : (
-                      <RoutesComponent />
+                      <RoutesComponent
+                        isMobile={isMobile}
+                        locationState={locationState}
+                      />
                     )}
                   </SignedIn>
                   <SignedOut>

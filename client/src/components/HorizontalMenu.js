@@ -191,12 +191,12 @@ const HorizontalMenu = ({
         {[
           {
             condition: showGoToItem,
-            label: "Go to linkup",
+            label: "Go to link-up",
             action: handleLinkupItemClick,
           },
           {
             condition: showGoToRequest,
-            label: "Go to linkup request",
+            label: "Go to link-up request",
             action: handleLinkupRequestClick,
           },
           {
@@ -204,7 +204,7 @@ const HorizontalMenu = ({
               showEditItem &&
               linkupItem.status !== "expired" &&
               linkupItem.status !== "closed",
-            label: "Edit this linkup",
+            label: "Edit this link-up",
             action: handleEditClick,
           },
           {
@@ -214,7 +214,7 @@ const HorizontalMenu = ({
               linkupItem.request_status !== "accepted" &&
               linkupItem.request_status !== "declined" &&
               linkupItem.request_status !== "closed",
-            label: "Accept linkup request",
+            label: "Accept link-up request",
             action: handleAcceptRequestClick,
           },
           {
@@ -224,7 +224,7 @@ const HorizontalMenu = ({
               linkupItem.request_status !== "accepted" &&
               linkupItem.request_status !== "declined" &&
               linkupItem.request_status !== "closed",
-            label: "Decline linkup request",
+            label: "Decline link-up request",
             action: handleDeclineRequestClick,
           },
           {
@@ -239,12 +239,12 @@ const HorizontalMenu = ({
           },
           {
             condition: showDeleteItem,
-            label: "Delete this linkup",
+            label: "Delete this link-up",
             action: handleDeleteClick,
           },
           {
             condition: showCloseItem,
-            label: "Close this linkup",
+            label: "Close this link-up",
             action: handleCloseClick,
           },
         ].map(

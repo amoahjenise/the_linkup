@@ -42,20 +42,6 @@ const FirstStep = ({ userData, setUserData }) => {
 
   return (
     <div className={classes.form}>
-      <label htmlFor="name" className={classes.label}>
-        First Name
-      </label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        placeholder="Add your first name"
-        value={userData.name}
-        onChange={handleChange}
-        required
-        className={classes.input}
-      />
-
       <label htmlFor="dateOfBirth" className={classes.label}>
         Date of Birth
       </label>
@@ -69,7 +55,6 @@ const FirstStep = ({ userData, setUserData }) => {
         required
         className={classes.input}
       />
-
       <label htmlFor="gender" className={classes.label}>
         Gender
       </label>

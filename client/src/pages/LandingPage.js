@@ -1,14 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import ImageIcon from "@material-ui/icons/Image";
-import PeopleIcon from "@material-ui/icons/People";
-import ExploreIcon from "@material-ui/icons/Explore";
-import logo from "../logo.png";
 import Button from "@material-ui/core/Button";
 import { useNavigate } from "react-router-dom"; // Import useHistory from React Router
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const useStyles = makeStyles((theme) => ({
   section: {
@@ -27,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
     zIndex: -10,
   },
   bgBlack: {
-    // backgroundColor: "rgba(0, 0, 0, 0.7)",
     position: "fixed",
     inset: 0,
     zIndex: -10,
@@ -82,57 +77,68 @@ const useStyles = makeStyles((theme) => ({
 const LandingPage = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <section className={classes.section}>
-      <div className={classes.relative}>
-        <div className={classes.absolute} />
-        <div className={classes.bgBlack} aria-hidden="true" />
-        <div className={classes.contentContainer}>
-          <div className={classes.textCenter}>
-            <h1 className={classes.title}>Welcome To Link-Up!</h1>
-            <p className={classes.subtitle}>
-              Join our community to explore a wide range of activities and
-              events with like-minded individuals.
-            </p>
-            <Typography
-              variant="subtitle2"
-              component="small"
-              className={classes.termsAndServices}
-            >
-              By signing up, you agree to the{" "}
-              <a href="/terms-of-service">Terms of Service </a> and{" "}
-              <a href="/privacy-policy">Privacy Policy</a>, including{" "}
-              <a href="/cookie-use">Cookie Use</a>.
-            </Typography>
-            <div className={classes.buttonContainer}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={() => navigate("/sign-up")}
-                className={classes.button}
+      {isAuthenticated ? (
+        <LoadingSpinner />
+      ) : (
+        <div className={classes.relative}>
+          <div className={classes.absolute} />
+          <div className={classes.bgBlack} aria-hidden="true" />
+          <div className={classes.contentContainer}>
+            <div className={classes.textCenter}>
+              <h1 className={classes.title}>Welcome To Link-Up!</h1>
+              <p className={classes.subtitle}>
+                Join our community to explore a wide range of activities and
+                events with like-minded individuals.
+              </p>
+              <Typography
+                variant="subtitle2"
+                component="small"
+                className={classes.termsAndServices}
               >
-                Sign Up
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                size="large"
-                onClick={() => navigate("/sign-in")}
-                className={classes.button}
-              >
-                Log In
-              </Button>
+                By signing up, you agree to the{" "}
+                <a href="/terms-of-service">Terms of Service</a> and{" "}
+                <a href="/privacy-policy">Privacy Policy</a>, including{" "}
+                <a href="/cookie-use">Cookie Use</a>.
+              </Typography>
+              <div className={classes.buttonContainer}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={() => navigate("/sign-up")}
+                  className={classes.button}
+                >
+                  Sign Up
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  onClick={() => navigate("/sign-in")}
+                  className={classes.button}
+                >
+                  Log In
+                </Button>
+              </div>
             </div>
           </div>
+          <div className={classes.textCenter}>
+            <Typography variant="body2">
+              &copy; {new Date().getFullYear()} Link-Up. All rights reserved.
+            </Typography>
+          </div>
         </div>
-        <div className={classes.textCenter}>
-          <Typography variant="body2">
-            &copy; {new Date().getFullYear()} Link-Up. All rights reserved.
-          </Typography>
-        </div>
-      </div>
+      )}
     </section>
   );
 };

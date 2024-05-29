@@ -3,9 +3,11 @@ import {
   NEXT_STEP,
   PREVIOUS_STEP,
   RESET_REGISTRATION_STATE,
+  SET_IS_REGISTERING,
 } from "../actions/actionTypes";
 
 const initialState = {
+  isRegistering: false,
   currentStep: 0,
   steps: ["User Info", "Avatar", "Launch"],
 };
@@ -24,6 +26,11 @@ const registrationReducer = (state = initialState, action) => {
       };
     case RESET_REGISTRATION_STATE:
       return initialState;
+    case SET_IS_REGISTERING:
+      return {
+        ...state,
+        isRegistering: action.payload,
+      };
     default:
       return state;
   }

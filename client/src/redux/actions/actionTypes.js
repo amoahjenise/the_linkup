@@ -2,6 +2,7 @@
 export const NEXT_STEP = "NEXT_STEP";
 export const PREVIOUS_STEP = "PREVIOUS_STEP";
 export const RESET_REGISTRATION_STATE = "RESET_REGISTRATION_STATE";
+export const SET_IS_REGISTERING = "SET_IS_REGISTERING";
 
 // Authentication action types
 export const LOGIN = "LOGIN";

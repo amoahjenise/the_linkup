@@ -2,7 +2,10 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
-const { validationResult } = require("express-validator");
+const axios = require("axios");
+
+const APP_ID = process.env.SENDBIRD_APP_ID;
+const API_TOKEN = process.env.SENDBIRD_API_TOKEN;
 
 const setUserStatusActive = async (id) => {
   try {
@@ -34,30 +37,59 @@ const setUserStatusActive = async (id) => {
   }
 };
 
-// Create a new user
-const createUser = async (req, res) => {
-  // Validate user input
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { id, phoneNumber } = req;
+// Create a new user in the posgresql db
+const createUser = async (user, client) => {
+  const { id, name, phoneNumber } = user; // Use req.body to access data
 
   try {
-    // Insert the new user into the database
     const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
-    const queryValues = [id, phoneNumber];
+    const queryValues = [id, name, phoneNumber];
 
-    const { rows, rowCount } = await pool.query(query, queryValues);
+    const { rows, rowCount } = await client.query(query, queryValues);
+    console.log("rows", rows);
 
     if (rowCount > 0) {
       return rows[0];
+    } else {
+      throw new Error("Failed to create user");
     }
   } catch (error) {
     console.error("Error creating user:", error);
     throw new Error("Internal server error");
+  }
+};
+
+// Create a new Sendbird user
+const createSendbirdUser = async (user, client) => {
+  console.log("user", user);
+
+  const { id, name } = user;
+
+  try {
+    const response = await axios.post(
+      `https://api-${APP_ID}.sendbird.com/v3/users`,
+      {
+        user_id: id,
+        nickname: name,
+        profile_url: "",
+        issue_access_token: true,
+      },
+      {
+        headers: {
+          "Api-Token": API_TOKEN,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error(`Failed to create user: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
   }
 };
 
@@ -121,6 +153,7 @@ const getUserByClerkId = async (req, res) => {
 
 module.exports = {
   createUser,
+  createSendbirdUser,
   loginUser,
   getUserByClerkId,
 };

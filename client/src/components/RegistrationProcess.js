@@ -6,27 +6,30 @@ import Button from "@material-ui/core/Button";
 import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
 import { useColorMode } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
-import { createUser } from "../api/sendbirdAPI";
-
-// Import Redux Actions
 import {
   nextStep,
   previousStep,
-  resetRegistrationState,
+  setIsRegistering,
 } from "../redux/actions/registrationActions";
 import { login } from "../redux/actions/authActions";
 import { setCurrentUser } from "../redux/actions/userActions";
-// Import Registration Steps
 import FirstStep from "../components/ProgressBarSteps/FirstStep";
 import SecondStep from "../components/ProgressBarSteps/SecondStep";
 import LastStep from "../components/ProgressBarSteps/LastStep";
-// Import API functions
 import { updateUser } from "../api/usersAPI";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    textAlign: "center",
+    padding: theme.spacing(2),
+  },
   title: {
     marginBottom: theme.spacing(8),
     fontSize: "24px",
+  },
+  subTitle: {
+    fontSize: "18px",
+    marginBottom: theme.spacing(2),
   },
   buttonContainer: {
     display: "flex",
@@ -66,35 +69,37 @@ const RegistrationProcess = () => {
   const { user } = useUser();
 
   const registrationData = useSelector((state) => state.registration);
-
   const [userData, setUserData] = useState({
-    name: "",
     dateOfBirth: "",
     gender: "",
     avatarURL: "",
     clerkUserId: "",
   });
 
+  useEffect(() => {
+    if (!registrationData.isRegistering) {
+      dispatch(setIsRegistering(true));
+      console.log(
+        "RegistrationProcess.js useEffect executed",
+        registrationData.isRegistering
+      );
+    }
+  }, []);
+
   const handleLaunchLuul = async () => {
     try {
-      // Create a new user in posgresql and store: name, birthday, gender, avatar, clerk user id
       const response = await updateUser({
         user: { ...userData, clerkUserId: user.id },
       });
 
-      // Create the user in Sendbird
-      await createUser(
-        response.data.user.id,
-        response.data.user.name,
-        response.data.user.avatar
-      );
-
       dispatch(setCurrentUser(response.data.user));
+      dispatch(setIsRegistering(false));
       dispatch(login());
       navigate(`/home`);
+      // Navigate to the home page after successful registration
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Failed to create user. Please try again.");
+      alert("An unknown error has occured. Please try again later.");
     }
   };
 
@@ -118,13 +123,6 @@ const RegistrationProcess = () => {
     "",
   ];
 
-  useEffect(() => {
-    return () => {
-      // Reset the registration state when the component unmounts
-      dispatch(resetRegistrationState());
-    };
-  }, []); // Dispatch resetRegistrationState only once when the component mounts
-
   const PageDisplay = () => {
     switch (registrationData.currentStep) {
       case 0:
@@ -132,12 +130,12 @@ const RegistrationProcess = () => {
       case 1:
         return <SecondStep userData={userData} setUserData={setUserData} />;
       default:
-        return <LastStep userData={userData} />;
+        return <LastStep clerkUser={user} />;
     }
   };
 
   return (
-    <div>
+    <div className={classes.root}>
       <MultiStepProgressBar colorMode={colorMode} />
       <div>
         <div className={classes.title}>
@@ -146,7 +144,9 @@ const RegistrationProcess = () => {
               ? "Congratulations!"
               : pageTitles[registrationData.currentStep]}
           </h1>
-          <p>{pageSubTitles[registrationData.currentStep]}</p>
+          <p className={classes.subTitle}>
+            {pageSubTitles[registrationData.currentStep]}
+          </p>
         </div>
         <div>{PageDisplay()}</div>
         <div className={classes.buttonContainer}>
@@ -172,7 +172,7 @@ const RegistrationProcess = () => {
             disabled={
               (registrationData.currentStep === 1 && !userData.avatarURL) ||
               (registrationData.currentStep === 0 &&
-                (!userData.name || !userData.gender || !userData.dateOfBirth))
+                (!userData.gender || !userData.dateOfBirth))
             }
             className={classes.continueButton}
           >

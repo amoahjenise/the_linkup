@@ -90,7 +90,7 @@ const Notifications = () => {
       }
 
       if (notification.notification_type === "linkup_request") {
-        navigate("/history/requests-received");
+        navigate("/messages");
       } else if (notification.notification_type === "linkup_request_action") {
         navigate("/history/requests-sent");
       } else if (notification.notification_type === "new_message") {

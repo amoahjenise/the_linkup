@@ -99,7 +99,9 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
-        setIsFetchingNextPage(false);
+        setTimeout(() => {
+          setIsFetchingNextPage(false);
+        }, 300);
       }
     },
     [
@@ -177,13 +179,7 @@ const HomePage = ({ isMobile }) => {
           linkupList={linkupList}
           isLoading={isFetchingNextPage}
           setShouldFetchLinkups={setShouldFetchLinkups}
-          refreshLinkups={refreshLinkups}
         />
-        {isFetchingNextPage && (
-          <div className={classes.loadingContainer}>
-            <LoadingSpinner />
-          </div>
-        )}
       </div>
       {!isMobile && (
         <div className={classes.widgetSection}>

@@ -32,7 +32,7 @@ const LogoHeader = () => {
         <img src={logo} alt="Logo" className={classes.logo} />
       </div> */}
       <Typography variant="h4" component="h1" className={classes.title}>
-        LUUL
+        LINK-UP
       </Typography>
     </div>
   );

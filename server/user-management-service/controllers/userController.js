@@ -91,7 +91,6 @@ const updateUser = async (req, res) => {
     // Execute the SQL query to update the user
     const queryValues = [
       user.clerkUserId,
-      user.name,
       user.gender,
       user.dateOfBirth,
       user.avatarURL,

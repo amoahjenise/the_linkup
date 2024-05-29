@@ -62,7 +62,7 @@ const SearchInput = ({ handleInputChange }) => {
           ref={inputRef} // Attach the ref to the input element
           type="search"
           name="search"
-          placeholder="Search Linkup"
+          placeholder="Search Link-Up"
           className={classes.input}
           onChange={handleInputChange}
         />

@@ -335,7 +335,7 @@ const LinkupHistoryPage = ({ isMobile }) => {
   return (
     <div className={classes.linkupHistoryPage}>
       <div className={classes.historySection}>
-        <TopNavBar className={classes.topBar} title="Link Ups" />
+        <TopNavBar className={classes.topBar} title="Link-Ups" />
         {isLoading ? (
           <LoadingSpinner />
         ) : (

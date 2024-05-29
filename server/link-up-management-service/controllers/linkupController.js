@@ -97,7 +97,7 @@ const createLinkup = async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        message: "Failed to create linkup",
+        message: "Failed to create link-up",
         newLinkup: null,
       });
     }
@@ -213,7 +213,7 @@ const deleteLinkup = async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        message: "Failed to delete linkup",
+        message: "Failed to delete link-up",
       });
     }
   } catch (error) {
@@ -248,7 +248,7 @@ const updateLinkup = async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        message: "Failed to update linkup",
+        message: "Failed to update link-up",
         linkup: null,
       });
     }

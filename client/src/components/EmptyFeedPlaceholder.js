@@ -1,6 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import sadFaceImage from "../assets/sad-face-2692.png"; // Import the PNG image
+import { useColorMode } from "@chakra-ui/react";
 
 const useStyles = makeStyles((theme) => ({
   placeholderContainer: {
@@ -16,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     width: "200px",
     height: "200px",
     marginBottom: theme.spacing(2),
+    filter: "invert(1)", // Apply inversion by default
   },
   message: {
     marginBottom: theme.spacing(2),
@@ -31,13 +34,18 @@ const useStyles = makeStyles((theme) => ({
 
 const EmptyFeedPlaceholder = () => {
   const classes = useStyles();
+  const { colorMode } = useColorMode();
+
+  // Conditionally change the inversion based on color mode
+  const imageColor = colorMode === "dark" ? "invert(1)" : "invert(0)";
 
   return (
     <div className={classes.placeholderContainer}>
       <img
-        src="https://source.unsplash.com/200x200/?white"
+        src={sadFaceImage} // Use the imported PNG image
         alt="Empty Feed Illustration"
         className={classes.illustration}
+        style={{ filter: imageColor }} // Apply inversion based on color mode
       />
 
       <Typography variant="h5" className={classes.message}>

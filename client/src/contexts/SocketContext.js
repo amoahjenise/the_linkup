@@ -117,7 +117,7 @@ export const SocketProvider = ({ children }) => {
     });
 
     linkupManagementSocket.on("linkupExpired", (expiredLinkup) => {
-      addSnackbar(`You linkup has expired!`);
+      addSnackbar(`Your link-up has expired!`);
     });
 
     // Linkup Request Service Events

@@ -9,7 +9,7 @@ import {
 
 const initialState = {
   linkupList: [],
-  isLoading: true,
+  isLoading: false,
   successMessage: "",
   error: "",
 };
