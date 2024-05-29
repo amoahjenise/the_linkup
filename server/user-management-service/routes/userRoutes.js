@@ -6,6 +6,7 @@ const { verifyAccessToken } = require("../middlewares/userAuthMiddleware");
 // Define routes
 // router.get("/get-user-by-id", verifyAccessToken, userController.getUserById);
 router.get("/get-user-by-id", userController.getUserById);
+router.get("/get-user-by-clerk-id", userController.getUserByClerkId);
 router.post("/delete-user/:userId", userController.deleteUser);
 router.post("/deactivate-user/:userId", userController.deactivateUser);
 

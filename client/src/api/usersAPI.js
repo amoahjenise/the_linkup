@@ -76,6 +76,41 @@ export const getUserById = async (userId) => {
   }
 };
 
+export const getUserByClerkId = async (clerkUserId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/get-user-by-clerk-id`, {
+      params: { clerkUserId },
+    });
+    return response.data;
+  } catch (error) {
+    try {
+      const errorResult = await handleError(
+        error,
+        "Failed to fetch user data."
+      );
+      if (errorResult.unauthorizedError) {
+        // Return an error object indicating unauthorized
+        return { unauthorizedError: true };
+      }
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    } catch (error) {
+      // Handle errors from the `handleError` function if needed
+      console.error("Error in handleError:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
+  }
+};
+
 export const deactivateUser = async (userId) => {
   try {
     const response = await axios.post(

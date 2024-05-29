@@ -55,6 +55,30 @@ const deleteUser = async (id) => {
   }
 };
 
+const getUserByClerkId = async (req, res) => {
+  const { clerkUserId } = req.query;
+  const queryPath = path.join(__dirname, "../db/queries/getUserByClerkId.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [clerkUserId];
+
+  try {
+    const { rows, rowCount } = await pool.query(query, queryValues);
+
+    if (rowCount > 0) {
+      // User exists in the database
+      res.json({ success: true, message: "User exists", user: rows[0] });
+    } else {
+      // User not found
+      res
+        .status(404)
+        .json({ success: false, message: "User not found", user: null });
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch user" });
+  }
+};
+
 const getUserById = async (req, res) => {
   const { userId } = req.query;
   const queryPath = path.join(__dirname, "../db/queries/getUserById.sql");
@@ -221,6 +245,7 @@ module.exports = {
   deactivateUser,
   deleteUser,
   getUserById,
+  getUserByClerkId,
   updateUser,
   updateUserBio,
   updateUserAvatar,

@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const RoutesComponent = ({ isMobile, locationState }) => (
+const RoutesComponent = ({ isMobile, locationState, userState }) => (
   <Routes>
     <Route path="/" exact element={<LandingPage />} />
     <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
@@ -153,33 +153,26 @@ const App = () => {
   const REACT_APP_SENDBIRD_APP_ACCESS_TOKEN =
     process.env.REACT_APP_SENDBIRD_APP_ACCESS_TOKEN;
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (
-  //       !user ||
-  //       !isAuthenticated ||
-  //       isSigningOut ||
-  //       !user?.id ||
-  //       isRegistering
-  //     )
-  //       return;
-  //     try {
-  //       const result = await authenticateUser(user.id);
-  //       if (result.success) {
-  //         console.log("App.js Fetch Data executed", isRegistering);
-  //         dispatch(setCurrentUser(result.user));
-  //         // updateLocation(true);
-  //         dispatch(login());
-  //       } else {
-  //         setAuthError(true);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error during user data fetch:", error);
-  //       setAuthError(true);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [user, isAuthenticated, isSigningOut, dispatch, isRegistering]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user || isSigningOut || !user?.id || isRegistering) return;
+      try {
+        const result = await authenticateUser(user.id);
+        if (result.success) {
+          console.log("App.js Fetch Data executed", isRegistering);
+          dispatch(setCurrentUser(result.user));
+          // updateLocation(true);
+          dispatch(login());
+        } else {
+          setAuthError(true);
+        }
+      } catch (error) {
+        console.error("Error during user data fetch:", error);
+        setAuthError(true);
+      }
+    };
+    fetchData();
+  }, [user, isAuthenticated, isSigningOut, dispatch, isRegistering]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -237,6 +230,7 @@ const App = () => {
                 <RoutesComponent
                   isMobile={isMobile}
                   locationState={locationState}
+                  userState={userState}
                 />
               ) : (
                 <>

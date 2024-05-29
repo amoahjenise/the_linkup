@@ -16,7 +16,7 @@ import { setCurrentUser } from "../redux/actions/userActions";
 import FirstStep from "../components/ProgressBarSteps/FirstStep";
 import SecondStep from "../components/ProgressBarSteps/SecondStep";
 import LastStep from "../components/ProgressBarSteps/LastStep";
-import { updateUser } from "../api/usersAPI";
+import { updateUser, getUserByClerkId } from "../api/usersAPI";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     display: "flex",
     alignContent: "center",
-    justifyContent: "center", // Center buttons horizontally
+    justifyContent: "center",
     marginTop: theme.spacing(2),
   },
   backButton: {
@@ -62,6 +62,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const RegistrationProcess = () => {
+  console.log("RegistrationProcess component mounted");
   const { colorMode } = useColorMode();
   const classes = useStyles({ colorMode });
   const navigate = useNavigate();
@@ -77,13 +78,31 @@ const RegistrationProcess = () => {
   });
 
   useEffect(() => {
-    if (!registrationData.isRegistering) {
-      dispatch(setIsRegistering(true));
-      console.log(
-        "RegistrationProcess.js useEffect executed",
-        registrationData.isRegistering
-      );
-    }
+    const checkRegistrationStatus = async () => {
+      if (!registrationData.isRegistering) {
+        try {
+          if (userData?.user?.gender && userData?.user?.date_of_birth) {
+            navigate("/home");
+            return;
+          }
+          const response = await getUserByClerkId(user.id);
+          if (
+            response.success &&
+            response.user.gender &&
+            response.user.date_of_birth
+          ) {
+            navigate("/home");
+          } else {
+            dispatch(setIsRegistering(true));
+          }
+        } catch (error) {
+          alert(`An unknown error occured. Please try again later.`);
+          console.log(`Error fetching user data: ${error.message}`);
+        }
+      }
+    };
+
+    checkRegistrationStatus();
   }, []);
 
   const handleLaunchLuul = async () => {
@@ -96,10 +115,9 @@ const RegistrationProcess = () => {
       dispatch(setIsRegistering(false));
       dispatch(login());
       navigate(`/home`);
-      // Navigate to the home page after successful registration
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("An unknown error has occured. Please try again later.");
+      alert("An unknown error has occurred. Please try again later.");
     }
   };
 
