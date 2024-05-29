@@ -73,7 +73,25 @@ For any inquiries, contributions, or support requests, please refer to the docum
 11. [User Account Deactivation and Reactivation](#user-account-deactivation-and-reactivation)
 12. [Search Functionality](#search-functionality)
 13. [Database Tables Documentation](#database-tables-documentation)
-
+14. [Testing Scenarios](#testing-scenarios)
+    - [User Registration](#user-registration)
+    - [Enabling Location Sharing](#enabling-location-sharing)
+    - [Creating a Link-Up](#creating-a-link-up)
+    - [Editing a Link-Up](#editing-a-link-up)
+    - [Refreshing the Feed](#refreshing-the-feed)
+    - [Searching for a Link-Up](#searching-for-a-link-up)
+    - [Deleting a Link-Up](#deleting-a-link-up)
+    - [Closing a Link-Up](#closing-a-link-up)
+    - [Accessing Link-Up History](#accessing-link-up-history)
+    - [Profile Page Actions](#profile-page-actions)
+    - [Interacting with Link-Ups](#interacting-with-link-ups)
+    - [Handling Requests](#handling-requests)
+    - [Account Management](#account-management)
+    - [Link-Up History Filters](#link-up-history-filters)
+    - [Notifications](#notifications)
+    - [Signing Out and Signing In](#signing-out-and-signing-in)
+    - [Link-Up Location Visibility](#link-up-location-visibility)
+    - 
 ## Authentication
 
 ### Introduction
@@ -383,3 +401,142 @@ Columns:
 - `reason`: Rating reason.
 - `created_at`: Timestamp of rating creation.
 - `updated_at`: Timestamp of last rating update.
+
+## Testing Scenarios
+
+### User Registration
+
+- **Scenario:** User accesses the website and initiates the registration process.
+  - **Steps:**
+    1. Access the website `http://localhost:3000/`.
+    2. Click on the "Sign Up" button.
+    3. Fill in the required information: First and Last names, phone number, and a secure password.
+    4. Continue through the registration process, including phone number verification, gender/date of birth input, and profile picture selection.
+    5. Complete the registration process and navigate to the Home page.
+
+### Enabling Location Sharing
+
+- **Scenario:** User enables location sharing when prompted.
+  - **Steps:**
+    1. After registration, when prompted to enable location sharing, click on "Allow".
+    2. Verify that the user can see the feed with location-based content.
+
+### Creating a Link-Up
+
+- **Scenario:** User creates a new link-up event.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Use the widget on the right side of the feed to create a link-up.
+    3. Input details such as activity, location, date/time, gender preference, and payment option.
+    4. Click on "Create" and verify that the link-up appears in the feed.
+
+### Editing a Link-Up
+
+- **Scenario:** User edits an existing link-up event.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Click on the horizontal menu on the link-up item and select "Edit this link-up".
+    3. Modify each field and click on "Update".
+    4. Verify that the changes are reflected in the link-up details.
+
+### Refreshing the Feed
+
+- **Scenario:** User refreshes the feed.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Trigger a manual refresh of the feed.
+    3. Verify that the feed updates with the latest content.
+
+### Searching for a Link-Up
+
+- **Scenario:** User searches for a specific link-up event.
+  - **Steps:**
+    1. Use the search functionality to enter search criteria such as activity type, creator name, date/time, or payment option.
+    2. Verify that relevant link-up events are displayed based on the search criteria.
+
+### Deleting a Link-Up
+
+- **Scenario:** User deletes an existing link-up event.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Click on the horizontal menu on the link-up item and select "Delete this link-up".
+    3. Confirm the deletion and verify that the link-up is removed from the feed.
+
+### Closing a Link-Up
+
+- **Scenario:** User closes an ongoing link-up event.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Click on the horizontal menu on the link-up item and select "Close this link-up".
+    3. Confirm the closure and verify that the link-up status is updated accordingly.
+
+### Accessing Link-Up History
+
+- **Scenario:** User accesses the link-up history page/tab.
+  - **Steps:**
+    1. Navigate to the Home page.
+    2. Click on the "Go to link-up" option from a specific link-up item.
+    3. Verify that the user is directed to the link-up history page/tab.
+
+### Profile Page Actions
+
+- **Scenario:** User performs actions on the profile page, such as updating avatar, adding/removing bio, and uploading images.
+  - **Steps:**
+    1. Access the profile page.
+    2. Perform various actions such as changing avatar, adding bio, uploading images, etc.
+    3. Verify that the changes are reflected in the profile page.
+
+### Interacting with Link-Ups
+
+- **Scenario:** User interacts with other users' link-up events, including sending requests, chatting, accepting/declining requests, etc.
+  - **Steps:**
+    1. Access a specific link-up event.
+    2. Perform actions such as sending requests, initiating chats, accepting/declining requests, etc.
+    3. Verify that the interactions are processed correctly and reflected in the UI.
+
+### Handling Requests
+1. Receive incoming requests for link-up participation.
+2. Accept or decline the requests based on user preferences.
+3. Verify that the status of the requests is updated accordingly and notifications are sent to the relevant users.
+4. Ensure that the link-up details are updated with the accepted participants.
+   
+### Account Management
+
+- **Scenario:** User manages account settings, including deactivating/reactivating the account and enabling/disabling location sharing.
+  - **Steps:**
+    1. Access the account settings page.
+    2. Perform actions such as deactivating/reactivating the account and enabling/disabling location sharing.
+    3. Verify that the changes are applied correctly and reflected in the account settings.
+
+### Link-Up History Filters
+
+- **Scenario:** User applies filters to the link-up history page/tab.
+  - **Steps:**
+    1. Access the link-up history page/tab.
+    2. Apply various filters such as activity type, date/time, location, etc.
+    3. Verify that the link-up events are filtered based on the selected criteria.
+
+### Notifications
+
+- **Scenario:** User receives notifications for new requests and other relevant events.
+  - **Steps:**
+    1. Trigger events that generate notifications, such as receiving new requests or messages.
+    2. Verify that notifications are displayed in real-time and reflect the relevant events.
+    3. Mark notifications as read and verify that they are updated accordingly.
+
+### Signing Out and Signing In
+
+- **Scenario:** User signs out of the app and signs back in.
+  - **Steps:**
+    1. Sign out of the app.
+    2. Sign back in using valid credentials.
+    3. Verify that the sign-in process is smooth and the user's data is loaded correctly.
+
+### Link-Up Location Visibility
+
+- **Scenario:** User verifies that link-up location details are visible only for users with accepted requests.
+  - **Steps:**
+    1. Access a link-up event as a user with an accepted request.
+    2. Verify that the location details are visible.
+    3. Access the same link-up event as a user without an accepted request.
+    4. Verify that the location details are not visible.
