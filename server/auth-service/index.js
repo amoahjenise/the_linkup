@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const {
   createUser,
   createSendbirdUser,
+  storeSendbirdAccessToken,
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
@@ -86,19 +87,17 @@ app.post(
         };
 
         // Call createUser with transaction client
-        console.log("Call createUser with transaction client", user);
         const response = await createUser(user, client);
 
-        console.log("response", response);
-        const sendbirdUser = { id: response.id, name: first_name };
-        console.log(
-          "Call createSendbirdUser with transaction client",
-          sendbirdUser
-        );
-
         // Call createSendbirdUser with transaction client
-        await createSendbirdUser(sendbirdUser, client);
-        console.log("User created with Sendbird API", response);
+        const sendbirdUser = { id: response.id, name: first_name };
+        const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
+        console.log("User created with Sendbird API.", sendbirdResponse);
+
+        // Store Sendbird access token
+        const sendbirdToken = sendbirdResponse.access_token;
+        await storeSendbirdAccessToken(response.id, sendbirdToken, client);
+        console.log("Sendbird access token stored", sendbirdToken);
       }
 
       console.log(`Webhook with an ID of ${id} and type of ${eventType}`);

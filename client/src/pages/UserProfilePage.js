@@ -234,6 +234,11 @@ const UserProfilePage = ({ isMobile }) => {
           userData={userData}
           onSave={handleSaveChanges}
           colorMode={colorMode}
+          userLocation={
+            locationState.city && locationState.country
+              ? `${locationState.city}, ${locationState.country}`
+              : "Unknown Location"
+          }
         />
       )}
       {/* Render the ImageUploadModal */}

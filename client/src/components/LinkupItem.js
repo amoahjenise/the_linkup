@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     border: "1px solid #d2d6dc",
-    padding: "1rem",
+    padding: "2rem",
     borderRadius: "0.375rem",
     width: "32rem",
     backgroundColor: "rgba(200, 200, 200, 0.1)",

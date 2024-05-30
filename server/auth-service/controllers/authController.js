@@ -7,6 +7,7 @@ const axios = require("axios");
 const APP_ID = process.env.SENDBIRD_APP_ID;
 const API_TOKEN = process.env.SENDBIRD_API_TOKEN;
 
+// Set user status to active in PostgreSQL
 const setUserStatusActive = async (id) => {
   try {
     const queryPath = path.join(
@@ -33,13 +34,14 @@ const setUserStatusActive = async (id) => {
       };
     }
   } catch (error) {
+    console.error("Error in setUserStatusActive:", error);
     throw new Error("Internal server error");
   }
 };
 
-// Create a new user in the posgresql db
+// Create a new user in PostgreSQL
 const createUser = async (user, client) => {
-  const { id, name, phoneNumber } = user; // Use req.body to access data
+  const { id, name, phoneNumber } = user;
 
   try {
     const queryPath = path.join(__dirname, "../db/queries/createUser.sql");
@@ -60,8 +62,37 @@ const createUser = async (user, client) => {
   }
 };
 
+// Store Sendbird access token in PostgreSQL
+const storeSendbirdAccessToken = async (id, token, client) => {
+  try {
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/storeSendbirdAccessToken.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [id, token];
+
+    const { rows, rowCount } = await client.query(query, values);
+
+    if (rowCount > 0) {
+      return {
+        success: true,
+        message: "Sendbird access token was stored successfully!",
+      };
+    } else {
+      return {
+        success: false,
+        message: "Error while storing Sendbird access token.",
+      };
+    }
+  } catch (error) {
+    console.error("Error in storeSendbirdAccessToken:", error);
+    throw new Error("Internal server error");
+  }
+};
+
 // Create a new Sendbird user
-const createSendbirdUser = async (user, client) => {
+const createSendbirdUser = async (user) => {
   console.log("user", user);
 
   const { id, name } = user;
@@ -88,7 +119,7 @@ const createSendbirdUser = async (user, client) => {
       throw new Error(`Failed to create user: ${response.statusText}`);
     }
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Error creating Sendbird user:", error);
     throw error;
   }
 };
@@ -98,12 +129,10 @@ const loginUser = async (req, res) => {
   const { clerkUserId } = req.query;
 
   try {
-    // Check if the user with the provided phone number exists
     const queryPath = path.join(
       __dirname,
       "../db/queries/getUserByClerkId.sql"
     );
-
     const queryText = fs.readFileSync(queryPath, "utf8");
     const queryValues = [clerkUserId];
 
@@ -112,13 +141,15 @@ const loginUser = async (req, res) => {
     if (rowCount > 0) {
       console.log("rows[0].status", rows[0].status);
       if (rows[0].status === "inactive") {
-        setUserStatusActive(rows[0].id);
+        await setUserStatusActive(rows[0].id);
       }
       res.status(200).json({
         success: true,
         user: rows[0],
         message: "Authentication successful",
       });
+    } else {
+      res.status(400).json({ success: false, message: "User not found" });
     }
   } catch (error) {
     console.error("Error in loginUser:", error);
@@ -126,6 +157,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get user by Clerk ID
 const getUserByClerkId = async (req, res) => {
   const { clerkUserId } = req.query;
   const queryPath = path.join(__dirname, "../db/queries/getUserByClerkId.sql");
@@ -139,10 +171,8 @@ const getUserByClerkId = async (req, res) => {
     if (rows.length > 0) {
       const user = rows[0];
 
-      // User exists in the database
-      res.json({ success: true, message: "User exists", user: user });
+      res.json({ success: true, message: "User exists", user });
     } else {
-      // User not found
       res.json({ success: false, message: "User not found", user: null });
     }
   } catch (error) {
@@ -154,6 +184,7 @@ const getUserByClerkId = async (req, res) => {
 module.exports = {
   createUser,
   createSendbirdUser,
+  storeSendbirdAccessToken,
   loginUser,
   getUserByClerkId,
 };

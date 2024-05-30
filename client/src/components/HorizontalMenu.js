@@ -5,7 +5,7 @@ import { Popover, MenuItem } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import DeleteModal from "./DeleteModal";
+import LinkupActionModal from "./LinkupActionModal";
 import EditLinkupModal from "./EditLinkupModal";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { closeLinkup, deleteLinkup } from "../api/linkupAPI";
@@ -256,10 +256,15 @@ const HorizontalMenu = ({
             )
         )}
       </Popover>
-      <DeleteModal
+      <LinkupActionModal
         open={modalState.isDeleteModalOpen}
         onClose={() => closeModal("isDeleteModalOpen")}
         onConfirm={handleDeleteConfirm}
+        color="#FF0000"
+        modalTitle="Delete Link-Up?"
+        modalContentText="Are you sure you want to delete your link-up? If you delete your link-up, you will permanently lose everything."
+        primaryButtonText="Delete Link-Up"
+        secondaryButtonText="Cancel"
       />
       <EditLinkupModal
         isOpen={modalState.isEditModalOpen}
@@ -267,20 +272,15 @@ const HorizontalMenu = ({
         setShouldFetchLinkups={setShouldFetchLinkups}
       />
       {/* Use the ConfirmationModal */}
-      <ConfirmationModal
+      <LinkupActionModal
         open={modalState.isCloseConfirmationOpen}
         onClose={() => closeModal("isCloseConfirmationOpen")}
         onConfirm={handleCloseConfirm}
-        title="Confirm"
-        message={
-          <>
-            Are you sure you want to close this linkup?
-            <br />
-            Once closed, no more requests can be received.
-            <br />
-            This action cannot be undone.
-          </>
-        }
+        color="#99DFD6"
+        modalTitle="Close Link-Up?"
+        modalContentText="Are you sure you want to close this link-up? Once closed, no more requests can be received. This action cannot be undone."
+        primaryButtonText="Close Link-Up"
+        secondaryButtonText="Cancel"
       />
     </div>
   );

@@ -150,8 +150,6 @@ const App = () => {
   };
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
-  const REACT_APP_SENDBIRD_APP_ACCESS_TOKEN =
-    process.env.REACT_APP_SENDBIRD_APP_ACCESS_TOKEN;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,7 +205,7 @@ const App = () => {
         <SendbirdProvider
           appId={REACT_APP_SENDBIRD_APP_ID}
           userId={userState?.user?.id}
-          accessToken={REACT_APP_SENDBIRD_APP_ACCESS_TOKEN}
+          accessToken={userState?.user?.access_token}
           theme={colorMode === "light" ? "light" : "dark"}
           colorSet={myColorSet}
           stringSet={myStringSet}

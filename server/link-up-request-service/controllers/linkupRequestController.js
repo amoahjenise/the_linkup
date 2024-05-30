@@ -65,7 +65,7 @@ const sendRequest = async (req, res) => {
         requesterId: requesterId,
         type: "linkup_request",
         linkupId: linkupId,
-        content: `New linkup request from ${requesterName}`,
+        content: `New link-up request from ${requesterName}`,
       };
 
       var notificationID = await createNotification(notificationData);

@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   modalContent: {
     padding: theme.spacing(4),
-    borderRadius: "0.5rem",
+    borderRadius: theme.shape.borderRadius,
     boxShadow: theme.shadows[5],
     position: "relative",
     width: "90%",
@@ -97,7 +97,7 @@ const CustomModal = ({
   const classes = useStyles();
   const { colorMode } = useColorMode();
 
-  const modalBackgroundColor = colorMode === "dark" ? "black" : "white";
+  const modalBackgroundColor = colorMode === "dark" ? "#1F1F1F" : "white";
   const modalCloseButtonColor = colorMode === "dark" ? "white" : "black";
 
   const handleClose = () => setShowModal(false);

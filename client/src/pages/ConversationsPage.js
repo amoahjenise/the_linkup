@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ConversationsPage = ({ isMobile }) => {
+const ConversationsPage = () => {
   const classes = useStyles();
 
   return (

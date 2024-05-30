@@ -3,6 +3,7 @@ import { Button, Modal } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../logo.png";
+import Color from "color";
 
 const useStyles = makeStyles((theme) => ({
   screen: {
@@ -28,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
   },
   modalHeader: {
     width: "24rem",
-    borderTop: `8px solid #FF0000`,
     borderRadius: theme.shape.borderRadius,
     display: "flex",
   },
@@ -38,27 +38,27 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
   },
-  icon: {
+  icon: (props) => ({
     width: theme.spacing(8),
     height: theme.spacing(8),
-    backgroundColor: "#FF0000",
+    backgroundColor: props.color,
     color: "white",
     padding: theme.spacing(2),
     borderRadius: "50%",
-  },
+  }),
   contentContainer: {
     width: "100%",
     paddingTop: theme.spacing(3),
     paddingRight: theme.spacing(2),
   },
-  title: {
+  title: (props) => ({
     fontWeight: "bold",
-    // color: "#b71c1c",
-  },
+    color: props.color,
+  }),
   description: {
     paddingTop: theme.spacing(1),
     fontSize: "0.875rem",
-    // color: "#9e9e9e",
+    color: "#9e9e9e",
   },
   buttonContainer: {
     padding: theme.spacing(2),
@@ -78,23 +78,37 @@ const useStyles = makeStyles((theme) => ({
       color: "#000",
     },
   },
-  deleteButton: {
-    width: "50%",
-    padding: theme.spacing(1.5),
-    textAlign: "center",
-    backgroundColor: "#FF0000",
-    color: "#fff",
-    fontWeight: "bold",
-    borderRadius: theme.shape.borderRadius,
-    "&:hover": {
-      backgroundColor: "#d81b60",
+  primaryButton: (props) => {
+    const darkenColor = Color(props.color).darken(0.2).hex();
+    return {
+      width: "50%",
+      padding: theme.spacing(1.5),
+      textAlign: "center",
+      backgroundColor: props.color,
       color: "#fff",
-    },
+      fontWeight: "bold",
+      borderRadius: theme.shape.borderRadius,
+      "&:hover": {
+        backgroundColor: darkenColor,
+        color: "#fff",
+      },
+    };
   },
 }));
 
-const DeleteModal = ({ open, onClose, onConfirm }) => {
-  const classes = useStyles();
+const LinkupActionModal = ({
+  open,
+  onClose,
+  onConfirm,
+  color,
+  modalTitle,
+  modalContentText,
+  primaryButtonText,
+  primaryButtonFn,
+  secondaryButtonText,
+  secondaryButtonFn,
+}) => {
+  const classes = useStyles({ color });
   const { colorMode } = useColorMode();
 
   const modalBackgroundColor = colorMode === "dark" ? "#1e1e1e" : "white";
@@ -114,18 +128,11 @@ const DeleteModal = ({ open, onClose, onConfirm }) => {
           className={classes.modalContainer}
           style={{ backgroundColor: modalBackgroundColor }}
         >
-          <div className={classes.modalHeader}>
+          <div
+            className={classes.modalHeader}
+            style={{ borderTop: `8px solid ${color}` }}
+          >
             <div className={classes.iconContainer}>
-              {/* <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={classes.icon}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 4.52765C9.64418 2.41689 6.02125 2.49347 3.75736 4.75736C1.41421 7.1005 1.41421 10.8995 3.75736 13.2426L10.5858 20.0711C11.3668 20.8521 12.6332 20.8521 13.4142 20.0711L20.2426 13.2426C22.5858 10.8995 22.5858 7.1005 20.2426 4.75736C17.9787 2.49347 14.3558 2.41689 12 4.52765ZM10.8284 6.17157L11.2929 6.63604C11.6834 7.02656 12.3166 7.02656 12.7071 6.63604L13.1716 6.17157C14.7337 4.60948 17.2663 4.60948 18.8284 6.17157C20.3905 7.73367 20.3905 10.2663 18.8284 11.8284L12 18.6569L5.17157 11.8284C3.60948 10.2663 3.60948 7.73367 5.17157 6.17157C6.73367 4.60948 9.26633 4.60948 10.8284 6.17157Z"
-                  fill="currentcolor"
-                />
-              </svg> */}
               <div className={classes.logoContainer}>
                 <img
                   src={logo}
@@ -136,19 +143,22 @@ const DeleteModal = ({ open, onClose, onConfirm }) => {
               </div>
             </div>
             <div className={classes.contentContainer}>
-              <h3 className={classes.title}>Delete Link-Up?</h3>
-              <p className={classes.description}>
-                Are you sure you want to delete your link-up? If you delete your
-                link-up, you will permanently lose everything.
-              </p>
+              <h3 className={classes.title}>{modalTitle}</h3>
+              <p className={classes.description}>{modalContentText}</p>
             </div>
           </div>
           <div className={classes.buttonContainer}>
-            <Button className={classes.cancelButton} onClick={onClose}>
-              Cancel
+            <Button
+              className={classes.cancelButton}
+              onClick={secondaryButtonFn || onClose}
+            >
+              {secondaryButtonText}
             </Button>
-            <Button className={classes.deleteButton} onClick={onConfirm}>
-              Delete Link-Up
+            <Button
+              className={classes.primaryButton}
+              onClick={primaryButtonFn || onConfirm}
+            >
+              {primaryButtonText}
             </Button>
           </div>
         </div>
@@ -157,4 +167,4 @@ const DeleteModal = ({ open, onClose, onConfirm }) => {
   );
 };
 
-export default DeleteModal;
+export default LinkupActionModal;

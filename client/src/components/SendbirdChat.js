@@ -35,49 +35,49 @@ export default function SendbirdChat() {
   const getGroupChannel = sendbirdSelectors.getGetGroupChannel(globalStore);
 
   useEffect(() => {
-    if (currentChannel?._url) {
-      const fetchChannelData = async () => {
-        try {
-          const linkupResponse = await getLinkupByConversation(
-            currentChannel._url
-          );
+    const fetchChannelData = async () => {
+      if (!currentChannel?._url) return;
 
-          setLinkup(linkupResponse.linkup);
+      try {
+        const linkupResponse = await getLinkupByConversation(
+          currentChannel._url
+        );
 
-          const channel = await getGroupChannel(currentChannel._url);
+        setLinkup(linkupResponse.linkup);
 
-          const operator = channel?.members.find(
-            (member) => member.role === "operator"
-          );
+        const channel = await getGroupChannel(currentChannel._url);
 
-          const isOperatorValue = operator && operator.userId === userId;
+        const operator = channel?.members.find(
+          (member) => member.role === "operator"
+        );
 
-          setIsOperator(isOperatorValue);
+        const isOperatorValue = operator && operator.userId === userId;
 
-          const response = await getChannelFirstTwoMessages(
-            currentChannel._url,
-            channel.createdAt
-          );
+        setIsOperator(isOperatorValue);
 
-          if (linkupResponse.linkup.request_status === "declined") {
-            setMessageInputDisabled(true);
-          } else if (
-            !isOperatorValue &&
-            response.messages.length === 1 &&
-            linkupResponse.linkup.request_status !== "accepted"
-          ) {
-            setMessageInputDisabled(true);
-          } else {
-            setMessageInputDisabled(false);
-          }
-        } catch (error) {
-          console.error("Error fetching channel:", error);
+        const response = await getChannelFirstTwoMessages(
+          currentChannel._url,
+          channel.createdAt
+        );
+
+        if (linkupResponse.linkup.request_status === "declined") {
+          setMessageInputDisabled(true);
+        } else if (
+          !isOperatorValue &&
+          response.messages.length === 1 &&
+          linkupResponse.linkup.request_status !== "accepted"
+        ) {
+          setMessageInputDisabled(true);
+        } else {
+          setMessageInputDisabled(false);
         }
-      };
+      } catch (error) {
+        console.error("Error fetching channel:", error);
+      }
+    };
 
-      fetchChannelData();
-    }
-  }, [currentChannel]);
+    fetchChannelData();
+  }, [currentChannel, getGroupChannel, userId]);
 
   return (
     <div className={classes.SendbirdChat}>

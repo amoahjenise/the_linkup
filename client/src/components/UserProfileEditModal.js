@@ -55,6 +55,7 @@ const UserProfileEditModal = ({
   userData,
   onSave,
   colorMode,
+  userLocation,
 }) => {
   const [editedBio, setEditedBio] = useState(userData.bio || "");
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null); // Initialize with the current avatar
@@ -106,8 +107,7 @@ const UserProfileEditModal = ({
 
           {/* Geolocation (Read-only) */}
           <Typography>
-            <strong>Geolocation:</strong>{" "}
-            {userData.geolocation || "Unknown Location"}
+            <strong>Location:</strong> {userLocation || "Unknown Location"}
           </Typography>
 
           {/* Bio (Editable) */}
