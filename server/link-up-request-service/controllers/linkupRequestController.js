@@ -321,9 +321,16 @@ const getRequestByLinkupidAndSenderid = async (req, res) => {
     if (rows.length > 0) {
       res.json({
         success: true,
-        message: "Linkup request fetched successfully",
+        message: "Link-up request fetched successfully",
         linkupRequestId: rows[0].id,
         linkupRequest: rows[0],
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "No link-up request for the given link-up id.",
+        linkupRequestId: null,
+        linkupRequest: null,
       });
     }
   } catch (error) {

@@ -14,8 +14,8 @@ const useStyles = makeStyles((theme) => ({
   iconWrapper: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(2),
-    backgroundColor: "#0097A7", // Replace with your theme's primary main color
-    color: "#fff", // Replace with your theme's common white color
+    backgroundColor: "#0097A7", 
+    color: "#fff", 
     borderRadius: "50%",
     padding: theme.spacing(1),
   },

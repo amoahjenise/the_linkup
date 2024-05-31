@@ -25,7 +25,7 @@ const SendRequestSection = ({ linkupId, linkups, colorMode }) => {
 
   return (
     <div className={classes.container}>
-      <TopNavBar title="Request a Link Up" />
+      <TopNavBar title="Request a Link-Up" />
       <div className={classes.messagesContainer}>
         <SendRequest
           linkups={linkups}

@@ -1,10 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import Box from "@material-ui/core/Box";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
@@ -21,6 +18,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     position: "sticky",
     top: 0,
+    borderBottomWidth: "1px",
+    borderBottomColor: "0.1px solid #D3D3D3",
   },
   card: {
     width: "100%",
@@ -147,7 +146,7 @@ const ProfileHeaderCard = ({
 
   return (
     <div className={classes.container}>
-      <Card className={classes.card} style={{ backgroundColor }}>
+      <div className={classes.card} style={{ backgroundColor }}>
         <Box className={classes.avatarSection}>
           <CardHeader
             title={
@@ -267,7 +266,7 @@ const ProfileHeaderCard = ({
         <div className={classes.editButton}>
           {renderEditButton && renderEditButton()}
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

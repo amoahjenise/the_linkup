@@ -78,21 +78,17 @@ const useStyles = makeStyles((theme) => ({
       color: "#000",
     },
   },
-  primaryButton: (props) => {
-    const darkenColor = Color(props.color).darken(0.2).hex();
-    return {
-      width: "50%",
-      padding: theme.spacing(1.5),
-      textAlign: "center",
-      backgroundColor: props.color,
-      color: "#fff",
-      fontWeight: "bold",
-      borderRadius: theme.shape.borderRadius,
-      "&:hover": {
-        backgroundColor: darkenColor,
-        color: "#fff",
-      },
-    };
+  primaryButton: {
+    width: "50%",
+    padding: theme.spacing(1.5),
+    textAlign: "center",
+    // backgroundColor: props.color,
+    color: "#fff",
+    fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
+      color: "#000",
+    },
   },
 }));
 
@@ -157,6 +153,7 @@ const LinkupActionModal = ({
             <Button
               className={classes.primaryButton}
               onClick={primaryButtonFn || onConfirm}
+              style={{ backgroundColor: color }}
             >
               {primaryButtonText}
             </Button>

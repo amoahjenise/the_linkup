@@ -52,7 +52,7 @@ const EmptyFeedPlaceholder = () => {
         There are no linkups available at the moment.
       </Typography>
       <Typography variant="body1">
-        Start by creating a linkup to connect with others.
+        Start by creating a link-up to connect with others.
       </Typography>
     </div>
   );

@@ -95,7 +95,10 @@ const UserProfilePage = ({ isMobile }) => {
         const newUserData = userDataResponse?.data?.user;
 
         if (newUserData) {
-          setUserData(newUserData);
+          setUserData((prevUserData) => ({
+            ...prevUserData,
+            ...newUserData,
+          }));
         }
 
         if (!profileImages.length) {
@@ -116,6 +119,10 @@ const UserProfilePage = ({ isMobile }) => {
     };
 
     fetchData();
+    // Cleanup function to reset userData when component unmounts or userId changes
+    return () => {
+      setUserData(null);
+    };
   }, [dispatch, navigate, userId, profileImages.length]);
 
   const renderEditButton = () => {
@@ -210,18 +217,19 @@ const UserProfilePage = ({ isMobile }) => {
             <LoadingSpinner />
           ) : (
             <div>
-              <ImageGridHeader
-                isLoggedUserProfile={isLoggedUserProfile}
-                isImageUploadModalOpen={isImageUploadModalOpen}
-                openImageUploadModal={openImageUploadModal}
-              />
+              {isLoggedUserProfile && (
+                <ImageGridHeader
+                  isImageUploadModalOpen={isImageUploadModalOpen}
+                  openImageUploadModal={openImageUploadModal}
+                />
+              )}
               <div className={classes.imageSection}>
                 <ImageGrid
                   images={profileImages || []}
                   currentImageIndex={currentImageIndex}
                   setCurrentImageIndex={setCurrentImageIndex}
                 />
-              </div>{" "}
+              </div>
             </div>
           )}
         </div>

@@ -23,19 +23,18 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(220, 200, 220, 0.1)",
   },
   message: {
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: theme.typography.body2.fontSize,
   },
   content: {
-    marginTop: theme.spacing(2),
+    marginLeft: theme.spacing(2), // Add spacing between avatar and content
+    flexGrow: 1, // Allow content to grow and occupy remaining space
   },
   time: {
     fontSize: theme.typography.caption.fontSize,
-    marginLeft: "auto",
   },
   avatar: {
-    marginRight: theme.spacing(2),
-    width: theme.spacing(7),
-    height: theme.spacing(7),
+    width: theme.spacing(10), // Adjust avatar size
+    height: theme.spacing(10), // Adjust avatar size
   },
 }));
 
@@ -94,29 +93,41 @@ const NotificationItem = ({ notification, onClick }) => {
       }`}
       onClick={onClick}
     >
-      <div>
-        <div className={classes.avatarContainer}>
-          <Avatar
-            alt={getDisplayName()}
-            src={getDisplayAvatar()}
-            className={classes.avatar}
-          />
-          <Typography variant="subtitle1" className={classes.content}>
-            {notification.content}
-          </Typography>
-        </div>
-        <div>
-          {notification.notification_type === "linkup_request" && (
-            <Typography variant="caption" className={classes.message}>
-              <span>Message: {notification.message}</span>
-            </Typography>
+      <Avatar
+        alt={getDisplayName()}
+        src={getDisplayAvatar()}
+        className={classes.avatar}
+      />
+      <div className={classes.content}>
+        <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+          {notification.notification_type === "linkup_request" ? (
+            <>
+              <span>{notification.requester_name}</span>
+              <span> wants to link up with you!</span>
+            </>
+          ) : notification.notification_type === "linkup_request_action" ? (
+            <>
+              <span>{notification.receiver_name}</span>
+              <span> accepted your link-up request!</span>
+            </>
+          ) : (
+            <>
+              <span>{notification.requester_name}</span>
+              <span> sent you a new message:</span>
+              <span className={classes.message}> {notification.content}</span>
+            </>
           )}
-        </div>
-      </div>
-      <div>
-        <div className={classes.time}>
-          <span>{getTimeAgo()}</span>
-        </div>
+        </Typography>
+        <Typography variant="body2" className={classes.message}>
+          {notification.notification_type === "linkup_request" ? (
+            <span>Message: {notification.message}</span>
+          ) : (
+            <></>
+          )}
+        </Typography>
+        <Typography variant="caption" className={classes.time}>
+          {getTimeAgo()}
+        </Typography>
       </div>
     </div>
   );

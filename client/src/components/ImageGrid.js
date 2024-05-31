@@ -106,7 +106,7 @@ const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
   }
 
   const totalImages = images.length;
-  const numberOfBlanks = 10 - (totalImages % 10);
+  const numberOfBlanks = 10 - totalImages;
   const filledImages = [...images, ...Array(numberOfBlanks).fill(null)];
 
   // Define background gradient based on color mode

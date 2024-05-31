@@ -1,6 +1,5 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
 import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
 import IconButton from "@material-ui/core/IconButton";
 import { useColorMode } from "@chakra-ui/react";
@@ -13,21 +12,23 @@ const useStyles = makeStyles((theme) => ({
     top: 0,
   },
   appBar: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    height: "50px",
     width: "100%",
     position: "sticky",
     top: 0,
     zIndex: theme.zIndex.appBar,
-    borderTopWidth: "1px",
     borderBottomWidth: "1px",
-    borderTopColor: "1px solid #D3D3D3",
-    borderBottomColor: "1px solid #D3D3D3",
+    borderBottomColor: "0.1px solid #D3D3D3",
   },
   cameraIcon: {
     marginLeft: "auto",
   },
 }));
 
-const ImageGridHeader = ({ isLoggedUserProfile, openImageUploadModal }) => {
+const ImageGridHeader = ({ openImageUploadModal }) => {
   const classes = useStyles();
   const { colorMode } = useColorMode();
 
@@ -43,23 +44,20 @@ const ImageGridHeader = ({ isLoggedUserProfile, openImageUploadModal }) => {
 
   return (
     <div className={classes.root}>
-      <AppBar
+      <div
         className={classes.appBar}
         elevation={0}
         style={{ color, backgroundColor }}
       >
-        {/* Render upload camera button */}
-        {isLoggedUserProfile && (
-          <IconButton
-            className={classes.cameraIcon}
-            aria-label="Upload Avatar"
-            onClick={openImageUploadModal}
-            style={{ color }}
-          >
-            <PhotoCameraIcon />
-          </IconButton>
-        )}
-      </AppBar>
+        <IconButton
+          className={classes.cameraIcon}
+          aria-label="Upload Avatar"
+          onClick={openImageUploadModal}
+          style={{ color }}
+        >
+          <PhotoCameraIcon />
+        </IconButton>
+      </div>
     </div>
   );
 };

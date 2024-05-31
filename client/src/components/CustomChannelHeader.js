@@ -128,6 +128,14 @@ const CustomChannelHeader = ({
     return "";
   };
 
+  const renderName = () => {
+    if (isOperator) {
+      return linkup?.requester_name;
+    } else {
+      return operator.nickname;
+    }
+  };
+
   const renderAvatar = () => {
     if (isOperator) {
       return linkup?.requester_avatar;
@@ -147,11 +155,11 @@ const CustomChannelHeader = ({
               <>
                 <Avatar
                   src={renderAvatar()}
-                  alt={operator.nickname}
+                  alt={renderName()}
                   className={classes.avatar}
                 />
                 <div>
-                  <div className={classes.nickname}>{operator.nickname}</div>
+                  <div className={classes.nickname}>{renderName()}</div>
                   <div>{renderLinkupItemText()}</div>
                   {linkup?.request_status && (
                     <div

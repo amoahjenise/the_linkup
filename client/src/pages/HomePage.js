@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import FeedSection from "../components/FeedSection";
 import WidgetSection from "../components/WidgetSection";
-import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkupAPI";

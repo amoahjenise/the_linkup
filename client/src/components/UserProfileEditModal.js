@@ -57,7 +57,7 @@ const UserProfileEditModal = ({
   colorMode,
   userLocation,
 }) => {
-  const [editedBio, setEditedBio] = useState(userData.bio || "");
+  const [editedBio, setEditedBio] = useState(userData.bio);
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null); // Initialize with the current avatar
 
   const classes = useStyles({

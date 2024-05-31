@@ -6,7 +6,7 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Resizer from "react-image-file-resizer";
 
-const MAX_IMAGES = 9; // Maximum number of images to display
+const MAX_IMAGES = 10; // Maximum number of images to display
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB (adjust the value as needed)
 
 const useStyles = makeStyles((theme) => ({
@@ -28,10 +28,10 @@ const useStyles = makeStyles((theme) => ({
     // Standard button styles
     width: "100%",
     marginTop: theme.spacing(2),
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: "#0097A7",
     color: theme.palette.common.white,
     "&:hover": {
-      backgroundColor: theme.palette.primary.dark,
+      backgroundColor: "#007b86",
     },
     // Stylish props
     borderRadius: "8px", // Adjust as needed
@@ -53,8 +53,8 @@ const useStyles = makeStyles((theme) => ({
   },
   imageGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 120px)", // Each square is 120px wide
-    gridTemplateRows: "repeat(3, 120px)", // Each square is 120px high
+    gridTemplateColumns: "repeat(5, 120px)", // Each square is 120px wide
+    gridTemplateRows: "repeat(2, 120px)", // Each square is 120px high
     gap: "8px",
   },
   imageGridItem: {
@@ -150,7 +150,7 @@ const ImageUploadModal = ({
 
   const modalBackgroundColor =
     colorMode === "dark"
-      ? "rgba(86, 68, 68, 1)" // Dark mode background color with no transparency
+      ? "#1e1e1e" // Dark mode background color with no transparency
       : "white";
 
   const overlayBackgroundColor =

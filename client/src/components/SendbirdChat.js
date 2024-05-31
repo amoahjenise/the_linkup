@@ -77,7 +77,7 @@ export default function SendbirdChat() {
     };
 
     fetchChannelData();
-  }, [currentChannel, getGroupChannel, userId]);
+  }, [currentChannel]);
 
   return (
     <div className={classes.SendbirdChat}>

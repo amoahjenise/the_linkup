@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
 import { Typography } from "@material-ui/core";
 import { NotificationsNoneOutlined } from "@material-ui/icons";
+import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
 
 const useStyles = makeStyles((theme) => ({
   mainContainer: {
@@ -108,10 +109,7 @@ const Notifications = () => {
         <LoadingSpinner marginTop="350px" />
       ) : notifications.length === 0 ? ( // Check if notifications array is empty
         <div className={classes.noNotificationsContainer}>
-          <Typography variant="body1" className={classes.noNotificationsText}>
-            <NotificationsNoneOutlined className={classes.icon} />
-            No notifications to show here
-          </Typography>
+          <EmptyNotificationsPlaceholder />
         </div>
       ) : (
         <ul className={classes.notificationsList}>

@@ -14,6 +14,7 @@ import {
   sendMessage,
   sendInvitation,
 } from "../api/sendbirdAPI";
+import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 
 const useStyles = makeStyles((theme) => ({
   sendRequest: {
@@ -107,6 +108,18 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
     const aUsers = [requesterId, post.creator_id];
 
     try {
+      // Check if a link-up request exists
+      const existingRequest = await getRequestByLinkupIdAndSenderId(
+        linkupId,
+        requesterId
+      );
+
+      if (existingRequest.success) {
+        // Display an alert informing the user that they have already sent a request for this link-up
+        addSnackbar("You have already sent a request for this link-up.");
+        return;
+      }
+
       // Create the group channel and wait for its response
       const channelResponse = await createGroupChannel(
         // post.avatar,

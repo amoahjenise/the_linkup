@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "if-env TYPE=server && (cd server/auth-service && npm install) && (cd server/user-management-service && npm install) && (cd server/link-up-management-service && npm install) && (cd server/link-up-request-service && npm install) && (cd server/notification-service && npm install) && (cd server/messaging-service && npm install) && (cd server/image-service && npm install) || (cd client && npm install) --legacy-peer-deps",
+    "build:server": "cd server/auth-service && npm install --legacy-peer-deps && cd ../../ && cd server/user-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-request-service && npm install --legacy-peer-deps && cd ../../ && cd server/notification-service && npm install --legacy-peer-deps && cd ../../ && cd server/messaging-service && npm install --legacy-peer-deps && cd ../../ && cd server/image-service && cd ../../ && cd server/location-service && npm install --legacy-peer-deps && cd ../../",
+    "build:client": "cd client && npm install --legacy-peer-deps",
+    "build": "if [ \"$TYPE\" = \"server\" ]; then npm run build:server; else npm run build:client; fi",
     "start:auth-service": "cd server/auth-service && npm start -- --reset-cache",
     "start:user-management-service": "cd server/user-management-service && npm start -- --reset-cache",
     "start:link-up-management-service": "cd server/link-up-management-service && npm start -- --reset-cache",
