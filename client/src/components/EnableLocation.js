@@ -55,7 +55,8 @@ const EnableLocation = () => {
         <Container className={classes.container}>
           <SettingsIcon className={classes.icon} />
           <Typography variant="h5" gutterBottom>
-            In order to use Linkup, please enable location sharing via Settings.
+            In order to use Link-Up, please enable location sharing via
+            Settings.
           </Typography>
           <Typography variant="body1" color={secondaryTextColor}>
             Location sharing allows us to provide you with the best experience
