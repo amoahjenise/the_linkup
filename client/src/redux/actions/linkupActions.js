@@ -1,4 +1,4 @@
-import { updateLinkup as updateLinkupAPI } from "../../api/linkupAPI";
+import { updateLinkup as updateLinkupAPI } from "../../api/linkUpAPI";
 
 import {
   SET_IS_LOADING,
