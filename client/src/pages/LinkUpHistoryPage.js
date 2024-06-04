@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryPage = ({ isMobile }) => {
+const LinkUpHistoryPage = ({ isMobile }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -470,4 +470,4 @@ const LinkupHistoryPage = ({ isMobile }) => {
   );
 };
 
-export default LinkupHistoryPage;
+export default LinkUpHistoryPage;
