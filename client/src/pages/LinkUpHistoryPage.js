@@ -10,7 +10,7 @@ import EditLinkupModal from "../components/EditLinkupModal";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
 import LinkupRequestItem from "../components/LinkupRequestItem";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
-import { getUserLinkups } from "../api/linkupAPI";
+import { getUserLinkups } from "../api/linkUpAPI";
 import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LinkupHistoryPage = ({ isMobile }) => {
+const LinkUpHistoryPage = ({ isMobile }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -470,4 +470,4 @@ const LinkupHistoryPage = ({ isMobile }) => {
   );
 };
 
-export default LinkupHistoryPage;
+export default LinkUpHistoryPage;

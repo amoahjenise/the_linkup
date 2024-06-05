@@ -8,7 +8,7 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import LinkupActionModal from "./LinkupActionModal";
 import EditLinkupModal from "./EditLinkupModal";
 import { setEditingLinkup } from "../redux/actions/editingLinkupActions";
-import { closeLinkup, deleteLinkup } from "../api/linkupAPI";
+import { closeLinkup, deleteLinkup } from "../api/linkUpAPI";
 import { useColorMode } from "@chakra-ui/react";
 import {
   acceptLinkupRequest,

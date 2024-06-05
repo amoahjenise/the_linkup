@@ -7,7 +7,7 @@ import UserAvatar from "./UserAvatar";
 import HorizontalMenu from "./HorizontalMenu";
 import PostActions from "./PostActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { getLinkupStatus } from "../api/linkupAPI";
+import { getLinkupStatus } from "../api/linkUpAPI";
 import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
 

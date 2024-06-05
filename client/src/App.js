@@ -15,7 +15,7 @@ import {
   UserProfilePage,
   SendRequestPage,
   ConversationsPage,
-  LinkupHistoryPage,
+  LinkUpHistoryPage,
   NotificationsPage,
   AcceptDeclinePage,
   TermsOfServicePage,
@@ -86,19 +86,19 @@ const RoutesComponent = ({ isMobile, locationState, userState }) => (
     <Route path="/send-request/:linkupId" element={<SendRequestPage />} />
     <Route
       path="/history"
-      element={<LinkupHistoryPage isMobile={isMobile} />}
+      element={<LinkUpHistoryPage isMobile={isMobile} />}
     />
     <Route
       path="/history/expired"
-      element={<LinkupHistoryPage isMobile={isMobile} />}
+      element={<LinkUpHistoryPage isMobile={isMobile} />}
     />
     <Route
       path="/history/requests-sent"
-      element={<LinkupHistoryPage isMobile={isMobile} />}
+      element={<LinkUpHistoryPage isMobile={isMobile} />}
     />
     <Route
       path="/history/requests-received"
-      element={<LinkupHistoryPage isMobile={isMobile} />}
+      element={<LinkUpHistoryPage isMobile={isMobile} />}
     />
     <Route
       path="/messages"

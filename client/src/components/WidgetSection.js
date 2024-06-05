@@ -4,7 +4,7 @@ import SearchInput from "./SearchInputWidget";
 import RefreshFeedWidget from "./RefreshFeedWidget";
 import CreateLinkupForm from "./CreateLinkupWidget";
 import { makeStyles } from "@material-ui/core/styles";
-import { searchLinkups } from "../api/linkupAPI";
+import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce"; // Import debounce function from lodash
 

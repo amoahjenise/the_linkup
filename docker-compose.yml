@@ -1,8 +1,8 @@
-version: '3'
+version: "3"
 services:
   client:
     build:
-      context: . 
+      context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -15,8 +15,10 @@ services:
       - link-up-request-service
       - notification-service
       - messaging-service
+      - image-service
+      - location-service
     env_file:
-      - ./client/.env         
+      - ./client/.env
 
   # Add a PostgreSQL service
   db:
@@ -31,7 +33,6 @@ services:
       - ./server/01_create_tables.sql:/docker-entrypoint-initdb.d
       - pg_data:/var/lib/postgresql/data
 
-      
   auth-service:
     build:
       context: ./server/auth-service
@@ -54,7 +55,7 @@ services:
       - ./server/user-management-service:/app/server/user-management-service
     command: npm start
     env_file:
-      - ./server/user-management-service/.env 
+      - ./server/user-management-service/.env
 
   link-up-management-service:
     build:
@@ -66,7 +67,7 @@ services:
       - ./server/link-up-management-service:/app/server/link-up-management-service
     command: npm start
     env_file:
-      - ./server/link-up-management-service/.env 
+      - ./server/link-up-management-service/.env
 
   link-up-request-service:
     build:
@@ -78,7 +79,7 @@ services:
       - ./server/link-up-request-service:/app/server/link-up-request-service
     command: npm start
     env_file:
-      - ./server/link-up-request-service/.env 
+      - ./server/link-up-request-service/.env
 
   notification-service:
     build:
@@ -88,9 +89,9 @@ services:
       - "3005:3005"
     volumes:
       - ./server/notification-service:/app/server/notification-service
-    command: npm start    
+    command: npm start
     env_file:
-      - ./server/notification-service/.env 
+      - ./server/notification-service/.env
 
   messaging-service:
     build:
@@ -102,8 +103,31 @@ services:
       - ./server/messaging-service:/app/server/messaging-service
     command: npm start
     env_file:
-      - ./server/messaging-service/.env    
+      - ./server/messaging-service/.env
 
+  image-service:
+    build:
+      context: ./server/image-service
+      dockerfile: Dockerfile
+    ports:
+      - "3007:3007"
+    volumes:
+      - ./server/image-service:/app/server/image-service
+    command: npm start
+    env_file:
+      - ./server/image-service/.env
+
+  location-service:
+    build:
+      context: ./server/location-service
+      dockerfile: Dockerfile
+    ports:
+      - "3008:3008"
+    volumes:
+      - ./server/location-service:/app/server/location-service
+    command: npm start
+    env_file:
+      - ./server/location-service/.env
 volumes:
   pg_data:
-    external: false      
+    external: false

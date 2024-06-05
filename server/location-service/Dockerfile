@@ -2,7 +2,7 @@
 FROM node:14
 
 # Set the working directory inside the container
-WORKDIR /app/server/auth-service
+WORKDIR /app/server/location-service
 
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install
 
 # Expose the port that your backend service will listen on
-EXPOSE 3001
+EXPOSE 3008
 
 # Specify the command to start the backend service
 CMD ["npm", "start"]

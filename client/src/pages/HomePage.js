@@ -5,7 +5,7 @@ import FeedSection from "../components/FeedSection";
 import WidgetSection from "../components/WidgetSection";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
-import { getLinkups } from "../api/linkupAPI";
+import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 
 const useStyles = makeStyles((theme) => ({
