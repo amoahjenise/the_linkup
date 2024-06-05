@@ -25,12 +25,17 @@ export const SocketProvider = ({ children }) => {
     (state) => state.conversation.selectedConversation
   );
 
+  const LINKUP_MANAGEMENT_SERVICE_URL =
+    process.env.REACT_APP_LINKUP_SERVICE_URL;
+  const LINKUP_REQUEST_SERVICE_URL =
+    process.env.REACT_APP_LINKUP_REQUESTS_SERVICE_URL;
+
   // Create Socket.IO instances for both services
-  const linkupManagementSocket = io("http://localhost:3003", {
+  const linkupManagementSocket = io(LINKUP_MANAGEMENT_SERVICE_URL, {
     query: { userId },
   });
 
-  const linkupRequestSocket = io("http://localhost:3004", {
+  const linkupRequestSocket = io(LINKUP_REQUEST_SERVICE_URL, {
     query: { userId },
   });
 
