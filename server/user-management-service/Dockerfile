@@ -4,13 +4,8 @@ FROM node:14
 # Set the working directory inside the container
 WORKDIR /app/server/user-management-service
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
-
-#  Rebuild the bcrypt module inside the Docker containers to ensure compatibility with the container's architecture
-# RUN npm rebuild bcrypt --build-from-source
-RUN npm uninstall bcrypt
-RUN npm install bcrypt@latest
+# Copy the entire user-management-service directory into the container
+COPY ./server/user-management-service ./
 
 # Install dependencies
 RUN npm install
