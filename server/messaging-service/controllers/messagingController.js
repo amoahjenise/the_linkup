@@ -2,7 +2,6 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
-const { getSocketByUserId } = require("../socket/messagingSocket");
 
 let messagingSocket;
 
@@ -10,10 +9,6 @@ let messagingSocket;
 const initializeSocket = (io) => {
   messagingSocket = io;
 };
-
-const {
-  createNotification,
-} = require("../../notification-service/controllers/notificationController");
 
 const createNewConversation = async (data) => {
   const { sender_id, receiver_id, conversation_id, linkup_id } = data;

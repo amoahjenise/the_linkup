@@ -4,8 +4,8 @@ FROM node:14
 # Set the working directory inside the container
 WORKDIR /app/server/image-service
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+# Copy the entire image-service directory into the container
+COPY ./server/image-service ./
 
 # Install dependencies
 RUN npm install

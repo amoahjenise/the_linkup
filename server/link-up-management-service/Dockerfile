@@ -4,8 +4,8 @@ FROM node:14
 # Set the working directory inside the container
 WORKDIR /app/server/link-up-management-service
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+# Copy the entire link-up-management-service directory into the container
+COPY ./server/link-up-management-service ./
 
 # Install dependencies
 RUN npm install

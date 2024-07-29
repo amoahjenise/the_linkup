@@ -1,9 +1,7 @@
 version: "3"
 services:
   client:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/client:latest
     ports:
       - "3000:3000"
     volumes:
@@ -19,8 +17,8 @@ services:
       - location-service
     env_file:
       - ./client/.env
+    restart: always
 
-  # Add a PostgreSQL service
   db:
     image: postgres:latest
     ports:
@@ -30,104 +28,74 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./server/01_create_tables.sql:/docker-entrypoint-initdb.d
+      - ./server/01_create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
       - pg_data:/var/lib/postgresql/data
+    restart: always
 
   auth-service:
-    build:
-      context: ./server/auth-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-auth-service:latest
     ports:
       - "3001:3001"
-    volumes:
-      - ./server/auth-service:/app/server/auth-service
-    command: npm start
     env_file:
       - ./server/auth-service/.env
+    restart: always
 
   user-management-service:
-    build:
-      context: ./server/user-management-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-user-management-service:latest
     ports:
       - "3002:3002"
-    volumes:
-      - ./server/user-management-service:/app/server/user-management-service
-    command: npm start
     env_file:
       - ./server/user-management-service/.env
+    restart: always
 
   link-up-management-service:
-    build:
-      context: ./server/link-up-management-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-link-up-management-service:latest
     ports:
       - "3003:3003"
-    volumes:
-      - ./server/link-up-management-service:/app/server/link-up-management-service
-    command: npm start
     env_file:
       - ./server/link-up-management-service/.env
+    restart: always
 
   link-up-request-service:
-    build:
-      context: ./server/link-up-request-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-link-up-request-service:latest
     ports:
       - "3004:3004"
-    volumes:
-      - ./server/link-up-request-service:/app/server/link-up-request-service
-    command: npm start
     env_file:
       - ./server/link-up-request-service/.env
+    restart: always
 
   notification-service:
-    build:
-      context: ./server/notification-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-notification-service:latest
     ports:
       - "3005:3005"
-    volumes:
-      - ./server/notification-service:/app/server/notification-service
-    command: npm start
     env_file:
       - ./server/notification-service/.env
+    restart: always
 
   messaging-service:
-    build:
-      context: ./server/messaging-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-messaging-service:latest
     ports:
       - "3006:3006"
-    volumes:
-      - ./server/messaging-service:/app/server/messaging-service
-    command: npm start
     env_file:
       - ./server/messaging-service/.env
+    restart: always
 
   image-service:
-    build:
-      context: ./server/image-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-image-service:latest
     ports:
       - "3007:3007"
-    volumes:
-      - ./server/image-service:/app/server/image-service
-    command: npm start
     env_file:
       - ./server/image-service/.env
+    restart: always
 
   location-service:
-    build:
-      context: ./server/location-service
-      dockerfile: Dockerfile
+    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-location-service:latest
     ports:
       - "3008:3008"
-    volumes:
-      - ./server/location-service:/app/server/location-service
-    command: npm start
     env_file:
       - ./server/location-service/.env
+    restart: always
+
 volumes:
   pg_data:
     external: false

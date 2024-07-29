@@ -4,8 +4,8 @@ FROM node:14
 # Set the working directory inside the container
 WORKDIR /app/server/auth-service
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+# Copy the entire auth-service directory into the container
+COPY ./server/auth-service ./
 
 # Install dependencies
 RUN npm install

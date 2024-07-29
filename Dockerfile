@@ -8,22 +8,31 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies for the root directory
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-# Copy the entire app into the container
-COPY . .
+# # Run npm audit fix --force
+# RUN npm audit fix --force
 
-# Build the frontend app
+# Set the working directory to the client directory
 WORKDIR /app/client
-COPY client/package*.json ./
-RUN npm install
-RUN npm run build
 
-# Go back to the root directory
-WORKDIR /app
+# Copy the package.json and package-lock.json files from the client directory
+COPY client/package*.json ./
+
+# Install client dependencies
+RUN npm install --legacy-peer-deps
+
+# # Run npm audit fix --force
+# RUN npm audit fix --force
+
+# Copy the rest of the client application code
+COPY ./client/ ./
 
 # Expose the port used by the client server
 EXPOSE 3000
 
 # Start the client server
-CMD ["npm", "run", "client"]
+CMD ["npm", "start"]
+
+# # Start the client server
+# CMD ["npm", "run", "start:client"]

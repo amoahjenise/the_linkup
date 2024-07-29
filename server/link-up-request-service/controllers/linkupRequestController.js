@@ -4,10 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
 const io = require("socket.io-client");
-const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATIONS_SERVICE_URL;
-const LINKUP_MANAGEMENT_SERVICE_URL = process.env.LINKUP_SERVICE_URL;
 
-const notificationSocket = io(NOTIFICATION_SERVICE_URL); // Initialize socket connection to notification service
+const LINKUP_MANAGEMENT_SERVICE_URL = process.env.LINKUP_MANAGEMENT_SERVICE_URL;
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL;
+const MESSAGING_SERVICE_URL = process.env.MESSAGING_SERVICE_URL;
+
 const linkupSocket = io(LINKUP_MANAGEMENT_SERVICE_URL); // Initialize socket connection to notification service
 
 let linkupRequestSocket;
@@ -17,13 +18,15 @@ const initializeSocket = (io) => {
   linkupRequestSocket = io;
 };
 
-const {
-  createNotification,
-} = require("../../notification-service/controllers/notificationController");
+const axios = require("axios");
 
-const {
-  createNewConversation,
-} = require("../../messaging-service/controllers/messagingController");
+// const {
+//   createNotification,
+// } = require("../../notification-service/controllers/notificationController");
+
+// const {
+//   createNewConversation,
+// } = require("../../messaging-service/controllers/messagingController");
 
 const sendRequest = async (req, res) => {
   const {
@@ -57,7 +60,12 @@ const sendRequest = async (req, res) => {
         linkup_id: linkupId,
       };
 
-      await createNewConversation(conversationData);
+      // await createNewConversation(conversationData);
+
+      await axios.post(
+        `${MESSAGING_SERVICE_URL}/create-conversation`,
+        conversationData
+      );
 
       // Post Notification
       const notificationData = {
@@ -68,7 +76,11 @@ const sendRequest = async (req, res) => {
         content: `New link-up request from ${requesterName}`,
       };
 
-      var notificationID = await createNotification(notificationData);
+      // var notificationID = await createNotification(notificationData);
+      await axios.post(
+        `${NOTIFICATION_SERVICE_URL}/post-notification`,
+        notificationData
+      );
 
       if (notificationID) {
         try {

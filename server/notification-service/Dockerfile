@@ -4,8 +4,8 @@ FROM node:14
 # Set the working directory inside the container
 WORKDIR /app/server/notification-service
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+# Copy the entire notification-service directory into the container
+COPY ./server/notification-service ./
 
 # Install dependencies
 RUN npm install
