@@ -29,7 +29,7 @@ export const postLocation = async (
   allowLocation
 ) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/user-location`, {
+    const response = await axios.post(`${BASE_URL}/api/location/user-location`, {
       id,
       city,
       country,

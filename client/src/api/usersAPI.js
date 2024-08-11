@@ -8,9 +8,12 @@ const AUTH_SERVICE_URL = process.env.REACT_APP_AUTH_SERVICE_URL;
 
 const refreshToken = async () => {
   try {
-    const response = await axios.post(`${AUTH_SERVICE_URL}/api/refresh-token`, {
-      refreshToken: localStorage.getItem("refresh_token"),
-    });
+    const response = await axios.post(
+      `${AUTH_SERVICE_URL}/api/user/refresh-token`,
+      {
+        refreshToken: localStorage.getItem("refresh_token"),
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to refresh access token", error);
@@ -43,7 +46,7 @@ export const handleError = async (error, errorMessage) => {
 
 export const getUserById = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-user-by-id`, {
+    const response = await axios.get(`${BASE_URL}/api/user/get-user-by-id`, {
       params: { userId },
     });
     return response;
@@ -78,9 +81,12 @@ export const getUserById = async (userId) => {
 
 export const getUserByClerkId = async (clerkUserId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-user-by-clerk-id`, {
-      params: { clerkUserId },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/api/user/get-user-by-clerk-id`,
+      {
+        params: { clerkUserId },
+      }
+    );
     return response.data;
   } catch (error) {
     try {
@@ -114,7 +120,7 @@ export const getUserByClerkId = async (clerkUserId) => {
 export const deactivateUser = async (userId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/deactivate-user/${userId}`
+      `${BASE_URL}/api/user/deactivate-user/${userId}`
     );
     return response;
   } catch (error) {
@@ -134,7 +140,10 @@ export const deactivateUser = async (userId) => {
 
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/create-user`, userData);
+    const response = await axios.post(
+      `${BASE_URL}/api/user/create-user`,
+      userData
+    );
     return response;
   } catch (error) {
     try {
@@ -153,7 +162,10 @@ export const createUser = async (userData) => {
 
 export const updateUser = async (userData) => {
   try {
-    const response = await axios.patch(`${BASE_URL}/api/update-user`, userData);
+    const response = await axios.patch(
+      `${BASE_URL}/api/user/update-user`,
+      userData
+    );
     console.log("Updated User: ", response);
     return response;
   } catch (error) {
@@ -164,7 +176,7 @@ export const updateUser = async (userData) => {
 export const updateUserBio = async (userId, bio) => {
   try {
     const response = await axios.patch(
-      `${BASE_URL}/api/update-user-bio/${userId}`,
+      `${BASE_URL}/api/user/update-user-bio/${userId}`,
       {
         bio,
       }
@@ -188,7 +200,7 @@ export const updateUserBio = async (userId, bio) => {
 export const updateUserAvatar = async (userId, avatar) => {
   try {
     const response = await axios.patch(
-      `${BASE_URL}/api/update-user-avatar/${userId}`,
+      `${BASE_URL}/api/user/update-user-avatar/${userId}`,
       {
         avatar,
       }
@@ -212,7 +224,7 @@ export const updateUserAvatar = async (userId, avatar) => {
 export const setUserStatusActive = async (userId) => {
   try {
     const response = await axios.patch(
-      `${BASE_URL}/api/set-user-status-active/${userId}`
+      `${BASE_URL}/api/user/set-user-status-active/${userId}`
     );
     return response;
   } catch (error) {

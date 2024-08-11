@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build:server": "cd server/auth-service && npm install --legacy-peer-deps && cd ../../ && cd server/user-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-request-service && npm install --legacy-peer-deps && cd ../../ && cd server/notification-service && npm install --legacy-peer-deps && cd ../../ && cd server/messaging-service && npm install --legacy-peer-deps && cd ../../ && cd server/image-service && cd ../../ && cd server/location-service && npm install --legacy-peer-deps && cd ../../",
+    "build:server": "cd server/auth-service && npm install --legacy-peer-deps && cd ../../ && cd server/user-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-request-service && npm install --legacy-peer-deps && cd ../../ && cd server/notification-service && npm install --legacy-peer-deps && cd ../../ && cd server/messaging-service && npm install --legacy-peer-deps && cd ../../ && cd server/image-service && npm install --legacy-peer-deps && cd ../../ && cd server/location-service && npm install --legacy-peer-deps && cd ../../",
     "build:client": "cd client && npm install --legacy-peer-deps",
     "build": "npm run build:server && npm run build:client",
     "start:auth-service": "cd server/auth-service && npm start -- --reset-cache",

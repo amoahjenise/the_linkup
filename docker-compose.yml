@@ -1,11 +1,11 @@
 version: "3"
 services:
   client:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/client:latest
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./client:/app/client
     depends_on:
       - auth-service
       - user-management-service
@@ -17,85 +17,145 @@ services:
       - location-service
     env_file:
       - ./client/.env
-    restart: always
-
-  db:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - ./server/01_create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
-      - pg_data:/var/lib/postgresql/data
-    restart: always
+      REACT_APP_AUTH_SERVICE_URL: ${REACT_APP_AUTH_SERVICE_URL}
+      REACT_APP_USER_SERVICE_URL: ${REACT_APP_USER_SERVICE_URL}
+      REACT_APP_LINKUP_SERVICE_URL: ${REACT_APP_LINKUP_SERVICE_URL}
+      REACT_APP_LINKUP_REQUESTS_SERVICE_URL: ${REACT_APP_LINKUP_REQUESTS_SERVICE_URL}
+      REACT_APP_NOTIFICATIONS_SERVICE_URL: ${REACT_APP_NOTIFICATIONS_SERVICE_URL}
+      REACT_APP_MESSAGING_SERVICE_URL: ${REACT_APP_MESSAGING_SERVICE_URL}
+      REACT_APP_IMAGE_SERVICE_URL: ${REACT_APP_IMAGE_SERVICE_URL}
+      REACT_APP_LOCATION_SERVICE_URL: ${REACT_APP_LOCATION_SERVICE_URL}
+      REACT_APP_LOCATION_SERVICE_API_KEY: ${REACT_APP_LOCATION_SERVICE_API_KEY}
+      REACT_APP_CLERK_PUBLISHABLE_KEY: ${REACT_APP_CLERK_PUBLISHABLE_KEY}
+      REACT_APP_SENDBIRD_APP_ID: ${REACT_APP_SENDBIRD_APP_ID}
+      REACT_APP_SENDBIRD_API_TOKEN: ${REACT_APP_SENDBIRD_API_TOKEN}
 
   auth-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-auth-service:latest
+    build:
+      context: ./server/auth-service
     ports:
       - "3001:3001"
     env_file:
       - ./server/auth-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      CLERK_WEBHOOK_SECRET_KEY: ${CLERK_WEBHOOK_SECRET_KEY}
+      SENDBIRD_API_TOKEN: ${SENDBIRD_API_TOKEN}
+      SENDBIRD_APP_ID: ${SENDBIRD_APP_ID}
 
   user-management-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-user-management-service:latest
+    build:
+      context: ./server/user-management-service
     ports:
       - "3002:3002"
     env_file:
       - ./server/user-management-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      CLERK_WEBHOOK_SECRET_KEY: ${CLERK_WEBHOOK_SECRET_KEY}
 
   link-up-management-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-link-up-management-service:latest
+    build:
+      context: ./server/link-up-management-service
     ports:
       - "3003:3003"
     env_file:
       - ./server/link-up-management-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
 
   link-up-request-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-link-up-request-service:latest
+    build:
+      context: ./server/link-up-request-service
     ports:
       - "3004:3004"
     env_file:
       - ./server/link-up-request-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      LINKUP_MANAGEMENT_SERVICE_URL: ${LINKUP_MANAGEMENT_SERVICE_URL}
+      NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL}
+      MESSAGING_SERVICE_URL: ${MESSAGING_SERVICE_URL}
 
   notification-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-notification-service:latest
+    build:
+      context: ./server/notification-service
     ports:
       - "3005:3005"
     env_file:
       - ./server/notification-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
 
   messaging-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-messaging-service:latest
+    build:
+      context: ./server/messaging-service
     ports:
       - "3006:3006"
     env_file:
       - ./server/messaging-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
 
   image-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-image-service:latest
+    build:
+      context: ./server/image-service
     ports:
       - "3007:3007"
     env_file:
       - ./server/image-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
 
   location-service:
-    image: 339712954224.dkr.ecr.us-east-2.amazonaws.com/linkup-location-service:latest
+    build:
+      context: ./server/location-service
     ports:
       - "3008:3008"
     env_file:
       - ./server/location-service/.env
-    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DBPORT: ${POSTGRES_DBPORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
 
 volumes:
   pg_data:
     external: false
+
+logging:
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"

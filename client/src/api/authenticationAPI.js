@@ -10,7 +10,7 @@ const handleError = (error, action) => {
 export const registerUser = async (userData) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/register-user`,
+      `${BASE_URL}/api/auth/register-user`,
       userData
     );
     return response;
@@ -22,7 +22,7 @@ export const registerUser = async (userData) => {
 export const authenticateUser = async (clerkUserId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/authenticate-user`,
+      `${BASE_URL}/api/auth/authenticate-user`,
       null,
       {
         params: { clerkUserId },
@@ -36,9 +36,12 @@ export const authenticateUser = async (clerkUserId) => {
 
 export const getUserByClerkId = async (clerkUserId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-user-by-clerk-id`, {
-      params: { clerkUserId },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/api/auth/get-user-by-clerk-id`,
+      {
+        params: { clerkUserId },
+      }
+    );
     return response.data;
   } catch (error) {
     handleError(error, "fetching user");

@@ -15,7 +15,7 @@ const handleError = (error) => {
 export async function getUserImages(userId) {
   try {
     // Make a GET request to the server endpoint for fetching images
-    const response = await axios.get(`${BASE_URL}/api/get-images`, {
+    const response = await axios.get(`${BASE_URL}/api/image/get-images`, {
       params: {
         userId: userId,
       },
@@ -46,7 +46,7 @@ export async function uploadImages(userId, imageUrls) {
     }
 
     // Make a POST request to the server endpoint for uploading images
-    const response = await axios.post(`${BASE_URL}/api/upload-images`, {
+    const response = await axios.post(`${BASE_URL}/api/image/upload-images`, {
       params: {
         userId: userId,
         imageUrls: aImagesUrls,
@@ -64,7 +64,7 @@ export async function uploadImages(userId, imageUrls) {
 export async function deleteImages(userId) {
   try {
     // Make a POST request to the server endpoint for deleting images
-    const response = await axios.post(`${BASE_URL}/api/delete-images`, {
+    const response = await axios.post(`${BASE_URL}/api/image/delete-images`, {
       params: {
         userId: userId,
       },

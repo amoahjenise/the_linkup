@@ -19,7 +19,7 @@ export const searchLinkups = async (
 ) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/linkups/search/${userId}`,
+      `${BASE_URL}/api/linkup/linkups/search/${userId}`,
       {
         params: {
           search_term: searchTerm,
@@ -42,15 +42,18 @@ export const getLinkups = async (
   longitude
 ) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/linkups/${userId}`, {
-      params: {
-        gender: gender,
-        offset: sqlOffset,
-        pageSize: pageSize,
-        latitude: latitude,
-        longitude: longitude,
-      },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/api/linkup/linkups/${userId}`,
+      {
+        params: {
+          gender: gender,
+          offset: sqlOffset,
+          pageSize: pageSize,
+          latitude: latitude,
+          longitude: longitude,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     handleError(error);
@@ -59,7 +62,9 @@ export const getLinkups = async (
 
 export const getUserLinkups = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/linkups/user/${userId}`);
+    const response = await axios.get(
+      `${BASE_URL}/api/linkup/linkups/user/${userId}`
+    );
     return response.data;
   } catch (error) {
     handleError(error);
@@ -69,7 +74,7 @@ export const getUserLinkups = async (userId) => {
 export const getLinkupStatus = async (linkupId) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/linkups/status/${linkupId}`
+      `${BASE_URL}/api/linkup/linkups/status/${linkupId}`
     );
     return response.data;
   } catch (error) {
@@ -79,7 +84,7 @@ export const getLinkupStatus = async (linkupId) => {
 
 export const createLinkup = async (linkUpData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/linkups/create`, {
+    const response = await axios.post(`${BASE_URL}/api/linkup/linkups/create`, {
       linkup: linkUpData,
     });
     return response.data;
@@ -90,7 +95,9 @@ export const createLinkup = async (linkUpData) => {
 
 export const deleteLinkup = async (linkupId) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/api/linkups/${linkupId}`);
+    const response = await axios.delete(
+      `${BASE_URL}/api/linkup/linkups/${linkupId}`
+    );
     return response.data;
   } catch (error) {
     handleError(error);
@@ -100,7 +107,7 @@ export const deleteLinkup = async (linkupId) => {
 export const closeLinkup = async (linkupId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/linkups/close/${linkupId}`
+      `${BASE_URL}/api/linkup/linkups/close/${linkupId}`
     );
     return response.data;
   } catch (error) {
@@ -111,7 +118,7 @@ export const closeLinkup = async (linkupId) => {
 export const updateLinkup = async (linkupId, linkupData) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/linkups/update/${linkupId}`,
+      `${BASE_URL}/api/linkup/linkups/update/${linkupId}`,
       {
         linkup: linkupData,
       }

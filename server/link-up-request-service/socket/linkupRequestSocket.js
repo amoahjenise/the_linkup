@@ -1,10 +1,11 @@
 // linkupSocket.js (in link-up-management-service)
 const socketIo = require("socket.io");
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 module.exports = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: "*",
+      origin: [ALLOWED_ORIGIN],
       methods: ["POST", "GET", "PATCH", "DELETE"],
     },
   });

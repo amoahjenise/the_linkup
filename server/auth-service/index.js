@@ -12,6 +12,7 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: "*",
+    origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET"],
     optionsSuccessStatus: 200,
     // credentials: true, // Allow credentials (cookies)
@@ -28,7 +29,7 @@ app.use(
 );
 
 // Routes for authentication
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 
 app.post(
   "/api/webhooks",
