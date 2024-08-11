@@ -12,11 +12,14 @@ const handleError = (error) => {
 
 export const getNotifications = async (userId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/get-notifications`, {
-      params: {
-        userId: userId,
-      },
-    });
+    const response = await axios.get(
+      `${BASE_URL}/api/notifications/get-notifications`,
+      {
+        params: {
+          userId: userId,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     handleError(error);
@@ -26,7 +29,7 @@ export const getNotifications = async (userId) => {
 export const markNotificationAsRead = async (notificationId) => {
   try {
     const response = await axios.post(
-      `${BASE_URL}/api/mark-as-read/${notificationId}`
+      `${BASE_URL}/api/notifications/mark-as-read/${notificationId}`
     );
     return response.data;
   } catch (error) {
@@ -37,7 +40,7 @@ export const markNotificationAsRead = async (notificationId) => {
 export const getUnreadNotificationsCount = async (userId) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/get-unread-notifications-count`,
+      `${BASE_URL}/api/notifications/get-unread-notifications-count`,
       {
         params: {
           userId: userId,

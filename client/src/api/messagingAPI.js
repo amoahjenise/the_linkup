@@ -13,7 +13,7 @@ const handleError = (error) => {
 export const getConversationByChannelUrl = async (channelUrl) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/conversation/channel/${channelUrl}`
+      `${BASE_URL}/api/messaging/conversation/channel/${channelUrl}`
     );
     return response.data;
   } catch (error) {
@@ -24,7 +24,7 @@ export const getConversationByChannelUrl = async (channelUrl) => {
 export const getLinkupByConversation = async (channelUrl) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/linkup-by-conversation/${channelUrl}`
+      `${BASE_URL}/api/messaging/linkup-by-conversation/${channelUrl}`
     );
     return response.data;
   } catch (error) {

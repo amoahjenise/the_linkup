@@ -5,6 +5,7 @@ const router = require("./routes/messagingRoutes");
 const cors = require("cors");
 const http = require("http");
 const server = http.createServer(app);
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 // Use helmet middleware to set security headers
 app.use(helmet());
@@ -12,12 +13,12 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET", "PATCH"],
   })
 );
 
-app.use("/api", router);
+app.use("/api/messaging", router);
 
 // Initialize socket event handlers
 
