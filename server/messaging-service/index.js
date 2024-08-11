@@ -27,7 +27,7 @@ app.use("/api/messaging", router);
 // // Pass the io instance to initializeSocket
 // initializeSocket(server);
 
-const PORT = process.env.PORT || 3006;
+const PORT = process.env.MESSAGING_SERVICE_PORT || 5006;
 server.listen(PORT, () => {
   console.log(`Messaging service running on port ${PORT}`);
 });

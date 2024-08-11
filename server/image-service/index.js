@@ -6,7 +6,7 @@ const imageRoutes = require("./routes/imageRoutes");
 const helmet = require("helmet");
 
 // Configuration using environment variables
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.IMAGE_SERVICE_PORT || 5007;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 // Increase the request payload size limit (e.g., 10MB)

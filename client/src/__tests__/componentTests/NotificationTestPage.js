@@ -13,7 +13,7 @@ const NotificationTestPage = () => {
 
       // Send a POST request to your backend server to emit the "linkup-requested" event
       const response = await axios.post(
-        `http://localhost:3004/api/send-request`,
+        `http://localhost:5004/api/send-request`,
         {
           requesterId: requesterId,
           requesterName: requesterName,

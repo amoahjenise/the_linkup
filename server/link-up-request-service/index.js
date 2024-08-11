@@ -28,7 +28,7 @@ const { initializeSocket } = require("./controllers/linkupRequestController");
 const io = linkupRequestSocket(server);
 initializeSocket(io);
 
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.LINKUP_REQUEST_SERVICE_PORT || 5003;
 server.listen(PORT, () => {
   console.log(`Link-up service running on port ${PORT}`);
 });

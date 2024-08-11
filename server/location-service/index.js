@@ -9,7 +9,7 @@ const locationRoutes = require("./routes/locationRoutes");
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 // Configuration using environment variables
-const PORT = process.env.PORT || 3008;
+const PORT = process.env.LOCATION_SERVICE_PORT || 5008;
 
 // const esClient = new ESClient({ node: `http://localhost:${PORT}` });
 
