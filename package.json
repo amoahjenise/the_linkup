@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "init-db": "psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "build:server": "cd server/auth-service && npm install && npm run build && cd ../user-management-service && npm install && npm run build && cd ../link-up-management-service && npm install && npm run build && cd ../link-up-request-service && npm install && npm run build && cd ../notification-service && npm install && npm run build && cd ../messaging-service && npm install && npm run build && cd ../image-service && npm install && npm run build && cd ../location-service && npm install && npm run build",
     "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
     "build": "npm run build:server && npm run build:client",
@@ -15,7 +16,7 @@
     "start:image-service": "cd server/image-service && npm start -- --reset-cache",
     "start:location-service": "cd server/location-service && npm start -- --reset-cache",
     "start:client": "cd client && npm start -- --reset-cache",
-    "start:all": "concurrently \"npm run start:auth-service -- --port=5001\" \"npm run start:user-management-service -- --port=5002\" \"npm run start:link-up-management-service -- --port=5003\" \"npm run start:link-up-request-service -- --port=5004\" \"npm run start:notification-service -- --port=5005\" \"npm run start:messaging-service -- --port=5006\" \"npm run start:location-service -- --port=5007\" \"npm run start:image-service -- --port=5008\" \"npm run start:client"
+    "start:all": "concurrently \"npm run start:auth-service -- --port=5001\" \"npm run start:user-management-service -- --port=5002\" \"npm run start:link-up-management-service -- --port=5003\" \"npm run start:link-up-request-service -- --port=5004\" \"npm run start:notification-service -- --port=5005\" \"npm run start:messaging-service -- --port=5006\" \"npm run start:location-service -- --port=5007\" \"npm run start:image-service -- --port=5008\" \"npm run start:client -- --port=3000\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
