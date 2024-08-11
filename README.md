@@ -3,6 +3,7 @@ Certainly! Here's the updated documentation with the changes you requested:
 ---
 
 # luul
+
 LUUL React App Repository
 
 ---
@@ -16,25 +17,20 @@ This React web application aims to provide users with a platform to create, brow
 - **Linkup Creation and Management:**
   - Users can create linkup events with details including activity type, date/time, location, and gender preference.
   - Linkup creators can update and delete their own linkup events.
-  
 - **Home Page Feed:**
   - The home page displays a feed of linkup events based on the user's gender preference.
   - Users can browse and view details of linkup events.
-  
 - **Messaging System:**
   - Users can exchange messages related to specific linkup events.
   - Sendbird SDK Integration
-  
 - **Notification System:**
   - Creators of linkup events receive notifications for new messages and participation requests.
-  
 - **Requesting Participation:**
   - Users interested in a linkup event can send participation requests along with messages to the event creator.
-  
 - **Accepting and Initializing Linkups:**
   - Linkup creators can accept participation requests and initialize linkups.
   - The app sets reminders for both parties regarding the scheduled linkup event.
-  
+
 ### Project Structure
 
 The project follows a modular structure for maintainability:
@@ -52,9 +48,7 @@ For any inquiries, contributions, or support requests, please refer to the docum
 
 ---
 
-
 ---
-
 
 # Linkup App Documentation
 
@@ -91,13 +85,16 @@ For any inquiries, contributions, or support requests, please refer to the docum
     - [Notifications](#notifications)
     - [Signing Out and Signing In](#signing-out-and-signing-in)
     - [Link-Up Location Visibility](#link-up-location-visibility)
-    - 
+    -
+
 ## Authentication
 
 ### Introduction
+
 The recent update to the LUUL React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
 
 ### Integration with Clerk for Authentication
+
 The integration with Clerk for authentication enhances the user authentication process by providing secure and seamless authentication services. The integration involves:
 
 1. **Installation and Configuration**: Clerk components for sign-in and sign-up have been added to the application. These components are configured to work with Clerk's authentication service, enabling users to authenticate securely.
@@ -107,6 +104,7 @@ The integration with Clerk for authentication enhances the user authentication p
 3. **User Authentication**: Logic has been implemented to authenticate users using Clerk's authentication service. Upon successful authentication, users are redirected to the desired page within the application.
 
 ### Webhooks for User Management
+
 Webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database. This ensures that user data remains consistent across the application. The webhook implementation involves:
 
 1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in luul/server/auth-service/index.js, while the implementation for managing user deletion can be found in luul/server/user-management-service/index.js.
@@ -114,13 +112,14 @@ Webhooks have been implemented to synchronize user creation and deletion events 
 2. **Verification and Event Handling**: Upon receiving webhook payloads, the application verifies the authenticity of the payloads and handles user creation and deletion events accordingly. User data is stored or removed from the PostgreSQL database based on the received events.
 
 ### Client-Side Integration
+
 The client-side of the application has been updated to handle user authentication status and redirect users accordingly. Additionally, logic has been implemented to fetch and display user-specific data based on authentication status.
 
 ### Conclusion
+
 The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the LUUL React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
 
 For detailed implementation and code examples, please refer to the updated documentation and codebase available in the LUUL React App repository.
-
 
 ## Linkup Creation and Management
 
@@ -159,7 +158,7 @@ Viewing public linkup information and initiating a conversation with the linkup 
 
 **Channel Data Handling**
 
-- The Sendbird channels were associated with conversations in our application. The Sendbird channel URL (_url) is stored in the conversations table.
+- The Sendbird channels were associated with conversations in our application. The Sendbird channel URL (\_url) is stored in the conversations table.
 - The conversations table schema includes fields for conversation_id (Sendbird channel URL), created_at, updated_at, operator_id, request_id, and linkup_id.
 
 **Linkup Integration**
@@ -167,7 +166,7 @@ Viewing public linkup information and initiating a conversation with the linkup 
 - We integrated linkup functionalities into the conversation flow.
 - Linkup data is retrieved based on the conversation's Sendbird channel URL.
 - Once a linkup is associated with a conversation, its details are displayed in the conversation header.
-  
+
 **User Role Detection**
 
 - User roles, specifically the operator role, are detected within the Sendbird channel members. The isOperator state is set based on whether the current user has the operator role in the conversation.
@@ -175,7 +174,7 @@ Viewing public linkup information and initiating a conversation with the linkup 
 **Message Input Handling**
 
 - Message input was disabled under specific conditions, such as when the linkup request was declined or when the conversation involved only one message and the linkup request was not yet accepted.
-The isMessageInputDisabled state controlled the message input component's disabled state based on these conditions.
+  The isMessageInputDisabled state controlled the message input component's disabled state based on these conditions.
 
 **Error Handling**
 
@@ -235,7 +234,7 @@ The implemented solution for user account deactivation and reactivation enhances
 
 2. **Data Soft Deletion:** To ensure user data is retained, we employ a soft deletion mechanism. We set the "hidden" column of the user's linkups, linkup requests, and notifications to true. This hides the data from user
 
- interfaces while keeping the data accessible for potential reactivation.
+interfaces while keeping the data accessible for potential reactivation.
 
 **Reactivation:**
 
@@ -258,7 +257,6 @@ The implemented solution for user account deactivation and reactivation enhances
 - To deactivate an account, the user initiates the process through the platform's interface.
 
 - To reactivate an account, users follow the reactivation process through the platform.
-
 
 ## Search Functionality
 
@@ -304,13 +302,14 @@ Refining search queries allows users to find more specific or relevant linkup ev
 Conclusion
 The search functionality in the LUUL React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
 
-
 ## Database Tables Documentation
 
 ### Table: users
+
 Stores user information including profile details, authentication, and preferences.
 
 Columns:
+
 - `id`: Unique identifier for each user.
 - `phone_number`: User's phone number.
 - `name`: User's name.
@@ -326,9 +325,11 @@ Columns:
 - `clerk_user_id`: ID of the Clerk user.
 
 ### Table: link_ups
+
 Stores details about created linkups, their creators, and associated information.
 
 Columns:
+
 - `id`: Unique identifier for each linkup.
 - `creator_id`: ID of the user who created the linkup.
 - `location`: Location of the linkup.
@@ -342,9 +343,11 @@ Columns:
 - `creator_name`: Name of the linkup creator.
 
 ### Table: link_up_requests
+
 Manages requests related to linkups, including status and messages.
 
 Columns:
+
 - `id`: Unique identifier for each linkup request.
 - `linkup_id`: ID of the related linkup.
 - `receiver_id`: ID of the user receiving the request.
@@ -355,9 +358,11 @@ Columns:
 - `requester_id`: ID of the user making the request.
 
 ### Table: images
+
 Stores user images, including avatars.
 
 Columns:
+
 - `id`: Unique identifier for each image.
 - `user_id`: ID of the user associated with the image.
 - `image_url`: URL of the image.
@@ -366,9 +371,11 @@ Columns:
 - `updated_at`: Timestamp of last image update.
 
 ### Table: conversations
+
 Stores information about conversations, such as participants, unread counts, and status.
 
 Columns:
+
 - `conversation_id`: Unique identifier for each conversation.
 - `created_at`: Timestamp of conversation creation.
 - `updated_at`: Timestamp of last conversation update.
@@ -377,9 +384,11 @@ Columns:
 - `linkup_id`: Unique identifier for the linkup associated to the conversation.
 
 ### Table: notifications
+
 Manages notifications for users.
 
 Columns:
+
 - `id`: Unique identifier for each notification.
 - `user_id`: ID of the user associated with the notification.
 - `type`: Type of the notification.
@@ -391,9 +400,11 @@ Columns:
 - `link_up_id`: ID of the related linkup (if applicable).
 
 ### Table: ratings
+
 Stores ratings provided by users for linkups.
 
 Columns:
+
 - `id`: Unique identifier for each rating.
 - `link_up_id`: ID of the rated linkup.
 - `user_id`: ID of the user providing the rating.
@@ -495,11 +506,12 @@ Columns:
     3. Verify that the interactions are processed correctly and reflected in the UI.
 
 ### Handling Requests
+
 1. Receive incoming requests for link-up participation.
 2. Accept or decline the requests based on user preferences.
 3. Verify that the status of the requests is updated accordingly and notifications are sent to the relevant users.
 4. Ensure that the link-up details are updated with the accepted participants.
-   
+
 ### Account Management
 
 - **Scenario:** User manages account settings, including deactivating/reactivating the account and enabling/disabling location sharing.

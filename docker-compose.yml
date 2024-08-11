@@ -35,7 +35,7 @@ services:
     build:
       context: ./server/auth-service
     ports:
-      - "3001:3001"
+      - "5001:5001"
     env_file:
       - ./server/auth-service/.env
     environment:
@@ -52,7 +52,7 @@ services:
     build:
       context: ./server/user-management-service
     ports:
-      - "3002:3002"
+      - "5002:5002"
     env_file:
       - ./server/user-management-service/.env
     environment:
@@ -67,7 +67,7 @@ services:
     build:
       context: ./server/link-up-management-service
     ports:
-      - "3003:3003"
+      - "5003:5003"
     env_file:
       - ./server/link-up-management-service/.env
     environment:
@@ -81,7 +81,7 @@ services:
     build:
       context: ./server/link-up-request-service
     ports:
-      - "3004:3004"
+      - "5004:5004"
     env_file:
       - ./server/link-up-request-service/.env
     environment:
@@ -98,7 +98,7 @@ services:
     build:
       context: ./server/notification-service
     ports:
-      - "3005:3005"
+      - "5005:5005"
     env_file:
       - ./server/notification-service/.env
     environment:
@@ -112,7 +112,7 @@ services:
     build:
       context: ./server/messaging-service
     ports:
-      - "3006:3006"
+      - "5006:5006"
     env_file:
       - ./server/messaging-service/.env
     environment:
@@ -126,7 +126,7 @@ services:
     build:
       context: ./server/image-service
     ports:
-      - "3007:3007"
+      - "5007:5007"
     env_file:
       - ./server/image-service/.env
     environment:
@@ -140,7 +140,7 @@ services:
     build:
       context: ./server/location-service
     ports:
-      - "3008:3008"
+      - "5008:5008"
     env_file:
       - ./server/location-service/.env
     environment:

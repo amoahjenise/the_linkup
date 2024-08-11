@@ -39,7 +39,7 @@ export const SocketProvider = ({ children }) => {
     query: { userId },
   });
 
-  // const messagingSocket = io("http://localhost:3006", {
+  // const messagingSocket = io("http://localhost:5006", {
   //   query: { userId },
   // });
 

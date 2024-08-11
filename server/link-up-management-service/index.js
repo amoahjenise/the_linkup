@@ -35,7 +35,7 @@ initializeSocket(io);
 // Schedule the job to run every minute
 scheduleLinkupExpiryJob(io);
 
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.LINKUP_MANAGEMENT_SERVICE_PORT || 5003;
 server.listen(PORT, () => {
   console.log(`Link-up service running on port ${PORT}`);
 });

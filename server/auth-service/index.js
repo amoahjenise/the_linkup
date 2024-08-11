@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const cors = require("cors");
 const helmet = require("helmet");
+
 const {
   createUser,
   createSendbirdUser,
@@ -136,7 +137,7 @@ app.post(
 );
 
 // Start the server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.AUTH_SERVICE_PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Auth service running on port ${PORT}`);
 });

@@ -114,7 +114,7 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 
 // Start the server
-const port = process.env.PORT || 3002;
+const port = process.env.USER_MANAGEMENT_SERVICE_PORT || 5002;
 app.listen(port, () => {
   console.log(`User management server is running on port ${port}`);
 });

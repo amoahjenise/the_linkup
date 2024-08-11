@@ -27,7 +27,7 @@ const server = http.createServer(app);
 // Pass the server instance to the socket server initialization function
 initSocketServer(server);
 
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.NOTIFICATION_SERVICE_PORT || 5005;
 server.listen(PORT, () => {
   console.log(`Notification service running on port ${PORT}`);
 });
