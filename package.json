@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "init-db": "psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "build:server": "cd server/auth-service && npm install && npm run build && cd ../user-management-service && npm install && npm run build && cd ../link-up-management-service && npm install && npm run build && cd ../link-up-request-service && npm install && npm run build && cd ../notification-service && npm install && npm run build && cd ../messaging-service && npm install && npm run build && cd ../image-service && npm install && npm run build && cd ../location-service && npm install && npm run build",
     "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
     "build": "npm run build:server && npm run build:client",
