@@ -15,7 +15,7 @@
     "start:image-service": "cd server/image-service && npm start -- --reset-cache",
     "start:location-service": "cd server/location-service && npm start -- --reset-cache",
     "start:client": "cd client && npm start -- --reset-cache",
-    "start:all": "concurrently \"npm run start:auth-service -- --port=5001\" \"npm run start:user-management-service -- --port=5002\" \"npm run start:link-up-management-service -- --port=5003\" \"npm run start:link-up-request-service -- --port=5004\" \"npm run start:notification-service -- --port=5005\" \"npm run start:messaging-service -- --port=5006\" \"npm run start:location-service -- --port=5007\" \"npm run start:image-service -- --port=5008\" \"npm run start:client"
+    "start:all": "concurrently \"npm run start:auth-service -- --port=5001\" \"npm run start:user-management-service -- --port=5002\" \"npm run start:link-up-management-service -- --port=5003\" \"npm run start:link-up-request-service -- --port=5004\" \"npm run start:notification-service -- --port=5005\" \"npm run start:messaging-service -- --port=5006\" \"npm run start:location-service -- --port=5007\" \"npm run start:image-service -- --port=5008\" \"npm run start:client -- --port=5009\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
