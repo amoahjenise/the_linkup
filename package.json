@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build:server": "cd server/auth-service && npm install --legacy-peer-deps && cd ../../ && cd server/user-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-management-service && npm install --legacy-peer-deps && cd ../../ && cd server/link-up-request-service && npm install --legacy-peer-deps && cd ../../ && cd server/notification-service && npm install --legacy-peer-deps && cd ../../ && cd server/messaging-service && npm install --legacy-peer-deps && cd ../../ && cd server/image-service && npm install --legacy-peer-deps && cd ../../ && cd server/location-service && npm install --legacy-peer-deps && cd ../../",
-    "build:client": "cd client && npm install --legacy-peer-deps",
+    "build:server": "cd server/auth-service && npm install && npm run build && cd ../user-management-service && npm install && npm run build && cd ../link-up-management-service && npm install && npm run build && cd ../link-up-request-service && npm install && npm run build && cd ../notification-service && npm install && npm run build && cd ../messaging-service && npm install && npm run build && cd ../image-service && npm install && npm run build && cd ../location-service && npm install && npm run build",
+    "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
     "build": "npm run build:server && npm run build:client",
     "start:auth-service": "cd server/auth-service && npm start -- --reset-cache",
     "start:user-management-service": "cd server/user-management-service && npm start -- --reset-cache",
@@ -38,6 +38,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "concurrently": "^7.0.0"
+    "concurrently": "^7.6.0"
   }
 }
