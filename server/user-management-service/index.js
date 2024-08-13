@@ -11,9 +11,6 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; //
 // Use helmet middleware to set security headers
 app.use(helmet());
 
-// // Middleware to handle JSON and URL-encoded form data
-// app.use(express.json());
-
 app.use(
   cors({
     origin: [ALLOWED_ORIGIN],
@@ -22,20 +19,6 @@ app.use(
     // credentials: true, // Enable credentials for all routes
   })
 );
-
-// // Will need to modify CORS configuration for production
-// app.use(
-//   cors({
-//     origin: [
-//       "https://your-production-domain.com",
-//       "https://your-other-domain.com",
-//     ],
-//     methods: ["POST", "GET", "PATCH"],
-//     optionsSuccessStatus: 200,
-//   })
-// );
-
-// app.use("/api", userRoutes);
 
 app.post(
   "/api/webhooks",
