@@ -27,7 +27,7 @@
     "@clerk/clerk-sdk-node": "^4.13.9",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
-    "@mui/styles": "^5.15.18",
+    "@mui/styles": "^5.16.7",
     "@reduxjs/toolkit": "^2.2.5",
     "@sendbird/uikit-react": "^3.14.6",
     "ajv": "^8.17.1",
