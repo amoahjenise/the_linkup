@@ -2,6 +2,9 @@
   "name": "luul",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "init-db": "psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "heroku-postbuild": "npm run build",
