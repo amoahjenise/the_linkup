@@ -1,25 +1,24 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
 const bodyParser = require("body-parser");
 const imageRoutes = require("./routes/imageRoutes");
 const helmet = require("helmet");
 
+// Create a router instance
+const router = express.Router();
+
 // Configuration using environment variables
-const PORT = process.env.IMAGE_SERVICE_PORT || 5007;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
 // Increase the request payload size limit (e.g., 10MB)
-app.use(bodyParser.json({ limit: "10mb" }));
-app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
+router.use(bodyParser.json({ limit: "10mb" }));
+router.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
 // Use helmet middleware to set security headers
-app.use(helmet());
-
-app.use(express.json());
+router.use(helmet());
 
 // Middleware
-app.use(
+router.use(
   cors({
     origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET"],
@@ -29,15 +28,13 @@ app.use(
 );
 
 // Routes
-app.use("/api/image", imageRoutes);
+router.use("/api/image", imageRoutes);
 
 // Error handling middleware (you can customize this)
-app.use((err, req, res, next) => {
+router.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Image server is running on port ${PORT}`);
-});
+// Export the router
+module.exports = router;

@@ -14,12 +14,14 @@ const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
-const app = express();
+// Create an Express Router instance
+const router = express.Router();
 
 // Use helmet middleware to set security headers
-app.use(helmet());
+router.use(helmet());
 
-app.use(
+// Use CORS middleware
+router.use(
   cors({
     origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET"],
@@ -28,10 +30,13 @@ app.use(
   })
 );
 
-// Routes for authentication
-app.use("/api/auth", authRoutes);
+// Middleware to parse JSON
+router.use(express.json());
 
-app.post(
+// Routes for authentication
+router.use("/api/auth", authRoutes);
+
+router.post(
   "/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
@@ -135,8 +140,5 @@ app.post(
   }
 );
 
-// Start the server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Auth service running on port ${PORT}`);
-});
+// Export the router
+module.exports = router;

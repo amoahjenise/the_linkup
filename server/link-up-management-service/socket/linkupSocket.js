@@ -2,7 +2,7 @@
 const socketIo = require("socket.io");
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
-module.exports = (server) => {
+const initializeSocket = (server) => {
   const io = socketIo(server, {
     cors: {
       origin: ALLOWED_ORIGIN, // Update to accept the correct origin
@@ -44,3 +44,5 @@ module.exports = (server) => {
 
   return io; // Export the io instance
 };
+
+module.exports = { initializeSocket }; // Export as an object with the function

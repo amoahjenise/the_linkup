@@ -1,17 +1,18 @@
-const { Webhook } = require("svix");
 const express = require("express");
-const app = express();
 const helmet = require("helmet");
-const userRoutes = require("./routes/userRoutes");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { Webhook } = require("svix");
+const userRoutes = require("./routes/userRoutes");
 const { deleteUser } = require("./controllers/userController");
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
-// Use helmet middleware to set security headers
-app.use(helmet());
+const router = express.Router(); // Create a router instance
 
-app.use(
+// Use helmet middleware to set security headers
+router.use(helmet());
+
+router.use(
   cors({
     origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET", "PATCH"],
@@ -20,7 +21,8 @@ app.use(
   })
 );
 
-app.post(
+// Webhook handler
+router.post(
   "/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
   async function (req, res) {
@@ -92,12 +94,10 @@ app.post(
 );
 
 // Middleware to handle JSON and URL-encoded form data
-app.use(express.json());
+router.use(express.json());
 
-app.use("/api/user", userRoutes);
+// Define and use the route files for users
+router.use("/api/user", userRoutes);
 
-// Start the server
-const port = process.env.USER_MANAGEMENT_SERVICE_PORT || 5002;
-app.listen(port, () => {
-  console.log(`User management server is running on port ${port}`);
-});
+// Export the router
+module.exports = router;
