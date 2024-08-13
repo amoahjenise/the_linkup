@@ -9,7 +9,7 @@
     "init-db": "psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "heroku-postbuild": "npm run build",
     "build:server": "cd server/auth-service && npm install && cd ../user-management-service && npm install && cd ../link-up-management-service && npm install && cd ../link-up-request-service && npm install && cd ../notification-service && npm install && cd ../messaging-service && npm install && cd ../image-service && npm install && cd ../location-service && npm install",
-    "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
+    "build:client": "cd client && npm install && npm run build",
     "build": "npm run build:client && npm run build:server",
     "start": "node index.js",
     "start:auth-service": "cd server/auth-service && npm start -- --reset-cache",
