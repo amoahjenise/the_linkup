@@ -51,7 +51,29 @@ const linkupRequestIo = linkupRequestSocket(io);
 linkupRequestInitializeSocket(linkupRequestIo.of("/linkup-request")); // Use the correct namespace
 
 // Middleware
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", // Note: `'unsafe-inline'` should be used cautiously as it can weaken your CSP.
+        "https://grand-airedale-41.clerk.accounts.dev",
+        "https://grand-airedale-41.accounts.dev",
+        "https://challenges.cloudflare.com",
+      ],
+      connectSrc: [
+        "'self'",
+        "https://grand-airedale-41.clerk.accounts.dev",
+        "https://grand-airedale-41.accounts.dev",
+      ],
+      imgSrc: ["'self'", "https://img.clerk.com"],
+      frameSrc: ["'self'"],
+      // Add other directives as needed, e.g., styleSrc, fontSrc, etc.
+    },
+  })
+);
+
 app.use(express.json());
 app.use(
   cors({
