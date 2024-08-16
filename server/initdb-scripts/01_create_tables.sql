@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Table: users
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     phone_number VARCHAR(15) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE users (
 );
 
 -- Table: link_ups
-CREATE TABLE link_ups (
+CREATE TABLE IF NOT EXISTS link_ups (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     creator_id UUID REFERENCES users(id),
     location VARCHAR(255),
@@ -33,7 +33,7 @@ CREATE TABLE link_ups (
 );
 
 -- Table: link_up_requests
-CREATE TABLE link_up_requests (
+CREATE TABLE IF NOT EXISTS link_up_requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     linkup_id UUID REFERENCES link_ups(id),
     receiver_id UUID REFERENCES users(id),
@@ -45,7 +45,7 @@ CREATE TABLE link_up_requests (
 );
 
 -- Table: images
-CREATE TABLE images (
+CREATE TABLE IF NOT EXISTS images (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id),
     image_url TEXT,
@@ -55,7 +55,7 @@ CREATE TABLE images (
 );
 
 -- Table: conversations
-CREATE TABLE conversations (
+CREATE TABLE IF NOT EXISTS conversations (
     conversation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -65,7 +65,7 @@ CREATE TABLE conversations (
 );
 
 -- Table: notifications
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id),
     type VARCHAR(50),
