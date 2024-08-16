@@ -551,4 +551,4 @@ Columns:
     1. Access a link-up event as a user with an accepted request.
     2. Verify that the location details are visible.
     3. Access the same link-up event as a user without an accepted request.
-    4. Verify that the location details are not visible..
+    4. Verify that the location details are not visible.
