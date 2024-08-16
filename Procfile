@@ -1,2 +1,2 @@
-release: npm run init-db && npm run build
+release: npm run init-db
 web: node index.js
