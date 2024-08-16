@@ -76,7 +76,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "babel-plugin-webpack-alias": "^2.1.2",
     "ignore-loader": "^0.1.2",
     "webpack-node-externals": "^3.0.0"
