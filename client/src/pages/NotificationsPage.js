@@ -1,34 +1,31 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import Notifications from "../components/Notifications";
 
-const useStyles = makeStyles((theme) => ({
-  notificationsPage: {
-    display: "flex",
-    flexDirection: "column",
-    width: "55%",
-    borderRightWidth: "1px",
-    borderRightColor: "1px solid #D3D3D3",
-    [theme.breakpoints.down("sm")]: {
-      width: "100%", // Set to 100% in mobile mode
-    },
-  },
-  notificationSection: {
-    display: "flex",
-    flexDirection: "column",
-    overflowY: "auto",
+// Define styled components
+const NotificationsPageWrapper = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "55%",
+  borderRight: "1px solid #D3D3D3",
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Set to 100% in mobile mode
   },
 }));
 
-const NotificationsPage = () => {
-  const classes = useStyles();
+const NotificationSection = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  overflowY: "auto",
+});
 
+const NotificationsPage = () => {
   return (
-    <div className={classes.notificationsPage}>
-      <div className={classes.notificationSection}>
+    <NotificationsPageWrapper>
+      <NotificationSection>
         <Notifications />
-      </div>
-    </div>
+      </NotificationSection>
+    </NotificationsPageWrapper>
   );
 };
 

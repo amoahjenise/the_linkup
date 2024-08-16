@@ -1,66 +1,60 @@
 import React from "react";
-import {
-  makeStyles,
-  ThemeProvider,
-  createTheme,
-} from "@material-ui/core/styles";
-import { Stepper, Step, StepLabel } from "@material-ui/core";
+import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
+import { Stepper, Step, StepLabel } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useColorMode } from "@chakra-ui/react";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-  },
-  customStepper: {
-    color: "white",
-    backgroundColor: "transparent",
-    padding: theme.spacing(3),
-  },
-  activeStep: {
-    fontWeight: "bold",
-    color: "white",
-  },
+// Styled components using MUI's styled API
+const StyledStepperContainer = styled("div")(({ theme }) => ({
+  width: "100%",
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+}));
+
+const StyledStepper = styled(Stepper)(({ theme, colorMode }) => ({
+  color: colorMode === "dark" ? "#000" : "black",
+  backgroundColor: "transparent",
+  padding: theme.spacing(3),
+}));
+
+const StyledStepLabel = styled(StepLabel)(({ theme, colorMode }) => ({
+  color: colorMode === "dark" ? "#000" : "black",
 }));
 
 const MultiStepProgressBar = () => {
   const { colorMode } = useColorMode();
-  const classes = useStyles({ colorMode });
   const currentStep = useSelector((state) => state.registration.currentStep);
   const steps = useSelector((state) => state.registration.steps);
 
+  // Create a theme to override default MUI styles
   const theme = createTheme({
-    overrides: {
+    components: {
       MuiStepLabel: {
-        label: {
-          color: (props) => (props.colorMode === "dark" ? "#000" : "black"),
+        styleOverrides: {
+          label: {
+            color: colorMode === "dark" ? "#000" : "black",
+          },
         },
       },
     },
   });
 
   return (
-    <div className={classes.root}>
+    <StyledStepperContainer>
       <ThemeProvider theme={theme}>
-        <Stepper
+        <StyledStepper
           activeStep={currentStep}
           alternativeLabel
-          style={{
-            backgroundColor:
-              colorMode === "dark" ? "transparent" : "transparent",
-            color: colorMode === "dark" ? "#000" : "black",
-          }}
+          colorMode={colorMode}
         >
           {steps.map((step, index) => (
             <Step key={step}>
-              <StepLabel>{step}</StepLabel>
+              <StyledStepLabel>{step}</StyledStepLabel>
             </Step>
           ))}
-        </Stepper>
+        </StyledStepper>
       </ThemeProvider>
-    </div>
+    </StyledStepperContainer>
   );
 };
 

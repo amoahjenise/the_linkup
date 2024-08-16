@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import Resizer from "react-image-file-resizer";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   cardInput: {
     display: "flex",
     flexDirection: "column",

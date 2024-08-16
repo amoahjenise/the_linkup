@@ -1,60 +1,56 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import { styled } from "@mui/material/styles";
+import { Typography } from "@mui/material";
 import sadFaceImage from "../assets/sad-face-2692.png"; // Import the PNG image
 import { useColorMode } from "@chakra-ui/react";
 
-const useStyles = makeStyles((theme) => ({
-  placeholderContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100%",
-    padding: theme.spacing(10),
-    textAlign: "center",
-  },
-  illustration: {
-    width: "200px",
-    height: "200px",
-    marginBottom: theme.spacing(2),
-    filter: "invert(1)", // Apply inversion by default
-  },
-  message: {
-    marginBottom: theme.spacing(2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    textDecoration: "none",
-    "&:hover": {
-      textDecoration: "underline",
-    },
+const PlaceholderContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "100%",
+  padding: theme.spacing(10),
+  textAlign: "center",
+}));
+
+const Illustration = styled("img")(({ theme, colorMode }) => ({
+  width: "200px",
+  height: "200px",
+  marginBottom: theme.spacing(2),
+  filter: colorMode === "dark" ? "invert(1)" : "invert(0)", // Apply inversion based on color mode
+}));
+
+const Message = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+}));
+
+const Link = styled("a")(({ theme }) => ({
+  color: theme.palette.primary.main,
+  textDecoration: "none",
+  "&:hover": {
+    textDecoration: "underline",
   },
 }));
 
 const EmptyFeedPlaceholder = () => {
-  const classes = useStyles();
   const { colorMode } = useColorMode();
 
-  // Conditionally change the inversion based on color mode
-  const imageColor = colorMode === "dark" ? "invert(1)" : "invert(0)";
-
   return (
-    <div className={classes.placeholderContainer}>
-      <img
+    <PlaceholderContainer>
+      <Illustration
         src={sadFaceImage} // Use the imported PNG image
         alt="Empty Feed Illustration"
-        className={classes.illustration}
-        style={{ filter: imageColor }} // Apply inversion based on color mode
+        colorMode={colorMode}
       />
 
-      <Typography variant="h5" className={classes.message}>
+      <Message variant="h5">
         There are no linkups available at the moment.
-      </Typography>
+      </Message>
       <Typography variant="body1">
         Start by creating a link-up to connect with others.
       </Typography>
-    </div>
+    </PlaceholderContainer>
   );
 };
 

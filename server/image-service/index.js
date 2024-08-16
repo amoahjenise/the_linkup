@@ -28,7 +28,7 @@ router.use(
 );
 
 // Routes
-router.use("/api/image", imageRoutes);
+router.use("/", imageRoutes);
 
 // Error handling middleware (you can customize this)
 router.use((err, req, res, next) => {

@@ -1,80 +1,85 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import CloseIcon from "@material-ui/icons/Close";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { styled } from "@mui/material/styles";
+import CloseIcon from "@mui/icons-material/Close";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useColorMode } from "@chakra-ui/react";
-import { Dialog } from "@material-ui/core";
+import { Dialog } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  cardsContainer: {
-    display: "grid",
-    gap: theme.spacing(4),
-    maxWidth: "1200px",
-    margin: "auto",
-    padding: theme.spacing(3),
-    justifyContent: "center",
-  },
-  card: {
-    position: "relative",
-    width: "100%",
-    paddingTop: "100%",
-    overflow: "hidden",
-    cursor: "pointer",
-    transition: "transform 0.3s ease",
-    "&:hover": {
-      transform: "scale(1.05)",
-    },
-    borderWidth: "1px",
-    borderColor: "1px solid #D3D3D3",
-  },
-  cardImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    transition: "opacity 0.3s ease",
-  },
-  modal: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalContent: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.palette.background.paper,
-    outline: "none",
-    padding: theme.spacing(2),
-    borderRadius: theme.spacing(1),
-    boxShadow: theme.shadows[5],
-    maxWidth: "80vw", // Adjust maximum width as needed
-    maxHeight: "80vh", // Adjust maximum height as needed
-    overflow: "auto",
-  },
+// Styled components
+const Container = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+});
 
-  modalImage: {
-    maxWidth: "100%",
-    maxHeight: "100%",
-    objectFit: "contain", // Ensure the image fits inside the Dialog
+const CardsContainer = styled("div")(({ theme, imagesPerLine }) => ({
+  display: "grid",
+  gap: theme.spacing(4),
+  maxWidth: "1200px",
+  margin: "auto",
+  padding: theme.spacing(3),
+  justifyContent: "center",
+  gridTemplateColumns: `repeat(${imagesPerLine}, 160px)`,
+}));
+
+const Card = styled("div")(({ theme }) => ({
+  position: "relative",
+  width: "100%",
+  paddingTop: "100%",
+  overflow: "hidden",
+  cursor: "pointer",
+  transition: "transform 0.3s ease",
+  "&:hover": {
+    transform: "scale(1.05)",
   },
-  closeIcon: {
-    position: "absolute",
-    top: theme.spacing(1),
-    right: theme.spacing(1),
-    cursor: "pointer",
-  },
+  borderWidth: "1px",
+  borderColor: "1px solid #D3D3D3",
+}));
+
+const CardImage = styled("img")({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+  transition: "opacity 0.3s ease",
+});
+
+const Modal = styled(Dialog)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+const ModalContent = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: theme.palette.background.paper,
+  outline: "none",
+  padding: theme.spacing(2),
+  borderRadius: theme.spacing(1),
+  boxShadow: theme.shadows[5],
+  maxWidth: "80vw", // Adjust maximum width as needed
+  maxHeight: "80vh", // Adjust maximum height as needed
+  overflow: "auto",
+}));
+
+const ModalImage = styled("img")({
+  maxWidth: "100%",
+  maxHeight: "100%",
+  objectFit: "contain", // Ensure the image fits inside the Dialog
+});
+
+const CloseIconStyled = styled(CloseIcon)(({ theme }) => ({
+  position: "absolute",
+  top: theme.spacing(1),
+  right: theme.spacing(1),
+  cursor: "pointer",
 }));
 
 const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
-  const classes = useStyles();
   const { colorMode } = useColorMode(); // Access color mode from Chakra UI
   const [openModal, setOpenModal] = useState(false);
 
@@ -93,16 +98,16 @@ const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
     }
   };
 
-  const isExtraSmall = useMediaQuery((theme) => theme.breakpoints.down("xs"));
+  const isExtraSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const isSmall = useMediaQuery((theme) =>
-    theme.breakpoints.between("sm", "md")
+    theme.breakpoints.between("sm", "lg")
   );
 
   let imagesPerLine = 5;
   if (isExtraSmall) {
     imagesPerLine = 2;
   } else if (isSmall) {
-    imagesPerLine = 2;
+    imagesPerLine = 3;
   }
 
   const totalImages = images.length;
@@ -116,47 +121,30 @@ const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
       : "linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(255, 255, 255, 0.8) 50%)";
 
   return (
-    <div className={classes.container}>
-      <div
-        className={classes.cardsContainer}
-        style={{
-          gridTemplateColumns: `repeat(${imagesPerLine}, 160px)`,
-        }}
-      >
+    <Container>
+      <CardsContainer imagesPerLine={imagesPerLine}>
         {filledImages.map((image, index) => (
-          <div
+          <Card
             key={index}
-            className={`${classes.card} ${image ? "" : classes.blankSquare}`}
             style={{
               background: image ? "" : blankSquareGradient,
             }}
             onClick={() => handleClickImage(index)}
           >
-            {image && (
-              <img
-                src={image}
-                alt={`${index + 1}`}
-                className={classes.cardImage}
-              />
-            )}
-          </div>
+            {image && <CardImage src={image} alt={`${index + 1}`} />}
+          </Card>
         ))}
-      </div>
-      <Dialog
-        open={openModal}
-        onClose={handleCloseModal}
-        className={classes.modal}
-      >
-        <div className="dialog">
-          <CloseIcon className={classes.closeIcon} onClick={handleCloseModal} />
-          <img
+      </CardsContainer>
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <ModalContent>
+          <CloseIconStyled onClick={handleCloseModal} />
+          <ModalImage
             src={images[currentImageIndex]}
             alt={`${currentImageIndex + 1}`}
-            className={classes.modalImage}
           />
-        </div>
-      </Dialog>
-    </div>
+        </ModalContent>
+      </Modal>
+    </Container>
   );
 };
 

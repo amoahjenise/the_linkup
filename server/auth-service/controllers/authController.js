@@ -139,7 +139,6 @@ const loginUser = async (req, res) => {
     const { rows, rowCount } = await pool.query(queryText, queryValues);
 
     if (rowCount > 0) {
-      console.log("rows[0].status", rows[0].status);
       if (rows[0].status === "inactive") {
         await setUserStatusActive(rows[0].id);
       }

@@ -2,29 +2,26 @@ import React, { useState } from "react";
 import useLocationUpdate from "../utils/useLocationUpdate";
 import EnableLocation from "./EnableLocation";
 import CustomModal from "./CustomModal";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-  feedSection: {
-    flex: "2",
-    overflowY: "hidden",
-    marginLeft: "auto",
-    marginRight: "auto",
-    borderRightWidth: "1px",
-    borderRightColor: "0.1px solid #D3D3D3",
-    height: "100%",
-  },
-  widgetSection: {
-    flex: "1",
-    overflowY: "auto",
-    overflowX: "hidden",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
+const FeedSection = styled("div")(({ theme }) => ({
+  flex: "2",
+  overflowY: "hidden",
+  marginLeft: "auto",
+  marginRight: "auto",
+  borderRight: "0.1px solid #D3D3D3",
+  height: "100%",
 }));
 
+const WidgetSection = styled("div")({
+  flex: "1",
+  overflowY: "auto",
+  overflowX: "hidden",
+  marginLeft: "auto",
+  marginRight: "auto",
+});
+
 const Geolocation = () => {
-  const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(true);
   const { updateLocation } = useLocationUpdate();
 
@@ -52,10 +49,10 @@ const Geolocation = () => {
         />
       ) : (
         <div>
-          <div className={classes.feedSection}>
+          <FeedSection>
             <EnableLocation />
-          </div>
-          <div className={classes.widgetSection} />
+          </FeedSection>
+          <WidgetSection />
         </div>
       )}
     </>

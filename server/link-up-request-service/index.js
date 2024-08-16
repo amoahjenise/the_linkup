@@ -20,7 +20,7 @@ router.use(
 
 // Define and use the route files for linkup requests
 const linkupRequestRoutes = require("./routes/linkupRequestRoutes");
-router.use("/api/linkup-requests", linkupRequestRoutes);
+router.use("/", linkupRequestRoutes);
 
 // Export the router
 module.exports = router;

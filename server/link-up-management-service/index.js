@@ -1,9 +1,6 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
-const {
-  scheduleLinkupExpiryJob,
-} = require("./scheduled-jobs/linkup-expiry-job");
 
 // Create a router instance
 const router = express.Router();
@@ -23,16 +20,7 @@ router.use(
 
 // Define and use the route files for linkups and users
 const linkupRoutes = require("./routes/linkupRoutes");
-router.use("/api/linkup", linkupRoutes);
-
-// Initialize socket event handlers
-const linkupSocket = require("./socket/linkupSocket");
-const { initializeSocket } = require("./controllers/linkupController");
-
-// Schedule the job to run every minute
-scheduleLinkupExpiryJob();
+router.use("/", linkupRoutes);
 
 // Export the router
 module.exports = router;
-
-// Initialize socket after exporting router (assumes socket setup will be handled elsewhere)

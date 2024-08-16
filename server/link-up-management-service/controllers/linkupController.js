@@ -3,13 +3,6 @@ const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
 
-let socketIo;
-
-// Function to initialize the Socket.IO instance
-const initializeSocket = (io) => {
-  socketIo = io;
-};
-
 const readQueryFile = (queryPath) => {
   return fs.readFileSync(queryPath, "utf8");
 };
@@ -23,37 +16,34 @@ const handleDatabaseError = (res, error, errorMessage) => {
   });
 };
 
+let socketIo;
+
+// Function to initialize the Socket.IO instance
+const initializeSocket = (io) => {
+  socketIo = io;
+};
+
 const searchLinkups = async (req, res) => {
-  const { search_term, gender } = req.query; // Retrieve search_term and gender from query parameters
-  const { userId } = req.params; // Retrieve userId from URL parameters
+  const { search_term, gender } = req.query;
+  const { userId } = req.params;
   const queryPath = path.join(__dirname, "../db/queries/searchLinkups.sql");
   const query = readQueryFile(queryPath);
+
   try {
-    // Execute the SQL query with the search term
-
-    console.log("search_term", search_term);
-    console.log("gender", gender);
-
     const { rows } = await pool.query(query, [
       `%${search_term}%`,
       gender,
       userId,
     ]);
 
-    if (rows.length > 0) {
-      const linkups = rows;
-      res.json({
-        success: true,
-        message: "Linkups fetched successfully",
-        linkupList: linkups,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No linkups found matching the search term",
-        linkupList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Linkups fetched successfully"
+          : "No linkups found matching the search term",
+      linkupList: rows,
+    });
   } catch (error) {
     handleDatabaseError(res, error, "Error searching linkups:");
   }
@@ -77,22 +67,26 @@ const createLinkup = async (req, res) => {
     const { rows, rowCount } = await pool.query(query, linkupQueryValues);
     if (rowCount > 0) {
       const newLinkup = rows[0];
-      const socketsMap = socketIo.sockets.sockets;
-      const socketKey = Array.from(socketsMap.keys())[0];
-      const socket = socketsMap.get(socketKey);
 
-      if (socket && socketIo) {
-        socketIo
-          .to(`user-${newLinkup.creator_id}`)
-          .emit("linkupCreated", { id: newLinkup.id });
-        const linkupRoomName = `linkup-${newLinkup.id}`;
-        socket.join(linkupRoomName);
+      // Check if the socket exists for the given user
+      const sockets = socketIo.sockets;
+
+      const userSocket = Array.from(sockets.values()).find((socket) => {
+        return socket.userId === newLinkup.creator_id;
+      });
+
+      if (userSocket) {
+        // Emit the event to the user
+        userSocket.emit("linkupCreated", { id: newLinkup.id });
+
+        // Add the socket to the room
+        userSocket.join(`linkup-${newLinkup.id}`);
       }
 
       res.json({
         success: true,
         message: "Linkup created successfully",
-        newLinkup: rows[0],
+        newLinkup,
       });
     } else {
       res.status(500).json({
@@ -121,23 +115,16 @@ const getLinkups = async (req, res) => {
   ];
 
   try {
-    // Modify your SQL query to handle pagination
     const { rows } = await pool.query(query, linkupsQueryValues);
 
-    if (rows.length > 0) {
-      const linkups = rows;
-      res.json({
-        success: true,
-        message: "Linkups fetched successfully",
-        linkupList: linkups,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No linkups in the database",
-        linkupList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Linkups fetched successfully"
+          : "No linkups in the database",
+      linkupList: rows,
+    });
   } catch (error) {
     handleDatabaseError(res, error, "Error fetching linkups:");
   }
@@ -155,20 +142,14 @@ const getUserLinkups = async (req, res) => {
   try {
     const { rows } = await pool.query(query, userLinkupsQueryValues);
 
-    if (rows.length > 0) {
-      const linkups = rows;
-      res.json({
-        success: true,
-        message: "Linkups fetched successfully",
-        linkupList: linkups,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No linkups in the database",
-        linkupList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Linkups fetched successfully"
+          : "No linkups in the database",
+      linkupList: rows,
+    });
   } catch (error) {
     handleDatabaseError(res, error, "Error fetching linkups:");
   }
@@ -190,6 +171,11 @@ const getLinkupStatus = async (req, res) => {
         message: "Linkup status fetched successfully",
         linkupStatus: status,
       });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Linkup status not found",
+      });
     }
   } catch (error) {
     handleDatabaseError(res, error, "Error fetching linkup status:");
@@ -203,17 +189,17 @@ const deleteLinkup = async (req, res) => {
   const deleteLinkupQueryValues = [linkupId];
 
   try {
-    const response = await pool.query(query, deleteLinkupQueryValues);
+    const { rowCount } = await pool.query(query, deleteLinkupQueryValues);
 
-    if (response.rowCount > 0) {
+    if (rowCount > 0) {
       res.json({
         success: true,
         message: "Linkup deleted successfully",
       });
     } else {
-      res.status(500).json({
+      res.status(404).json({
         success: false,
-        message: "Failed to delete link-up",
+        message: "Linkup not found",
       });
     }
   } catch (error) {
@@ -239,16 +225,15 @@ const updateLinkup = async (req, res) => {
     const { rows } = await pool.query(query, updateLinkupQueryValues);
 
     if (rows.length > 0) {
-      const linkup = rows[0];
       res.json({
         success: true,
         message: "Linkup updated successfully",
-        linkup: linkup,
+        linkup: rows[0],
       });
     } else {
-      res.status(500).json({
+      res.status(404).json({
         success: false,
-        message: "Failed to update link-up",
+        message: "Linkup not found",
         linkup: null,
       });
     }
@@ -265,19 +250,28 @@ const closeLinkup = async (req, res) => {
 
   try {
     const { rows } = await pool.query(query, closeLinkupQueryValues);
-    console.log("closeLinkup: ", rows);
 
     if (rows.length > 0) {
-      const closedLinkup = rows;
+      const linkup = rows[0];
+
+      if (socketIo) {
+        socketIo.emit("linkupClosed", { linkup });
+      }
 
       res.json({
         success: true,
-        message: "Link-up closed.",
-        linkupList: rows[0],
+        message: "Linkup closed successfully",
+        linkup,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Linkup not found",
+        linkup: null,
       });
     }
   } catch (error) {
-    handleDatabaseError(res, error, "Error closing the link-up:");
+    handleDatabaseError(res, error, "Error closing linkup:");
   }
 };
 
@@ -286,8 +280,8 @@ module.exports = {
   searchLinkups,
   createLinkup,
   getLinkups,
-  getLinkupStatus,
   getUserLinkups,
+  getLinkupStatus,
   deleteLinkup,
   updateLinkup,
   closeLinkup,

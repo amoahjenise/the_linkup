@@ -1,34 +1,33 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+import { styled } from "@mui/material/styles";
+import { FormControlLabel, Switch } from "@mui/material";
 import { updateLocationSharing } from "../redux/reducers/locationSlice";
 import useLocationUpdate from "../utils/useLocationUpdate";
 
-const useStyles = makeStyles((theme) => ({
-  section: {
-    flex: "1",
-    padding: theme.spacing(2),
-    flexDirection: "column",
-    justifyContent: "center",
-    position: "sticky",
-    top: 0,
-    overflowY: "auto",
-  },
-  sectionTitle: {
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-    marginBottom: theme.spacing(2),
-  },
-  sectionContent: {
-    fontSize: "1rem",
-    marginBottom: theme.spacing(2),
-  },
+// Styled Components
+const Section = styled("div")(({ theme }) => ({
+  flex: "1",
+  padding: theme.spacing(2),
+  flexDirection: "column",
+  justifyContent: "center",
+  position: "sticky",
+  top: 0,
+  overflowY: "auto",
+}));
+
+const SectionTitle = styled("h2")(({ theme }) => ({
+  fontSize: "1.5rem",
+  fontWeight: "bold",
+  marginBottom: theme.spacing(2),
+}));
+
+const SectionContent = styled("p")(({ theme }) => ({
+  fontSize: "1rem",
+  marginBottom: theme.spacing(2),
 }));
 
 const LocationSharingSetting = () => {
-  const classes = useStyles();
   const locationState = useSelector((state) => state.location);
   const dispatch = useDispatch();
 
@@ -63,11 +62,11 @@ const LocationSharingSetting = () => {
   };
 
   return (
-    <div className={classes.section}>
-      <h2 className={classes.sectionTitle}>Grant Access to Device Location</h2>
-      <p className={classes.sectionContent}>
+    <Section>
+      <SectionTitle>Grant Access to Device Location</SectionTitle>
+      <SectionContent>
         To use Linkup, you'll need to grant access to your device's location:
-      </p>
+      </SectionContent>
       <FormControlLabel
         control={
           <Switch
@@ -78,7 +77,7 @@ const LocationSharingSetting = () => {
         }
         label="Allow Location Sharing"
       />
-    </div>
+    </Section>
   );
 };
 

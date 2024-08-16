@@ -21,7 +21,7 @@ router.use(
 
 // Define and use the route files for messaging
 const messagingRoutes = require("./routes/messagingRoutes");
-router.use("/api/messaging", messagingRoutes);
+router.use("/", messagingRoutes);
 
 // Error handling middleware (you can customize this)
 router.use((err, req, res, next) => {

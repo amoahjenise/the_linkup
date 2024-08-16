@@ -34,7 +34,7 @@ router.use(
 router.use(express.json());
 
 // Routes for authentication
-router.use("/api/auth", authRoutes);
+router.use("/", authRoutes);
 
 router.post(
   "/api/webhooks",

@@ -1,49 +1,61 @@
 import React, { useState } from "react";
 import {
   Modal,
-  makeStyles,
+  styled,
   Button,
   TextField,
   Typography,
   Paper,
-} from "@material-ui/core";
+} from "@mui/material";
 import AvatarUpdate from "../components/AvatarUpdate";
 
-const useStyles = makeStyles((theme) => ({
-  // Remove rounded corners
-  paper: {
-    borderRadius: 0,
-    position: "absolute",
-    width: 400,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(3),
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
+  borderRadius: 0,
+  position: "absolute",
+  width: 400,
+  boxShadow: theme.shadows[5],
+  padding: theme.spacing(3),
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor: colorMode === "dark" ? "#1e1e1e" : "white",
+}));
+
+const DialogContent = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+}));
+
+const AvatarContainer = styled("div")(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+}));
+
+const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
+  marginTop: theme.spacing(2),
+  "& .MuiInputBase-root": {
+    color: colorMode === "dark" ? "white" : "black",
   },
-  dialogContent: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // Center content horizontally
+  "& .MuiInputLabel-root": {
+    color: colorMode === "dark" ? "white" : "black",
   },
-  avatarContainer: {
-    marginBottom: theme.spacing(2),
-  },
-  bio: {
-    marginTop: theme.spacing(2),
-  },
-  charCount: {
-    marginTop: theme.spacing(1),
-    color: ({ charsRemaining }) => (charsRemaining <= 10 ? "red" : "inherit"),
-  },
-  button: {
-    width: "120px",
-  },
-  buttonGroup: {
-    display: "flex",
-    justifyContent: "center",
-    marginTop: theme.spacing(3),
-  },
+}));
+
+const CharCount = styled(Typography)(({ theme, charsRemaining }) => ({
+  marginTop: theme.spacing(1),
+  color: charsRemaining <= 10 ? "red" : "inherit",
+}));
+
+const ButtonGroup = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  marginTop: theme.spacing(3),
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  width: "120px",
+  marginRight: theme.spacing(2),
 }));
 
 const MAX_BIO_LENGTH = 160;
@@ -60,45 +72,24 @@ const UserProfileEditModal = ({
   const [editedBio, setEditedBio] = useState(userData.bio);
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null); // Initialize with the current avatar
 
-  const classes = useStyles({
-    charsRemaining: MAX_BIO_LENGTH - editedBio.length,
-  });
-
   const handleSave = () => {
     onSave(editedBio, updatedAvatar);
   };
 
-  // Define text and background color based on color mode
-  const modalTextColor =
-    colorMode === "dark"
-      ? "white" // Dark mode background color with no transparency
-      : "black";
-
-  const modalBackgroundColor =
-    colorMode === "dark"
-      ? "#1e1e1e" // Dark mode background color with no transparency
-      : "white";
-
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Paper
-        className={classes.paper}
-        style={{
-          color: modalTextColor,
-          backgroundColor: modalBackgroundColor,
-        }}
-      >
+      <StyledPaper colorMode={colorMode}>
         <Typography variant="h6">Edit Profile</Typography>
-        <div className={classes.dialogContent}>
+        <DialogContent>
           {/* Avatar (Editable using AvatarUpdate component) */}
-          <div className={classes.avatarContainer}>
+          <AvatarContainer>
             <AvatarUpdate
               userId={userData.id}
               currentAvatarUrl={userData.avatar}
               isLoggedUserProfile={true}
               onUpdateAvatar={setUpdatedAvatar}
             />
-          </div>
+          </AvatarContainer>
 
           {/* Name (Read-only) */}
           <Typography>
@@ -111,15 +102,18 @@ const UserProfileEditModal = ({
           </Typography>
 
           {/* Bio (Editable) */}
-          <TextField
-            className={classes.bio}
+          <BioTextField
             label="Bio"
             multiline
             minRows={6}
             variant="outlined"
             value={editedBio}
-            InputProps={{ style: { color: modalTextColor } }}
-            InputLabelProps={{ style: { color: modalTextColor } }}
+            InputProps={{
+              style: { color: colorMode === "dark" ? "white" : "black" },
+            }}
+            InputLabelProps={{
+              style: { color: colorMode === "dark" ? "white" : "black" },
+            }}
             onChange={(e) => {
               const newBio = e.target.value;
               if (newBio.length <= MAX_BIO_LENGTH) {
@@ -129,31 +123,24 @@ const UserProfileEditModal = ({
           />
           {MAX_BIO_LENGTH - editedBio.length <=
             MIN_CHARS_REMAINING_TO_DISPLAY && (
-            <Typography className={classes.charCount}>
+            <CharCount charsRemaining={MAX_BIO_LENGTH - editedBio.length}>
               {MAX_BIO_LENGTH - editedBio.length} characters remaining
-            </Typography>
+            </CharCount>
           )}
-        </div>
-        <div className={classes.buttonGroup}>
-          <Button
-            className={classes.button}
+        </DialogContent>
+        <ButtonGroup>
+          <StyledButton
             onClick={handleSave}
             color="primary"
-            variant="contained" // Make buttons raised
-            style={{ marginRight: "20px" }}
+            variant="contained"
           >
             Save
-          </Button>
-          <Button
-            className={classes.button}
-            onClick={onClose}
-            color="default"
-            variant="contained" // Make buttons raised
-          >
+          </StyledButton>
+          <StyledButton onClick={onClose} variant="contained">
             Cancel
-          </Button>
-        </div>
-      </Paper>
+          </StyledButton>
+        </ButtonGroup>
+      </StyledPaper>
     </Modal>
   );
 };

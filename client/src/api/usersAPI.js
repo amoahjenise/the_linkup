@@ -3,8 +3,8 @@ import axios from "axios";
 // Add this configuration globally for Axios to include credentials
 // axios.defaults.withCredentials = true;
 
-const BASE_URL = process.env.REACT_APP_USER_SERVICE_URL;
-const AUTH_SERVICE_URL = process.env.REACT_APP_AUTH_SERVICE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+const AUTH_SERVICE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const refreshToken = async () => {
   try {

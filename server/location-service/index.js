@@ -20,7 +20,7 @@ router.use(
 
 // Define and use the route files for location
 const locationRoutes = require("./routes/locationRoutes");
-router.use("/api/location", locationRoutes);
+router.use("/", locationRoutes);
 
 // Error handling middleware (you can customize this)
 router.use((err, req, res, next) => {

@@ -1,27 +1,82 @@
-// linkupRequestSocket.js (backend side)
-const initializeSocket = (io) => {
-  io.on("connection", (socket) => {
-    console.log("A user connected to the linkup request service socket");
+// Define the linkupRequestSocket function
+const linkupRequestSocket = (io) => {
+  const linkupRequestNamespace = io.of("/linkup-request");
 
-    // Handle real-time events here
+  let userSockets = {}; // Define the userSockets object
+
+  // Function to get socket instance by user ID
+  const getSocketByUserId = (userId) => {
+    return userSockets[userId];
+  };
+
+  linkupRequestNamespace.on("connection", (socket) => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("A user connected to the linkup request service socket");
+    }
+
+    const userId = socket.handshake.query.userId;
+    if (!userId) {
+      console.error("Missing userId in socket handshake query");
+      socket.disconnect();
+      return;
+    }
+
+    socket.userId = userId;
+    socket.join(`user-${userId}`);
+
+    // Handle "request-sent" event
     socket.on("request-sent", (data) => {
-      console.log("Notify user that a request was received.");
+      if (!data.creator_id) {
+        console.error("Missing creator_id in request-sent event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("A request was sent.");
+      }
+      socket.to(`user-${data.creator_id}`).emit("new-linkup-request", data);
     });
 
-    socket.on("request-approved", (data) => {
-      console.log("Notify user that a request was approved.");
+    // Handle "request-accepted" event
+    socket.on("request-accepted", (data) => {
+      if (!data.requester_id) {
+        console.error("Missing requester_id in request-accepted event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("Notify user that a request was approved.");
+      }
+      socket.to(`user-${data.requester_id}`).emit("request-accepted", data);
     });
 
-    // Handle the "join-linkup-room" event
+    // Handle "request-declined" event
+    socket.on("request-declined", (data) => {
+      if (!data.requester_id) {
+        console.error("Missing requester_id in request-declined event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("Notify user that a request was declined.");
+      }
+      socket.to(`user-${data.requester_id}`).emit("request-declined", data);
+    });
+
+    // Handle "join-linkup-room" event
     socket.on("join-linkup-room", (linkupId) => {
-      // Join the room with the linkup ID
+      if (!linkupId) {
+        console.error("Missing linkupId in join-linkup-room event");
+        return;
+      }
       socket.join(`linkup-${linkupId}`);
-      console.log(`User ${socket.userId} joined linkup room ${linkupId}`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(`User ${socket.userId} joined linkup room ${linkupId}`);
+      }
     });
 
-    // Handle disconnect
+    // Handle disconnect event
     socket.on("disconnect", () => {
-      console.log("A user disconnected");
+      if (process.env.NODE_ENV === "development") {
+        console.log("A user disconnected from linkup request service");
+      }
     });
 
     // Handle Socket.IO errors
@@ -29,6 +84,9 @@ const initializeSocket = (io) => {
       console.error("Socket.IO Error:", error);
     });
   });
+
+  // Return the io instance
+  return io;
 };
 
-module.exports = { initializeSocket }; // Export the function
+module.exports = linkupRequestSocket;

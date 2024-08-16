@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import NotificationItem from "./NotificationItem";
 import LoadingSpinner from "./LoadingSpinner"; // Import the LoadingSpinner component
 import { updateUnreadNotificationsCount } from "../redux/actions/notificationActions";
@@ -10,44 +10,45 @@ import {
 } from "../api/notificationAPI";
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
-import { Typography } from "@material-ui/core";
-import { NotificationsNoneOutlined } from "@material-ui/icons";
+import { Typography } from "@mui/material";
+import { NotificationsNoneOutlined } from "@mui/icons-material";
 import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
 
-const useStyles = makeStyles((theme) => ({
-  mainContainer: {
-    display: "flex",
-    flexDirection: "column",
-    overflowY: "hidden",
-    width: "100%",
-  },
-  notificationsList: {
-    overflowY: "auto",
-    listStyle: "none",
-    padding: 0,
-    margin: 0,
-  },
-
-  noNotificationsContainer: {
-    padding: theme.spacing(4),
-    borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[3],
-  },
-  noNotificationsText: {
-    fontSize: "1.2rem",
-    textAlign: "center",
-    padding: "10px",
-    backgroundColor: "rgba(200, 200, 200, 0.1)",
-    borderRadius: "8px",
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-  },
-  icon: {
-    marginRight: "4px",
-  },
+// Define styled components
+const MainContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  overflowY: "hidden",
+  width: "100%",
 }));
 
+const NotificationsList = styled("ul")({
+  overflowY: "auto",
+  listStyle: "none",
+  padding: 0,
+  margin: 0,
+});
+
+const NoNotificationsContainer = styled("div")(({ theme }) => ({
+  padding: theme.spacing(4),
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[3],
+}));
+
+const NoNotificationsText = styled(Typography)(({ theme }) => ({
+  fontSize: "1.2rem",
+  textAlign: "center",
+  padding: "10px",
+  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  borderRadius: "8px",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+}));
+
+const Icon = styled("div")({
+  marginRight: "4px",
+});
+
 const Notifications = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const unreadNotificationsCount = useSelector(
@@ -103,16 +104,16 @@ const Notifications = () => {
   };
 
   return (
-    <div className={classes.mainContainer}>
+    <MainContainer>
       <TopNavBar title="Notifications" />
       {isLoading ? (
         <LoadingSpinner marginTop="350px" />
       ) : notifications.length === 0 ? ( // Check if notifications array is empty
-        <div className={classes.noNotificationsContainer}>
+        <NoNotificationsContainer>
           <EmptyNotificationsPlaceholder />
-        </div>
+        </NoNotificationsContainer>
       ) : (
-        <ul className={classes.notificationsList}>
+        <NotificationsList>
           {notifications.map((notification) => (
             <NotificationItem
               key={notification.id}
@@ -120,9 +121,9 @@ const Notifications = () => {
               onClick={() => handleNotificationClick(notification)}
             />
           ))}
-        </ul>
+        </NotificationsList>
       )}
-    </div>
+    </MainContainer>
   );
 };
 

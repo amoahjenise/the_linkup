@@ -20,7 +20,7 @@ router.use(
 
 // Define and use the route files for notifications
 const notificationRoutes = require("./routes/notificationRoutes");
-router.use("/api/notifications", notificationRoutes);
+router.use("/", notificationRoutes);
 
 // Initialize socket server function (for integration in main server file)
 const initializeSocketServer = (server) => {

@@ -1,25 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import Resizer from "react-image-file-resizer";
-import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import { Avatar, IconButton } from "@mui/material";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 
-const useStyles = makeStyles((theme) => ({
-  avatarUpdate: {
-    position: "relative",
-    display: "inline-block",
+const AvatarUpdateContainer = styled("div")({
+  position: "relative",
+  display: "inline-block",
+});
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: theme.spacing(15),
+  height: theme.spacing(15),
+  [theme.breakpoints.down("md")]: {
+    width: theme.spacing(8),
+    height: theme.spacing(8),
   },
-  avatar: {
-    width: theme.spacing(15),
-    height: theme.spacing(15),
-    [theme.breakpoints.down("sm")]: {
-      width: theme.spacing(8),
-      height: theme.spacing(8),
-    },
-    border: `2px solid ${theme.palette.background.default}`,
-  },
-  cameraIcon: {
+  border: `2px solid ${theme.palette.background.default}`,
+}));
+
+const CameraIconButton = styled(IconButton)(
+  ({ theme, isLoggedUserProfile }) => ({
     position: "absolute",
     bottom: 0,
     right: 0,
@@ -27,20 +28,19 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "50%",
     padding: theme.spacing(0.5),
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
-    display: ({ isLoggedUserProfile }) =>
-      isLoggedUserProfile ? "block" : "none",
-  },
-  input: {
-    display: "none",
-  },
-}));
+    display: isLoggedUserProfile ? "block" : "none",
+  })
+);
+
+const HiddenInput = styled("input")({
+  display: "none",
+});
 
 const AvatarUpdate = ({
   currentAvatarUrl,
   isLoggedUserProfile,
   onUpdateAvatar,
 }) => {
-  const classes = useStyles({ isLoggedUserProfile });
   const [selectedImage, setSelectedImage] = useState(currentAvatarUrl);
   const inputRef = useRef(null);
 
@@ -63,9 +63,6 @@ const AvatarUpdate = ({
         (resizedImage) => {
           setSelectedImage(resizedImage);
           onUpdateAvatar(resizedImage);
-          {
-            /* Pass the updated avatar to the parent component */
-          }
         },
         "base64"
       );
@@ -77,33 +74,32 @@ const AvatarUpdate = ({
   };
 
   return (
-    <div className={classes.avatarUpdate}>
-      <Avatar
+    <AvatarUpdateContainer>
+      <StyledAvatar
         src={selectedImage}
         alt="Profile Avatar"
-        className={classes.avatar}
         onClick={handleClick}
       />
       {isLoggedUserProfile && (
         <>
-          <input
+          <HiddenInput
             type="file"
             ref={inputRef}
             accept="image/jpeg, image/png"
-            className={classes.input}
             onChange={handleImageChange}
           />
-          <IconButton
-            className={classes.cameraIcon}
+          <CameraIconButton
+            isLoggedUserProfile={isLoggedUserProfile}
             component="span"
             aria-label="Upload Avatar"
             onClick={handleClick}
+            size="large"
           >
             <PhotoCameraIcon />
-          </IconButton>
+          </CameraIconButton>
         </>
       )}
-    </div>
+    </AvatarUpdateContainer>
   );
 };
 

@@ -1,48 +1,48 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import { styled } from "@mui/material/styles";
+import { Typography } from "@mui/material";
 import TopNavBar from "./TopNavBar";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    padding: theme.spacing(3),
-  },
-  sections: {
-    marginRight: theme.spacing(4),
-  },
-  sectionItem: {
-    cursor: "pointer",
-    marginBottom: theme.spacing(2),
-    "&:hover": {
-      color: theme.palette.primary.main,
-    },
-  },
-  subSectionItem: {
-    cursor: "pointer",
-    marginBottom: theme.spacing(2),
-    "&:hover": {
-      color: theme.palette.primary.main,
-      textDecoration: "underline",
-    },
-  },
-  activeSectionItem: {
+// Styled components
+const Root = styled("div")(({ theme }) => ({
+  display: "flex",
+  padding: theme.spacing(3),
+}));
+
+const Sections = styled("div")(({ theme }) => ({
+  marginRight: theme.spacing(4),
+}));
+
+const SectionItem = styled("div")(({ theme, active }) => ({
+  cursor: "pointer",
+  marginBottom: theme.spacing(2),
+  color: active ? theme.palette.primary.main : "inherit",
+  fontWeight: active ? "bold" : "normal",
+  "&:hover": {
     color: theme.palette.primary.main,
-    fontWeight: "bold",
   },
-  activeSubSectionItem: {
+}));
+
+const SubSectionItem = styled(Typography)(({ theme, active }) => ({
+  cursor: "pointer",
+  marginBottom: theme.spacing(2),
+  color: active ? theme.palette.primary.main : "inherit",
+  fontWeight: active ? "bold" : "normal",
+  textDecoration: active ? "underline" : "none",
+  "&:hover": {
     color: theme.palette.primary.main,
-    fontWeight: "bold",
+    textDecoration: "underline",
   },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    borderLeftWidth: "1px",
-    borderLeftColor: "1px solid #D3D3D3",
-  },
-  title: {
-    marginBottom: theme.spacing(3),
-  },
+}));
+
+const Content = styled("div")(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  borderLeft: "1px solid #D3D3D3",
+}));
+
+const Title = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
 }));
 
 const Settings = ({
@@ -50,7 +50,6 @@ const Settings = ({
   setActiveSubSection,
   onSubSectionClick,
 }) => {
-  const classes = useStyles();
   const [activeSection, setActiveSection] = useState("account");
 
   const handleSectionClick = (section) => {
@@ -61,110 +60,82 @@ const Settings = ({
   return (
     <div>
       <TopNavBar title="Settings" />
-      <div className={classes.root}>
-        <div className={classes.sections}>
-          <Typography variant="h6" className={classes.title}>
-            Settings
-          </Typography>
-          <div
-            className={`${classes.sectionItem} ${
-              activeSection === "account" && classes.activeSectionItem
-            }`}
+      <Root>
+        <Sections>
+          <Title variant="h6">Settings</Title>
+          <SectionItem
+            active={activeSection === "account"}
             onClick={() => handleSectionClick("account")}
           >
             Account
-          </div>
-          <div
-            className={`${classes.sectionItem} ${
-              activeSection === "security" && classes.activeSectionItem
-            }`}
+          </SectionItem>
+          <SectionItem
+            active={activeSection === "security"}
             onClick={() => handleSectionClick("security")}
           >
             Security
-          </div>
-          <div
-            className={`${classes.sectionItem} ${
-              activeSection === "data" && classes.activeSectionItem
-            }`}
+          </SectionItem>
+          <SectionItem
+            active={activeSection === "data"}
             onClick={() => handleSectionClick("data")}
           >
             Data
-          </div>
-          <div
-            className={`${classes.sectionItem} ${
-              activeSection === "location" && classes.activeSectionItem
-            }`}
+          </SectionItem>
+          <SectionItem
+            active={activeSection === "location"}
             onClick={() => handleSectionClick("location")}
           >
             Location Sharing
-          </div>
-        </div>
-        <div
-          className={classes.content}
-          // style={{ borderLeft: `1px solid ${borderLeftColor}` }}
-        >
+          </SectionItem>
+        </Sections>
+        <Content>
           {activeSection === "account" && (
             <>
-              <Typography
+              <SubSectionItem
                 variant="h6"
+                active={activeSubSection === "accountSettings"}
                 onClick={() => onSubSectionClick("accountSettings")}
-                className={`${classes.subSectionItem} ${
-                  activeSubSection === "accountSettings" &&
-                  classes.activeSubSectionItem
-                }`}
               >
                 Account settings
-              </Typography>
-              <Typography
+              </SubSectionItem>
+              <SubSectionItem
                 variant="h6"
+                active={activeSubSection === "deactivateAccount"}
                 onClick={() => onSubSectionClick("deactivateAccount")}
-                className={`${classes.subSectionItem} ${
-                  activeSubSection === "deactivateAccount" &&
-                  classes.activeSubSectionItem
-                }`}
               >
                 Deactivate account
-              </Typography>
+              </SubSectionItem>
             </>
           )}
           {activeSection === "security" && (
-            <Typography
+            <SubSectionItem
               variant="h6"
+              active={activeSubSection === "securitySettings"}
               onClick={() => onSubSectionClick("securitySettings")}
-              className={`${classes.subSectionItem} ${
-                activeSubSection === "securitySettings" &&
-                classes.activeSubSectionItem
-              }`}
             >
               Security settings
-            </Typography>
+            </SubSectionItem>
           )}
           {activeSection === "data" && (
-            <Typography
+            <SubSectionItem
               variant="h6"
+              active={activeSubSection === "dataAndPermissions"}
               onClick={() => onSubSectionClick("dataAndPermissions")}
-              className={`${classes.subSectionItem} ${
-                activeSubSection === "dataAndPermissions" &&
-                classes.activeSubSectionItem
-              }`}
             >
               Data and permissions
-            </Typography>
+            </SubSectionItem>
           )}
           {activeSection === "location" && (
-            <Typography
+            <SubSectionItem
               variant="h6"
+              active={activeSubSection === "locationSharing"}
               onClick={() => onSubSectionClick("locationSharing")}
-              className={`${classes.subSectionItem} ${
-                activeSubSection === "locationSharing" &&
-                classes.activeSubSectionItem
-              }`}
             >
               Control location sharing
-            </Typography>
+            </SubSectionItem>
           )}
-        </div>
-      </div>
+        </Content>
+      </Root>
     </div>
   );
 };

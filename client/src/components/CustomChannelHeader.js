@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Avatar from "@material-ui/core/Avatar";
+import { styled } from "@mui/material/styles";
+import { Avatar, Box, Typography } from "@mui/material";
 import HorizontalMenu from "./HorizontalMenu"; // Adjust the path as necessary
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
@@ -9,53 +9,48 @@ import nlp from "compromise";
 
 const compromise = nlp;
 
-const useStyles = makeStyles((theme) => ({
-  header: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: theme.spacing(2),
-    borderBottomWidth: "1px",
-    borderBottom: "0.1px solid #lightgray",
-    boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
-  },
-  channelInfo: {
-    display: "flex",
-    alignItems: "center",
-  },
-  avatar: {
-    marginRight: theme.spacing(2),
-    width: theme.spacing(7),
-    height: theme.spacing(7),
-  },
-  nickname: {
-    fontWeight: "bold",
-    fontSize: "1.2rem",
-  },
-  status: {
-    display: "inline-block",
-    padding: theme.spacing(0.5, 1),
-    borderRadius: theme.shape.borderRadius,
-    fontWeight: "bold",
-    textTransform: "capitalize",
-  },
-  pending: {
-    backgroundColor: "#ffd700",
-    color: "#333",
-  },
-  accepted: {
-    backgroundColor: "#28a745",
-    color: "#fff",
-  },
-  declined: {
-    backgroundColor: "#dc3545",
-    color: "#fff",
-  },
-  expired: {
-    backgroundColor: "#6c757d",
-    color: "#fff",
-  },
+const Header = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: theme.spacing(2),
+  borderBottomWidth: "1px",
+  borderBottom: "0.1px solid #lightgray",
+  boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
 }));
+
+const ChannelInfo = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  marginRight: theme.spacing(2),
+  width: theme.spacing(7),
+  height: theme.spacing(7),
+}));
+
+const Nickname = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+  fontSize: "1.2rem",
+}));
+
+const Status = styled(Typography)(({ theme, statusColor }) => ({
+  display: "inline-block",
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  fontWeight: "bold",
+  textTransform: "capitalize",
+  backgroundColor: statusColor.background,
+  color: statusColor.color,
+}));
+
+const statusColors = {
+  pending: { background: "#ffd700", color: "#333" },
+  accepted: { background: "#28a745", color: "#fff" },
+  declined: { background: "#dc3545", color: "#fff" },
+  expired: { background: "#6c757d", color: "#fff" },
+};
 
 const CustomChannelHeader = ({
   linkup,
@@ -64,7 +59,6 @@ const CustomChannelHeader = ({
   isOperator,
   loading,
 }) => {
-  const classes = useStyles();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
@@ -145,35 +139,29 @@ const CustomChannelHeader = ({
   };
 
   return (
-    <div className={classes.header}>
+    <Header>
       {loading ? (
         <LoadingSpinner />
       ) : (
         !loading && (
-          <div className={classes.channelInfo}>
+          <ChannelInfo>
             {operator && (
               <>
-                <Avatar
-                  src={renderAvatar()}
-                  alt={renderName()}
-                  className={classes.avatar}
-                />
-                <div>
-                  <div className={classes.nickname}>{renderName()}</div>
-                  <div>{renderLinkupItemText()}</div>
+                <StyledAvatar src={renderAvatar()} alt={renderName()} />
+                <Box>
+                  <Nickname>{renderName()}</Nickname>
+                  <Box>{renderLinkupItemText()}</Box>
                   {linkup?.request_status && (
-                    <div
-                      className={`${classes.status} ${
-                        classes[linkupRequestStatus] // Change this line
-                      }`}
+                    <Status
+                      statusColor={statusColors[linkupRequestStatus] || {}}
                     >
                       {linkupRequestStatus}
-                    </div>
+                    </Status>
                   )}
-                </div>
+                </Box>
               </>
             )}
-          </div>
+          </ChannelInfo>
         )
       )}
       {/* <IconButton className={classes.iconButton} onClick={onActionClick}>
@@ -195,7 +183,7 @@ const CustomChannelHeader = ({
           setShouldFetchLinkups={setShouldFetchLinkups}
         />
       )}
-    </div>
+    </Header>
   );
 };
 

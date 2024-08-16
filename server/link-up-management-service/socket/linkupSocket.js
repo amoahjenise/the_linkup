@@ -1,39 +1,44 @@
-// linkupSocket.js (in link-up-management-service)
-const socketIo = require("socket.io");
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
+const linkupSocket = (io) => {
+  const linkupNamespace = io.of("/linkup-management");
 
-const initializeSocket = (server) => {
-  const io = socketIo(server, {
-    cors: {
-      origin: ALLOWED_ORIGIN, // Update to accept the correct origin
-      methods: ["POST", "GET", "PATCH", "DELETE"],
-    },
-  });
-
-  io.on("connection", (socket) => {
-    // Get the user ID or any unique identifier for the user
+  linkupNamespace.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
 
-    // Assign the user's socket ID as the unique identifier
-    socket.userId = userId;
+    if (!userId) {
+      console.error("User ID is undefined. Disconnecting socket.");
+      socket.disconnect();
+      return;
+    }
 
+    socket.userId = userId;
     socket.join(`user-${userId}`);
 
-    console.log(
-      "A user connected to the linkup service socket:",
-      JSON.stringify(socket.handshake.query)
-    );
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `User ${userId} connected to the linkup service socket`,
+        JSON.stringify(socket.handshake.query)
+      );
+    }
 
-    // Listen for "join-linkup-room" events
+    // Handle "join-linkup-room" event
     socket.on("join-linkup-room", (linkupId) => {
-      console.log("join-linkup-room", linkupId);
-      // Create a room for the linkup (if not already created) and add the creator to it
+      if (!linkupId) {
+        console.error("Linkup ID is undefined in join-linkup-room event.");
+        return;
+      }
       socket.join(`linkup-${linkupId}`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(`User ${userId} joined linkup room ${linkupId}`);
+      }
     });
 
-    // Handle disconnect
+    // Handle socket disconnection
     socket.on("disconnect", () => {
-      console.log("A user disconnected to the linkup service socket");
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `User ${userId} disconnected from the linkup service socket`
+        );
+      }
     });
 
     // Handle Socket.IO errors
@@ -42,7 +47,7 @@ const initializeSocket = (server) => {
     });
   });
 
-  return io; // Export the io instance
+  return io; // Return the io instance
 };
 
-module.exports = { initializeSocket }; // Export as an object with the function
+module.exports = linkupSocket;

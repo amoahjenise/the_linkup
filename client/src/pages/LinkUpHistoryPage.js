@@ -1,10 +1,9 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import TopNavBar from "../components/TopNavBar";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import { Tab, Tabs } from "@mui/material";
 import FilterBar from "../components/FilterBar";
 import EditLinkupModal from "../components/EditLinkupModal";
 import LinkupHistoryItem from "../components/LinkupHistoryItem";
@@ -15,33 +14,34 @@ import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
 
-const useStyles = makeStyles((theme) => ({
-  linkupHistoryPage: {
-    display: "flex",
-    width: "100%",
-  },
-  historySection: {
-    flex: "2",
-    overflowY: "auto",
-    overflowX: "hidden",
-    margin: "0 auto",
-  },
-  topBar: {
-    position: "sticky",
-    top: 0,
-    zIndex: 1,
-  },
-  tabBar: {
-    borderBottomWidth: "1px",
-    borderBottomColor: "1px solid #D3D3D3",
-    position: "sticky", // Make the tabs bar sticky
-    top: 65, // Stick it bellow the top bar
-    zIndex: 1, // Ensure it's above other content
-  },
+// Styled components
+const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  width: "100%",
+}));
+
+const HistorySection = styled("div")(({ theme }) => ({
+  flex: 2,
+  overflowY: "auto",
+  overflowX: "hidden",
+  margin: "0 auto",
+}));
+
+const TopBarContainer = styled("div")(({ theme }) => ({
+  position: "sticky",
+  top: 0,
+  zIndex: 1,
+}));
+
+const TabBar = styled(Tabs)(({ theme }) => ({
+  borderBottomWidth: "1px",
+  borderBottomColor: "1px solid #D3D3D3",
+  position: "sticky", // Make the tabs bar sticky
+  top: 65, // Stick it bellow the top bar
+  zIndex: 1, // Ensure it's above other content
 }));
 
 const LinkUpHistoryPage = ({ isMobile }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const location = useLocation();
   const { colorMode } = useColorMode();
@@ -333,23 +333,22 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   ]);
 
   return (
-    <div className={classes.linkupHistoryPage}>
-      <div className={classes.historySection}>
-        <TopNavBar className={classes.topBar} title="Link-Ups" />
+    <LinkupHistoryPageContainer>
+      <HistorySection>
+        <TopBarContainer>
+          <TopNavBar title="Link-Ups" />
+        </TopBarContainer>
         {isLoading ? (
           <LoadingSpinner />
         ) : (
           <>
-            <Tabs
-              className={classes.tabBar}
+            <TabBar
               value={activeTab}
               onChange={handleTabChange}
               variant={isMobile ? "scrollable" : "standard"}
               indicatorColor="primary"
-              // textColor="inherit"
               style={{
-                width: isMobile ? "100%" : "auto",
-                color,
+                width: "100%", // Ensure Tabs take full width
                 backgroundColor,
               }}
             >
@@ -363,10 +362,14 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                       ? `Sent Requests (${sentRequests.filteredList.length})`
                       : `Received Requests (${receivedRequests.filteredList.length})`
                   }
-                  style={{ width: "33%" }}
+                  style={{
+                    width: "33%",
+                    color, // Apply the color directly to each Tab
+                  }}
                 />
               ))}
-            </Tabs>
+            </TabBar>
+
             {activeTab === 0 && (
               <div>
                 {linkups.filteredList.map((linkup) => (
@@ -406,7 +409,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
             )}
           </>
         )}
-      </div>
+      </HistorySection>
       <FilterBar
         activeTab={activeTab}
         activeStatus={
@@ -466,7 +469,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
           setShouldFetchLinkups={setShouldFetchLinkups}
         />
       )}
-    </div>
+    </LinkupHistoryPageContainer>
   );
 };
 

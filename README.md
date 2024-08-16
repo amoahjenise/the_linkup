@@ -214,7 +214,7 @@ The app follows a modular component structure (components/):
 
 A cohesive UI enhances user experience:
 
-- makeStyles from "@material-ui/core/styles" ensures consistent styling.
+- styled from "@material-ui/core/styles" ensures consistent styling.
 - User-friendly interfaces follow intuitive design principles.
 
 ## Server and API Endpoints

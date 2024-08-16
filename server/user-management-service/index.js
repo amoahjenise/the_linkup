@@ -97,7 +97,7 @@ router.post(
 router.use(express.json());
 
 // Define and use the route files for users
-router.use("/api/user", userRoutes);
+router.use("/", userRoutes);
 
 // Export the router
 module.exports = router;

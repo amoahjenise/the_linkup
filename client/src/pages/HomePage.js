@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import FeedSection from "../components/FeedSection";
 import WidgetSection from "../components/WidgetSection";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
@@ -8,12 +8,20 @@ import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsAct
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 
-const useStyles = makeStyles((theme) => ({
-  homePage: {
+const PREFIX = "HomePage";
+const classes = {
+  homePage: `${PREFIX}-homePage`,
+  feedSection: `${PREFIX}-feedSection`,
+  widgetSection: `${PREFIX}-widgetSection`,
+  loadingContainer: `${PREFIX}-loadingContainer`,
+};
+
+const StyledDiv = styled("div")(({ theme }) => ({
+  [`&.${classes.homePage}`]: {
     display: "flex",
     width: "100%",
   },
-  feedSection: {
+  [`&.${classes.feedSection}`]: {
     flex: "2",
     overflowY: "auto",
     marginLeft: "auto",
@@ -21,14 +29,14 @@ const useStyles = makeStyles((theme) => ({
     borderRightWidth: "1px",
     borderRightColor: "0.1px solid #D3D3D3",
   },
-  widgetSection: {
+  [`&.${classes.widgetSection}`]: {
     flex: "1",
     overflowY: "auto",
     overflowX: "hidden",
     marginLeft: "auto",
     marginRight: "auto",
   },
-  loadingContainer: {
+  [`&.${classes.loadingContainer}`]: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -39,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
 const PAGE_SIZE = 10;
 
 const HomePage = ({ isMobile }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const feedSectionRef = useRef(null);
   const linkupList = useSelector((state) => state.linkups.linkupList);
@@ -172,16 +179,16 @@ const HomePage = ({ isMobile }) => {
   };
 
   return (
-    <div className={classes.homePage}>
-      <div className={classes.feedSection} ref={feedSectionRef}>
+    <StyledDiv className={classes.homePage}>
+      <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
         <FeedSection
           linkupList={linkupList}
           isLoading={isFetchingNextPage}
           setShouldFetchLinkups={setShouldFetchLinkups}
         />
-      </div>
+      </StyledDiv>
       {!isMobile && (
-        <div className={classes.widgetSection}>
+        <StyledDiv className={classes.widgetSection}>
           <WidgetSection
             setShouldFetchLinkups={setShouldFetchLinkups}
             scrollToTopCallback={scrollToTop}
@@ -189,9 +196,9 @@ const HomePage = ({ isMobile }) => {
             userId={userId}
             gender={gender}
           />
-        </div>
+        </StyledDiv>
       )}
-    </div>
+    </StyledDiv>
   );
 };
 

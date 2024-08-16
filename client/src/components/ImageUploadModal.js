@@ -1,111 +1,104 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import { uploadImages, deleteImages } from "../api/imagesAPI"; // Adjust the import based on your API functions.
 import { useSnackbar } from "../contexts/SnackbarContext";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Resizer from "react-image-file-resizer";
 
 const MAX_IMAGES = 10; // Maximum number of images to display
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB (adjust the value as needed)
 
-const useStyles = makeStyles((theme) => ({
-  imageUploadModal: {
-    position: "absolute",
-    top: "55%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(4),
-    outline: "none",
-    textAlign: "center",
-  },
-  title: {
-    fontSize: "18px",
-    marginBottom: theme.spacing(2),
-  },
-  uploadButton: {
-    // Standard button styles
-    width: "100%",
-    marginTop: theme.spacing(2),
-    backgroundColor: "#0097A7",
-    color: theme.palette.common.white,
-    "&:hover": {
-      backgroundColor: "#007b86",
-    },
-    // Stylish props
-    borderRadius: "8px", // Adjust as needed
-    padding: "10px 20px", // Adjust as needed
-    fontSize: "16px", // Adjust as needed
-  },
-  closeButton: {
-    position: "absolute",
-    bottom: "95%",
-    left: "89%",
-    backgroundColor: "transparent",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "black",
-    width: "2px",
-    height: "2px",
-  },
-  imageGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(5, 120px)", // Each square is 120px wide
-    gridTemplateRows: "repeat(2, 120px)", // Each square is 120px high
-    gap: "8px",
-  },
-  imageGridItem: {
-    position: "relative",
-    overflow: "hidden",
-    width: "100%",
-    height: "100%",
-  },
-  uploadedImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  addImageOverlay: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    cursor: "pointer",
-    color: "white",
-  },
-  removeButton: {
-    position: "absolute",
-    top: "4px",
-    right: "4px",
-    backgroundColor: "rgba(100, 100, 100, 0.3)", // Light gray with 90% transparency
-    border: "none",
-    borderRadius: "50%", // Makes it round
-    cursor: "pointer",
-    padding: "4px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "30px", // Adjust as needed
-    height: "30px", // Adjust as needed
-  },
+const Title = styled("div")(({ theme }) => ({
+  fontSize: "18px",
+  marginBottom: theme.spacing(2),
+}));
 
-  emptyGridItem: {
-    backgroundColor: theme.palette.background.paper,
-    border: "1px solid #e1e8ed",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "24px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    width: "100%",
-    height: "100%",
+const UploadButton = styled("button")(({ theme }) => ({
+  width: "100%",
+  marginTop: theme.spacing(2),
+  backgroundColor: "#0097A7",
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: "#007b86",
   },
+  borderRadius: "8px", // Adjust as needed
+  padding: "10px 20px", // Adjust as needed
+  fontSize: "16px", // Adjust as needed
+}));
+
+const CloseButton = styled("button")(() => ({
+  position: "absolute",
+  bottom: "95%",
+  left: "89%",
+  backgroundColor: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "24px",
+  fontWeight: "bold",
+  color: "black",
+  width: "2px",
+  height: "2px",
+}));
+
+const ImageGrid = styled("div")(() => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(5, 120px)", // Each square is 120px wide
+  gridTemplateRows: "repeat(2, 120px)", // Each square is 120px high
+  gap: "8px",
+}));
+
+const ImageGridItem = styled("div")(() => ({
+  position: "relative",
+  overflow: "hidden",
+  width: "100%",
+  height: "100%",
+}));
+
+const UploadedImage = styled("img")(() => ({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+}));
+
+const AddImageOverlay = styled("label")(() => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  cursor: "pointer",
+  color: "white",
+}));
+
+const RemoveButton = styled("button")(() => ({
+  position: "absolute",
+  top: "4px",
+  right: "4px",
+  backgroundColor: "rgba(100, 100, 100, 0.3)", // Light gray with 90% transparency
+  border: "none",
+  borderRadius: "50%", // Makes it round
+  cursor: "pointer",
+  padding: "4px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "30px", // Adjust as needed
+  height: "30px", // Adjust as needed
+}));
+
+const EmptyGridItem = styled("div")(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: "1px solid #e1e8ed",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "24px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  width: "100%",
+  height: "100%",
 }));
 
 const ImageUploadModal = ({
@@ -117,7 +110,6 @@ const ImageUploadModal = ({
   setCurrentImageIndex,
   colorMode,
 }) => {
-  const classes = useStyles();
   const { addSnackbar } = useSnackbar();
 
   // Utility function to resize images
@@ -143,29 +135,12 @@ const ImageUploadModal = ({
   ]);
 
   // Define text and background color based on color mode
-  const modalTextColor =
-    colorMode === "dark"
-      ? "white" // Dark mode background color with no transparency
-      : "black";
+  const modalTextColor = colorMode === "dark" ? "white" : "black";
 
-  const modalBackgroundColor =
-    colorMode === "dark"
-      ? "#1e1e1e" // Dark mode background color with no transparency
-      : "white";
+  const modalBackgroundColor = colorMode === "dark" ? "#1e1e1e" : "white";
 
   const overlayBackgroundColor =
     colorMode === "dark" ? "rgba(0, 0, 0, 0.5)" : "";
-
-  // // Utility function to convert a File object to a base64 URL
-  // const convertFileToBase64URL = (file) => {
-  //   return new Promise((resolve) => {
-  //     const reader = new FileReader();
-  //     reader.onload = (event) => {
-  //       resolve(event.target.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   });
-  // };
 
   const handleImageSelection = async (e, index) => {
     const file = e.target.files[0];
@@ -245,52 +220,43 @@ const ImageUploadModal = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={handleCloseModal}
-      className={classes.imageUploadModal}
       style={{
         content: {
           color: modalTextColor,
           backgroundColor: modalBackgroundColor,
-        },
-        overlay: {
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: overlayBackgroundColor,
+          position: "absolute",
+          top: "55%",
+          left: "50%",
+          height: "55%",
+          width: "40%",
+          transform: "translate(-50%, -50%)",
+          padding: "2rem",
+          outline: "none",
+          textAlign: "center",
         },
       }}
     >
-      <button onClick={handleCloseModal} className={classes.closeButton}>
-        &times;
-      </button>
-      <div className={classes.title}>
+      <CloseButton onClick={handleCloseModal}>&times;</CloseButton>
+      <Title>
         <p>Upload Pictures</p>
-      </div>
-      <div className={classes.imageGrid}>
+      </Title>
+      <ImageGrid>
         {Array.from({ length: MAX_IMAGES }).map((_, index) => (
-          <div key={index} className={classes.imageGridItem}>
+          <ImageGridItem key={index}>
             {tempProfileImages[index] && (
               <>
-                <img
+                <UploadedImage
                   src={tempProfileImages[index]}
                   alt={`Preview ${index}`}
-                  className={classes.uploadedImage}
                 />
-                <button
-                  onClick={() => handleRemove(index)}
-                  className={classes.removeButton}
-                >
+                <RemoveButton onClick={() => handleRemove(index)}>
                   <DeleteIcon style={{ fontSize: 24, opacity: 0.9 }} />
-                </button>
+                </RemoveButton>
               </>
             )}
             {!tempProfileImages[index] && (
               // Use handleImageSelection for empty grid items
-              <label
-                htmlFor={`file-upload-${index}`}
-                className={classes.addImageOverlay}
-              >
+              <AddImageOverlay htmlFor={`file-upload-${index}`}>
                 +
                 <input
                   type="file"
@@ -299,14 +265,12 @@ const ImageUploadModal = ({
                   onChange={(e) => handleImageSelection(e, index)}
                   aria-label={`Upload image number ${index + 1}`}
                 />
-              </label>
+              </AddImageOverlay>
             )}
-          </div>
+          </ImageGridItem>
         ))}
-      </div>
-      <button className={classes.uploadButton} onClick={handleUpload}>
-        Upload
-      </button>
+      </ImageGrid>
+      <UploadButton onClick={handleUpload}>Upload</UploadButton>
     </Modal>
   );
 };

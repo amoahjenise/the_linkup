@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { Popover, MenuItem } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { Popover, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "../contexts/SnackbarContext";
@@ -15,10 +15,16 @@ import {
   declineLinkupRequest,
 } from "../api/linkupRequestAPI";
 
-const useStyles = makeStyles((theme) => ({
-  moreIcon: {
-    cursor: "pointer",
-  },
+// Styled components
+const MoreIcon = styled(MoreHorizIcon)(({ theme }) => ({
+  cursor: "pointer",
+}));
+
+const PopoverPaper = styled("div")(({ theme, colorMode }) => ({
+  color: "white",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(18, 78, 88, 0.95)" : "rgba(8, 98, 110, 0.75)",
+  boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.5)",
 }));
 
 const HorizontalMenu = ({
@@ -27,7 +33,7 @@ const HorizontalMenu = ({
   showEditItem,
   showDeleteItem,
   showCloseItem,
-  showCheckInLinkup, // Ation for checking in the linkup
+  showCheckInLinkup,
   showAcceptLinkupRequest,
   showDeclineLinkupRequest,
   linkupItem,
@@ -35,13 +41,11 @@ const HorizontalMenu = ({
   setMenuAnchor,
   setShouldFetchLinkups,
 }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
   const { colorMode } = useColorMode();
 
-  // Define a single state for both modals
   const [modalState, setModalState] = useState({
     isEditModalOpen: false,
     isDeleteModalOpen: false,
@@ -49,15 +53,14 @@ const HorizontalMenu = ({
   });
 
   const openModal = (modalName) => {
-    setModalState({ ...modalState, [modalName]: true });
+    setModalState((prev) => ({ ...prev, [modalName]: true }));
   };
 
   const closeModal = (modalName) => {
-    setModalState({ ...modalState, [modalName]: false });
+    setModalState((prev) => ({ ...prev, [modalName]: false }));
   };
 
   const handleCheckInClick = () => {
-    // Add your logic for checking in the linkup here
     handleMenuClose();
   };
 
@@ -88,6 +91,7 @@ const HorizontalMenu = ({
     } catch (error) {
       addSnackbar(error.message);
     }
+    handleMenuClose();
   };
 
   const handleEditClick = () => {
@@ -101,10 +105,9 @@ const HorizontalMenu = ({
     handleMenuClose();
   };
 
-  const handleCloseClick = async () => {
-    // Open the completion confirmation dialog
+  const handleCloseClick = () => {
     openModal("isCloseConfirmationOpen");
-    handleMenuClose(); // Close the main menu
+    handleMenuClose();
   };
 
   const handleCloseConfirm = async () => {
@@ -163,7 +166,7 @@ const HorizontalMenu = ({
 
   return (
     <div>
-      <MoreHorizIcon onClick={handleMenuClick} className={classes.moreIcon} />
+      <MoreIcon onClick={handleMenuClick} />
       <Popover
         open={Boolean(menuAnchor)}
         anchorEl={menuAnchor}
@@ -177,14 +180,8 @@ const HorizontalMenu = ({
           horizontal: "left",
         }}
         PaperProps={{
-          style: {
-            color: "white",
-            backgroundColor:
-              colorMode === "dark"
-                ? "rgba(18, 78, 88, 0.95)"
-                : "rgba(8, 98, 110, 0.75)",
-            boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.5)",
-          },
+          component: PopoverPaper,
+          props: { colorMode },
         }}
       >
         {[

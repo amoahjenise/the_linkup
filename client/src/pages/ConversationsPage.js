@@ -1,33 +1,30 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import TopNavBar from "../components/TopNavBar";
 import SendbirdChat from "../components/SendbirdChat";
 
-const useStyles = makeStyles((theme) => ({
-  conversationsPage: {
-    display: "flex",
-    flexDirection: "column", // Adjusted to column direction
-    alignItems: "center", // Center items horizontally
-    width: "100%",
-  },
-  container: {
-    display: "flex",
-    flexDirection: "column", // Adjusted to column direction
-    width: "100%",
-    overflowY: "hidden",
-  },
+const ConversationsPageContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  width: "100%",
+}));
+
+const Container = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  overflowY: "hidden",
 }));
 
 const ConversationsPage = () => {
-  const classes = useStyles();
-
   return (
-    <div className={classes.conversationsPage}>
+    <ConversationsPageContainer>
       <TopNavBar title="Messages" />
-      <div className={classes.container}>
+      <Container>
         <SendbirdChat />
-      </div>
-    </div>
+      </Container>
+    </ConversationsPageContainer>
   );
 };
 
