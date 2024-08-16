@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_AUTH_SERVICE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const handleError = (error, action) => {
   console.error(`Error ${action}:`, error);

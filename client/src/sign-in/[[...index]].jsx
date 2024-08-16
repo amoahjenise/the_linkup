@@ -1,32 +1,29 @@
 import React from "react";
 import { SignIn } from "@clerk/clerk-react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-  section: {
-    paddingTop: theme.spacing(6),
-  },
-  container: {
-    display: "flex",
-    height: "100vh",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+const Section = styled("section")(({ theme }) => ({
+  paddingTop: theme.spacing(6),
 }));
 
-export default function ClerkCustomSignIn() {
-  const classes = useStyles();
+const Container = styled("div")({
+  display: "flex",
+  height: "100vh",
+  alignItems: "center",
+  justifyContent: "center",
+});
 
+export default function ClerkCustomSignIn() {
   return (
-    <section className={classes.section}>
-      <div className={classes.container}>
+    <Section>
+      <Container>
         <SignIn
           path="/sign-in"
           signUpUrl="/sign-up"
           afterSignInUrl={"/home"}
           afterSignUpUrl={"/registration"}
         />
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

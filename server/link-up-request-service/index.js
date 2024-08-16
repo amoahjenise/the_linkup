@@ -1,34 +1,28 @@
 const express = require("express");
 const helmet = require("helmet");
-const http = require("http");
 const cors = require("cors");
-const app = express();
-const server = http.createServer(app);
+
+// Create a router instance
+const router = express.Router();
+
+// Configuration using environment variables
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
 
-// Import your event handlers
-const linkupRequestSocket = require("./socket/linkupRequestSocket");
-
 // Use helmet middleware to set security headers
-app.use(helmet());
-app.use(express.json());
-app.use(
+router.use(helmet());
+router.use(express.json());
+router.use(
   cors({
     origin: [ALLOWED_ORIGIN],
     methods: ["POST", "GET", "PATCH", "DELETE"],
   })
 );
 
-// Define and use the route files for linkups and users
+// Define and use the route files for linkup requests
 const linkupRequestRoutes = require("./routes/linkupRequestRoutes");
-app.use("/api/linkup-requests", linkupRequestRoutes);
+router.use("/", linkupRequestRoutes);
 
-// Initialize socket event handlers
-const { initializeSocket } = require("./controllers/linkupRequestController");
-const io = linkupRequestSocket(server);
-initializeSocket(io);
+// Export the router
+module.exports = router;
 
-const PORT = process.env.LINKUP_REQUEST_SERVICE_PORT || 5003;
-server.listen(PORT, () => {
-  console.log(`Link-up service running on port ${PORT}`);
-});
+// Import and initialize socket event handlers in the main server file

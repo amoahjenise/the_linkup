@@ -1,60 +1,65 @@
 import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import UserAvatar from "./UserAvatar";
-import Typography from "@material-ui/core/Typography";
-import Chip from "@material-ui/core/Chip";
+import { Typography, Chip } from "@mui/material";
 import {
   CheckCircleOutlined,
   QueryBuilderOutlined,
   CancelOutlined,
-} from "@material-ui/icons";
+} from "@mui/icons-material";
 import moment from "moment";
 import HorizontalMenu from "./HorizontalMenu";
 import nlp from "compromise";
 const compromise = nlp;
 
-const useStyles = makeStyles((theme) => ({
-  linkupHistoryItem: {
-    padding: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    borderBottomWidth: "1px",
-    borderBottomColor: "1px solid #D3D3D3",
-  },
-  itemHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: theme.spacing(1),
-  },
-  linkupDetails: {
-    display: "flex",
-    alignItems: "center",
-    marginRight: theme.spacing(4),
-  },
-  chip: {
-    width: "140px",
-    marginLeft: "auto",
-  },
-  pendingChip: {
-    backgroundColor: "#f1c40f", // Yellow
-    color: theme.palette.text.secondary,
-  },
-  closedChip: {
-    backgroundColor: "#F0F7F8", // Lightblue-gray
-    color: theme.palette.text.secondary,
-  },
-  completedChip: {
-    backgroundColor: "rgb(115, 255, 174, 0.9)", // Green
-    color: theme.palette.text.secondary,
-  },
-  declinedChip: {
-    backgroundColor: "pink", // Pink
-    color: theme.palette.text.secondary,
-  },
+// Styled components
+const LinkupHistoryItemWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(1),
+  borderBottom: "1px solid #D3D3D3",
 }));
 
+const ItemHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: theme.spacing(1),
+}));
+
+const LinkupDetails = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  marginRight: theme.spacing(4),
+}));
+
+const StyledChip = styled(Chip)(({ theme, status }) => {
+  let backgroundColor;
+  switch (status) {
+    case "active":
+      backgroundColor = "#f1c40f"; // Yellow
+      break;
+    case "closed":
+      backgroundColor = "#F0F7F8"; // Lightblue-gray
+      break;
+    case "completed":
+      backgroundColor = "rgb(115, 255, 174, 0.9)"; // Green
+      break;
+    case "expired":
+      backgroundColor = "pink"; // Pink
+      break;
+    default:
+      backgroundColor = "#FFFFFF";
+      break;
+  }
+  return {
+    width: "140px",
+    marginLeft: "auto",
+    backgroundColor: backgroundColor,
+    color: theme.palette.text.secondary,
+  };
+});
+
 const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
-  const classes = useStyles();
   const [menuAnchor, setMenuAnchor] = useState(null); // Added back menuAnchor
 
   const {
@@ -88,21 +93,6 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     }
   };
 
-  const getStatusChipClass = () => {
-    switch (status) {
-      case "active":
-        return `${classes.chip} ${classes.pendingChip}`;
-      case "closed":
-        return `${classes.chip} ${classes.closedChip}`;
-      case "completed":
-        return `${classes.chip} ${classes.completedChip}`;
-      case "expired":
-        return `${classes.chip} ${classes.declinedChip}`;
-      default:
-        return classes.chip;
-    }
-  };
-
   const renderStatusIcon = () => {
     switch (status) {
       case "active":
@@ -113,7 +103,6 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
         return <CheckCircleOutlined />;
       case "expired":
         return <CancelOutlined />;
-
       default:
         return null;
     }
@@ -151,8 +140,8 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   };
 
   return (
-    <div className={classes.linkupHistoryItem}>
-      <div className={classes.itemHeader}>
+    <LinkupHistoryItemWrapper>
+      <ItemHeader>
         <UserAvatar
           userData={{
             id: creator_id,
@@ -176,22 +165,22 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
             setMenuAnchor={setMenuAnchor}
           />
         )}
-      </div>
-      <div className={classes.linkupDetails}>
+      </ItemHeader>
+      <LinkupDetails>
         <div>
-          <p className={classes.requestText}>{renderLinkupItemText()}</p>
+          <p>{renderLinkupItemText()}</p>
         </div>
-        <Chip
+        <StyledChip
           label={getStatusLabel()}
           icon={renderStatusIcon()}
           variant="outlined"
-          className={getStatusChipClass()}
+          status={status} // Pass the status for conditional styling
         />
-      </div>
+      </LinkupDetails>
       <Typography variant="subtitle2" component="details">
         <span>{formattedLocation}</span>
       </Typography>
-    </div>
+    </LinkupHistoryItemWrapper>
   );
 };
 

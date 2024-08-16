@@ -1,8 +1,7 @@
-require("dotenv").config();
-const Pool = require("pg").Pool;
+require("dotenv").config({ path: "./server/link-up-management-service/.env" });
+const { Pool } = require("pg");
 
-console.log("DB User:", process.env.POSTGRES_USER); // For debugging
-console.log("DB Host:", process.env.POSTGRES_HOST); // For debugging
+// console.log("Loading .env from", require("path").resolve(".env"));
 
 const pool = new Pool({
   user: process.env.POSTGRES_USER,

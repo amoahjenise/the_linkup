@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
@@ -8,36 +8,35 @@ import {
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-  },
-  actionButton: {
-    fontSize: "14px",
-    margin: "0 20px",
-    cursor: "pointer",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-  },
-  requestButton: {
-    display: "flex",
-    alignItems: "center",
-    fontSize: "14px",
-    cursor: "pointer",
-    "&:hover": {
-      textDecoration: "underline",
-    },
-    marginRight: "16px",
-  },
-  icon: {
-    marginRight: "4px",
+const Root = styled("div")({
+  display: "flex",
+});
+
+const ActionButton = styled("div")({
+  fontSize: "14px",
+  margin: "0 20px",
+  cursor: "pointer",
+  "&:hover": {
+    textDecoration: "underline",
   },
 });
 
-const PostActions = ({ onRequestClick, disableRequest }) => {
-  const classes = useStyles();
+const RequestButton = styled("div")({
+  display: "flex",
+  alignItems: "center",
+  fontSize: "14px",
+  cursor: "pointer",
+  "&:hover": {
+    textDecoration: "underline",
+  },
+  marginRight: "16px",
+});
 
+const Icon = styled(FontAwesomeIcon)({
+  marginRight: "4px",
+});
+
+const PostActions = ({ onRequestClick, disableRequest }) => {
   // Handle the request click event
   const handleRequestClick = () => {
     // Call the onRequestClick function when the request icon is clicked
@@ -45,55 +44,52 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
   };
 
   return (
-    <div className={classes.root}>
-      <div
+    <Root>
+      <RequestButton
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Request"
         role="button"
         tabIndex="0"
-        className={classes.requestButton}
         onClick={handleRequestClick}
       >
-        <FontAwesomeIcon
+        <Icon
           icon={disableRequest ? faClock : faEnvelope}
-          className={classes.icon}
           style={{ color: disableRequest ? "#A4B96B" : "#2DBFBF" }}
         />
-
         {disableRequest ? "Sent" : "Join"}
-      </div>
-      {/* <div
+      </RequestButton>
+
+      {/* Uncomment and add more action buttons if needed */}
+      {/* 
+      <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Like"
         role="button"
         tabIndex="1"
-        className={classes.actionButton}
       >
-        <FontAwesomeIcon
+        <Icon
           icon={faHeart}
-          className={classes.icon}
           style={{ color: "red" }}
         />
         Like
-      </div>
-      <div
+      </ActionButton>
+      <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Share post"
         role="button"
         tabIndex="2"
-        className={classes.actionButton}
       >
-        <FontAwesomeIcon
+        <Icon
           icon={faShare}
-          className={classes.icon}
           style={{ color: "blue" }}
         />
         Share Post
-      </div> */}
-    </div>
+      </ActionButton>
+      */}
+    </Root>
   );
 };
 

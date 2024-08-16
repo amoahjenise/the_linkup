@@ -214,7 +214,7 @@ The app follows a modular component structure (components/):
 
 A cohesive UI enhances user experience:
 
-- makeStyles from "@material-ui/core/styles" ensures consistent styling.
+- styled from "@material-ui/core/styles" ensures consistent styling.
 - User-friendly interfaces follow intuitive design principles.
 
 ## Server and API Endpoints
@@ -551,4 +551,4 @@ Columns:
     1. Access a link-up event as a user with an accepted request.
     2. Verify that the location details are visible.
     3. Access the same link-up event as a user without an accepted request.
-    4. Verify that the location details are not visible.
+    4. Verify that the location details are not visible..

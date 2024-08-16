@@ -38,8 +38,8 @@ const getNotifications = async (req, res) => {
   }
 };
 
-const createNotification = async (data) => {
-  const { creatorId, requesterId, type, content, linkupId } = data;
+const createNotification = async (req, res) => {
+  const { creatorId, requesterId, type, content, linkupId } = req.body;
 
   const queryPath = path.join(
     __dirname,
@@ -52,10 +52,17 @@ const createNotification = async (data) => {
 
   try {
     const { rows } = await pool.query(query, values);
-    return rows[0].id;
+    res.json({
+      success: true,
+      message: "Notification posted successfully",
+      notificationId: rows[0].id,
+    });
   } catch (error) {
-    console.error("Error creating notification:", error);
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: "Failed to post notification",
+      error: error.message,
+    });
   }
 };
 
@@ -69,13 +76,19 @@ const markNotificationAsRead = async (req, res) => {
   `;
 
   const values = [notificationId];
-  console.log("Values", values);
   try {
     const { rows } = await pool.query(query, values);
-    return rows[0];
+    res.json({
+      success: true,
+      message: "Notification marked as read successfully",
+      notification: rows[0],
+    });
   } catch (error) {
-    console.error("Error marking notification as read:", error);
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: "Failed to mark notification as read",
+      error: error.message,
+    });
   }
 };
 

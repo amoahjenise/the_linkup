@@ -1,131 +1,60 @@
-import React, { createContext, useContext, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { createContext, useEffect, useMemo, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
-import { useDispatch } from "react-redux";
-// import { incrementUnreadMessagesCount } from "../redux/actions/messageActions";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
-import {
-  updateConversation,
-  newMessage,
-} from "../redux/actions/conversationActions";
 
 const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
-  const conversations = useSelector(
-    (state) => state.conversation.conversations
-  );
   const loggedUser = useSelector((state) => state.loggedUser);
-  const userId = loggedUser.user.id;
+  const userId = loggedUser?.user?.id;
 
-  const selectedConversation = useSelector(
-    (state) => state.conversation.selectedConversation
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+  const LINKUP_MANAGEMENT_SOCKET_NAMESPACE =
+    process.env.REACT_APP_LINKUP_MANAGEMENT_SOCKET_NAMESPACE ||
+    "/linkup-management";
+  const LINKUP_REQUEST_SOCKET_NAMESPACE =
+    process.env.REACT_APP_LINKUP_REQUEST_SOCKET_NAMESPACE || "/linkup-request";
+
+  // Create Socket.IO instances using useMemo
+  const linkupManagementSocket = useMemo(
+    () =>
+      io(`${BASE_URL}${LINKUP_MANAGEMENT_SOCKET_NAMESPACE}`, {
+        query: { userId },
+      }),
+    [BASE_URL, LINKUP_MANAGEMENT_SOCKET_NAMESPACE, userId]
   );
 
-  const LINKUP_MANAGEMENT_SERVICE_URL =
-    process.env.REACT_APP_LINKUP_SERVICE_URL;
-  const LINKUP_REQUEST_SERVICE_URL =
-    process.env.REACT_APP_LINKUP_REQUESTS_SERVICE_URL;
-
-  // Create Socket.IO instances for both services
-  const linkupManagementSocket = io(LINKUP_MANAGEMENT_SERVICE_URL, {
-    query: { userId },
-  });
-
-  const linkupRequestSocket = io(LINKUP_REQUEST_SERVICE_URL, {
-    query: { userId },
-  });
-
-  // const messagingSocket = io("http://localhost:5006", {
-  //   query: { userId },
-  // });
+  const linkupRequestSocket = useMemo(
+    () =>
+      io(`${BASE_URL}${LINKUP_REQUEST_SOCKET_NAMESPACE}`, {
+        query: { userId },
+      }),
+    [BASE_URL, LINKUP_REQUEST_SOCKET_NAMESPACE, userId]
+  );
 
   useEffect(() => {
-    // Function to authenticate the user with the sockets
-    const authenticateUser = (socket) => {
-      socket.emit("authenticate", userId);
+    // Disconnect sockets if userId changes
+    return () => {
+      linkupManagementSocket.disconnect();
+      linkupRequestSocket.disconnect();
+      if (process.env.NODE_ENV === "development") {
+        console.log("Sockets disconnected due to userId change.");
+      }
     };
+  }, [linkupManagementSocket, linkupRequestSocket, userId]);
 
-    // Authenticate users with their respective sockets
-    // authenticateUser(linkupManagementSocket);
-    // authenticateUser(linkupRequestSocket);
-    // authenticateUser(messagingSocket);
-
-    // Messaging Service Events
-
-    // messagingSocket.on("new-message", (data) => {
-    //   // Data contains the incoming message details, e.g., sender_id, message_content, conversation_id
-    //   const {
-    //     timestamp,
-    //     message_id,
-    //     message_content,
-    //     sender_id,
-    //     sender_name,
-    //     sender_avatar,
-    //     conversation_id,
-    //   } = data;
-
-    //   // Dispatch the newMessage action to update the Redux store for both sender and receiver
-    //   dispatch(
-    //     newMessage({
-    //       message_id: message_id,
-    //       conversation_id: conversation_id,
-    //       sender_id: sender_id,
-    //       sender_name: sender_name,
-    //       sender_avatar: sender_avatar,
-    //       content: message_content,
-    //       timestamp: timestamp,
-    //     })
-    //   );
-
-    //   // Find the conversation with the matching conversation_id in the conversations array
-    //   if (conversations) {
-    //     const conversationToUpdate = conversations.find(
-    //       (conversation) => conversation.conversation_id === conversation_id
-    //     );
-
-    //     // Check if the conversation was found
-    //     if (conversationToUpdate) {
-    //       // Create an updated conversation object with the new last_message and last_message_timestamp
-    //       const updatedConversation = {
-    //         ...conversationToUpdate,
-    //         last_message: message_content,
-    //         last_message_timestamp: timestamp,
-    //       };
-
-    //       // Dispatch the updateConversation action to update the conversation in the Redux store
-    //       dispatch(updateConversation(updatedConversation));
-    //     }
-    //   }
-
-    //   // Increment the unread messages count if the user is not in the current conversation
-    //   if (selectedConversation?.conversation_id !== conversation_id) {
-    //     dispatch(incrementUnreadMessagesCount());
-    //   }
-    // });
-
-    // messagingSocket.on("new-message-notification", (notification) => {
-    //   addSnackbar(notification.content, { timeout: 7000 });
-    //   dispatch(incrementUnreadNotificationsCount());
-    //   // dispatch(incrementConversationUnreadCount());
-    // });
-
-    // Linkup Management Service Events
-
+  useEffect(() => {
     linkupManagementSocket.on("linkupCreated", (newLinkup) => {
-      // addSnackbar(
-      //   `Linkup ${newLinkup.id} created in Linkup Management Service.`
-      // );
+      // Handle new linkup created
     });
 
-    linkupManagementSocket.on("linkupExpired", (expiredLinkup) => {
-      addSnackbar(`Your link-up has expired!`);
+    linkupManagementSocket.on("linkupExpired", (data) => {
+      addSnackbar(data.message, { timeout: 7000 });
     });
-
-    // Linkup Request Service Events
 
     linkupRequestSocket.on("new-linkup-request", (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
@@ -133,44 +62,42 @@ export const SocketProvider = ({ children }) => {
     });
 
     linkupRequestSocket.on("request-accepted", (notification) => {
+      console.log("request-accepted client side");
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
     });
 
     linkupRequestSocket.on("request-declined", (notification) => {
+      console.log("request-declined client side");
+
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
     });
 
-    // Cleanup function to disconnect the sockets when the component unmounts
     return () => {
       linkupManagementSocket.disconnect();
       linkupRequestSocket.disconnect();
-      // messagingSocket.disconnect();
-      console.log("Client side disconnected from sockets.");
+      if (process.env.NODE_ENV === "development") {
+        console.log("Client side disconnected from sockets.");
+      }
     };
   }, [
     addSnackbar,
-    conversations,
+    dispatch,
+    userId,
     linkupManagementSocket,
     linkupRequestSocket,
-    // messagingSocket,
-    userId,
-    dispatch,
-    selectedConversation?.conversation_id,
   ]);
 
-  const sockets = {
-    linkupManagementSocket,
-    linkupRequestSocket,
-    // messagingSocket,
-  };
+  const sockets = useMemo(
+    () => ({
+      linkupManagementSocket,
+      linkupRequestSocket,
+    }),
+    [linkupManagementSocket, linkupRequestSocket]
+  );
 
   return (
     <SocketContext.Provider value={sockets}>{children}</SocketContext.Provider>
   );
-};
-
-export const useSockets = () => {
-  return useContext(SocketContext);
 };

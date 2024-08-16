@@ -10,8 +10,8 @@ const initializeSocket = (io) => {
   messagingSocket = io;
 };
 
-const createNewConversation = async (data) => {
-  const { sender_id, receiver_id, conversation_id, linkup_id } = data;
+const createNewConversation = async (req, res) => {
+  const { sender_id, receiver_id, conversation_id, linkup_id } = req.body;
 
   const queryPathConversation = path.join(
     __dirname,
@@ -33,7 +33,18 @@ const createNewConversation = async (data) => {
       queryValuesConversation
     );
 
-    return rows[0];
+    if (rows.length > 0) {
+      res.json({
+        success: true,
+        message: "New conversation saved successfully",
+        conversation: rows[0],
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "New conversation failed to save.",
+      });
+    }
   } catch (error) {
     console.error("Error creating conversation:", error);
     throw error;
@@ -51,7 +62,19 @@ const getConversationByChannelUrl = async (channelUrl) => {
 
   try {
     const { rows } = await pool.query(query, queryValues);
-    return rows[0];
+
+    if (rows.length > 0) {
+      res.json({
+        success: true,
+        message: "New conversation saved successfully",
+        channel: rows[0],
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "New conversation failed to save.",
+      });
+    }
   } catch (error) {
     console.error("Error fetching conversation by channel URL:", error);
     throw error;

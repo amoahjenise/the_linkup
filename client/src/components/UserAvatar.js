@@ -1,20 +1,18 @@
 import React from "react";
-import Avatar from "@material-ui/core/Avatar";
-import { makeStyles } from "@material-ui/core/styles";
+import { Avatar } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-const useStyles = makeStyles((theme) => ({
-  clickableAvatar: {
-    borderRadius: "50%",
-    objectFit: "cover",
-    marginRight: theme.spacing(1),
-    border: "1px solid #e1e8ed",
-    cursor: "pointer",
-  },
+// Create a styled component for Avatar with applied styles
+const ClickableAvatar = styled(Avatar)(({ theme }) => ({
+  borderRadius: "50%",
+  objectFit: "cover",
+  marginRight: theme.spacing(1),
+  border: "1px solid #e1e8ed",
+  cursor: "pointer",
 }));
 
 const UserAvatar = ({ userData, width, height }) => {
-  const classes = useStyles();
   const navigate = useNavigate(); // Use useNavigate hook
 
   // Function to handle click on the Avatar
@@ -27,10 +25,9 @@ const UserAvatar = ({ userData, width, height }) => {
   };
 
   return (
-    <Avatar
+    <ClickableAvatar
       alt={userData?.name}
       src={userData?.avatar}
-      className={classes.clickableAvatar}
       style={{ width, height }} // Set width and height as inline styles
       onClick={handleClick}
     />

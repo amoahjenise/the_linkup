@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Avatar from "@material-ui/core/Avatar";
+import { styled } from "@mui/material/styles";
+import { Button, TextField, Avatar } from "@mui/material";
 import moment from "moment";
 import { sendRequest } from "../api/linkupRequestAPI";
 import { addSentRequest } from "../redux/actions/userSentRequestsActions";
@@ -16,88 +14,87 @@ import {
 } from "../api/sendbirdAPI";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 
-const useStyles = makeStyles((theme) => ({
-  sendRequest: {
-    display: "flex",
-    height: "100vh",
-  },
-  mainSection: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: theme.spacing(2),
-  },
-  linkUpInfo: {
-    marginBottom: theme.spacing(2),
-    fontSize: "20px",
-  },
-  messageInput: {
-    marginBottom: theme.spacing(2),
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#D3D3D3",
-      },
-      "&:hover fieldset": {
-        borderColor: "#D3D3D3",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#0097A7",
-      },
+const SendRequestContainer = styled("div")({
+  display: "flex",
+  height: "100vh",
+});
+
+const MainSection = styled("div")(({ theme }) => ({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2),
+}));
+
+const LinkUpInfo = styled("div")(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  fontSize: "20px",
+}));
+
+const StyledTextField = styled(TextField)(({ theme, textColor }) => ({
+  marginBottom: theme.spacing(2),
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#D3D3D3",
     },
-    "& .MuiInputLabel-root": {
-      color: (props) => props.textColor,
+    "&:hover fieldset": {
+      borderColor: "#D3D3D3",
     },
-    "& .MuiInputBase-input": {
-      color: (props) => props.textColor,
+    "&.Mui-focused fieldset": {
+      borderColor: "#0097A7",
     },
   },
-  sendButton: {
-    marginBottom: theme.spacing(2),
-    borderRadius: "40px",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
-    backgroundColor: "#0097A7",
-    fontWeight: "bold",
-    color: "white",
-    "&:hover": {
-      backgroundColor: "#007b86", // Slightly darker color on hover
-    },
-    width: "200px",
-    height: "60px",
-    marginTop: theme.spacing(2),
+  "& .MuiInputLabel-root": {
+    color: textColor,
   },
-  avatar: {
-    width: theme.spacing(20),
-    height: theme.spacing(20),
-    marginBottom: theme.spacing(2),
-  },
-  locationDetails: {
-    display: "flex",
-    fontSize: "16px",
-    justifyContent: "center",
-    alignItems: "center",
+  "& .MuiInputBase-input": {
+    color: textColor,
   },
 }));
+
+const SendButton = styled(Button)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: "40px",
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
+  backgroundColor: "#0097A7",
+  fontWeight: "bold",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "#007b86",
+  },
+  width: "200px",
+  height: "60px",
+  marginTop: theme.spacing(2),
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: theme.spacing(20),
+  height: theme.spacing(20),
+  marginBottom: theme.spacing(2),
+}));
+
+const LocationDetails = styled("span")({
+  display: "flex",
+  fontSize: "16px",
+  justifyContent: "center",
+  alignItems: "center",
+});
 
 const SendRequest = ({ linkupId, linkups, colorMode }) => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
-  // Find the post by postId
   const post = linkups.find((p) => p.id === linkupId);
   const requesterId = loggedUser.user.id;
   const requesterName = loggedUser.user.name;
 
-  const classes = useStyles();
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // useNavigate hook for navigation
+  const navigate = useNavigate();
 
-  const textColor =
-    colorMode === "dark"
-      ? "white" // Dark mode background color with no transparency
-      : "black";
+  const textColor = colorMode === "dark" ? "white" : "black";
 
   const disabledStyle = {
     color:
@@ -108,32 +105,27 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
     const aUsers = [requesterId, post.creator_id];
 
     try {
-      // Check if a link-up request exists
       const existingRequest = await getRequestByLinkupIdAndSenderId(
         linkupId,
         requesterId
       );
 
-      if (existingRequest.success) {
-        // Display an alert informing the user that they have already sent a request for this link-up
+      console.log("existingRequest.linkupRequest", existingRequest);
+
+      if (existingRequest.linkupRequest) {
         addSnackbar("You have already sent a request for this link-up.");
         return;
       }
 
-      // Create the group channel and wait for its response
       const channelResponse = await createGroupChannel(
-        // post.avatar,
         aUsers,
         post.creator_id,
         requesterId
       );
-
-      // Extract the channel URL from the response
       const channelUrl = channelResponse.channel_url;
 
       await sendInvitation(channelUrl, [requesterId], post.creator_id);
 
-      // Call the sendMessage function with the channel URL and the message
       const sendMessageResponse = await sendMessage(
         requesterId,
         channelUrl,
@@ -163,7 +155,6 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
   };
 
   const renderPostText = () => {
-    // Replace with your logic to generate the post text
     const dateText = post.date
       ? `${moment(post.date).format("MMM DD, YYYY")}`
       : "";
@@ -172,44 +163,37 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
   };
 
   return (
-    <div className={classes.sendRequest}>
-      <div className={classes.mainSection}>
-        <Avatar
-          alt={post.creator_name}
-          src={post.avatar}
-          className={classes.avatar}
-        />
-        <div className={classes.linkUpInfo}>
+    <SendRequestContainer>
+      <MainSection>
+        <StyledAvatar alt={post.creator_name} src={post.avatar} />
+        <LinkUpInfo>
           <div>{renderPostText()}</div>
-          <span className={classes.locationDetails}>
+          <LocationDetails>
             Location details will be provided if the request gets accepted.
-          </span>
-        </div>
-        <TextField
-          className={classes.messageInput}
+          </LocationDetails>
+        </LinkUpInfo>
+        <StyledTextField
           label="Message"
           multiline
           rows={4}
           variant="outlined"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          InputProps={{ style: { color: textColor } }}
-          InputLabelProps={{ style: { color: textColor } }}
+          textColor={textColor}
         />
         <div className="cta-buttons">
-          <Button
+          <SendButton
             variant="contained"
             color="primary"
-            className={classes.sendButton}
             onClick={handleSendRequest}
-            disabled={!message} // Disable the button if message is empty
+            disabled={!message}
             style={!message ? disabledStyle : {}}
           >
             Send Request
-          </Button>
+          </SendButton>
         </div>
-      </div>
-    </div>
+      </MainSection>
+    </SendRequestContainer>
   );
 };
 

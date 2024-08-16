@@ -2,23 +2,18 @@
   "name": "luul",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
-    "init-db": "psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
+    "init-db": "PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "heroku-postbuild": "npm run build",
     "build:server": "cd server/auth-service && npm install && cd ../user-management-service && npm install && cd ../link-up-management-service && npm install && cd ../link-up-request-service && npm install && cd ../notification-service && npm install && cd ../messaging-service && npm install && cd ../image-service && npm install && cd ../location-service && npm install",
-    "build:client": "cd client && npm install --legacy-peer-deps && npm run build",
+    "build:client": "cd client && npm install && npm run build",
     "build": "npm run build:client && npm run build:server",
     "start": "node index.js",
-    "start:auth-service": "cd server/auth-service && npm start -- --reset-cache",
-    "start:user-management-service": "cd server/user-management-service && npm start -- --reset-cache",
-    "start:link-up-management-service": "cd server/link-up-management-service && npm start -- --reset-cache",
-    "start:link-up-request-service": "cd server/link-up-request-service && npm start -- --reset-cache",
-    "start:notification-service": "cd server/notification-service && npm start -- --reset-cache",
-    "start:messaging-service": "cd server/messaging-service && npm start -- --reset-cache",
-    "start:image-service": "cd server/image-service && npm start -- --reset-cache",
-    "start:location-service": "cd server/location-service && npm start -- --reset-cache",
-    "start:client": "cd client && npm start -- --reset-cache",
-    "start:all": "concurrently \"npm run start:auth-service -- --port=5001\" \"npm run start:user-management-service -- --port=5002\" \"npm run start:link-up-management-service -- --port=5003\" \"npm run start:link-up-request-service -- --port=5004\" \"npm run start:notification-service -- --port=5005\" \"npm run start:messaging-service -- --port=5006\" \"npm run start:location-service -- --port=5007\" \"npm run start:image-service -- --port=5008\" \"npm run start:client -- --port=3000\""
+    "start:client": "cd client && npm start",
+    "start:dev": "concurrently \"npm run start\" \"npm run start:client\""
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -27,7 +22,6 @@
     "@clerk/clerk-sdk-node": "^4.13.9",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
-    "@mui/styles": "^5.15.18",
     "@reduxjs/toolkit": "^2.2.5",
     "@sendbird/uikit-react": "^3.14.6",
     "ajv": "^8.17.1",
@@ -37,10 +31,12 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "framer-motion": "^10.18.0",
+    "helmet": "^7.1.0",
     "if-env": "^1.0.4",
     "path": "^0.12.7",
     "react-router-dom": "^6.14.2",
     "sendbird": "^3.1.33",
+    "socket.io": "^4.7.5",
     "svix": "^1.17.0"
   },
   "devDependencies": {

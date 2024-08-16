@@ -1,40 +1,41 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
+import { styled } from "@mui/material/styles";
+import { Typography } from "@mui/material";
 import logo from "../logo.png";
 
-const useStyles = makeStyles((theme) => ({
-  main: {
-    display: "flex",
-    justifyContent: "center",
-    textAlign: "center",
-  },
-  title: {
-    fontWeight: "bold",
-  },
-  logoContainer: {
-    marginBottom: theme.spacing(4),
-    [theme.breakpoints.down("sm")]: {
-      marginBottom: theme.spacing(0),
-    },
-  },
-  logo: {
-    height: "40px",
+// Styled components
+const MainContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  textAlign: "center",
+}));
+
+const LogoContainer = styled("div")(({ theme }) => ({
+  marginBottom: theme.spacing(4),
+  [theme.breakpoints.down("md")]: {
+    marginBottom: theme.spacing(0),
   },
 }));
 
-const LogoHeader = () => {
-  const classes = useStyles();
+const LogoImage = styled("img")({
+  height: "40px",
+});
 
+const Title = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+}));
+
+const LogoHeader = () => {
   return (
-    <div className={classes.main}>
-      {/* <div className={classes.logoContainer}>
-        <img src={logo} alt="Logo" className={classes.logo} />
-      </div> */}
-      <Typography variant="h4" component="h1" className={classes.title}>
+    <MainContainer>
+      {/* Uncomment this to include the logo */}
+      {/* <LogoContainer>
+        <LogoImage src={logo} alt="Logo" />
+      </LogoContainer> */}
+      <Title variant="h4" component="h1">
         LINK-UP
-      </Typography>
-    </div>
+      </Title>
+    </MainContainer>
   );
 };
 

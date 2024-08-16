@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+import { styled } from "@mui/material/styles";
+import { Button } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateLinkup } from "../api/linkUpAPI";
@@ -9,101 +9,121 @@ import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
-const useStyles = makeStyles((theme) => ({
-  searchInputContainer: {
-    padding: theme.spacing(2),
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+const SearchInputContainer = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}));
+
+const ModalOverlay = styled("div")({
+  flex: "1",
+  position: "sticky",
+  top: 0,
+  width: "100%",
+});
+
+const ModalContainer = styled("div")({
+  flex: "1",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  position: "sticky",
+  top: 0,
+});
+
+const ModalTitle = styled("h2")(({ theme }) => ({
+  fontWeight: "bold",
+  marginBottom: theme.spacing(3),
+}));
+
+const ModalForm = styled("form")({
+  display: "flex",
+  flexDirection: "column",
+});
+
+const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(1),
+  borderRadius: "24px",
+  border: "1px solid #ccc",
+  width: "100%",
+}));
+
+const ModalLabel = styled("label")({
+  fontSize: "13px",
+  display: "flex",
+  justifyContent: "start",
+  fontWeight: "bold",
+  color: "#6B7280",
+});
+
+const ModalInput = styled("input")(({ theme }) => ({
+  width: "100%",
+  fontSize: "14px",
+  padding: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
   },
-  modalOverlay: {
-    flex: "1",
-    position: "sticky",
-    top: 0,
-    width: "100%x",
-  },
-  modalContainer: {
-    flex: "1",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    position: "sticky",
-    top: 0,
-  },
-  modalTitle: {
-    fontWeight: "bold",
-    marginBottom: theme.spacing(3),
-  },
-  modalForm: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  datePicker: {
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(1),
-    borderRadius: "24px",
-    border: "1px solid #ccc", // Add border style
+}));
+
+const ButtonGroup = styled("div")(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  display: "flex",
+  justifyContent: "center",
+  height: "40px",
+}));
+
+const CustomDropdown = styled("div")(({ theme }) => ({
+  fontSize: "14px",
+  position: "relative",
+  marginBottom: theme.spacing(2),
+  "& select": {
     width: "100%",
-  },
-  modalLabel: {
-    fontSize: "13px",
-    display: "flex",
-    justifyContent: "start",
-    fontWeight: "bold",
-    color: "#6B7280", // Adjust color to your preference
-  },
-  modalInput: {
-    width: "100%",
-    fontSize: "14px",
     padding: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    border: `1px solid ${theme.palette.divider}`,
+    border: "1px solid #ccc",
+    appearance: "none",
+    backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
+    backgroundPosition: "right 12px center",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "auto 20px",
+    paddingRight: "2.5rem",
     "&:focus": {
+      outline: "none",
       borderColor: theme.palette.primary.main,
-    },
-  },
-  buttonGroup: {
-    marginTop: theme.spacing(2),
-    display: "flex",
-    justifyContent: "center",
-    height: "40px",
-  },
-  button: {
-    width: "140px",
-    border: "none",
-    borderRadius: "4px",
-  },
-  // Define styles for the custom dropdown
-  customDropdown: {
-    fontSize: "14px",
-    position: "relative",
-    marginBottom: theme.spacing(2),
-    "& select": {
-      width: "100%",
-      padding: theme.spacing(1),
-      border: "1px solid #ccc",
-      appearance: "none",
-      backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
-      backgroundPosition: "right 12px center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "auto 20px",
-      paddingRight: "2.5rem", // Ensure room for the arrow icon
-      "&:focus": {
-        outline: "none",
-        borderColor: theme.palette.primary.main,
-      },
     },
   },
 }));
 
+const StyledButton = styled(Button)(({ theme }) => ({
+  width: "140px",
+  border: "none",
+  borderRadius: "4px",
+  marginRight: "10%",
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
+  backgroundColor: "#0097A7",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "#007b86",
+  },
+}));
+
+const CancelButton = styled(Button)({
+  width: "140px",
+  border: "none",
+  borderRadius: "4px",
+  backgroundColor: "#E0E0E0",
+});
+
 const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
 
-  // State variables to track form changes
   const [selectedDate, setSelectedDate] = useState(editingLinkup?.linkup?.date);
   const [activity, setActivity] = useState(editingLinkup?.linkup?.activity);
   const [location, setLocation] = useState(editingLinkup?.linkup?.location);
@@ -114,18 +134,16 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
     editingLinkup?.linkup?.payment_option || ""
   );
 
-  // State variable to track form modification
   const [isFormModified, setIsFormModified] = useState(false);
-
   const { addSnackbar } = useSnackbar();
 
   const maxTime = new Date();
-  maxTime.setHours(23); // Set hours to 11
-  maxTime.setMinutes(45); // Set minutes to 45
+  maxTime.setHours(23);
+  maxTime.setMinutes(45);
 
   const minTimeDefault = new Date();
-  minTimeDefault.setHours(0); // Set hours to 0 (midnight)
-  minTimeDefault.setMinutes(0); // Set minutes to 0
+  minTimeDefault.setHours(0);
+  minTimeDefault.setMinutes(0);
 
   const currentDate = new Date();
   const minTime = selectedDate
@@ -134,7 +152,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       : minTimeDefault
     : currentDate;
 
-  // Event handlers to update form state and modification status
   const handleActivityChange = (e) => {
     setActivity(e.target.value);
     setIsFormModified(true);
@@ -159,12 +176,11 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
     async (e) => {
       e.preventDefault();
 
-      // Check if any changes were made in the form
       if (!isFormModified) {
         onClose();
         dispatch(clearEditingLinkup());
         addSnackbar("No changes were made.");
-        return; // Don't perform the update
+        return;
       }
 
       const updatedLinkup = {
@@ -215,15 +231,12 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   };
 
   return (
-    <div className={classes.modalOverlay}>
-      <div className={classes.modalContainer}>
-        <h2 className={classes.modalTitle}>Edit Link-Up</h2>
-        <form className={classes.modalForm} onSubmit={handleUpdateLinkup}>
-          <label htmlFor="activity" className={classes.modalLabel}>
-            Activity
-          </label>
-          <input
-            className={classes.modalInput}
+    <ModalOverlay>
+      <ModalContainer>
+        <ModalTitle>Edit Link-Up</ModalTitle>
+        <ModalForm onSubmit={handleUpdateLinkup}>
+          <ModalLabel htmlFor="activity">Activity</ModalLabel>
+          <ModalInput
             type="text"
             placeholder="Activity"
             name="activity"
@@ -232,11 +245,8 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             onChange={handleActivityChange}
             required
           />
-          <label htmlFor="location" className={classes.modalLabel}>
-            Location
-          </label>
-          <input
-            className={classes.modalInput}
+          <ModalLabel htmlFor="location">Location</ModalLabel>
+          <ModalInput
             type="text"
             placeholder="Location"
             name="location"
@@ -245,10 +255,8 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             onChange={handleLocationChange}
             required
           />
-          <label htmlFor="date" className={classes.modalLabel}>
-            Date and Time
-          </label>
-          <DatePicker
+          <ModalLabel htmlFor="date">Date and Time</ModalLabel>
+          <DatePickerStyled
             selected={new Date(selectedDate)}
             onChange={handleDateChange}
             showTimeSelect
@@ -256,18 +264,15 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             timeIntervals={15}
             timeCaption="Time"
             dateFormat="MMMM d, yyyy h:mm aa"
-            minDate={new Date()} // Set the minimum date to the current date
-            minTime={minTime} // Set the minimum time conditionally
+            minDate={new Date()}
+            minTime={minTime}
             maxTime={maxTime}
-            className={`${classes.modalInput} ${classes.datePicker}`} // Apply styles
             placeholderText="Select date and time"
             id="date"
             required
           />
-          <label htmlFor="genderPreference" className={classes.modalLabel}>
-            Gender Preference
-          </label>
-          <div className={classes.customDropdown}>
+          <ModalLabel htmlFor="genderPreference">Gender Preference</ModalLabel>
+          <CustomDropdown>
             <select
               value={genderPreference}
               onChange={handleGenderPreferenceChange}
@@ -282,59 +287,31 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               <option value="female">Female</option>
               <option value="any">Any</option>
             </select>
-          </div>
-
-          {/* Payment Option */}
-          <label htmlFor="paymentOption" className={classes.modalLabel}>
-            Payment Option
-          </label>
-          <div className={classes.customDropdown}>
+          </CustomDropdown>
+          <ModalLabel htmlFor="paymentOption">Payment Option</ModalLabel>
+          <CustomDropdown>
             <select
               value={paymentOption}
               onChange={handlePaymentOptionChange}
               aria-label="Payment Option"
               id="paymentOption"
+              required
             >
-              <option value="">Select Payment Option (Optional)</option>{" "}
+              <option value="" disabled>
+                Select Payment Option
+              </option>
               <option value="split">Split The Bill</option>
               <option value="iWillPay">I Will Pay</option>
               <option value="pleasePay">Please Pay</option>
             </select>
-          </div>
-          <div className={classes.buttonGroup}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              style={{
-                marginRight: "10%",
-                cursor: "pointer",
-                transition: "background-color 0.3s ease",
-                backgroundColor: "#0097A7",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#007b86", // Slightly darker color on hover
-                },
-              }}
-            >
-              Update
-            </Button>
-            <Button
-              variant="contained"
-              color="default"
-              onClick={handleCancelClick}
-              className={classes.button}
-              style={{
-                backgroundColor: "#E0E0E0",
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+          </CustomDropdown>
+          <ButtonGroup>
+            <StyledButton type="submit">Update</StyledButton>
+            <CancelButton onClick={handleCancelClick}>Cancel</CancelButton>
+          </ButtonGroup>
+        </ModalForm>
+      </ModalContainer>
+    </ModalOverlay>
   );
 };
 

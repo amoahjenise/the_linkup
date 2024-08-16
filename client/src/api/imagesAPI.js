@@ -4,7 +4,7 @@ import axios from "axios";
 // axios.defaults.withCredentials = true;
 
 // Define the base URL of your server API
-const BASE_URL = process.env.REACT_APP_IMAGE_SERVICE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const handleError = (error) => {
   console.error("Error:", error);

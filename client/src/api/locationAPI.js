@@ -3,7 +3,7 @@ import axios from "axios";
 // Add this configuration globally for Axios to include credentials
 // axios.defaults.withCredentials = true;
 
-const BASE_URL = process.env.REACT_APP_LOCATION_SERVICE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const handleError = (error) => {
   console.error("Error:", error);
@@ -29,14 +29,17 @@ export const postLocation = async (
   allowLocation
 ) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/location/user-location`, {
-      id,
-      city,
-      country,
-      latitude,
-      longitude,
-      allow_location: allowLocation,
-    });
+    const response = await axios.post(
+      `${BASE_URL}/api/location/user-location`,
+      {
+        id,
+        city,
+        country,
+        latitude,
+        longitude,
+        allow_location: allowLocation,
+      }
+    );
     return response.data;
   } catch (error) {
     handleError(error);

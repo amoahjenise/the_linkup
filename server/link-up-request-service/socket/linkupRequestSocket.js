@@ -1,14 +1,6 @@
-// linkupSocket.js (in link-up-management-service)
-const socketIo = require("socket.io");
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
-
-module.exports = (server) => {
-  const io = socketIo(server, {
-    cors: {
-      origin: [ALLOWED_ORIGIN],
-      methods: ["POST", "GET", "PATCH", "DELETE"],
-    },
-  });
+// Define the linkupRequestSocket function
+const linkupRequestSocket = (io) => {
+  const linkupRequestNamespace = io.of("/linkup-request");
 
   let userSockets = {}; // Define the userSockets object
 
@@ -17,144 +9,84 @@ module.exports = (server) => {
     return userSockets[userId];
   };
 
-  io.on("connection", (socket) => {
-    // Get the user ID or any unique identifier for the user
-    const userId = socket.handshake.query.userId;
-    // Assign the user's socket ID as the unique identifier
-    socket.userId = userId;
+  linkupRequestNamespace.on("connection", (socket) => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("A user connected to the linkup request service socket");
+    }
 
+    const userId = socket.handshake.query.userId;
+    if (!userId) {
+      console.error("Missing userId in socket handshake query");
+      socket.disconnect();
+      return;
+    }
+
+    socket.userId = userId;
     socket.join(`user-${userId}`);
 
-    // // Store the socket connection with the user ID
-    // socket.on("store-user-id", (userId) => {
-    //   userSockets[userId] = socket;
-    // });
+    // Handle "request-sent" event
+    socket.on("request-sent", (data) => {
+      if (!data.creator_id) {
+        console.error("Missing creator_id in request-sent event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("A request was sent.");
+      }
+      socket.to(`user-${data.creator_id}`).emit("new-linkup-request", data);
+    });
 
-    // // Handle real-time events here
-    // socket.on("request-sent", (data) => {
-    //   console.log("Notify user that a request was received.");
-    // });
+    // Handle "request-accepted" event
+    socket.on("request-accepted", (data) => {
+      if (!data.requester_id) {
+        console.error("Missing requester_id in request-accepted event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("Notify user that a request was approved.");
+      }
+      socket.to(`user-${data.requester_id}`).emit("request-accepted", data);
+    });
 
-    // socket.on("request-approved", (data) => {
-    //   console.log("Notify user that a request was approved.");
-    // });
+    // Handle "request-declined" event
+    socket.on("request-declined", (data) => {
+      if (!data.requester_id) {
+        console.error("Missing requester_id in request-declined event");
+        return;
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("Notify user that a request was declined.");
+      }
+      socket.to(`user-${data.requester_id}`).emit("request-declined", data);
+    });
 
-    // Handle disconnect
-    socket.on("request-declined", () => {
-      console.log("Notify user that a request was declined.");
+    // Handle "join-linkup-room" event
+    socket.on("join-linkup-room", (linkupId) => {
+      if (!linkupId) {
+        console.error("Missing linkupId in join-linkup-room event");
+        return;
+      }
+      socket.join(`linkup-${linkupId}`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(`User ${socket.userId} joined linkup room ${linkupId}`);
+      }
+    });
+
+    // Handle disconnect event
+    socket.on("disconnect", () => {
+      if (process.env.NODE_ENV === "development") {
+        console.log("A user disconnected from linkup request service");
+      }
+    });
+
+    // Handle Socket.IO errors
+    socket.on("error", (error) => {
+      console.error("Socket.IO Error:", error);
     });
   });
 
-  return io; // Export the io instance
+  // Return the io instance
+  return io;
 };
 
-// // Initialize the socket functionality
-// const initializeSocket = (socket) => {
-//   socket.on("connection", (socket) => {
-//     console.log("Link-up request socket connected.");
-
-//     // Get the user ID or any unique identifier for the user
-//     const userId = socket.handshake.query.userId;
-//     // Assign the user's socket ID as the unique identifier
-//     socket.userId = userId;
-
-//     socket.join(`user-${userId}`);
-
-//     // Store the socket connection with the user ID
-//     socket.on("store-user-id", (userId) => {
-//       userSockets[userId] = socket;
-//     });
-
-//     // Handle real-time events here
-//     socket.on("request-sent", (data) => {
-//       console.log("Notify user that a request was received.");
-//     });
-
-//     socket.on("request-approved", (data) => {
-//       console.log("Notify user that a request was approved.");
-//     });
-
-//     // Handle disconnect
-//     socket.on("request-declined", () => {
-//       console.log("Notify user that a request was declined.");
-//     });
-//   });
-// };
-
-// // Export the functions
-// module.exports = {
-//   getSocketByUserId,
-//   initializeSocket,
-// };
-
-// // linkupRequestSocket.js (backend side)
-// module.exports = (io) => {
-//   io.on("connection", (socket) => {
-//     console.log("A user connected to the linkup request service socket");
-
-//     // Handle real-time events here
-//     socket.on("request-sent", (data) => {
-//       console.log("Notify user that a request was received.");
-//     });
-
-//     socket.on("request-approved", (data) => {
-//       console.log("Notify user that a request was approved.");
-//     });
-
-//     // Handle the "join-linkup-room" event
-//     socket.on("join-linkup-room", (linkupId) => {
-//       // Join the room with the linkup ID
-//       socket.join(`linkup-${linkupId}`);
-//       console.log(`User ${socket.userId} joined linkup room ${linkupId}`);
-//     });
-
-//     // Handle disconnect
-//     socket.on("disconnect", () => {
-//       console.log("A user disconnected");
-//     });
-
-//     // Handle Socket.IO errors
-//     socket.on("error", (error) => {
-//       console.error("Socket.IO Error:", error);
-//     });
-//   });
-// };
-
-// let userSockets = {}; // Define the userSockets object
-
-// // Function to get socket instance by user ID
-// const getSocketByUserId = (userId) => {
-//   return userSockets[userId];
-// };
-
-// // Initialize the socket functionality
-// const initializeSocket = (io) => {
-//   io.on("connection", (socket) => {
-//     console.log("Link-up request socket connected.");
-
-//     // Store the socket connection with the user ID
-//     socket.on("store-user-id", (userId) => {
-//       userSockets[userId] = socket;
-//     });
-
-//     // Handle real-time events here
-//     socket.on("request-sent", (data) => {
-//       console.log("Notify user that a request was received.");
-//     });
-
-//     socket.on("request-approved", (data) => {
-//       console.log("Notify user that a request was approved.");
-//     });
-
-//     // Handle disconnect
-//     socket.on("request-declined", () => {
-//       console.log("Notify user that a request was declined.");
-//     });
-//   });
-// };
-
-// // Export the functions
-// module.exports = {
-//   getSocketByUserId,
-//   initializeSocket,
-// };
+module.exports = linkupRequestSocket;

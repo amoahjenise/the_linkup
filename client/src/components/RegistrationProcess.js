@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
+import { styled } from "@mui/material/styles";
+import { Button } from "@mui/material";
 import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
 import { useColorMode } from "@chakra-ui/react";
 import { useUser } from "@clerk/clerk-react";
@@ -18,53 +18,54 @@ import SecondStep from "../components/ProgressBarSteps/SecondStep";
 import LastStep from "../components/ProgressBarSteps/LastStep";
 import { updateUser, getUserByClerkId } from "../api/usersAPI";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    textAlign: "center",
-    padding: theme.spacing(2),
+// Styled components
+const Root = styled("div")(({ theme }) => ({
+  textAlign: "center",
+  padding: theme.spacing(2),
+}));
+
+const Title = styled("div")(({ theme }) => ({
+  marginBottom: theme.spacing(8),
+  fontSize: "24px",
+}));
+
+const SubTitle = styled("p")(({ theme }) => ({
+  fontSize: "18px",
+  marginBottom: theme.spacing(2),
+}));
+
+const ButtonContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignContent: "center",
+  justifyContent: "center",
+  marginTop: theme.spacing(2),
+}));
+
+const BackButton = styled(Button)(({ theme, colorMode }) => ({
+  width: "50%",
+  border: "1px solid #ccc",
+  color: colorMode === "dark" ? "#fff" : "#000",
+  marginRight: theme.spacing(2),
+  "&:hover": {
+    backgroundColor: colorMode === "dark" ? "#1976d2" : "#434EA5",
   },
-  title: {
-    marginBottom: theme.spacing(8),
-    fontSize: "24px",
+}));
+
+const ContinueButton = styled(Button)(({ theme, colorMode }) => ({
+  width: "50%",
+  border: "1px solid #ccc",
+  color: colorMode === "dark" ? "#fff" : "#000",
+  "&:hover": {
+    backgroundColor: colorMode === "dark" ? "#1976d2" : "#434EA5",
   },
-  subTitle: {
-    fontSize: "18px",
-    marginBottom: theme.spacing(2),
-  },
-  buttonContainer: {
-    display: "flex",
-    alignContent: "center",
-    justifyContent: "center",
-    marginTop: theme.spacing(2),
-  },
-  backButton: {
-    width: "50%",
-    border: "1px solid #ccc",
-    color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
-    marginRight: theme.spacing(2),
-    "&:hover": {
-      backgroundColor: (props) =>
-        props.colorMode === "dark" ? "#1976d2" : "#434EA5",
-    },
-  },
-  continueButton: {
-    width: "50%",
-    border: "1px solid #ccc",
-    color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
-    "&:hover": {
-      backgroundColor: (props) =>
-        props.colorMode === "dark" ? "#1976d2" : "#434EA5",
-    },
-    "&.Mui-disabled": {
-      color: (props) => (props.colorMode === "dark" ? "#fff" : "#000"),
-    },
+  "&.Mui-disabled": {
+    color: colorMode === "dark" ? "#fff" : "#000",
   },
 }));
 
 const RegistrationProcess = () => {
   console.log("RegistrationProcess component mounted");
   const { colorMode } = useColorMode();
-  const classes = useStyles({ colorMode });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useUser();
@@ -96,14 +97,14 @@ const RegistrationProcess = () => {
             dispatch(setIsRegistering(true));
           }
         } catch (error) {
-          alert(`An unknown error occured. Please try again later.`);
+          alert(`An unknown error occurred. Please try again later.`);
           console.log(`Error fetching user data: ${error.message}`);
         }
       }
     };
 
     checkRegistrationStatus();
-  }, []);
+  }, [registrationData.isRegistering, userData, user.id, dispatch, navigate]);
 
   const handleLaunchLuul = async () => {
     try {
@@ -153,33 +154,31 @@ const RegistrationProcess = () => {
   };
 
   return (
-    <div className={classes.root}>
+    <Root>
       <MultiStepProgressBar colorMode={colorMode} />
       <div>
-        <div className={classes.title}>
+        <Title>
           <h1>
             {registrationData.currentStep === pageTitles.length
               ? "Congratulations!"
               : pageTitles[registrationData.currentStep]}
           </h1>
-          <p className={classes.subTitle}>
-            {pageSubTitles[registrationData.currentStep]}
-          </p>
-        </div>
+          <SubTitle>{pageSubTitles[registrationData.currentStep]}</SubTitle>
+        </Title>
         <div>{PageDisplay()}</div>
-        <div className={classes.buttonContainer}>
+        <ButtonContainer>
           {registrationData.currentStep > 0 &&
             registrationData.currentStep !== 2 && (
-              <Button
+              <BackButton
                 variant="contained"
                 color="primary"
                 onClick={handlePreviousStep}
-                className={classes.backButton}
+                colorMode={colorMode}
               >
                 Back
-              </Button>
+              </BackButton>
             )}
-          <Button
+          <ContinueButton
             variant="contained"
             color="primary"
             onClick={
@@ -192,13 +191,13 @@ const RegistrationProcess = () => {
               (registrationData.currentStep === 0 &&
                 (!userData.gender || !userData.dateOfBirth))
             }
-            className={classes.continueButton}
+            colorMode={colorMode}
           >
             {registrationData.currentStep === 2 ? "Launch LUUL" : "Continue"}
-          </Button>
-        </div>
+          </ContinueButton>
+        </ButtonContainer>
       </div>
-    </div>
+    </Root>
   );
 };
 

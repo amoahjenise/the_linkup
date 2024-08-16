@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./server/notification-service/.env" });
 const Pool = require("pg").Pool;
 
 const pool = new Pool({

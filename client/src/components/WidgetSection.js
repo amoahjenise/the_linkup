@@ -3,22 +3,21 @@ import { useDispatch } from "react-redux";
 import SearchInput from "./SearchInputWidget";
 import RefreshFeedWidget from "./RefreshFeedWidget";
 import CreateLinkupForm from "./CreateLinkupWidget";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce"; // Import debounce function from lodash
 
-const useStyles = makeStyles((theme) => ({
-  widgetSection: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: theme.spacing(4),
-  },
-  widget: {
-    width: "100%",
-    marginBottom: theme.spacing(4), // Spacing between widgets
-  },
+const WidgetSectionContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  padding: theme.spacing(4),
+}));
+
+const Widget = styled("div")(({ theme }) => ({
+  width: "100%",
+  marginBottom: theme.spacing(4), // Spacing between widgets
 }));
 
 const WidgetSection = ({
@@ -28,9 +27,7 @@ const WidgetSection = ({
   userId,
   gender,
 }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
-
   const [loading, setLoading] = useState(false);
 
   // Function to handle input change and trigger search with debounce
@@ -53,29 +50,29 @@ const WidgetSection = ({
           setLoading(false);
         });
     }, 300),
-    [searchLinkups, gender, dispatch, setLoading]
+    [userId, gender, dispatch] // Dependencies adjusted for correct effect
   );
 
   return (
-    <div className={classes.widgetSection}>
+    <WidgetSectionContainer>
       {/* Search Input Component */}
-      <div className={classes.widget}>
+      <Widget>
         <SearchInput handleInputChange={handleInputChange} />
-      </div>
+      </Widget>
 
       {/* Refresh Feed Component */}
-      <div className={classes.widget}>
+      <Widget>
         <RefreshFeedWidget onRefreshClick={onRefreshClick} />
-      </div>
+      </Widget>
 
       {/* Create Linkup Component */}
-      <div className={classes.widget}>
+      <Widget>
         <CreateLinkupForm
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTopCallback}
         />
-      </div>
-    </div>
+      </Widget>
+    </WidgetSectionContainer>
   );
 };
 

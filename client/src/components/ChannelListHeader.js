@@ -1,53 +1,53 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-  headerContainer: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(1),
-    borderBottomWidth: "1px",
-    borderBottomColor: "0.1px solid lightgrey",
-  },
-  iconWrapper: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(2),
-    backgroundColor: "#0097A7", 
-    color: "#fff", 
-    borderRadius: "50%",
-    padding: theme.spacing(1),
-  },
-  textWrapper: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  title: {
-    fontSize: "1rem",
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: "0.875rem",
-    color: "#757575", // Replace with your theme's text secondary color
-  },
+// Styled components using MUI's styled API
+const HeaderContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(1),
+  borderBottomWidth: "1px",
+  borderBottomColor: "lightgrey",
+  borderBottomStyle: "solid",
 }));
 
-const ChannelListHeader = () => {
-  const classes = useStyles();
+const IconWrapper = styled("div")(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  marginRight: theme.spacing(2),
+  backgroundColor: "#0097A7",
+  color: "#fff",
+  borderRadius: "50%",
+  padding: theme.spacing(1),
+}));
 
+const TextWrapper = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+});
+
+const Title = styled("p")({
+  fontSize: "1rem",
+  fontWeight: "bold",
+});
+
+const Subtitle = styled("p")({
+  fontSize: "0.875rem",
+  color: "#757575", // Replace with your theme's text secondary color if needed
+});
+
+const ChannelListHeader = () => {
   return (
-    <Box className={classes.headerContainer}>
-      <div className={classes.iconWrapper}>
+    <HeaderContainer>
+      <IconWrapper>
         <ChatBubbleIcon />
-      </div>
-      <Box className={classes.textWrapper}>
-        <p className={classes.title}>Discover New Link-ups</p>
-        <p className={classes.subtitle}>
-          Check the feed to link up with people!
-        </p>
-      </Box>
-    </Box>
+      </IconWrapper>
+      <TextWrapper>
+        <Title>Discover New Link-ups</Title>
+        <Subtitle>Check the feed to link up with people!</Subtitle>
+      </TextWrapper>
+    </HeaderContainer>
   );
 };
 

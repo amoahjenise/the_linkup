@@ -1,109 +1,115 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { createLinkup } from "../api/linkUpAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
+import { Tooltip, IconButton, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import Typography from "@material-ui/core/Typography";
 
-const useStyles = makeStyles((theme) => ({
-  widgetContainer: {
-    flex: "1",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    padding: theme.spacing(2),
-    backgroundColor: "rgba(200, 200, 200, 0.1)",
-    borderRadius: "24px",
-    borderWidth: "1px",
-    border: "0.1px solid #lightgray",
-    overflow: "hidden",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
-    transition: "box-shadow 0.3s ease",
-    "&:hover": {
-      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-    },
+// Styled components
+const WidgetContainer = styled("div")(({ theme }) => ({
+  flex: "1",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  padding: theme.spacing(2),
+  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  borderRadius: "24px",
+  borderWidth: "1px",
+  border: "0.1px solid #lightgray",
+  overflow: "hidden",
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+  transition: "box-shadow 0.3s ease",
+  "&:hover": {
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
   },
-  centerElement: { textAlign: "center" },
-  createLinkUpTitle: {
-    textAlign: "center",
-    marginBottom: theme.spacing(3),
+}));
+
+const CenterElement = styled("div")({
+  textAlign: "center",
+});
+
+const CreateLinkUpTitle = styled("h2")(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(3),
+}));
+
+const Form = styled("form")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  padding: theme.spacing(1, 4),
+}));
+
+const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(1),
+  borderRadius: "24px",
+  border: "1px solid #ccc", // Add border style
+  width: "100%",
+}));
+
+const CreateLinkUpButton = styled("button")(({ theme }) => ({
+  borderRadius: "40px",
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
+  backgroundColor: "#0097A7",
+  fontWeight: "bold",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "#007b86", // Slightly darker color on hover
   },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    padding: theme.spacing(1, 4),
+  width: "200px",
+  height: "60px",
+  marginTop: theme.spacing(2),
+}));
+
+const InputField = styled("input")(({ theme }) => ({
+  width: "100%",
+  fontSize: "14px",
+  padding: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
   },
-  datePicker: {
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(1),
-    borderRadius: "24px",
-    border: "1px solid #ccc", // Add border style
+  backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+}));
+
+const InputWithIcon = styled("div")({
+  position: "relative",
+  display: "flex",
+});
+
+const InfoIconStyled = styled(IconButton)(({ theme }) => ({
+  width: "0%",
+  height: "50%",
+  position: "absolute",
+  right: theme.spacing(1),
+  top: theme.spacing(0.8),
+  pointerEvents: "auto", // Allow clicking on the icon
+  color: "lightgray",
+}));
+
+const CustomDropdown = styled("div")(({ theme }) => ({
+  fontSize: "14px",
+  position: "relative",
+  "& select": {
     width: "100%",
-  },
-  createLinkUpButton: {
-    borderRadius: "40px",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
-    backgroundColor: "#0097A7",
-    fontWeight: "bold",
-    color: "white",
-    "&:hover": {
-      backgroundColor: "#007b86", // Slightly darker color on hover
-    },
-    width: "200px",
-    height: "60px",
-    marginTop: theme.spacing(2),
-  },
-  inputField: {
-    width: "100%",
-    fontSize: "14px",
     padding: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    border: `1px solid ${theme.palette.divider}`,
-    "&:focus": {
-      borderColor: theme.palette.primary.main,
-    },
-    backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+    backgroundSize: "auto 20px",
+    paddingRight: "2.5rem", // Ensure room for the arrow icon
   },
-  inputWithIcon: {
-    position: "relative",
-    display: "flex",
-  },
-  infoIcon: {
-    width: "0%",
-    height: "50%",
-    position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(0.8),
-    pointerEvents: "auto", // Allow clicking on the icon
-    color: "lightgray",
-  },
-  // Define styles for the custom dropdown
-  customDropdown: {
-    fontSize: "14px",
-    position: "relative",
-    "& select": {
-      width: "100%",
-      padding: theme.spacing(1),
-      backgroundSize: "auto 20px",
-      paddingRight: "2.5rem", // Ensure room for the arrow icon
-    },
-    "& option": {
-      backgroundColor: "rgba(64, 64, 64, 2)", // Darker color for the options
-      color: "#FFFFFF", // Ensure text is readable
-    },
+  "& option": {
+    backgroundColor: "rgba(64, 64, 64, 2)", // Darker color for the options
+    color: "#FFFFFF", // Ensure text is readable
   },
 }));
 
 const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
-  const classes = useStyles();
   const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState("");
   const [paymentOption, setPaymentOption] = useState("");
@@ -160,20 +166,18 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   };
 
   return (
-    <div className={classes.widgetContainer}>
-      <h2 className={classes.createLinkUpTitle}>Create a Link-Up</h2>
-      <form className={classes.form} onSubmit={handleCreateLinkUp}>
-        <input
-          className={classes.inputField}
+    <WidgetContainer>
+      <CreateLinkUpTitle>Create a Link-Up</CreateLinkUpTitle>
+      <Form onSubmit={handleCreateLinkUp}>
+        <InputField
           type="text"
           placeholder="Activity"
           name="activity"
           required
         />
 
-        <div className={classes.inputWithIcon}>
-          <input
-            className={classes.inputField}
+        <InputWithIcon>
+          <InputField
             type="text"
             placeholder="Location"
             name="location"
@@ -187,15 +191,14 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
               </Typography>
             }
             arrow
-            PopperProps={{}}
           >
-            <IconButton className={classes.infoIcon}>
+            <InfoIconStyled size="large">
               <InfoIcon />
-            </IconButton>
+            </InfoIconStyled>
           </Tooltip>
-        </div>
+        </InputWithIcon>
 
-        <DatePicker
+        <DatePickerStyled
           selected={selectedDate}
           onChange={(date) => setSelectedDate(date)}
           showTimeSelect
@@ -206,15 +209,14 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           minDate={new Date()} // Set the minimum date to the current date
           minTime={minTime} // Set the minimum time to the current time
           maxTime={maxTime}
-          className={`${classes.inputField} ${classes.datePicker}`} // Apply styles
           placeholderText="Select date and time"
           required
         />
-        <div className={classes.customDropdown}>
+        <CustomDropdown>
           <select
             value={genderPreference}
             onChange={(e) => setGenderPreference(e.target.value)}
-            className={classes.inputField}
+            className={InputField.className}
             required
           >
             <option value="" disabled>
@@ -224,26 +226,24 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <option value="female">Female</option>
             <option value="any">Any</option>
           </select>
-        </div>
-        <div className={classes.customDropdown}>
+        </CustomDropdown>
+        <CustomDropdown>
           <select
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
-            className={classes.inputField}
+            className={InputField.className}
           >
             <option value="">Payment Option (Optional)</option>
             <option value="split">Split The Bill</option>
             <option value="iWillPay">I Will Pay</option>
             <option value="pleasePay">Please Pay</option>
           </select>
-        </div>
-        <div className={classes.centerElement}>
-          <button type="submit" className={classes.createLinkUpButton}>
-            Create
-          </button>
-        </div>
-      </form>
-    </div>
+        </CustomDropdown>
+        <CenterElement>
+          <CreateLinkUpButton type="submit">Create</CreateLinkUpButton>
+        </CenterElement>
+      </Form>
+    </WidgetContainer>
   );
 };
 

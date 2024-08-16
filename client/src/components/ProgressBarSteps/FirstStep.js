@@ -1,37 +1,37 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start", // Align items to the beginning
-  },
-  label: {
-    marginBottom: theme.spacing(1),
-  },
-  input: {
-    padding: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    border: `1px solid ${theme.palette.divider}`,
-    width: "100%",
-    boxSizing: "border-box",
-  },
-  select: {
-    padding: theme.spacing(1),
-    marginBottom: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius,
-    border: `1px solid ${theme.palette.divider}`,
-    width: "100%",
-    boxSizing: "border-box",
-    appearance: "none",
-  },
+// Define styled components
+const FormContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start", // Align items to the beginning
+}));
+
+const Label = styled("label")(({ theme }) => ({
+  marginBottom: theme.spacing(1),
+}));
+
+const Input = styled("input")(({ theme }) => ({
+  padding: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  width: "100%",
+  boxSizing: "border-box",
+}));
+
+const Select = styled("select")(({ theme }) => ({
+  padding: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  width: "100%",
+  boxSizing: "border-box",
+  appearance: "none",
 }));
 
 const FirstStep = ({ userData, setUserData }) => {
-  const classes = useStyles();
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevUserData) => ({
@@ -41,11 +41,9 @@ const FirstStep = ({ userData, setUserData }) => {
   };
 
   return (
-    <div className={classes.form}>
-      <label htmlFor="dateOfBirth" className={classes.label}>
-        Date of Birth
-      </label>
-      <input
+    <FormContainer>
+      <Label htmlFor="dateOfBirth">Date of Birth</Label>
+      <Input
         type="date"
         id="dateOfBirth"
         name="dateOfBirth"
@@ -53,24 +51,20 @@ const FirstStep = ({ userData, setUserData }) => {
         onChange={handleChange}
         max={new Date().toISOString().split("T")[0]} // Set max date to today
         required
-        className={classes.input}
       />
-      <label htmlFor="gender" className={classes.label}>
-        Gender
-      </label>
-      <select
+      <Label htmlFor="gender">Gender</Label>
+      <Select
         id="gender"
         name="gender"
         value={userData.gender}
         onChange={handleChange}
         required
-        className={`custom-input ${classes.select}`}
       >
         <option value="">--Select--</option>
         <option value="male">Male</option>
         <option value="female">Female</option>
-      </select>
-    </div>
+      </Select>
+    </FormContainer>
   );
 };
 

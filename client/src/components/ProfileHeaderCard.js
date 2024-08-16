@@ -1,124 +1,114 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import CardHeader from "@material-ui/core/CardHeader";
-import Box from "@material-ui/core/Box";
-import LocationOnIcon from "@material-ui/icons/LocationOn";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import TwitterIcon from "@material-ui/icons/Twitter";
-import InstagramIcon from "@material-ui/icons/Instagram";
+import { styled } from "@mui/material/styles";
+import { Typography, IconButton, CardHeader, Box } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import InstagramIcon from "@mui/icons-material/Instagram";
 import UserAvatar from "./UserAvatar";
 import { useColorMode } from "@chakra-ui/react";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "sticky",
-    top: 0,
-    borderBottomWidth: "1px",
-    borderBottomColor: "0.1px solid #D3D3D3",
-  },
-  card: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    backgroundColor: "transparent",
-  },
-  avatarSection: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: theme.spacing(1),
-    flex: 1,
-    // borderRightWidth: "1px",
-    // borderRightColor: "1px solid #D3D3D3",
-  },
-  detailsSection: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  socialButtons: {
-    marginTop: theme.spacing(1),
-  },
-  editButton: {
-    padding: theme.spacing(2),
-    marginLeft: "-5rem",
-  },
-  button: {
-    background: `rgba(0, 151, 167, 0.6)`,
-    color: theme.palette.primary.contrastText,
-    fontWeight: "bold",
-    textTransform: "none",
-    "&:hover": {
-      backgroundColor: "#0099B7",
-    },
-  },
-  statisticsContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  statisticsItem: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginRight: theme.spacing(2),
-  },
-  icon: {
-    fontSize: "1.5rem", // Adjust icon size as needed
-  },
-  locationSection: {
-    display: "flex",
-    alignItems: "center",
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  locationText: {
-    fontWeight: "normal",
-  },
-  storiesContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    marginRight: theme.spacing(2),
-  },
-  storyCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: "50%",
-    backgroundColor: "#D3D3D3",
-    position: "relative",
-    marginLeft: theme.spacing(4),
-  },
-  plusCircle: {
-    width: 25,
-    height: 25,
-    borderWidth: "2px",
-    borderColor: "black",
-    borderRadius: "50%",
-    backgroundColor: "blue",
-    position: "absolute",
-    bottom: theme.spacing(1),
-    left: theme.spacing(1),
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  plusIcon: {
-    fontSize: "1rem",
-    color: "white",
-  },
+const Container = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "sticky",
+  top: 0,
+  borderBottom: "1px solid #D3D3D3",
+}));
+
+const Card = styled("div")(({ theme, backgroundColor }) => ({
+  width: "100%",
+  display: "flex",
+  flexDirection: "row",
+  backgroundColor: backgroundColor,
+}));
+
+const AvatarSection = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: theme.spacing(1),
+  flex: 1,
+}));
+
+const SocialButtons = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
+
+const EditButton = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginLeft: "-5rem",
+}));
+
+const StatisticsContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+}));
+
+const StatisticsItem = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginRight: theme.spacing(2),
+}));
+
+const Icon = styled("p")(({ color }) => ({
+  fontSize: "1.5rem", // Adjust icon size as needed
+  color: color,
+}));
+
+const LocationSection = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+}));
+
+const LocationText = styled(Typography)(({ theme }) => ({
+  fontWeight: "normal",
+}));
+
+const StoriesContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  marginRight: theme.spacing(2),
+}));
+
+const StoryCircle = styled("div")(({ theme }) => ({
+  width: 100,
+  height: 100,
+  borderRadius: "50%",
+  backgroundColor: "#D3D3D3",
+  position: "relative",
+  marginLeft: theme.spacing(4),
+}));
+
+const PlusCircle = styled("div")(({ theme }) => ({
+  width: 25,
+  height: 25,
+  borderWidth: "2px",
+  borderColor: "black",
+  borderRadius: "50%",
+  backgroundColor: "blue",
+  position: "absolute",
+  bottom: theme.spacing(1),
+  left: theme.spacing(1),
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+}));
+
+const PlusIcon = styled(Typography)(({ theme }) => ({
+  fontSize: "1rem",
+  color: "white",
 }));
 
 const ProfileHeaderCard = ({
@@ -127,7 +117,6 @@ const ProfileHeaderCard = ({
   calculateAge,
   renderEditButton,
 }) => {
-  const classes = useStyles();
   const { colorMode } = useColorMode();
 
   // Define text color based on color mode
@@ -145,9 +134,9 @@ const ProfileHeaderCard = ({
   };
 
   return (
-    <div className={classes.container}>
-      <div className={classes.card} style={{ backgroundColor }}>
-        <Box className={classes.avatarSection}>
+    <Container>
+      <Card backgroundColor={backgroundColor}>
+        <AvatarSection>
           <CardHeader
             title={
               <>
@@ -158,15 +147,12 @@ const ProfileHeaderCard = ({
                   {capitalizeFirstLetter(userData?.name)},{" "}
                   {calculateAge(userData?.date_of_birth)}
                 </Typography>
-                <Box className={classes.locationSection}>
+                <LocationSection>
                   <LocationOnIcon style={{ color: "#FF3348" }} />
-                  <Typography
-                    className={classes.locationText}
-                    style={{ color: textColor }}
-                  >
+                  <LocationText style={{ color: textColor }}>
                     {userLocation}
-                  </Typography>
-                </Box>
+                  </LocationText>
+                </LocationSection>
               </>
             }
             subheader={
@@ -183,11 +169,9 @@ const ProfileHeaderCard = ({
             }
             style={{ color: textColor }} // Set text color for card header
           />
-          <Box className={classes.statisticsContainer}>
-            <div className={classes.statisticsItem}>
-              <p className={classes.icon} style={{ color: "#C13584" }}>
-                ...
-              </p>
+          <StatisticsContainer>
+            <StatisticsItem>
+              <Icon color="#C13584">...</Icon>
               <Typography
                 variant="body2"
                 align="center"
@@ -195,11 +179,9 @@ const ProfileHeaderCard = ({
               >
                 Created Linkups
               </Typography>
-            </div>
-            <div className={classes.statisticsItem}>
-              <p className={classes.icon} style={{ color: "#833AB4" }}>
-                ...
-              </p>
+            </StatisticsItem>
+            <StatisticsItem>
+              <Icon color="#833AB4">...</Icon>
               <Typography
                 variant="body2"
                 align="center"
@@ -207,11 +189,9 @@ const ProfileHeaderCard = ({
               >
                 Completed Linkups
               </Typography>
-            </div>
-            <div className={classes.statisticsItem}>
-              <p className={classes.icon} style={{ color: "#1DA1F2" }}>
-                ...
-              </p>
+            </StatisticsItem>
+            <StatisticsItem>
+              <Icon color="#1DA1F2">...</Icon>
               <Typography
                 variant="body2"
                 align="center"
@@ -219,55 +199,53 @@ const ProfileHeaderCard = ({
               >
                 Linkup Rating Score
               </Typography>
-            </div>
-          </Box>
-          <Box className={classes.socialButtons}>
-            <IconButton>
+            </StatisticsItem>
+          </StatisticsContainer>
+          <SocialButtons>
+            <IconButton size="large">
               <FacebookIcon style={{ color: "#1877f2" }} />
             </IconButton>
-            <IconButton>
+            <IconButton size="large">
               <TwitterIcon style={{ color: "#1da1f2" }} />
             </IconButton>
-            <IconButton>
+            <IconButton size="large">
               <InstagramIcon style={{ color: "#c32aa3" }} />
             </IconButton>
-          </Box>
-        </Box>
+          </SocialButtons>
+        </AvatarSection>
 
         {/* <CardContent className={classes.detailsSection}>
-          <Box className={classes.storiesContainer}>
-            <div className={classes.storyCircle}>
-              <div className={classes.plusCircle}>
-                <Typography className={classes.plusIcon}>+</Typography>
-              </div>
-            </div>
-            <div className={classes.storyCircle}>
-              <div className={classes.plusCircle}>
-                <Typography className={classes.plusIcon}>+</Typography>
-              </div>
-            </div>
-            <div className={classes.storyCircle}>
-              <div className={classes.plusCircle}>
-                <Typography className={classes.plusIcon}>+</Typography>
-              </div>
-            </div>
-            <div className={classes.storyCircle}>
-              <div className={classes.plusCircle}>
-                <Typography className={classes.plusIcon}>+</Typography>
-              </div>
-            </div>
-            <div className={classes.storyCircle}>
-              <div className={classes.plusCircle}>
-                <Typography className={classes.plusIcon}>+</Typography>
-              </div>
-            </div>
-          </Box>
+          <StoriesContainer>
+            <StoryCircle>
+              <PlusCircle>
+                <PlusIcon>+</PlusIcon>
+              </PlusCircle>
+            </StoryCircle>
+            <StoryCircle>
+              <PlusCircle>
+                <PlusIcon>+</PlusIcon>
+              </PlusCircle>
+            </StoryCircle>
+            <StoryCircle>
+              <PlusCircle>
+                <PlusIcon>+</PlusIcon>
+              </PlusCircle>
+            </StoryCircle>
+            <StoryCircle>
+              <PlusCircle>
+                <PlusIcon>+</PlusIcon>
+              </PlusCircle>
+            </StoryCircle>
+            <StoryCircle>
+              <PlusCircle>
+                <PlusIcon>+</PlusIcon>
+              </PlusCircle>
+            </StoryCircle>
+          </StoriesContainer>
         </CardContent> */}
-        <div className={classes.editButton}>
-          {renderEditButton && renderEditButton()}
-        </div>
-      </div>
-    </div>
+        <EditButton>{renderEditButton && renderEditButton()}</EditButton>
+      </Card>
+    </Container>
   );
 };
 

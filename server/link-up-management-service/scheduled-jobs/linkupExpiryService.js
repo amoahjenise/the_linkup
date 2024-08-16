@@ -26,33 +26,30 @@ const updateExpiredLinkups = async (io) => {
     if (rowCount > 0) {
       const expiredLinkups = rows;
 
-      // Iterate through expiredLinkups and emit notifications to creators and requesters
       for (const expiredLinkup of expiredLinkups) {
         const { id, creator_id } = expiredLinkup;
 
-        console.log("Event: linkupsExpired, creator_id: ", creator_id);
+        // Use the correct namespace
+        io.of("/linkup-management")
+          .to(`user-${creator_id}`)
+          .emit("linkupExpired", {
+            linkupId: id,
+            message: "One of your linkups has expired!",
+          });
 
-        // Emit a real-time event to notify the creator of the expired link-up
-        io.to(`user-${creator_id}`).emit("linkupExpired", { linkupId: id });
-
-        // Find and emit notifications to requesters of the expired link-up
         const requesters = await findRequestersForLinkup(id);
-        console.log("requesters: ", requesters);
 
         for (const requester of requesters) {
-          io.to(`user-${requester.requester_id}`).emit("linkupExpired", {
-            linkupId: id,
-          });
+          io.of("/linkup-management")
+            .to(`user-${requester.requester_id}`)
+            .emit("linkupExpired", {
+              linkupId: id,
+              message: "A requested linkup has expired!",
+            });
         }
-
-        // io.to(`linkup-${id}`).emit("linkupExpired", {
-        //   linkup: expiredLinkup,
-        // });
       }
 
       console.log("Expired linkups updated successfully");
-    } else {
-      console.log("No link-ups to update");
     }
   } catch (error) {
     console.error("Error updating link-ups:", error);

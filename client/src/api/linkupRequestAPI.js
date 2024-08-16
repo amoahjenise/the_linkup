@@ -3,7 +3,7 @@ import axios from "axios";
 // Add this configuration globally for Axios to include credentials
 // axios.defaults.withCredentials = true;
 
-const BASE_URL = process.env.REACT_APP_LINKUP_REQUESTS_SERVICE_URL;
+const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const handleError = (error) => {
   console.error("Error:", error);

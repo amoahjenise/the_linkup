@@ -1,15 +1,11 @@
 require("dotenv").config();
-
 const fs = require("fs");
 const path = require("path");
 const { pool } = require("../db");
+const axios = require("axios");
 const io = require("socket.io-client");
 
-const LINKUP_MANAGEMENT_SERVICE_URL = process.env.LINKUP_MANAGEMENT_SERVICE_URL;
-const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL;
-const MESSAGING_SERVICE_URL = process.env.MESSAGING_SERVICE_URL;
-
-const linkupSocket = io(LINKUP_MANAGEMENT_SERVICE_URL); // Initialize socket connection to notification service
+const linkupSocket = io("http://localhost:5000/linkup-management"); // Initialize socket connection to notification service
 
 let linkupRequestSocket;
 
@@ -18,15 +14,9 @@ const initializeSocket = (io) => {
   linkupRequestSocket = io;
 };
 
-const axios = require("axios");
-
-// const {
-//   createNotification,
-// } = require("../../notification-service/controllers/notificationController");
-
-// const {
-//   createNewConversation,
-// } = require("../../messaging-service/controllers/messagingController");
+// Environment variables
+const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL;
+const MESSAGING_SERVICE_URL = process.env.MESSAGING_SERVICE_URL;
 
 const sendRequest = async (req, res) => {
   const {
@@ -37,22 +27,17 @@ const sendRequest = async (req, res) => {
     content,
     conversation_id,
   } = req.body;
+
   const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [requesterId, creator_id, linkupId, content];
 
   try {
     // Post Linkup Request
-    var { rows } = await pool.query(query, queryValues);
+    const { rows } = await pool.query(query, queryValues);
 
     if (rows.length > 0) {
-      // Notify all users in the link-up room about a new link-up request
-      const roomName = `linkup-${linkupId}`;
-      // linkupSocket.to(roomName).emit("new-linkup-request", notificationData);
-
-      // Create a new conversation
-
-      // Post Notification
+      // Save new conversation in db
       const conversationData = {
         sender_id: requesterId,
         receiver_id: creator_id,
@@ -60,14 +45,12 @@ const sendRequest = async (req, res) => {
         linkup_id: linkupId,
       };
 
-      // await createNewConversation(conversationData);
-
       await axios.post(
         `${MESSAGING_SERVICE_URL}/create-conversation`,
         conversationData
       );
 
-      // Post Notification
+      // Notification
       const notificationData = {
         creatorId: creator_id,
         requesterId: requesterId,
@@ -76,28 +59,30 @@ const sendRequest = async (req, res) => {
         content: `New link-up request from ${requesterName}`,
       };
 
-      // var notificationID = await createNotification(notificationData);
-      await axios.post(
+      const notificationResponse = await axios.post(
         `${NOTIFICATION_SERVICE_URL}/post-notification`,
         notificationData
       );
 
-      if (notificationID) {
+      const notificationId = notificationResponse.data.notificationId;
+
+      if (notificationId) {
         try {
-          // // Emit the user ID to store the socket connection
-          // socket.emit("store-user-id", requesterId);
-
-          // Emit the new linkup request event
-          // notificationSocket.emit("new-linkup-request", notificationData);
-
+          // Emit socket events
           linkupRequestSocket
             .to(`user-${creator_id}`)
-            .emit("new-linkup-request", notificationData);
+            .emit("new-linkup-request", {
+              ...notificationData,
+              notificationId,
+            });
 
-          // Emit the "join-linkup-room" event to make the user join the room
-          linkupSocket.emit("join-linkup-room", linkupId);
+          console.log("Event emitted: new-linkup-request");
 
-          console.log("EMIT JOIN LINKUP ROOM");
+          linkupRequestSocket
+            .to(`user-${requesterId}`)
+            .emit("join-linkup-room", linkupId);
+
+          console.log("Event emitted: join-linkup-room");
 
           res.json({
             success: true,
@@ -142,19 +127,35 @@ const acceptRequest = async (req, res) => {
         content: `${linkupRequest.creator_name} accepted your request for ${linkupRequest.activity}.`,
       };
 
-      var notificationID = await createNotification(notificationData);
+      const notificationResponse = await axios.post(
+        `${NOTIFICATION_SERVICE_URL}/post-notification`,
+        notificationData
+      );
 
-      if (notificationID) {
-        // Emit request-accepted event to the requester of the linkup only
-        linkupRequestSocket
-          .to(`user-${linkupRequest.requester_id}`)
-          .emit("request-accepted", notificationData);
+      const notificationId = notificationResponse.data.notificationId;
 
-        res.json({
-          success: true,
-          message: "Approved request successfully",
-          linkupRequest: linkupRequest,
-        });
+      if (notificationId) {
+        try {
+          // Emit request-accepted event
+          linkupRequestSocket
+            .to(`user-${linkupRequest.requester_id}`)
+            .emit("request-accepted", {
+              ...notificationData,
+              notificationId,
+            });
+
+          res.json({
+            success: true,
+            message: "Approved request successfully",
+            linkupRequest: linkupRequest,
+          });
+        } catch (error) {
+          res.status(500).json({
+            success: false,
+            message: "Failed to emit request-accepted event",
+            error: error.message,
+          });
+        }
       }
     }
   } catch (error) {
@@ -168,8 +169,7 @@ const acceptRequest = async (req, res) => {
 
 const declineRequest = async (req, res) => {
   const { linkupRequestId } = req.params;
-  let queryPath = path.join(__dirname, "../db/queries/declineRequest.sql");
-
+  const queryPath = path.join(__dirname, "../db/queries/declineRequest.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [linkupRequestId];
 
@@ -188,18 +188,36 @@ const declineRequest = async (req, res) => {
         content: `${linkupRequest.creator_name} declined your request for ${linkupRequest.activity}.`,
       };
 
-      var notificationID = await createNotification(notificationData);
+      const notificationResponse = await axios.post(
+        `${NOTIFICATION_SERVICE_URL}/post-notification`,
+        notificationData
+      );
 
-      if (notificationID) {
-        // Emit request-accepted event to the requester of the linkup only
-        linkupRequestSocket
-          .to(`user-${linkupRequest.requester_id}`)
-          .emit("request-declined", notificationData);
-        res.json({
-          success: true,
-          message: "Decline request successfully",
-          linkupRequest: linkupRequest,
-        });
+      const notificationId = notificationResponse.data.notificationId;
+
+      if (notificationId) {
+        try {
+          // Emit request-declined event
+          //const linkupRequestNamespace = linkupSocket;
+          linkupRequestSocket
+            .to(`user-${linkupRequest.requester_id}`)
+            .emit("request-declined", {
+              ...notificationData,
+              notificationId,
+            });
+
+          res.json({
+            success: true,
+            message: "Declined request successfully",
+            linkupRequest: linkupRequest,
+          });
+        } catch (error) {
+          res.status(500).json({
+            success: false,
+            message: "Failed to emit request-declined event",
+            error: error.message,
+          });
+        }
       }
     }
   } catch (error) {
@@ -223,20 +241,14 @@ const getLinkupRequests = async (req, res) => {
   try {
     const { rows } = await pool.query(query, queryValues);
 
-    if (rows.length > 0) {
-      const linkupRequests = rows;
-      res.json({
-        success: true,
-        message: "Linkup Requests fetched successfully",
-        linkupRequestList: linkupRequests,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No linkup requests in the database",
-        linkupRequestList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Linkup Requests fetched successfully"
+          : "No linkup requests in the database",
+      linkupRequestList: rows,
+    });
   } catch (error) {
     console.error("Error fetching linkup requests:", error);
     res.status(500).json({
@@ -256,26 +268,47 @@ const getSentRequests = async (req, res) => {
   try {
     const { rows } = await pool.query(query, queryValues);
 
-    if (rows.length > 0) {
-      const linkupRequests = rows;
-
-      res.json({
-        success: true,
-        message: "Sent requests fetched successfully",
-        linkupRequestList: linkupRequests,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No sent requests in the database",
-        linkupRequestList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Sent requests fetched successfully"
+          : "No sent requests in the database",
+      linkupRequestList: rows,
+    });
   } catch (error) {
     console.error("Error fetching sent requests:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch sent requests",
+      error: error.message,
+    });
+  }
+};
+
+const getRequestByLinkupidAndSenderid = async (req, res) => {
+  const { linkupId, senderId } = req.params;
+  const queryPath = path.join(
+    __dirname,
+    "../db/queries/getRequestByLinkupidAndSenderid.sql"
+  );
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [linkupId, senderId];
+
+  try {
+    const { rows } = await pool.query(query, queryValues);
+
+    res.json({
+      success: true,
+      message:
+        rows.length > 0 ? "Request fetched successfully" : "No request found",
+      linkupRequest: rows[0],
+    });
+  } catch (error) {
+    console.error("Error fetching request by linkupId and senderId:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch request",
       error: error.message,
     });
   }
@@ -293,63 +326,20 @@ const getReceivedRequests = async (req, res) => {
   try {
     const { rows } = await pool.query(query, queryValues);
 
-    if (rows.length > 0) {
-      const linkupRequests = rows;
-      res.json({
-        success: true,
-        message: "Received requests fetched successfully",
-        linkupRequestList: linkupRequests,
-      });
-    } else {
-      res.json({
-        success: true,
-        message: "No received requests in the database",
-        linkupRequestList: [],
-      });
-    }
+    res.json({
+      success: true,
+      message:
+        rows.length > 0
+          ? "Received requests fetched successfully"
+          : "No received requests in the database",
+      linkupRequestList: rows,
+    });
   } catch (error) {
     console.error("Error fetching received requests:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch sent requests",
+      message: "Failed to fetch received requests",
       error: error.message,
-    });
-  }
-};
-
-const getRequestByLinkupidAndSenderid = async (req, res) => {
-  const { linkupId, requesterId } = req.query;
-  let queryPath = path.join(
-    __dirname,
-    "../db/queries/getRequestByLinkupidAndSenderid.sql"
-  );
-
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [linkupId, requesterId];
-
-  try {
-    const { rows } = await pool.query(query, queryValues);
-
-    if (rows.length > 0) {
-      res.json({
-        success: true,
-        message: "Link-up request fetched successfully",
-        linkupRequestId: rows[0].id,
-        linkupRequest: rows[0],
-      });
-    } else {
-      res.json({
-        success: false,
-        message: "No link-up request for the given link-up id.",
-        linkupRequestId: null,
-        linkupRequest: null,
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Linkup request fetch failed",
-      linkupRequest: {},
     });
   }
 };
@@ -357,10 +347,10 @@ const getRequestByLinkupidAndSenderid = async (req, res) => {
 module.exports = {
   initializeSocket,
   sendRequest,
-  getLinkupRequests,
-  getRequestByLinkupidAndSenderid,
   acceptRequest,
   declineRequest,
+  getLinkupRequests,
   getSentRequests,
+  getRequestByLinkupidAndSenderid,
   getReceivedRequests,
 };

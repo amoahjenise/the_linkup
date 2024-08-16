@@ -1,31 +1,30 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
+import { styled } from "@mui/material/styles";
+import { Container, Typography, Box } from "@mui/material";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: theme.spacing(3),
-  },
-  section: {
-    marginBottom: theme.spacing(3),
-  },
-  title: {
-    marginBottom: theme.spacing(2),
-  },
-  subtitle: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  },
-  text: {
-    marginBottom: theme.spacing(1),
-  },
+// Define styled components
+const RootContainer = styled(Container)(({ theme }) => ({
+  padding: theme.spacing(3),
+}));
+
+const Section = styled("section")(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+}));
+
+const Title = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+}));
+
+const Subtitle = styled(Typography)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(1),
+}));
+
+const Text = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(1),
 }));
 
 const CookieUsePage = () => {
-  const classes = useStyles();
-
   // Get today's date in the format "Month Day, Year"
   const today = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -34,21 +33,15 @@ const CookieUsePage = () => {
   });
 
   return (
-    <Container className={classes.root}>
+    <RootContainer>
       <Box mb={4}>
-        <Typography variant="h4" className={classes.title}>
-          Cookie Use
-        </Typography>
-        <Typography variant="subtitle1" className={classes.text}>
-          Last Updated: {today}
-        </Typography>
+        <Title variant="h4">Cookie Use</Title>
+        <Text variant="subtitle1">Last Updated: {today}</Text>
       </Box>
 
-      <section className={classes.section}>
-        <Typography variant="h5" className={classes.subtitle}>
-          Cookies Usage
-        </Typography>
-        <Typography variant="body1" className={classes.text}>
+      <Section>
+        <Subtitle variant="h5">Cookies Usage</Subtitle>
+        <Text variant="body1">
           We use cookies on our website in compliance with Quebec, Canada
           regulations and standards. These cookies are used for various purposes
           including but not limited to:
@@ -57,12 +50,12 @@ const CookieUsePage = () => {
             <li>Improving user experience</li>
             <li>Marketing and analytics</li>
           </ul>
-        </Typography>
+        </Text>
         {/* Add more sections as needed */}
-      </section>
+      </Section>
 
       {/* Other sections remain the same */}
-    </Container>
+    </RootContainer>
   );
 };
 

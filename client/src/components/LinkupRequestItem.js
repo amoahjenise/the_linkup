@@ -1,97 +1,90 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import {
   acceptLinkupRequest,
   declineLinkupRequest,
 } from "../api/linkupRequestAPI";
 import UserAvatar from "./UserAvatar";
-import Chip from "@material-ui/core/Chip";
+import { Chip, Button, Typography } from "@mui/material";
 import {
   CheckCircleOutlined,
   CloseOutlined,
   QueryBuilderOutlined,
-} from "@material-ui/icons";
-import Button from "@material-ui/core/Button";
+} from "@mui/icons-material";
 import moment from "moment";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import Typography from "@material-ui/core/Typography";
 import nlp from "compromise";
+
 const compromise = nlp;
 
-const useStyles = makeStyles((theme) => ({
-  linkupRequestItem: {
-    padding: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    borderBottomWidth: "1px",
-    borderBottomColor: "1px solid #D3D3D3",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  chip: {
-    width: "110px",
-    marginR: "auto",
-  },
-  pendingChip: {
-    backgroundColor: "#f1c40f", // Yellow
-    color: theme.palette.text.secondary,
-  },
-  acceptedChip: {
-    backgroundColor: "rgb(115, 255, 174, 0.9)", // Green
-    color: theme.palette.text.secondary,
-  },
-  declinedChip: {
-    backgroundColor: "pink", // Pink
-    color: theme.palette.text.secondary,
-  },
-  requestText: {
-    margin: 0,
-    marginBottom: theme.spacing(1),
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-  acceptButton: {
-    backgroundColor: "transparent",
+const LinkupRequestItemContainer = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(1),
+  borderBottom: "1px solid #D3D3D3",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+}));
+
+const StatusChip = styled(Chip)(({ theme, status }) => ({
+  width: "110px",
+  marginRight: "auto",
+  backgroundColor:
+    status === "pending"
+      ? "#f1c40f"
+      : status === "accepted"
+      ? "rgb(115, 255, 174, 0.9)"
+      : "pink",
+  color: theme.palette.text.secondary,
+}));
+
+const AcceptButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "transparent",
+  color: "#00BFFF",
+  borderColor: "#00BFFF",
+  borderWidth: "1px",
+  border: "0.1px solid #ccc",
+  marginRight: theme.spacing(2),
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
+  "&:hover": {
     color: "#00BFFF",
-    borderColor: "#00BFFF",
-    borderWidth: "1px",
-    border: "0.1px solid #ccc", // Add border style
-
-    marginRight: theme.spacing(2),
-    cursor: "pointer",
-    transition: "background-color 0.3s ease", // Add transition for smooth color change
-    "&:hover": {
-      color: "#00BFFF",
-      backgroundColor: "rgb(0, 191, 255, 0.1)", // Change to the darker blue color on hover
-    },
-  },
-  declineButton: {
-    backgroundColor: "transparent",
-    color: "#FF0000",
-    borderColor: "#FF0000",
-    borderWidth: "1px",
-    border: "0.1px solid #ccc", // Add border style
-
-    marginRight: theme.spacing(2),
-    cursor: "pointer",
-    transition: "background-color 0.3s ease", // Add transition for smooth color change
-    "&:hover": {
-      color: "#FF0000",
-      backgroundColor: "rgb(255, 0, 67, 0.2)", // Change to the darker blue color on hover
-    },
-  },
-  buttonGroup: {
-    display: "flex",
-    marginTop: theme.spacing(1),
-    "& > *": {
-      marginRight: theme.spacing(1),
-    },
+    backgroundColor: "rgb(0, 191, 255, 0.1)",
   },
 }));
 
+const DeclineButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "transparent",
+  color: "#FF0000",
+  borderColor: "#FF0000",
+  borderWidth: "1px",
+  border: "0.1px solid #ccc",
+  marginRight: theme.spacing(2),
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
+  "&:hover": {
+    color: "#FF0000",
+    backgroundColor: "rgb(255, 0, 67, 0.2)",
+  },
+}));
+
+const ButtonGroup = styled("div")(({ theme }) => ({
+  display: "flex",
+  marginTop: theme.spacing(1),
+  "& > *": {
+    marginRight: theme.spacing(1),
+  },
+}));
+
+const RequestText = styled("p")(({ theme }) => ({
+  margin: 0,
+  marginBottom: theme.spacing(1),
+  marginTop: theme.spacing(1),
+  marginRight: theme.spacing(1),
+}));
+
 const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id || "";
@@ -156,21 +149,6 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
     }
   };
 
-  const getStatusChipClass = () => {
-    switch (post.status) {
-      case "pending":
-        return `${classes.chip} ${classes.pendingChip}`;
-      case "accepted":
-        return `${classes.chip} ${classes.acceptedChip}`;
-      case "declined":
-        return `${classes.chip} ${classes.declinedChip}`;
-      case "expired":
-        return `${classes.chip} ${classes.declinedChip}`;
-      default:
-        return null;
-    }
-  };
-
   const renderLinkupItemText = () => {
     const doc = compromise(post.activity);
     const startsWithVerb = doc.verbs().length > 0;
@@ -203,7 +181,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   }, [post.creator_id, userId]);
 
   return (
-    <div className={classes.linkupRequestItem}>
+    <LinkupRequestItemContainer>
       <div>
         <UserAvatar
           userData={{
@@ -215,7 +193,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
           height="40px"
         />
         <div>
-          <p className={classes.requestText}>{renderLinkupItemText()}</p>
+          <RequestText>{renderLinkupItemText()}</RequestText>
           {isMyLinkup ||
             (post.status === "accepted" && (
               <Typography variant="subtitle2" component="details">
@@ -224,48 +202,47 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
             ))}
         </div>
       </div>
-
-      {userId === post.receiver_id ? (
-        <div>
-          {post.status === "pending" ? (
-            <div className={classes.buttonGroup}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={handleAcceptClick}
-                className={classes.acceptButton}
-              >
-                Accept
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={handleDeclineClick}
-                className={classes.declineButton}
-              >
-                Decline
-              </Button>
-            </div>
-          ) : (
-            <Chip
-              label={getStatusLabel()}
-              icon={renderStatusIcon()}
-              variant="outlined"
-              className={getStatusChipClass()}
-            />
-          )}
-        </div>
-      ) : (
-        <Chip
-          label={getStatusLabel()}
-          icon={renderStatusIcon()}
-          variant="outlined"
-          className={getStatusChipClass()}
-        />
-      )}
-    </div>
+      <div>
+        {userId === post.receiver_id ? (
+          <div>
+            {post.status === "pending" ? (
+              <ButtonGroup>
+                <AcceptButton
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={handleAcceptClick}
+                >
+                  Accept
+                </AcceptButton>
+                <DeclineButton
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={handleDeclineClick}
+                >
+                  Decline
+                </DeclineButton>
+              </ButtonGroup>
+            ) : (
+              <StatusChip
+                label={getStatusLabel()}
+                icon={renderStatusIcon()}
+                variant="outlined"
+                status={post.status}
+              />
+            )}
+          </div>
+        ) : (
+          <StatusChip
+            label={getStatusLabel()}
+            icon={renderStatusIcon()}
+            variant="outlined"
+            status={post.status}
+          />
+        )}
+      </div>
+    </LinkupRequestItemContainer>
   );
 };
 

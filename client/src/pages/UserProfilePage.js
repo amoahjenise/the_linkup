@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import EditIcon from "@material-ui/icons/Edit";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import { IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import ImageGrid from "../components/ImageGrid";
 import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
 import { getUserImages } from "../api/imagesAPI";
@@ -13,41 +13,40 @@ import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ImageUploadModal from "../components/ImageUploadModal";
 import { useColorMode } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import ProfileHeaderCard from "../components/ProfileHeaderCard";
 import ImageGridHeader from "../components/ImageGridHeader";
 
-const useStyles = makeStyles((theme) => ({
-  userProfilePage: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    overflowY: "hidden", // Make only the image section vertically scrollable
-  },
-  profileSection: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  imageSection: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    overflowY: "auto", // Make only the image section vertically scrollable
-    maxHeight: "60vh", // Limit the height of the image section to 60vh
-  },
-  editButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    color: theme.palette.primary.contrastText,
-    "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, 0.3)",
-    },
+// Define styled components
+const UserProfilePageContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  overflowY: "hidden",
+}));
+
+const ProfileSection = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+});
+
+const ImageSection = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  overflowY: "auto",
+  maxHeight: "60vh",
+});
+
+const EditButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 0, 0, 0.2)",
+  color: theme.palette.primary.contrastText,
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
 }));
 
 const UserProfilePage = ({ isMobile }) => {
   let { id: userId } = useParams();
-  const classes = useStyles();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [profileImages, setProfileImages] = useState([]);
@@ -68,13 +67,9 @@ const UserProfilePage = ({ isMobile }) => {
     setImageUploadModalOpen(false);
   };
 
-  // Check if userData is available before accessing its properties
   const isUserDataAvailable = userData !== null;
-
-  // Access user data from Redux store
   const loggedUser = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
-
   const isLoggedUserProfile = userId === "me" || userId === loggedUser.user.id;
 
   if (userId === "me") {
@@ -119,7 +114,6 @@ const UserProfilePage = ({ isMobile }) => {
     };
 
     fetchData();
-    // Cleanup function to reset userData when component unmounts or userId changes
     return () => {
       setUserData(null);
     };
@@ -128,12 +122,9 @@ const UserProfilePage = ({ isMobile }) => {
   const renderEditButton = () => {
     if (isLoggedUserProfile) {
       return (
-        <IconButton
-          className={classes.editButton}
-          onClick={() => setIsEditModalOpen(true)}
-        >
+        <EditButton onClick={() => setIsEditModalOpen(true)} size="large">
           <EditIcon />
-        </IconButton>
+        </EditButton>
       );
     }
     return null;
@@ -156,10 +147,9 @@ const UserProfilePage = ({ isMobile }) => {
     try {
       let bioResponse = null;
       let avatarResponse = null;
-      let changesMade = false; // Track whether any changes were made
+      let changesMade = false;
 
       if (userData?.bio !== editedBio) {
-        // Update the bio if it has changed
         bioResponse = await updateUserBio(userData?.id, editedBio);
         if (bioResponse?.data?.success !== false) {
           changesMade = true;
@@ -167,7 +157,6 @@ const UserProfilePage = ({ isMobile }) => {
       }
 
       if (userData?.avatar !== editedAvatar) {
-        // Update the avatar if it has changed
         avatarResponse = await updateUserAvatar(userData?.id, editedAvatar);
         if (avatarResponse?.data?.success !== false) {
           changesMade = true;
@@ -175,8 +164,6 @@ const UserProfilePage = ({ isMobile }) => {
       }
 
       if (changesMade) {
-        // Check if any changes were made
-        // After a successful update, update userData with the new bio and avatar
         setUserData((prevUserData) => ({
           ...prevUserData,
           bio: bioResponse?.data?.bio,
@@ -185,7 +172,6 @@ const UserProfilePage = ({ isMobile }) => {
         addSnackbar("Profile updated!");
         setIsEditModalOpen(false);
       } else {
-        // No changes were made, display a message and close the modal
         addSnackbar("No changes were made.");
         setIsEditModalOpen(false);
       }
@@ -196,12 +182,12 @@ const UserProfilePage = ({ isMobile }) => {
   };
 
   return (
-    <div className={classes.userProfilePage}>
+    <UserProfilePageContainer>
       <TopNavBar title="Profile" />
       {isLoading ? (
         <LoadingSpinner />
       ) : (
-        <div className={classes.profileSection}>
+        <ProfileSection>
           <ProfileHeaderCard
             isMobile={isMobile}
             userData={userData}
@@ -223,18 +209,17 @@ const UserProfilePage = ({ isMobile }) => {
                   openImageUploadModal={openImageUploadModal}
                 />
               )}
-              <div className={classes.imageSection}>
+              <ImageSection>
                 <ImageGrid
                   images={profileImages || []}
                   currentImageIndex={currentImageIndex}
                   setCurrentImageIndex={setCurrentImageIndex}
                 />
-              </div>
+              </ImageSection>
             </div>
           )}
-        </div>
+        </ProfileSection>
       )}
-      {/* Render the UserProfileEditModal only if userData is available */}
       {isUserDataAvailable && (
         <UserProfileEditModal
           isOpen={isEditModalOpen}
@@ -249,7 +234,6 @@ const UserProfilePage = ({ isMobile }) => {
           }
         />
       )}
-      {/* Render the ImageUploadModal */}
       <ImageUploadModal
         userId={userId}
         isOpen={isImageUploadModalOpen}
@@ -260,7 +244,7 @@ const UserProfilePage = ({ isMobile }) => {
         setCurrentImageIndex={setCurrentImageIndex}
         colorMode={colorMode}
       />
-    </div>
+    </UserProfilePageContainer>
   );
 };
 

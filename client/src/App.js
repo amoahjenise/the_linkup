@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { makeStyles, ThemeProvider, useTheme } from "@material-ui/core/styles";
+import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
 import { setUnreadMessagesCount } from "./redux/actions/messageActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
@@ -26,7 +26,7 @@ import {
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
 import ToggleColorMode from "./components/ToggleColorMode";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { authenticateUser } from "./api/authenticationAPI";
 import { setCurrentUser } from "./redux/actions/userActions";
@@ -36,7 +36,6 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
-// import useLocationUpdate from "./utils/useLocationUpdate";
 import Geolocation from "./components/Geolocation";
 
 const publicPages = [
@@ -48,14 +47,18 @@ const publicPages = [
   "/cookie-use",
 ];
 
-const useStyles = makeStyles((theme) => ({
-  app: {
+// Define AppWrapper with conditional styling
+const AppWrapper = styled("div", {
+  shouldForwardProp: (prop) => prop !== "isAuthenticated",
+})(({ theme, isAuthenticated }) => ({
+  // Apply additional styles if authenticated
+  ...(isAuthenticated && {
     display: "flex",
     height: "100vh",
-  },
+  }),
 }));
 
-const RoutesComponent = ({ isMobile, locationState, userState }) => (
+const RoutesComponent = ({ isMobile, locationState }) => (
   <Routes>
     <Route path="/" exact element={<LandingPage />} />
     <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
@@ -110,19 +113,17 @@ const RoutesComponent = ({ isMobile, locationState, userState }) => (
 );
 
 const App = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const userState = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
   const { isRegistering } = useSelector((state) => state.registration);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isSigningOut } = useSelector((state) => state.logout);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const theme = createTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { user } = useUser();
   const [authError, setAuthError] = useState(false);
   const { colorMode } = useColorMode();
-  // const { updateLocation } = useLocationUpdate();
 
   const myColorSet = {
     "--sendbird-light-primary-500": "#00487c",
@@ -154,12 +155,13 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user || isSigningOut || !user?.id || isRegistering) return;
+
       try {
         const result = await authenticateUser(user.id);
+        console.log(result);
+
         if (result.success) {
-          console.log("App.js Fetch Data executed", isRegistering);
           dispatch(setCurrentUser(result.user));
-          // updateLocation(true);
           dispatch(login());
         } else {
           setAuthError(true);
@@ -174,7 +176,6 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // if (!user || !isAuthenticated) return;
       if (!user || !isAuthenticated || isSigningOut || isRegistering) return;
       try {
         const messagesCount = await getUnreadMessagesCount(userState?.user?.id);
@@ -220,7 +221,7 @@ const App = () => {
           }}
         >
           <BrowserRouter>
-            <div className={`${isAuthenticated ? classes.app : ""}`}>
+            <AppWrapper isAuthenticated={isAuthenticated}>
               {isAuthenticated && !isRegistering && (
                 <LeftMenu isMobile={isMobile} />
               )}
@@ -234,19 +235,12 @@ const App = () => {
                 <>
                   <SignedIn>
                     {authError ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <ErrorPage />
-                      </div>
+                      <ErrorPage />
                     ) : (
                       <RoutesComponent
                         isMobile={isMobile}
                         locationState={locationState}
+                        userState={userState}
                       />
                     )}
                   </SignedIn>
@@ -255,7 +249,7 @@ const App = () => {
                   </SignedOut>
                 </>
               )}
-            </div>
+            </AppWrapper>
           </BrowserRouter>
         </SendbirdProvider>
       </ToggleColorMode>

@@ -1,12 +1,14 @@
 const socketIo = require("socket.io");
 const userSockets = require("../userSockets");
 
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
+
 const initSocketServer = (httpServer) => {
   console.log("Notification socket server initialized");
 
   const io = socketIo(httpServer, {
     cors: {
-      origin: "*",
+      origin: ALLOWED_ORIGIN,
       methods: ["GET", "POST"],
     },
   });

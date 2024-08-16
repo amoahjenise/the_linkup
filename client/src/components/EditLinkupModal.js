@@ -1,28 +1,26 @@
 import React from "react";
-import Modal from "@material-ui/core/Modal";
-import { makeStyles } from "@material-ui/core/styles";
+import { Modal } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import EditLinkupForm from "./EditLinkupForm";
 import { useColorMode } from "@chakra-ui/react";
 
-const useStyles = makeStyles((theme) => ({
-  editModal: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(4),
-    outline: "none",
-    width: "400px",
-    textAlign: "center",
-    fontFamily: "Arial, sans-serif", // Use a common sans-serif font
-    fontSize: "16px", // Adjust the font size as needed
-    lineHeight: "1.5", // Adjust the line height for readability
-  },
+// Styled component for the modal content
+const StyledModalContent = styled("div")(({ theme }) => ({
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  boxShadow: theme.shadows[5],
+  padding: theme.spacing(4),
+  outline: "none",
+  width: "400px",
+  textAlign: "center",
+  fontFamily: "Arial, sans-serif",
+  fontSize: "16px",
+  lineHeight: "1.5",
 }));
 
 const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
-  const classes = useStyles();
   const { colorMode } = useColorMode();
 
   const handleModalClose = () => {
@@ -40,8 +38,7 @@ const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
       aria-labelledby="edit-modal-title"
       aria-describedby="edit-modal-description"
     >
-      <div
-        className={classes.editModal}
+      <StyledModalContent
         style={{
           backgroundColor:
             colorMode === "dark"
@@ -53,7 +50,7 @@ const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
           setShouldFetchLinkups={setShouldFetchLinkups}
           onClose={handleModalClose}
         />
-      </div>
+      </StyledModalContent>
     </Modal>
   );
 };

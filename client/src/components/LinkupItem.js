@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
 import HorizontalMenu from "./HorizontalMenu";
@@ -13,97 +13,96 @@ import nlp from "compromise";
 
 const compromise = nlp;
 
-const useStyles = makeStyles((theme) => ({
-  avatar: {
-    height: "3rem",
-    width: "3rem",
-    borderRadius: "9999px",
-    marginRight: "0.5rem",
-  },
-  container: {
-    padding: "0.75rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    height: "100%",
-    borderBottomWidth: "1px",
-    borderBottomColor: "1px solid #D3D3D3",
-  },
-  card: {
-    border: "1px solid #d2d6dc",
-    padding: "2rem",
-    borderRadius: "0.375rem",
-    width: "32rem",
-    backgroundColor: "rgba(200, 200, 200, 0.1)",
-    cursor: "pointer",
-    overflow: "hidden",
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
-    transition: "box-shadow 0.2s ease",
-    "&:hover": {
-      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-    },
-  },
-  highlightedCard: {
-    backgroundColor: "rgba(200, 200, 200, 0.2)", // Change to your desired darker color
-  },
-  horizontalMenu: {
-    marginLeft: "auto",
-  },
-  userDetail: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  userInfo: {
-    display: "flex",
-    alignItems: "center",
-  },
-  userName: {
-    fontSize: "1rem",
-    fontWeight: "bold",
-  },
-  postActions: {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "0.5rem",
-  },
-  distanceInfo: {
-    display: "flex",
-    alignItems: "center",
-    fontSize: "0.9rem",
-    color: "#718096",
-    marginTop: "0.25rem",
-    marginLeft: "4px", // Added
-  },
-  postContent: {
-    fontSize: "0.95rem",
-    lineHeight: "1.25rem",
-    marginTop: "1rem",
-  },
-  postInfo: {
-    display: "flex",
-    alignItems: "center",
-    fontSize: "0.9rem",
-    color: "#718096",
-    marginTop: "0.25rem",
-  },
-  onlineIndicator: {
-    height: "0.75rem",
-    marginRight: "0.125rem",
-  },
-  paymentOptionIcon: {
-    display: "flex",
-    justifyContent: "space-between",
-    width: "50%",
-    height: "50%",
-  },
-  paymentOptionIconContainer: {
-    display: "inline-block", // Ensures the container wraps around the emoji
+// Styled Components
+const Container = styled("div")(({ theme }) => ({
+  padding: "0.75rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  height: "100%",
+  borderBottom: "1px solid #D3D3D3",
+}));
+
+const CardContainer = styled("div")(({ theme }) => ({
+  border: "1px solid #d2d6dc",
+  padding: "2rem",
+  borderRadius: "0.375rem",
+  width: "32rem",
+  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  cursor: "pointer",
+  overflow: "hidden",
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
+  transition: "box-shadow 0.2s ease",
+  "&:hover": {
+    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
   },
 }));
 
+const HighlightedCard = styled(CardContainer)(({ theme }) => ({
+  backgroundColor: "rgba(200, 200, 200, 0.2)",
+}));
+
+const HorizontalMenuContainer = styled("div")(({ theme }) => ({
+  marginLeft: "auto",
+}));
+
+const UserName = styled("div")(({ theme }) => ({
+  fontSize: "1rem",
+  fontWeight: "bold",
+}));
+
+const UserInfo = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+}));
+
+const PostActionsContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  marginTop: "0.5rem",
+}));
+
+const DistanceInfo = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  fontSize: "0.9rem",
+  color: "#718096",
+  marginTop: "0.25rem",
+  marginLeft: "4px",
+}));
+
+const PostContent = styled("p")(({ theme }) => ({
+  fontSize: "0.95rem",
+  lineHeight: "1.25rem",
+  marginTop: "1rem",
+}));
+
+const PostInfo = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  fontSize: "0.9rem",
+  color: "#718096",
+  marginTop: "0.25rem",
+}));
+
+const OnlineIndicator = styled("span")(({ theme }) => ({
+  height: "0.75rem",
+  marginRight: "0.125rem",
+}));
+
+const PaymentOptionIcon = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  width: "50%",
+  height: "50%",
+}));
+
+const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
+  display: "inline-block",
+}));
+
 const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [distance, setDistance] = useState(null);
@@ -175,10 +174,10 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             aria-label="split the bill"
             style={{ fontSize: "30px" }}
           >
-            <div className={classes.paymentOptionIcon}>
+            <PaymentOptionIcon>
               <IoReceipt />
               <IoReceipt />
-            </div>
+            </PaymentOptionIcon>
           </span>
         );
       case "iWillPay":
@@ -189,24 +188,24 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             aria-label="i'll pay"
             style={{ fontSize: "30px" }}
           >
-            <div className={classes.paymentOptionIcon}>
+            <PaymentOptionIcon>
               <IoReceipt />
-            </div>
+            </PaymentOptionIcon>
           </span>
         );
       case "pleasePay":
         return (
-          <span className={classes.paymentOptionIconContainer}>
+          <PaymentOptionIconContainer>
             <span
               title="Please pay"
               role="img"
               aria-label="watery eyes"
               style={{ fontSize: "20px" }}
-              className={classes.paymentOptionIcon}
+              className={PaymentOptionIcon}
             >
               🥹
             </span>
-          </span>
+          </PaymentOptionIconContainer>
         );
       default:
         return null;
@@ -261,12 +260,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
 
     return (
       <span>
-        <Link to={`/profile/${creator_id}`} className={classes.usernameLink}>
+        <Link to={`/profile/${creator_id}`} className={UserName}>
           <strong>{creator_name}</strong>
         </Link>{" "}
-        is trying to link up{" "}
-        <strong className={classes.boldText}>{activityText}</strong> on{" "}
-        <strong className={classes.boldText}>
+        is trying to link up <strong>{activityText}</strong> on{" "}
+        <strong>
           {dateText} {timeText}
         </strong>
         .
@@ -278,35 +276,24 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     const now = moment();
     const created = moment(createdAt);
     const duration = moment.duration(now.diff(created));
-    const days = duration.days();
-    const hours = duration.hours();
-    const minutes = duration.minutes();
+    const days = duration.asDays();
 
-    if (days > 0) {
-      return `${days}d ago`;
-    } else if (hours > 0) {
-      return `${hours}h ago`;
-    } else if (minutes > 0) {
-      return `${minutes}m ago`;
+    if (days < 1) {
+      return "Today";
+    } else if (days < 2) {
+      return "Yesterday";
     } else {
-      return "Just now";
+      return `${Math.floor(days)} days ago`;
     }
   };
 
   return (
-    <div
-      className={classes.container}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div
-        className={`${classes.card} ${
-          isHovered || linkupItem.id === editingLinkup?.linkup?.id
-            ? classes.highlightedCard
-            : ""
-        }`}
+    <Container>
+      <CardContainer
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <div className={classes.userInfo}>
+        <UserInfo>
           <div style={{ display: "flex", alignItems: "center" }}>
             <UserAvatar
               userData={{
@@ -318,13 +305,13 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               height="50px"
             />
             <div>
-              <div className={classes.userName}>{creator_name}</div>
-              <div className={classes.postInfo}>
+              <UserName>{creator_name}</UserName>
+              <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>
-              </div>
+              </PostInfo>
             </div>
           </div>
-          <div className={classes.horizontalMenu}>
+          <HorizontalMenuContainer>
             {loggedUser.user.id === linkupItem.creator_id ? (
               <HorizontalMenu
                 showGoToItem={true}
@@ -339,15 +326,15 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 setMenuAnchor={setMenuAnchor}
               />
             ) : (
-              <div className={classes.distanceInfo}>
+              <DistanceInfo>
                 {distance && <span>{`${distance} km away`}</span>}
-              </div>
+              </DistanceInfo>
             )}
-          </div>
-        </div>
+          </HorizontalMenuContainer>
+        </UserInfo>
 
-        <p className={classes.postContent}>{renderLinkupItemText()}</p>
-        <div className={classes.postActions}>
+        <PostContent>{renderLinkupItemText()}</PostContent>
+        <PostActionsContainer>
           {loggedUser.user.id !== linkupItem.creator_id && (
             <div>
               <div>
@@ -360,9 +347,9 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             </div>
           )}
           <span>{renderPaymentOptionIcon()}</span>
-        </div>
-      </div>
-    </div>
+        </PostActionsContainer>
+      </CardContainer>
+    </Container>
   );
 };
 
