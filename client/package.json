@@ -40,6 +40,7 @@
     "react-step-progress-bar": "^1.0.3",
     "react-window": "^1.8.9",
     "redux": "^4.2.1",
+    "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.4.2",
     "reselect": "^4.1.8",
@@ -78,7 +79,6 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "babel-plugin-webpack-alias": "^2.1.2",
     "ignore-loader": "^0.1.2",
-    "redux-logger": "^3.0.6",
     "webpack-node-externals": "^3.0.0"
   }
 }
