@@ -5,6 +5,7 @@ const socketIo = require("socket.io");
 const path = require("path");
 const helmet = require("helmet");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const {
   scheduleLinkupExpiryJob,
