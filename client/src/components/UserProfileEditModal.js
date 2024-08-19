@@ -70,7 +70,7 @@ const UserProfileEditModal = ({
   userLocation,
 }) => {
   const [editedBio, setEditedBio] = useState(userData.bio);
-  const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null); // Initialize with the current avatar
+  const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || ""); // Initialize with the current avatar
 
   const handleSave = () => {
     onSave(editedBio, updatedAvatar);

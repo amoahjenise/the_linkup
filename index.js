@@ -51,42 +51,42 @@ linkupInitializeSocket(linkupIo.of("/linkup-management")); // Use the correct na
 const linkupRequestIo = linkupRequestSocket(io);
 linkupRequestInitializeSocket(linkupRequestIo.of("/linkup-request")); // Use the correct namespace
 
-// Middleware
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
-        "https://challenges.cloudflare.com", // Cloudflare bot protection
-        "'unsafe-inline'", // Required for Clerk's inline scripts
-      ],
-      connectSrc: [
-        "'self'",
-        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
-      ],
-      imgSrc: [
-        "'self'",
-        "https://img.clerk.com", // Clerk's image hosting
-        "data:", // Allow Base64 encoded images
-      ],
-      workerSrc: [
-        "'self'",
-        "blob:", // Required for worker scripts
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'", // Required for Clerk's runtime CSS-in-JS
-      ],
-      frameSrc: [
-        "'self'",
-        "https://challenges.cloudflare.com", // Cloudflare bot protection
-      ],
-      // Add any other directives you may need
-    },
-  })
-);
+// // Middleware
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       scriptSrc: [
+//         "'self'",
+//         "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
+//         "https://challenges.cloudflare.com", // Cloudflare bot protection
+//         "'unsafe-inline'", // Required for Clerk's inline scripts
+//       ],
+//       connectSrc: [
+//         "'self'",
+//         "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
+//       ],
+//       imgSrc: [
+//         "'self'",
+//         "https://img.clerk.com", // Clerk's image hosting
+//         "data:", // Allow Base64 encoded images
+//       ],
+//       workerSrc: [
+//         "'self'",
+//         "blob:", // Required for worker scripts
+//       ],
+//       styleSrc: [
+//         "'self'",
+//         "'unsafe-inline'", // Required for Clerk's runtime CSS-in-JS
+//       ],
+//       frameSrc: [
+//         "'self'",
+//         "https://challenges.cloudflare.com", // Cloudflare bot protection
+//       ],
+//       // Add any other directives you may need
+//     },
+//   })
+// );
 
 app.use("/api/auth/api/webhooks", bodyParser.raw({ type: "*/*" }));
 
