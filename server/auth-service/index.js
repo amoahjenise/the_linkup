@@ -12,7 +12,7 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // Default to your front-end URL
 
 // Create an Express Router instance
 const router = express.Router();
@@ -92,8 +92,14 @@ router.post(
           name: first_name,
         };
 
+        console.log("createUser data:", user);
+        console.log("createUser client:", client);
+
         // Call createUser with transaction client
         const response = await createUser(user, client);
+
+        console.log("createSendbirdUser sendbirdUser:", sendbirdUser);
+        console.log("createSendbirdUser client:", client);
 
         // Call createSendbirdUser with transaction client
         const sendbirdUser = { id: response.id, name: first_name };
