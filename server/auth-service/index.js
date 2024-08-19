@@ -103,13 +103,13 @@ router.post(
         // Call createUser with transaction client
         const response = await createUser(user, client);
 
-        console.log("createSendbirdUser sendbirdUser:", sendbirdUser);
-        console.log("createSendbirdUser client:", client);
-
         // Call createSendbirdUser with transaction client
         const sendbirdUser = { id: response.id, name: first_name };
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
+
+        console.log("createSendbirdUser sendbirdUser:", sendbirdUser);
+        console.log("createSendbirdUser client:", client);
 
         // Store Sendbird access token
         const sendbirdToken = sendbirdResponse.access_token;
