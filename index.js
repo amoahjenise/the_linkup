@@ -69,6 +69,7 @@ app.use(
       imgSrc: [
         "'self'",
         "https://img.clerk.com", // Clerk's image hosting
+        "data:", // Allow Base64 encoded images
       ],
       workerSrc: [
         "'self'",
