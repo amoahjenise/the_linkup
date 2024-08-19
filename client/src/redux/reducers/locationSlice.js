@@ -7,7 +7,7 @@ export const fetchLocation = createAsyncThunk(
   "location/fetchLocation",
   async ({ lat, lon, allow_location }) => {
     const response = await axios.get(
-      `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
     );
     return {
       allow_location: allow_location,
