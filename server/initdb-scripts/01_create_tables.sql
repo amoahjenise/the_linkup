@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
     bio TEXT,
     status VARCHAR(20),
     avatar TEXT,
-    clerk_user_id VARCHAR(255) UNIQUE
+    clerk_user_id VARCHAR(255) UNIQUE,
+    access_token VARCHAR(255),
+    city VARCHAR(255) 
 );
 
 -- Table: link_ups
@@ -29,7 +31,8 @@ CREATE TABLE IF NOT EXISTS link_ups (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20),
-    creator_name VARCHAR(100)
+    creator_name VARCHAR(100),
+    hidden BOOLEAN DEFAULT FALSE
 );
 
 -- Table: link_up_requests
@@ -41,7 +44,8 @@ CREATE TABLE IF NOT EXISTS link_up_requests (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     message TEXT,
-    requester_id UUID REFERENCES users(id)
+    requester_id UUID REFERENCES users(id),
+    hidden BOOLEAN DEFAULT FALSE
 );
 
 -- Table: images
@@ -74,5 +78,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     requester_id UUID REFERENCES users(id),
-    link_up_id UUID REFERENCES link_ups(id)
+    link_up_id UUID REFERENCES link_ups(id),
+    hidden BOOLEAN DEFAULT FALSE
 );
