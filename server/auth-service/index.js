@@ -55,7 +55,8 @@ router.post(
 
       // Grab the headers and body
       const headers = req.headers;
-      const payload = req.body.text();
+      // Convert the raw buffer into a string
+      const payload = req.body.toString("utf8");
 
       // Get the Svix headers for verification
       const svix_id = headers["svix-id"];
