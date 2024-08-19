@@ -57,23 +57,34 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: [
         "'self'",
-        "'unsafe-inline'", // Note: `'unsafe-inline'` should be used cautiously as it can weaken your CSP.
-        "https://grand-airedale-41.clerk.accounts.dev",
-        "https://grand-airedale-41.accounts.dev",
-        "https://challenges.cloudflare.com",
+        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
+        "https://challenges.cloudflare.com", // Cloudflare bot protection
+        "'unsafe-inline'", // Required for Clerk's inline scripts
       ],
       connectSrc: [
         "'self'",
-        "https://grand-airedale-41.clerk.accounts.dev",
-        "https://grand-airedale-41.accounts.dev",
+        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
       ],
-      imgSrc: ["'self'", "https://img.clerk.com"],
-      frameSrc: ["'self'"],
-      // Add other directives as needed, e.g., styleSrc, fontSrc, etc.
+      imgSrc: [
+        "'self'",
+        "https://img.clerk.com", // Clerk's image hosting
+      ],
+      workerSrc: [
+        "'self'",
+        "blob:", // Required for worker scripts
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for Clerk's runtime CSS-in-JS
+      ],
+      frameSrc: [
+        "'self'",
+        "https://challenges.cloudflare.com", // Cloudflare bot protection
+      ],
+      // Add any other directives you may need
     },
   })
 );
-
 app.use(express.json());
 app.use(
   cors({

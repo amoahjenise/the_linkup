@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     bio TEXT,
     status VARCHAR(20),
     avatar TEXT,
-    clerk_user_id UUID UNIQUE
+    clerk_user_id VARCHAR(255) UNIQUE
 );
 
 -- Table: link_ups

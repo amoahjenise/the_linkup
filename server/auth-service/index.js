@@ -41,7 +41,7 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
     let client; // Declare client variable for transaction
-
+    console.log("/api/webhooks api executed");
     try {
       // Begin transaction
       client = await pool.connect();
