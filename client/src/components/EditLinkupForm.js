@@ -9,13 +9,6 @@ import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
-const SearchInputContainer = styled("div")(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-}));
-
 const ModalOverlay = styled("div")({
   flex: "1",
   position: "sticky",
@@ -297,9 +290,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               id="paymentOption"
               required
             >
-              <option value="" disabled>
-                Select Payment Option
-              </option>
+              <option value="">Select Payment Option (Optional)</option>{" "}
               <option value="split">Split The Bill</option>
               <option value="iWillPay">I Will Pay</option>
               <option value="pleasePay">Please Pay</option>
