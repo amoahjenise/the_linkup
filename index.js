@@ -86,6 +86,8 @@ app.use(
   })
 );
 
+app.use("/api/auth/api/webhooks", bodyParser.raw({ type: "*/*" }));
+
 app.use(express.json());
 app.use(
   cors({
