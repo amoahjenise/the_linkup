@@ -56,7 +56,7 @@ router.post(
       // Grab the headers and body
       const headers = req.headers;
       // Convert the raw buffer into a string
-      const payload = req.body.toString("utf8");
+      const payload = req.rawBody;
       console.log("ID", headers["svix-id"]);
       console.log("TIMESTAMP", headers["svix-timestamp"]);
       console.log("SIGNATURE", headers["svix-signature"]);
