@@ -55,7 +55,7 @@ router.post(
 
       // Grab the headers and body
       const headers = req.headers;
-      const payload = req.body;
+      const payload = req.body.text();
 
       // Get the Svix headers for verification
       const svix_id = headers["svix-id"];
