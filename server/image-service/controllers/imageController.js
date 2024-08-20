@@ -30,7 +30,7 @@ const getImages = async (req, res) => {
 };
 
 const uploadImages = async (req, res) => {
-  const { userId, imageUrls } = req.body.params; // Access userId and imageUrls from req.body.params
+  const { userId, imageUrls } = req.body; // Access userId and imageUrls from req.body
 
   const queryPath = path.join(__dirname, "../db/queries/uploadImages.sql");
 
