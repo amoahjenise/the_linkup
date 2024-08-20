@@ -46,8 +46,10 @@ const Form = styled("form")(({ theme }) => ({
 const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
-  borderRadius: "24px",
-  border: "1px solid #ccc", // Add border style
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+  },
+  backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
   width: "100%",
 }));
 
@@ -96,15 +98,17 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
 
 const CustomDropdown = styled("div")(({ theme }) => ({
   fontSize: "14px",
+  marginBottom: theme.spacing(2),
   position: "relative",
   "& select": {
     width: "100%",
     padding: theme.spacing(1),
     backgroundSize: "auto 20px",
+    backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
     paddingRight: "2.5rem", // Ensure room for the arrow icon
   },
   "& option": {
-    backgroundColor: "rgba(64, 64, 64, 2)", // Darker color for the options
+    backgroundColor: "rgba(64, 64, 64, 0.7)", // Darker color for the options
     color: "#FFFFFF", // Ensure text is readable
   },
 }));
