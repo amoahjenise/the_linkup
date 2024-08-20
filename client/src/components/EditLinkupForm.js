@@ -286,7 +286,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               onChange={handlePaymentOptionChange}
               aria-label="Payment Option"
               id="paymentOption"
-              required
             >
               <option value="">Select Payment Option (Optional)</option>{" "}
               <option value="split">Split The Bill</option>
