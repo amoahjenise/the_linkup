@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@clerk/clerk-react": "^5.4.0",
@@ -76,7 +77,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "babel-plugin-webpack-alias": "^2.1.2",
     "ignore-loader": "^0.1.2",
     "webpack-node-externals": "^3.0.0"

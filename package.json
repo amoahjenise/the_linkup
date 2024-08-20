@@ -16,6 +16,7 @@
     "start:dev": "concurrently \"npm run start\" \"npm run start:client\""
   },
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@clerk/clerk-react": "^4.27.2",
@@ -25,8 +26,10 @@
     "@reduxjs/toolkit": "^2.2.5",
     "@sendbird/uikit-react": "^3.14.6",
     "ajv": "^8.17.1",
+    "body-parser": "^1.20.2",
     "color": "^4.2.3",
     "compromise": "^14.12.0",
+    "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -38,9 +41,5 @@
     "sendbird": "^3.1.33",
     "socket.io": "^4.7.5",
     "svix": "^1.17.0"
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "concurrently": "^7.6.0"
   }
 }

@@ -28,7 +28,7 @@ const createNewConversation = async (req, res) => {
 
   try {
     // Insert into conversations and get the conversation_id
-    const { rows } = await pool.query(
+    const { rows } = await pool.query( 
       queryConversation,
       queryValuesConversation
     );

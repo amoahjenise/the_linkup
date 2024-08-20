@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Table: users
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     phone_number VARCHAR(15) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -14,11 +14,13 @@ CREATE TABLE users (
     bio TEXT,
     status VARCHAR(20),
     avatar TEXT,
-    clerk_user_id UUID UNIQUE
+    clerk_user_id VARCHAR(255) UNIQUE,
+    access_token VARCHAR(255),
+    city VARCHAR(255) 
 );
 
 -- Table: link_ups
-CREATE TABLE link_ups (
+CREATE TABLE IF NOT EXISTS link_ups (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     creator_id UUID REFERENCES users(id),
     location VARCHAR(255),
@@ -29,11 +31,12 @@ CREATE TABLE link_ups (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20),
-    creator_name VARCHAR(100)
+    creator_name VARCHAR(100),
+    hidden BOOLEAN DEFAULT FALSE
 );
 
 -- Table: link_up_requests
-CREATE TABLE link_up_requests (
+CREATE TABLE IF NOT EXISTS link_up_requests (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     linkup_id UUID REFERENCES link_ups(id),
     receiver_id UUID REFERENCES users(id),
@@ -41,11 +44,12 @@ CREATE TABLE link_up_requests (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     message TEXT,
-    requester_id UUID REFERENCES users(id)
+    requester_id UUID REFERENCES users(id),
+    hidden BOOLEAN DEFAULT FALSE
 );
 
 -- Table: images
-CREATE TABLE images (
+CREATE TABLE IF NOT EXISTS images (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id),
     image_url TEXT,
@@ -55,17 +59,18 @@ CREATE TABLE images (
 );
 
 -- Table: conversations
-CREATE TABLE conversations (
+CREATE TABLE IF NOT EXISTS conversations (
     conversation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     operator_id UUID,
     request_id UUID REFERENCES link_up_requests(id),
-    linkup_id UUID REFERENCES link_ups(id)
+    linkup_id UUID REFERENCES link_ups(id),
+    requester_id UUID REFERENCES users(id),
 );
 
 -- Table: notifications
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID REFERENCES users(id),
     type VARCHAR(50),
@@ -74,5 +79,6 @@ CREATE TABLE notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     requester_id UUID REFERENCES users(id),
-    link_up_id UUID REFERENCES link_ups(id)
+    link_up_id UUID REFERENCES link_ups(id),
+    hidden BOOLEAN DEFAULT FALSE
 );

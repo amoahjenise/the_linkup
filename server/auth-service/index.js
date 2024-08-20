@@ -12,13 +12,48 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // Default to your front-end URL
 
 // Create an Express Router instance
 const router = express.Router();
 
 // Use helmet middleware to set security headers
-router.use(helmet());
+// Middleware
+router.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
+        "https://challenges.cloudflare.com", // Cloudflare bot protection
+        "'unsafe-inline'", // Required for Clerk's inline scripts
+      ],
+      connectSrc: [
+        "'self'",
+        "https://grand-airedale-41.clerk.accounts.dev", // Replace with your actual Clerk FAPI hostname
+      ],
+      imgSrc: [
+        "'self'",
+        "https://img.clerk.com", // Clerk's image hosting
+        "data:", // Allow Base64 encoded images
+      ],
+      workerSrc: [
+        "'self'",
+        "blob:", // Required for worker scripts
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for Clerk's runtime CSS-in-JS
+      ],
+      frameSrc: [
+        "'self'",
+        "https://challenges.cloudflare.com", // Cloudflare bot protection
+      ],
+      // Add any other directives you may need
+    },
+  })
+);
 
 // Use CORS middleware
 router.use(
@@ -31,7 +66,7 @@ router.use(
 );
 
 // Middleware to parse JSON
-router.use(express.json());
+// router.use(express.json());
 
 // Routes for authentication
 router.use("/", authRoutes);
@@ -41,7 +76,7 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
     let client; // Declare client variable for transaction
-
+    console.log("/api/webhooks api executed");
     try {
       // Begin transaction
       client = await pool.connect();
@@ -55,8 +90,13 @@ router.post(
 
       // Grab the headers and body
       const headers = req.headers;
+      // Convert the raw buffer into a string
       const payload = req.body;
+      console.log("ID", headers["svix-id"]);
+      console.log("TIMESTAMP", headers["svix-timestamp"]);
+      console.log("SIGNATURE", headers["svix-signature"]);
 
+      console.log("payload", req);
       // Get the Svix headers for verification
       const svix_id = headers["svix-id"];
       const svix_timestamp = headers["svix-timestamp"];
@@ -92,6 +132,9 @@ router.post(
           name: first_name,
         };
 
+        console.log("createUser data:", user);
+        console.log("createUser client:", client);
+
         // Call createUser with transaction client
         const response = await createUser(user, client);
 
@@ -99,6 +142,9 @@ router.post(
         const sendbirdUser = { id: response.id, name: first_name };
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
+
+        console.log("createSendbirdUser sendbirdUser:", sendbirdUser);
+        console.log("createSendbirdUser client:", client);
 
         // Store Sendbird access token
         const sendbirdToken = sendbirdResponse.access_token;

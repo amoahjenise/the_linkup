@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { styled } from "@mui/material/styles";
-import { uploadImages, deleteImages } from "../api/imagesAPI"; // Adjust the import based on your API functions.
+import { uploadImages, deleteImages } from "../api/imagesAPI";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Resizer from "react-image-file-resizer";
 
 const MAX_IMAGES = 10; // Maximum number of images to display
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB (adjust the value as needed)
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const Title = styled("div")(({ theme }) => ({
   fontSize: "18px",
@@ -22,9 +22,9 @@ const UploadButton = styled("button")(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#007b86",
   },
-  borderRadius: "8px", // Adjust as needed
-  padding: "10px 20px", // Adjust as needed
-  fontSize: "16px", // Adjust as needed
+  borderRadius: "8px",
+  padding: "10px 20px",
+  fontSize: "16px",
 }));
 
 const CloseButton = styled("button")(() => ({
@@ -43,8 +43,8 @@ const CloseButton = styled("button")(() => ({
 
 const ImageGrid = styled("div")(() => ({
   display: "grid",
-  gridTemplateColumns: "repeat(5, 120px)", // Each square is 120px wide
-  gridTemplateRows: "repeat(2, 120px)", // Each square is 120px high
+  gridTemplateColumns: "repeat(5, 120px)",
+  gridTemplateRows: "repeat(2, 120px)",
   gap: "8px",
 }));
 
@@ -76,29 +76,16 @@ const RemoveButton = styled("button")(() => ({
   position: "absolute",
   top: "4px",
   right: "4px",
-  backgroundColor: "rgba(100, 100, 100, 0.3)", // Light gray with 90% transparency
+  backgroundColor: "rgba(100, 100, 100, 0.3)",
   border: "none",
-  borderRadius: "50%", // Makes it round
+  borderRadius: "50%",
   cursor: "pointer",
   padding: "4px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  width: "30px", // Adjust as needed
-  height: "30px", // Adjust as needed
-}));
-
-const EmptyGridItem = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: "1px solid #e1e8ed",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "24px",
-  fontWeight: "bold",
-  cursor: "pointer",
-  width: "100%",
-  height: "100%",
+  width: "30px",
+  height: "30px",
 }));
 
 const ImageUploadModal = ({
@@ -111,17 +98,22 @@ const ImageUploadModal = ({
   colorMode,
 }) => {
   const { addSnackbar } = useSnackbar();
+  const [tempProfileImages, setTempProfileImages] = useState([
+    ...profileImages,
+  ]);
 
-  // Utility function to resize images
+  const modalTextColor = colorMode === "dark" ? "white" : "black";
+  const modalBackgroundColor = colorMode === "dark" ? "#1e1e1e" : "white";
+
   const resizeImage = (file, outputType) =>
     new Promise((resolve) => {
       Resizer.imageFileResizer(
         file,
-        1080, // Desired width
-        1080, // Desired height
-        outputType, // Output type (JPEG or PNG)
-        90, // Quality
-        0, // Rotation
+        1080,
+        1080,
+        outputType,
+        90,
+        0,
         (uri) => {
           resolve(uri);
         },
@@ -129,23 +121,9 @@ const ImageUploadModal = ({
       );
     });
 
-  // Create a separate state to hold changes temporarily
-  const [tempProfileImages, setTempProfileImages] = useState([
-    ...profileImages,
-  ]);
-
-  // Define text and background color based on color mode
-  const modalTextColor = colorMode === "dark" ? "white" : "black";
-
-  const modalBackgroundColor = colorMode === "dark" ? "#1e1e1e" : "white";
-
-  const overlayBackgroundColor =
-    colorMode === "dark" ? "rgba(0, 0, 0, 0.5)" : "";
-
   const handleImageSelection = async (e, index) => {
     const file = e.target.files[0];
 
-    // Validate file type and size here
     if (!["image/jpeg", "image/png"].includes(file.type)) {
       addSnackbar("Invalid file type. Please choose a JPEG or PNG image.");
       return;
@@ -156,54 +134,43 @@ const ImageUploadModal = ({
       return;
     }
 
-    // Resize the selected image to JPEG or PNG format based on its type
-    let resizedImage;
-    if (file.type === "image/jpeg") {
-      resizedImage = await resizeImage(file, "JPEG");
-    } else if (file.type === "image/png") {
-      resizedImage = await resizeImage(file, "PNG");
+    try {
+      const resizedImage =
+        file.type === "image/jpeg"
+          ? await resizeImage(file, "JPEG")
+          : await resizeImage(file, "PNG");
+      const newProfileImages = [...tempProfileImages];
+      newProfileImages[index] = resizedImage;
+      setTempProfileImages(newProfileImages);
+    } catch (error) {
+      addSnackbar("Error resizing image.", error);
     }
-
-    // Update profileImages state with the new image URI
-    const newProfileImages = [...tempProfileImages];
-    newProfileImages[index] = resizedImage;
-    setTempProfileImages(newProfileImages);
   };
 
   const handleRemove = (index) => {
-    // Remove the image from the tempProfileImages state
     const newProfileImages = [...tempProfileImages];
     newProfileImages.splice(index, 1);
     setTempProfileImages(newProfileImages);
   };
 
   const handleCloseModal = () => {
-    // Clear selected files when closing the modal
     setTempProfileImages(profileImages);
     onClose();
   };
 
   const handleUpload = async () => {
     try {
-      // Delete existing images under the user ID
       await deleteImages(userId);
-
       const newProfileImages = tempProfileImages.filter(
         (image) => image !== null && image !== undefined
       );
 
       if (newProfileImages.length > 0) {
-        // Upload newProfileImages to the database
         await uploadImages(userId, newProfileImages);
       }
 
-      // Update the profileImages state with the new state
       setProfileImages(newProfileImages);
-
-      // Set the currentImageIndex to 0
-      setCurrentImageIndex(0); // Add this line
-
-      // Close the modal and show a success message
+      setCurrentImageIndex(0);
       onClose();
       addSnackbar("Images uploaded!");
     } catch (error) {
@@ -212,7 +179,6 @@ const ImageUploadModal = ({
   };
 
   useEffect(() => {
-    // Update the tempProfileImages state whenever profileImages changes
     setTempProfileImages([...profileImages]);
   }, [profileImages]);
 
@@ -228,7 +194,7 @@ const ImageUploadModal = ({
           top: "55%",
           left: "50%",
           height: "55%",
-          width: "40%",
+          width: "50%",
           transform: "translate(-50%, -50%)",
           padding: "2rem",
           outline: "none",
@@ -237,13 +203,11 @@ const ImageUploadModal = ({
       }}
     >
       <CloseButton onClick={handleCloseModal}>&times;</CloseButton>
-      <Title>
-        <p>Upload Pictures</p>
-      </Title>
+      <Title>Upload Pictures</Title>
       <ImageGrid>
         {Array.from({ length: MAX_IMAGES }).map((_, index) => (
           <ImageGridItem key={index}>
-            {tempProfileImages[index] && (
+            {tempProfileImages[index] ? (
               <>
                 <UploadedImage
                   src={tempProfileImages[index]}
@@ -253,9 +217,7 @@ const ImageUploadModal = ({
                   <DeleteIcon style={{ fontSize: 24, opacity: 0.9 }} />
                 </RemoveButton>
               </>
-            )}
-            {!tempProfileImages[index] && (
-              // Use handleImageSelection for empty grid items
+            ) : (
               <AddImageOverlay htmlFor={`file-upload-${index}`}>
                 +
                 <input

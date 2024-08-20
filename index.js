@@ -5,6 +5,7 @@ const socketIo = require("socket.io");
 const path = require("path");
 const helmet = require("helmet");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const {
   scheduleLinkupExpiryJob,
@@ -50,8 +51,8 @@ linkupInitializeSocket(linkupIo.of("/linkup-management")); // Use the correct na
 const linkupRequestIo = linkupRequestSocket(io);
 linkupRequestInitializeSocket(linkupRequestIo.of("/linkup-request")); // Use the correct namespace
 
-// Middleware
-app.use(helmet());
+app.use("/api/auth/api/webhooks", bodyParser.raw({ type: "*/*" }));
+
 app.use(express.json());
 app.use(
   cors({

@@ -3,47 +3,45 @@ import { useDropzone } from "react-dropzone";
 import { styled } from "@mui/material/styles";
 import Resizer from "react-image-file-resizer";
 
-const useStyles = styled((theme) => ({
-  cardInput: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    width: theme.spacing(24),
-    height: theme.spacing(24),
-    border: `2px dashed ${theme.palette.secondary.main}`,
-    borderRadius: "50%",
-    cursor: "pointer",
-    margin: "0 auto",
-    marginTop: theme.spacing(4),
-  },
-  cardInputDragActive: {
-    background: theme.palette.secondary.light,
-  },
-  avatar: {
-    width: "100%",
-    height: "100%",
-    borderRadius: "50%",
-    overflow: "hidden",
-    position: "relative",
-  },
-  avatarImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  uploadText: {
-    textAlign: "center",
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    margin: 0,
-  },
+const CardInput = styled("div")(({ theme, isDragActive }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: theme.spacing(24),
+  height: theme.spacing(24),
+  border: `2px dashed ${theme.palette.secondary.main}`,
+  borderRadius: "50%",
+  cursor: "pointer",
+  margin: "0 auto",
+  marginTop: theme.spacing(4),
+  background: isDragActive ? theme.palette.secondary.light : "transparent",
 }));
 
+const Avatar = styled("div")({
+  width: "100%",
+  height: "100%",
+  borderRadius: "50%",
+  overflow: "hidden",
+  position: "relative",
+});
+
+const AvatarImage = styled("img")({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+});
+
+const UploadText = styled("span")({
+  textAlign: "center",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  margin: 0,
+});
+
 const AvatarUploadInput = ({ userData, setUserData }) => {
-  const classes = useStyles();
   const [isImageUploaded, setIsImageUploaded] = useState(!!userData.avatarURL);
 
   useEffect(() => {
@@ -65,9 +63,7 @@ const AvatarUploadInput = ({ userData, setUserData }) => {
           0,
           (resizedImage) => {
             // Update the registration with the data URL of the resized image
-            // dispatch(updateRegistrationData({ avatarURL: resizedImage }));
             setUserData({ ...userData, avatarURL: resizedImage });
-            // setIsImageUploaded(true);
           },
           "base64"
         );
@@ -83,27 +79,18 @@ const AvatarUploadInput = ({ userData, setUserData }) => {
 
   return (
     <div>
-      <div
-        {...getRootProps()}
-        className={`${classes.cardInput} ${
-          isDragActive ? classes.cardInputDragActive : ""
-        }`}
-      >
+      <CardInput {...getRootProps()} isDragActive={isDragActive}>
         <input {...getInputProps()} />
-        <div className={classes.avatar}>
+        <Avatar>
           {isImageUploaded ? (
-            <img
-              src={userData.avatarURL}
-              alt=""
-              className={classes.avatarImage}
-            />
+            <AvatarImage src={userData.avatarURL} alt="" />
           ) : (
-            <span className={classes.uploadText}>
+            <UploadText>
               Upload Profile Picture. Drag and drop an image here
-            </span>
+            </UploadText>
           )}
-        </div>
-      </div>
+        </Avatar>
+      </CardInput>
     </div>
   );
 };
