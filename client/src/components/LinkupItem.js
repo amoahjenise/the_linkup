@@ -281,7 +281,20 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     const days = duration.asDays();
 
     if (days < 1) {
-      return "Today";
+      const hours = duration.asHours();
+      const minutes = duration.asMinutes();
+
+      if (hours >= 1) {
+        return `${Math.floor(hours)} hour${
+          Math.floor(hours) !== 1 ? "s" : ""
+        } ago`;
+      } else if (minutes >= 1) {
+        return `${Math.floor(minutes)} minute${
+          Math.floor(minutes) !== 1 ? "s" : ""
+        } ago`;
+      } else {
+        return "Just now";
+      }
     } else if (days < 2) {
       return "Yesterday";
     } else {
