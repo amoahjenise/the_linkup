@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS conversations (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     operator_id UUID,
     request_id UUID REFERENCES link_up_requests(id),
-    linkup_id UUID REFERENCES link_ups(id)
+    linkup_id UUID REFERENCES link_ups(id),
+    requester_id UUID REFERENCES users(id),
 );
 
 -- Table: notifications

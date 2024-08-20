@@ -273,9 +273,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               id="genderPreference"
               required
             >
-              <option value="" disabled>
-                Gender Preference
-              </option>
+              <option value="">Select Payment Option (Optional)</option>{" "}
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="any">Any</option>

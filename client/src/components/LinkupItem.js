@@ -107,7 +107,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [distance, setDistance] = useState(null);
   const loggedUser = useSelector((state) => state.loggedUser);
-  const editingLinkup = useSelector((state) => state.editingLinkup);
   const {
     id,
     creator_id,
