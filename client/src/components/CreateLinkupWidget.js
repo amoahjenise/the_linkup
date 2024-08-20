@@ -185,7 +185,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           />
           <Tooltip
             title={
-              <Typography fontSize={30}>
+              <Typography fontSize={24}>
                 The location of your linkup event will be visible to users whose
                 requests you have accepted.
               </Typography>
