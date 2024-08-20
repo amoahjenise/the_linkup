@@ -199,8 +199,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               title="Please pay"
               role="img"
               aria-label="watery eyes"
-              style={{ fontSize: "20px" }}
-              className={PaymentOptionIcon}
+              style={{
+                fontSize: "20px",
+                fontFamily:
+                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+              }}
             >
               🥹
             </span>

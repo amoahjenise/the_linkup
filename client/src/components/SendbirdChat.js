@@ -11,19 +11,19 @@ import { getLinkupByConversation } from "../api/messagingAPI";
 import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 
-const SendbirdChatWrapper = styled('div')(({ theme }) => ({
+const SendbirdChatWrapper = styled("div")(({ theme }) => ({
   height: "calc(100vh - 60px)",
   display: "flex",
   borderWidth: "0px",
 }));
 
-const ConversationWrap = styled('div')({
+const ConversationWrap = styled("div")({
   borderWidth: "0px",
   borderLeftColor: "lightgrey",
   borderLeftWidth: "1px",
 });
 
-const SettingsPanelWrap = styled('div')({
+const SettingsPanelWrap = styled("div")({
   flex: "0 0 auto",
 });
 
@@ -43,19 +43,30 @@ export default function SendbirdChat() {
       if (!currentChannel?._url) return;
 
       try {
-        const linkupResponse = await getLinkupByConversation(currentChannel._url);
+        const linkupResponse = await getLinkupByConversation(
+          currentChannel._url
+        );
         setLinkup(linkupResponse.linkup);
 
         const channel = await getGroupChannel(currentChannel._url);
-        const operator = channel?.members.find((member) => member.role === "operator");
+        const operator = channel?.members.find(
+          (member) => member.role === "operator"
+        );
         const isOperatorValue = operator && operator.userId === userId;
         setIsOperator(isOperatorValue);
 
-        const response = await getChannelFirstTwoMessages(currentChannel._url, channel.createdAt);
+        const response = await getChannelFirstTwoMessages(
+          currentChannel._url,
+          channel.createdAt
+        );
 
         if (linkupResponse.linkup.request_status === "declined") {
           setMessageInputDisabled(true);
-        } else if (!isOperatorValue && response.messages.length === 1 && linkupResponse.linkup.request_status !== "accepted") {
+        } else if (
+          !isOperatorValue &&
+          response.messages.length === 1 &&
+          linkupResponse.linkup.request_status !== "accepted"
+        ) {
           setMessageInputDisabled(true);
         } else {
           setMessageInputDisabled(false);
