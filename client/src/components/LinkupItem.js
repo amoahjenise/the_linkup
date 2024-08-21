@@ -10,6 +10,7 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkUpAPI";
 import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
+import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
 
 const compromise = nlp;
 
@@ -24,23 +25,23 @@ const Container = styled("div")(({ theme }) => ({
   borderBottom: "1px solid #D3D3D3",
 }));
 
-const CardContainer = styled("div")(({ theme }) => ({
-  border: "1px solid #d2d6dc",
+const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
+  border: `1px solid ${colorMode === "light" ? "#d2d6dc" : "#2D3748"}`,
   padding: "2rem",
   borderRadius: "0.375rem",
   width: "32rem",
-  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  backgroundColor:
+    colorMode === "light"
+      ? "rgba(200, 200, 200, 0.1)"
+      : "rgba(45, 55, 72, 0.1)", // Adjust background for dark mode
   cursor: "pointer",
   overflow: "hidden",
-  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
+  boxShadow: isHovered
+    ? colorMode === "light"
+      ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)" // Hover effect for light mode
+      : "0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7)" // Hover effect for dark mode
+    : "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)", // Default shadow
   transition: "box-shadow 0.2s ease",
-  "&:hover": {
-    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-  },
-}));
-
-const HighlightedCard = styled(CardContainer)(({ theme }) => ({
-  backgroundColor: "rgba(200, 200, 200, 0.2)",
 }));
 
 const HorizontalMenuContainer = styled("div")(({ theme }) => ({
@@ -103,6 +104,7 @@ const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
 }));
 
 const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
+  const { colorMode } = useColorMode(); // Use useColorMode hook
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [distance, setDistance] = useState(null);
@@ -305,6 +307,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   return (
     <Container>
       <CardContainer
+        isHovered={isHovered}
+        colorMode={colorMode}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

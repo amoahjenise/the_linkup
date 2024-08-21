@@ -9,6 +9,7 @@ import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { IconButton } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import { useColorMode } from "@chakra-ui/react";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -100,6 +101,7 @@ const HomePage = ({ isMobile }) => {
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
+  const { colorMode } = useColorMode();
 
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
