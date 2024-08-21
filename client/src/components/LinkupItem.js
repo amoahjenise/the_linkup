@@ -165,6 +165,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     fetchUserLocation();
   }, [latitude, longitude]);
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return "";
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   // Function to render the appropriate icon based on the payment option
   const renderPaymentOptionIcon = () => {
     switch (linkupItem.payment_option) {
@@ -205,7 +210,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               style={{
                 fontSize: "20px",
                 fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif",
               }}
             >
               🥹
@@ -272,7 +277,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
         <strong>
           {dateText} {timeText}
         </strong>{" "}
-        at <strong>{location}</strong>.
+        at <strong>{capitalizeFirstLetter(location)}</strong>.
       </span>
     );
   };

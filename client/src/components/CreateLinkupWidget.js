@@ -160,10 +160,15 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
       : minTimeDefault
     : currentDate;
 
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return "";
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
     const activity = e.target.activity.value;
-    const location = e.target.location.value;
+    const location = capitalizeFirstLetter(e.target.location.value);
 
     try {
       const response = await createLinkup({
@@ -221,6 +226,15 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
               </Typography>
             }
             arrow
+            PopperProps={{
+              sx: {
+                "& .MuiTooltip-tooltip": {
+                  backgroundColor: colorMode === "dark" ? "#181717" : "#f0f0f0",
+                  color: colorMode === "dark" ? "#ffffff" : "#333333",
+                  border: "1px solid #b3b3b3",
+                },
+              },
+            }}
           >
             <InfoIconStyled size="large">
               <InfoIcon />
