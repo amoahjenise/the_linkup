@@ -11,6 +11,7 @@ import { getLinkupStatus } from "../api/linkUpAPI";
 import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
 import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
+import EmojiTooltip from "../utils/EmojiTooltip"; // Adjust the import path as needed
 
 const compromise = nlp;
 
@@ -203,18 +204,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
       case "pleasePay":
         return (
           <PaymentOptionIconContainer>
-            <span
-              title="Please pay"
-              role="img"
-              aria-label="watery eyes"
-              style={{
-                fontSize: "20px",
-                fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif",
-              }}
-            >
-              🥹
-            </span>
+            <EmojiTooltip />
           </PaymentOptionIconContainer>
         );
       default:
