@@ -28,29 +28,25 @@ export async function getUserImages(userId) {
   }
 }
 
-// Function to upload images to the server
 export async function uploadImages(userId, imageUrls) {
   try {
     const aImagesUrls = [];
 
     // Check if imageUrls is an array before using forEach
     if (Array.isArray(imageUrls)) {
-      imageUrls.forEach((imageUrl, index) => {
+      imageUrls.forEach((imageUrl) => {
         aImagesUrls.push(imageUrl);
       });
     } else {
-      // Handle the case where imageUrls is not an array
       console.error("Invalid imageUrls:", imageUrls);
-      // You can throw an error or handle it as needed
-      // throw new Error("Invalid imageUrls");
+      // Handle the case where imageUrls is not an array
+      throw new Error("Invalid imageUrls");
     }
 
     // Make a POST request to the server endpoint for uploading images
     const response = await axios.post(`${BASE_URL}/api/image/upload-images`, {
-      params: {
-        userId: userId,
-        imageUrls: aImagesUrls,
-      },
+      userId: userId,
+      imageUrls: aImagesUrls,
     });
 
     // Return the response data (which may include the image URLs after storage)

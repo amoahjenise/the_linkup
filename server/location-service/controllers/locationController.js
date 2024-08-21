@@ -4,7 +4,7 @@ const path = require("path");
 
 const postLocation = async (req, res) => {
   const { id, city, country, latitude, longitude, allow_location } = req.body;
-  const queryPath = path.join(__dirname, "../db/queries/postlocation.sql");
+  const queryPath = path.join(__dirname, "../db/queries/postLocation.sql");
   const query = fs.readFileSync(queryPath, "utf8");
 
   try {

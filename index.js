@@ -54,6 +54,7 @@ linkupRequestInitializeSocket(linkupRequestIo.of("/linkup-request")); // Use the
 app.use("/api/auth/api/webhooks", bodyParser.raw({ type: "*/*" }));
 
 app.use(express.json());
+
 app.use(
   cors({
     origin: [process.env.ALLOWED_ORIGIN || "http://localhost:3000"],
