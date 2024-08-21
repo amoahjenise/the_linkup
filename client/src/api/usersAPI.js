@@ -221,6 +221,30 @@ export const updateUserAvatar = async (userId, avatar) => {
   }
 };
 
+export const updateUserName = async (userId, name) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/api/user/update-user-name/${userId}`,
+      {
+        name,
+      }
+    );
+    return response;
+  } catch (error) {
+    try {
+      return await handleError(error, "Failed to update the user's name.");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
+  }
+};
+
 export const setUserStatusActive = async (userId) => {
   try {
     const response = await axios.patch(

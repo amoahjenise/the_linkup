@@ -210,6 +210,35 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
+const updateUserName = async (req, res) => {
+  const userId = req.params.userId;
+  const { name } = req.body;
+
+  try {
+    const queryPath = path.join(__dirname, "../db/queries/updateUserName.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [name, userId];
+
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "Name updated successfully!",
+        name: rows[0].name,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Could not update user's name.",
+        name: "",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
 
@@ -249,5 +278,6 @@ module.exports = {
   updateUser,
   updateUserBio,
   updateUserAvatar,
+  updateUserName,
   setUserStatusActive,
 };

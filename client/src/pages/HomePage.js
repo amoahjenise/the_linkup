@@ -108,8 +108,11 @@ const HomePage = ({ isMobile }) => {
       setIsFetchingNextPage(true);
       try {
         if (!userId) return;
+
         const adjustedPage = page - 1;
         const sqlOffset = adjustedPage * PAGE_SIZE;
+
+        // Fetch linkups from the API
         const response = await getLinkups(
           userId,
           gender,
@@ -118,13 +121,19 @@ const HomePage = ({ isMobile }) => {
           latitude,
           longitude
         );
+
         if (response.success) {
+          // Filter only active linkups
           const activeLinkups = response.linkupList.filter(
             (linkup) => linkup.status === "active"
           );
+
+          // Update the linkup list based on whether it's the first page or subsequent pages
           const updatedLinkupList =
             page === 1 ? activeLinkups : [...linkupList, ...activeLinkups];
-          const newLinkups = updatedLinkupList.filter(
+
+          // Filter out any old linkups and update only with newer data
+          const newLinkups = activeLinkups.filter(
             (newLinkup) =>
               !fetchedLinkupIds.includes(newLinkup.id) ||
               updatedLinkupList.some(
@@ -134,10 +143,16 @@ const HomePage = ({ isMobile }) => {
                     new Date(existingLinkup.updated_at)
               )
           );
+
+          // Sort the updated list by creation date, descending
           updatedLinkupList.sort(
             (a, b) => new Date(b.created_at) - new Date(a.created_at)
           );
+
+          // Dispatch updated linkups to Redux store
           dispatch(fetchLinkupsSuccess(updatedLinkupList));
+
+          // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
           const newFetchedLinkupIds = newLinkups.map((linkup) => linkup.id);
           setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
@@ -147,9 +162,8 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
-        setTimeout(() => {
-          setIsFetchingNextPage(false);
-        }, 300);
+        // Ensure fetching state is reset
+        setIsFetchingNextPage(false);
       }
     },
     [

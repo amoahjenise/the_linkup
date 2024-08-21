@@ -5,7 +5,12 @@ import { styled } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ImageGrid from "../components/ImageGrid";
-import { getUserById, updateUserBio, updateUserAvatar } from "../api/usersAPI";
+import {
+  getUserById,
+  updateUserBio,
+  updateUserAvatar,
+  updateUserName,
+} from "../api/usersAPI";
 import { getUserImages } from "../api/imagesAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
@@ -143,10 +148,11 @@ const UserProfilePage = ({ isMobile }) => {
     setIsEditModalOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const handleSaveChanges = async (editedBio, editedAvatar) => {
+  const handleSaveChanges = async (editedBio, editedAvatar, editedName) => {
     try {
       let bioResponse = null;
       let avatarResponse = null;
+      let nameResponse = null;
       let changesMade = false;
 
       if (userData?.bio !== editedBio) {
@@ -163,18 +169,26 @@ const UserProfilePage = ({ isMobile }) => {
         }
       }
 
+      if (userData?.name !== editedName) {
+        nameResponse = await updateUserName(userData?.id, editedName);
+        if (nameResponse?.data?.success !== false) {
+          changesMade = true;
+        }
+      }
+
       if (changesMade) {
         setUserData((prevUserData) => ({
           ...prevUserData,
-          bio: bioResponse?.data?.bio,
+          bio: bioResponse?.data?.bio || prevUserData.bio,
           avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
+          name: nameResponse?.data?.name || prevUserData.name,
         }));
         addSnackbar("Profile updated!");
-        setIsEditModalOpen(false);
       } else {
         addSnackbar("No changes were made.");
-        setIsEditModalOpen(false);
       }
+
+      setIsEditModalOpen(false);
     } catch (error) {
       console.error(error);
       addSnackbar(error.message);
@@ -227,11 +241,6 @@ const UserProfilePage = ({ isMobile }) => {
           userData={userData}
           onSave={handleSaveChanges}
           colorMode={colorMode}
-          userLocation={
-            locationState.city && locationState.country
-              ? `${locationState.city}, ${locationState.country}`
-              : "Unknown Location"
-          }
         />
       )}
       <ImageUploadModal
