@@ -29,6 +29,10 @@ const WidgetContainer = styled("div")(({ theme }) => ({
   },
 }));
 
+const CenterElement = styled("div")({
+  textAlign: "center",
+});
+
 const CreateLinkUpTitle = styled("h2")(({ theme }) => ({
   textAlign: "center",
   marginBottom: theme.spacing(3),
@@ -199,7 +203,6 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           name="activity"
           required
         />
-
         <InputWithIcon>
           <InputField
             type="text"
@@ -221,7 +224,6 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             </InfoIconStyled>
           </Tooltip>
         </InputWithIcon>
-
         <DatePickerStyled
           selected={selectedDate}
           onChange={(date) => setSelectedDate(date)}
@@ -266,8 +268,9 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <option value="pleasePay">Please Pay</option>
           </select>
         </CustomDropdown>
-
-        <CreateLinkUpButton type="submit">Create Link-Up</CreateLinkUpButton>
+        <CenterElement>
+          <CreateLinkUpButton type="submit">Create</CreateLinkUpButton>
+        </CenterElement>{" "}
       </Form>
     </WidgetContainer>
   );
