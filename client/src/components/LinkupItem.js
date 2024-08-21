@@ -11,7 +11,7 @@ import { getLinkupStatus } from "../api/linkUpAPI";
 import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
 import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
-import EmojiTooltip from "../utils/EmojiTooltip"; // Adjust the import path as needed
+import EmojiTooltip from "./EmojiTooltip";
 
 const compromise = nlp;
 

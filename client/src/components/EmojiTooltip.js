@@ -16,7 +16,7 @@ const isEmojiSupported = (emoji) => {
 
 const EmojiTooltip = () => {
   const pleadingFaceEmoji = "🥹";
-  const fallbackEmoji = "😅"; // Fallback emoji
+  const fallbackEmoji = "😊"; // Fallback emoji
   const [supportedEmoji, setSupportedEmoji] = React.useState(fallbackEmoji);
 
   React.useEffect(() => {
