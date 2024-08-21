@@ -273,7 +273,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             minDate={new Date()}
             minTime={minTime}
             maxTime={maxTime}
-            placeholderText="Select date and time"
+            placeholderText="Select Date and Time"
             id="date"
             required
           />

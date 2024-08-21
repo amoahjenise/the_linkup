@@ -238,7 +238,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           minDate={new Date()} // Set the minimum date to the current date
           minTime={minTime} // Set the minimum time to the current time
           maxTime={maxTime}
-          placeholderText="Select date and time"
+          placeholderText="Select Date and Time"
           required
           colorMode={colorMode} // Pass colorMode to styled component
         />
