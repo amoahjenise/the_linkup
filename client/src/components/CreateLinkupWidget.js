@@ -210,11 +210,14 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             name="location"
             required
           />
-          {/* <Tooltip
+          <Tooltip
             title={
               <Typography fontSize={16}>
-                The location of your linkup event will be visible to users whose
-                requests you have accepted.
+                Please be cautious when specifying a location. Be aware of
+                untrusted individuals to prevent uninvited or harmful people
+                from attending. We recommend using a vague public location and
+                sharing more specific details only when chatting directly with
+                trusted individuals.
               </Typography>
             }
             arrow
@@ -222,7 +225,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <InfoIconStyled size="large">
               <InfoIcon />
             </InfoIconStyled>
-          </Tooltip> */}
+          </Tooltip>
         </InputWithIcon>
         <DatePickerStyled
           selected={selectedDate}
