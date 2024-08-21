@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   styled,
@@ -44,8 +44,14 @@ const AvatarContainer = styled("div")(({ theme }) => ({
 // BioTextField for the editable bio input
 const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
   marginTop: theme.spacing(2),
-
   width: "100%",
+  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Set text color based on mode
+  "& .MuiInputBase-input": {
+    color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Ensure input text color is applied
+  },
+  "& .MuiInputLabel-root": {
+    color: colorMode === "dark" ? "#B0B0B0" : "#606060", // Label color
+  },
 }));
 
 // CharCount for character count display
@@ -99,6 +105,15 @@ const UserProfileEditModal = ({
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null);
   const [editedName, setEditedName] = useState(userData.name || "");
 
+  useEffect(() => {
+    if (isOpen) {
+      // Reset the state with userData values when the modal is opened
+      setEditedBio(userData.bio || "");
+      setUpdatedAvatar(userData.avatar || null);
+      setEditedName(userData.name || "");
+    }
+  }, [isOpen, userData]);
+
   const handleSave = () => {
     onSave(editedBio, updatedAvatar, editedName);
   };
@@ -131,9 +146,6 @@ const UserProfileEditModal = ({
                 color: colorMode === "dark" ? "#B0B0B0" : "#909090",
                 backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
               },
-              // style: {
-              //   color: colorMode === "dark" ? "#E0E0E0" : "#202124",
-              // },
             }}
             InputLabelProps={{
               style: { color: colorMode === "dark" ? "#B0B0B0" : "#606060" },
@@ -172,6 +184,7 @@ const UserProfileEditModal = ({
                 setEditedBio(newBio);
               }
             }}
+            colorMode={colorMode} // Pass colorMode prop
           />
           {MAX_BIO_LENGTH - editedBio.length <=
             MIN_CHARS_REMAINING_TO_DISPLAY && (

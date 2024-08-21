@@ -23,7 +23,7 @@ const classes = {
   slideOut: `${PREFIX}-slideOut`,
 };
 
-const StyledDiv = styled("div")(({ theme }) => ({
+const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.homePage}`]: {
     display: "flex",
     width: "100%",
@@ -33,7 +33,7 @@ const StyledDiv = styled("div")(({ theme }) => ({
     flex: "2",
     overflowY: "auto",
     borderRightWidth: "1px",
-    borderRightColor: "#D3D3D3",
+    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3", // Adjust border color based on mode
     [theme.breakpoints.down("sm")]: {
       flex: "1",
     },
@@ -45,15 +45,15 @@ const StyledDiv = styled("div")(({ theme }) => ({
     display: "block", // Make sure it's displayed by default
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
-      top: "64px",
+      top: 0,
       right: 0,
       width: "100%",
-      height: "calc(100vh - 64px)",
-      backgroundColor: theme.palette.mode === "dark" ? "black" : "white",
+      height: "100vh",
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
-      zIndex: 1000,
+      zIndex: 2000,
       overflowY: "auto",
     },
   },
@@ -66,9 +66,9 @@ const StyledDiv = styled("div")(({ theme }) => ({
   [`&.${classes.widgetCloseButton}`]: {
     position: "absolute",
     top: "10px",
-    left: "10px",
+    left: "10px", // Position close button on the right side
     zIndex: 1100,
-    color: theme.palette.mode === "dark" ? "white" : "black",
+    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
   },
   [`&.${classes.slideIn}`]: {
     transform: "translateX(0)",
@@ -239,7 +239,7 @@ const HomePage = ({ isMobile }) => {
   };
 
   return (
-    <StyledDiv className={classes.homePage}>
+    <StyledDiv className={classes.homePage} colorMode={colorMode}>
       <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
         <FeedSection
           linkupList={linkupList}
@@ -248,7 +248,7 @@ const HomePage = ({ isMobile }) => {
         />
       </StyledDiv>
       {!isMobile && (
-        <StyledDiv className={classes.widgetSection}>
+        <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
           <WidgetSection
             setShouldFetchLinkups={setShouldFetchLinkups}
             scrollToTopCallback={scrollToTop}
@@ -271,6 +271,7 @@ const HomePage = ({ isMobile }) => {
             className={`${classes.widgetSection} ${
               isWidgetVisible ? classes.slideIn : classes.slideOut
             }`}
+            colorMode={colorMode}
           >
             <IconButton
               className={classes.widgetCloseButton}

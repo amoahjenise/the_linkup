@@ -177,9 +177,10 @@ const UserProfilePage = ({ isMobile }) => {
       }
 
       if (changesMade) {
+        console.log("bioResponse?.data?.bio", bioResponse?.data?.bio);
         setUserData((prevUserData) => ({
           ...prevUserData,
-          bio: bioResponse?.data?.bio || prevUserData.bio,
+          bio: bioResponse?.data?.bio,
           avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
           name: nameResponse?.data?.name || prevUserData.name,
         }));
