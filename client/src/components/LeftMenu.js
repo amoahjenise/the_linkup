@@ -36,7 +36,7 @@ const MainContainer = styled("div")(
         : "white"
       : "transparent",
     height: isMobile ? (isOpen ? "100vh" : "auto") : "100%",
-    transition: "all 0.3s ease",
+    transition: "all 0.9s ease-in-out",
   })
 );
 
@@ -149,33 +149,45 @@ const LeftMenu = ({ isMobile }) => {
                   to="/home"
                   icon={<HomeIcon />}
                   location={location.pathname}
+                  text="Home"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItemComponent
                   to="/notifications"
                   icon={<NotificationsIcon />}
                   badgeContent={unreadNotificationsCount}
                   location={location.pathname}
+                  text="Notifications"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItemComponent
                   to="/profile/me"
                   icon={<AccountCircleIcon />}
                   location={location.pathname}
+                  text="Profile"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItemComponent
                   to="/history"
                   icon={<HistoryIcon />}
                   location={location.pathname}
+                  text="Link-Ups"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItemComponent
                   to="/messages"
                   icon={<MessageIcon />}
-                  location={location.pathname}
                   badgeContent={unreadMessagesCount}
+                  location={location.pathname}
+                  text="Messages"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItemComponent
                   to="/settings"
                   icon={<SettingsIcon />}
                   location={location.pathname}
+                  text="Settings"
+                  toggleMenu={toggleMenu} // Pass toggleMenu function
                 />
                 <StyledMenuItem>
                   <CustomUserButton />
@@ -248,22 +260,18 @@ const StyledMenuItemComponent = ({
   text,
   badgeContent,
   location,
+  toggleMenu,
 }) => {
-  const { colorMode } = useColorMode();
-  const isActive = location.startsWith(to);
-
+  const isActive = location === to;
   return (
-    <StyledMenuItem isActive={isActive} colorMode={colorMode}>
-      <MenuItemLink to={to}>
-        {icon}
-        {text && <div style={{ marginRight: "24px" }}>{text}</div>}
-        {badgeContent > 0 && (
-          <BadgeStyled
-            badgeContent={parseInt(badgeContent)}
-            overlap="rectangular"
-            color="secondary"
-          />
+    <StyledMenuItem isActive={isActive}>
+      <MenuItemLink to={to} onClick={toggleMenu}>
+        {badgeContent ? (
+          <BadgeStyled badgeContent={badgeContent}>{icon}</BadgeStyled>
+        ) : (
+          icon
         )}
+        {text}
       </MenuItemLink>
     </StyledMenuItem>
   );

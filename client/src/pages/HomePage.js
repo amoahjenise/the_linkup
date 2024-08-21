@@ -7,34 +7,73 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
+import { IconButton } from "@mui/material";
+import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 
 const PREFIX = "HomePage";
 const classes = {
   homePage: `${PREFIX}-homePage`,
   feedSection: `${PREFIX}-feedSection`,
   widgetSection: `${PREFIX}-widgetSection`,
+  widgetButton: `${PREFIX}-widgetButton`,
+  widgetCloseButton: `${PREFIX}-widgetCloseButton`,
   loadingContainer: `${PREFIX}-loadingContainer`,
+  slideIn: `${PREFIX}-slideIn`,
+  slideOut: `${PREFIX}-slideOut`,
 };
 
 const StyledDiv = styled("div")(({ theme }) => ({
   [`&.${classes.homePage}`]: {
     display: "flex",
     width: "100%",
+    position: "relative",
   },
   [`&.${classes.feedSection}`]: {
     flex: "2",
     overflowY: "auto",
-    marginLeft: "auto",
-    marginRight: "auto",
     borderRightWidth: "1px",
-    borderRightColor: "0.1px solid #D3D3D3",
+    borderRightColor: "#D3D3D3",
+    [theme.breakpoints.down("sm")]: {
+      flex: "1",
+    },
   },
   [`&.${classes.widgetSection}`]: {
     flex: "1",
     overflowY: "auto",
     overflowX: "hidden",
-    marginLeft: "auto",
-    marginRight: "auto",
+    display: "block", // Make sure it's displayed by default
+    [theme.breakpoints.down("sm")]: {
+      position: "fixed",
+      top: "64px",
+      right: 0,
+      width: "100%",
+      height: "calc(100vh - 64px)",
+      backgroundColor: theme.palette.mode === "dark" ? "black" : "white",
+      boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
+      transform: "translateX(100%)",
+      transition: "transform 0.3s ease",
+      zIndex: 1000,
+      overflowY: "auto",
+    },
+  },
+  [`&.${classes.widgetButton}`]: {
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    zIndex: 1100,
+  },
+  [`&.${classes.widgetCloseButton}`]: {
+    position: "absolute",
+    top: "10px",
+    left: "10px",
+    zIndex: 1100,
+    color: theme.palette.mode === "dark" ? "white" : "black",
+  },
+  [`&.${classes.slideIn}`]: {
+    transform: "translateX(0)",
+  },
+  [`&.${classes.slideOut}`]: {
+    transform: "translateX(100%)",
   },
   [`&.${classes.loadingContainer}`]: {
     display: "flex",
@@ -59,6 +98,7 @@ const HomePage = ({ isMobile }) => {
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
+  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
 
   const fetchLinkupsAndPoll = useCallback(
@@ -178,6 +218,10 @@ const HomePage = ({ isMobile }) => {
     }
   };
 
+  const toggleWidget = () => {
+    setIsWidgetVisible(!isWidgetVisible);
+  };
+
   return (
     <StyledDiv className={classes.homePage}>
       <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
@@ -197,6 +241,36 @@ const HomePage = ({ isMobile }) => {
             gender={gender}
           />
         </StyledDiv>
+      )}
+      {isMobile && (
+        <>
+          <IconButton
+            className={classes.widgetButton}
+            onClick={toggleWidget}
+            color="primary"
+          >
+            <MenuIcon />
+          </IconButton>
+          <StyledDiv
+            className={`${classes.widgetSection} ${
+              isWidgetVisible ? classes.slideIn : classes.slideOut
+            }`}
+          >
+            <IconButton
+              className={classes.widgetCloseButton}
+              onClick={toggleWidget}
+            >
+              <CloseIcon />
+            </IconButton>
+            <WidgetSection
+              setShouldFetchLinkups={setShouldFetchLinkups}
+              scrollToTopCallback={scrollToTop}
+              onRefreshClick={refreshLinkups}
+              userId={userId}
+              gender={gender}
+            />
+          </StyledDiv>
+        </>
       )}
     </StyledDiv>
   );

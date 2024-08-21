@@ -8,6 +8,7 @@ import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { Tooltip, IconButton, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import { useColorMode } from "@chakra-ui/react";
 
 // Styled components
 const WidgetContainer = styled("div")(({ theme }) => ({
@@ -28,10 +29,6 @@ const WidgetContainer = styled("div")(({ theme }) => ({
   },
 }));
 
-const CenterElement = styled("div")({
-  textAlign: "center",
-});
-
 const CreateLinkUpTitle = styled("h2")(({ theme }) => ({
   textAlign: "center",
   marginBottom: theme.spacing(3),
@@ -43,13 +40,21 @@ const Form = styled("form")(({ theme }) => ({
   padding: theme.spacing(1, 4),
 }));
 
-const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
+const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
+  fontSize: "14px",
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`,
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
-  backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+  backgroundColor:
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.12)"
+      : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
   width: "100%",
 }));
 
@@ -68,17 +73,20 @@ const CreateLinkUpButton = styled("button")(({ theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
-const InputField = styled("input")(({ theme }) => ({
+const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
   fontSize: "14px",
   padding: theme.spacing(1),
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`,
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
-  backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+  backgroundColor:
+    colorMode === "dark" ? "#2e2e2e" : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
 }));
 
 const InputWithIcon = styled("div")({
@@ -96,20 +104,31 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
   color: "lightgray",
 }));
 
-const CustomDropdown = styled("div")(({ theme }) => ({
+const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
   fontSize: "14px",
   marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  color: colorMode === "dark" ? "grey" : "grey",
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+  },
   position: "relative",
   "& select": {
     width: "100%",
     padding: theme.spacing(1),
     backgroundSize: "auto 20px",
-    backgroundColor: "rgba(130, 131, 129, 0.12)", // Slightly darker color on hover
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(130, 131, 129, 0.12)"
+        : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
     paddingRight: "2.5rem", // Ensure room for the arrow icon
   },
   "& option": {
-    backgroundColor: "rgba(64, 64, 64, 0.7)", // Darker color for the options
-    color: "#FFFFFF", // Ensure text is readable
+    color: colorMode === "dark" ? "white" : "black",
+    backgroundColor: colorMode === "dark" ? "#2e2e2e" : "white",
   },
 }));
 
@@ -120,6 +139,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id, name } = loggedUser?.user || {};
   const { addSnackbar } = useSnackbar();
+  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
 
   const maxTime = new Date();
   maxTime.setHours(23);
@@ -215,37 +235,39 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           maxTime={maxTime}
           placeholderText="Select date and time"
           required
+          colorMode={colorMode} // Pass colorMode to styled component
         />
-        <CustomDropdown>
+        <CustomDropdown colorMode={colorMode}>
           <select
             value={genderPreference}
             onChange={(e) => setGenderPreference(e.target.value)}
-            className={InputField.className}
             required
           >
             <option value="" disabled>
-              Gender Preference
+              Select Gender Preference
             </option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="any">Any</option>
           </select>
         </CustomDropdown>
-        <CustomDropdown>
+        <CustomDropdown colorMode={colorMode}>
           <select
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
-            className={InputField.className}
+            required
           >
+            <option value="" disabled>
+              Select Payment Option
+            </option>
             <option value="">Payment Option (Optional)</option>
             <option value="split">Split The Bill</option>
             <option value="iWillPay">I Will Pay</option>
             <option value="pleasePay">Please Pay</option>
           </select>
         </CustomDropdown>
-        <CenterElement>
-          <CreateLinkUpButton type="submit">Create</CreateLinkUpButton>
-        </CenterElement>
+
+        <CreateLinkUpButton type="submit">Create Link-Up</CreateLinkUpButton>
       </Form>
     </WidgetContainer>
   );
