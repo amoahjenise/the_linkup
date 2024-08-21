@@ -12,7 +12,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useColorMode } from "@chakra-ui/react";
-import logo from "../logo.png";
+import logo from "../assets/logo.png";
 import CustomUserButton from "./UserButton";
 import useSendbirdHandlers from "../handlers/useSendbirdHandlers";
 import { setUnreadMessagesCount } from "../redux/actions/messageActions";

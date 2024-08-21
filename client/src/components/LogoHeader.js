@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { Typography } from "@mui/material";
-import logo from "../logo.png";
+import logo from "../assets/logo.png";
 
 // Styled components
 const MainContainer = styled("div")(({ theme }) => ({

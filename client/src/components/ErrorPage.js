@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
-import Logo from "../logo.png"; // Import the logo image
+import Logo from "../assets/logo.png"; // Import the logo image
 import { useColorMode } from "@chakra-ui/react";
 
 // Define styled components

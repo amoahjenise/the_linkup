@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
-import logo from "../logo.png";
+import logo from "../assets/logo.png";
 
 const Screen = styled("div")({
   minHeight: "100vh",
