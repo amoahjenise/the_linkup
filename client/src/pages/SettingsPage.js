@@ -20,11 +20,17 @@ const SettingsPageContainer = styled("div")(({ theme }) => ({
 const MainSection = styled("div")(({ theme, colorMode }) => ({
   width: "65%",
   borderRight: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
-  transition: "transform 0.3s ease",
   [theme.breakpoints.down("md")]: {
     width: "100%",
     borderRight: "none",
-    transform: "translateX(0)",
+  },
+}));
+
+const RightSection = styled("div")(({ theme, colorMode }) => ({
+  width: "35%",
+  padding: theme.spacing(2),
+  [theme.breakpoints.down("md")]: {
+    display: "none",
   },
 }));
 
@@ -38,7 +44,7 @@ const SlidingSection = styled("div")(({ theme, show, colorMode }) => ({
   boxShadow: `-2px 0 5px ${colorMode === "dark" ? "#000000" : "#aaaaaa"}`,
   transform: show ? "translateX(0)" : "translateX(100%)",
   transition: "transform 0.3s ease",
-  zIndex: 1000, // Ensure it's above other content
+  zIndex: 1000,
   overflowY: "auto",
   [theme.breakpoints.up("md")]: {
     display: "none",
@@ -50,7 +56,7 @@ const CloseButton = styled(IconButton)(({ theme }) => ({
   top: "20px",
   right: "20px",
   color: theme.palette.text.primary,
-  zIndex: 1100, // Ensure the close button is above other content
+  zIndex: 1100,
 }));
 
 const SettingsPage = () => {
@@ -79,15 +85,28 @@ const SettingsPage = () => {
           onSubSectionClick={handleSubSectionClick}
         />
       </MainSection>
+
+      {/* RightSection is visible on desktop */}
+      <RightSection colorMode={colorMode}>
+        {activeSubSection === "deactivateAccount" && (
+          <DeactivateAccount colorMode={colorMode} />
+        )}
+        {activeSubSection === "locationSharing" && (
+          <LocationSharingSetting
+            activeSubSection={activeSubSection}
+            setActiveSubSection={setActiveSubSection}
+          />
+        )}
+      </RightSection>
+
+      {/* SlidingSection is only shown on mobile */}
       <SlidingSection show={showSlidingSection} colorMode={colorMode}>
         <CloseButton onClick={closeSlidingSection}>
           <CloseIcon />
         </CloseButton>
-        {/* Render the active section content based on activeSection and activeSubsection */}
         {activeSubSection === "deactivateAccount" && (
           <DeactivateAccount colorMode={colorMode} />
         )}
-
         {activeSubSection === "locationSharing" && (
           <LocationSharingSetting
             activeSubSection={activeSubSection}
