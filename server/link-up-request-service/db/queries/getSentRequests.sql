@@ -4,6 +4,7 @@ SELECT
   link_ups.creator_name,
   link_ups.location,
   link_ups.activity,
+  link_ups.payment_option,
   link_ups.date AS link_up_date,
   users.avatar,
   (SELECT name FROM users WHERE id = link_up_requests.requester_id) AS requester_name,

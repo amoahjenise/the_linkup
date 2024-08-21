@@ -119,6 +119,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     avatar,
     latitude,
     longitude,
+    location,
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
@@ -270,8 +271,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
         is trying to link up <strong>{activityText}</strong> on{" "}
         <strong>
           {dateText} {timeText}
-        </strong>
-        .
+        </strong>{" "}
+        at <strong>{location}</strong>.
       </span>
     );
   };

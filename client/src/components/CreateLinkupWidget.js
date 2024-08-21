@@ -210,7 +210,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             name="location"
             required
           />
-          <Tooltip
+          {/* <Tooltip
             title={
               <Typography fontSize={16}>
                 The location of your linkup event will be visible to users whose
@@ -222,7 +222,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <InfoIconStyled size="large">
               <InfoIcon />
             </InfoIconStyled>
-          </Tooltip>
+          </Tooltip> */}
         </InputWithIcon>
         <DatePickerStyled
           selected={selectedDate}
