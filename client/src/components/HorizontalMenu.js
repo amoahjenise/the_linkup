@@ -262,7 +262,7 @@ const HorizontalMenu = ({
         open={modalState.isDeleteModalOpen}
         onClose={() => closeModal("isDeleteModalOpen")}
         onConfirm={handleDeleteConfirm}
-        color="#FF0000"
+        color="#fe9494"
         modalTitle="Delete Link-Up?"
         modalContentText="Are you sure you want to delete your link-up? If you delete your link-up, you will permanently lose everything."
         primaryButtonText="Delete Link-Up"

@@ -258,9 +258,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
           >
-            <option value="" disabled>
-              Select Payment Option (Optional)
-            </option>
+            <option value="">Select Payment Option (Optional)</option>
             <option value="split">Split The Bill</option>
             <option value="iWillPay">I Will Pay</option>
             <option value="pleasePay">Please Pay</option>

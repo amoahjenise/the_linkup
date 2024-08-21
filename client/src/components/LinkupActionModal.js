@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
@@ -76,31 +76,51 @@ const ButtonContainer = styled("div")(({ theme }) => ({
 }));
 
 const CancelButton = styled(Button)(({ theme }) => ({
-  width: "50%",
+  flex: "1",
   padding: theme.spacing(1.5),
   textAlign: "center",
   backgroundColor: "#f5f5f5",
   color: "#9e9e9e",
-  fontWeight: "bold",
+  fontWeight: "600",
   borderRadius: theme.shape.borderRadius,
   "&:hover": {
     backgroundColor: "#e0e0e0",
     color: "#000",
   },
+  marginRight: theme.spacing(1),
 }));
 
 const PrimaryButton = styled(Button)(({ theme, color }) => ({
-  width: "50%",
+  flex: "1",
   padding: theme.spacing(1.5),
   textAlign: "center",
-  color: "#fff",
-  fontWeight: "bold",
-  backgroundColor: color, // Use the color prop for the background color
-  "&:hover": {
-    backgroundColor: "#e0e0e0",
-    color: "#000",
-  },
+  fontWeight: "600",
+  borderRadius: theme.shape.borderRadius,
 }));
+
+const shadeColor = (color, percent) => {
+  if (!color || color === "undefined") {
+    console.error("Invalid color:", color);
+    return "#da2424"; // Fallback color
+  }
+
+  // Convert hex to RGB
+  let r = parseInt(color.substring(1, 3), 16);
+  let g = parseInt(color.substring(3, 5), 16);
+  let b = parseInt(color.substring(5, 7), 16);
+
+  // Calculate new RGB values
+  r = Math.min(255, Math.max(0, Math.floor(r + (r * percent) / 100)));
+  g = Math.min(255, Math.max(0, Math.floor(g + (g * percent) / 100)));
+  b = Math.min(255, Math.max(0, Math.floor(b + (b * percent) / 100)));
+
+  // Convert RGB back to hex
+  const rHex = r.toString(16).padStart(2, "0");
+  const gHex = g.toString(16).padStart(2, "0");
+  const bHex = b.toString(16).padStart(2, "0");
+
+  return `#${rHex}${gHex}${bHex}`;
+};
 
 const LinkupActionModal = ({
   open,
@@ -120,6 +140,14 @@ const LinkupActionModal = ({
 
   const filterStyle =
     colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none"; // Set filter style based on colorMode
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
+
+  // Calculate hover color
+  const hoverColor = shadeColor(color, -10);
 
   return (
     <Modal
@@ -145,10 +173,14 @@ const LinkupActionModal = ({
             <CancelButton onClick={secondaryButtonFn || onClose}>
               {secondaryButtonText}
             </CancelButton>
-            <PrimaryButton>
+            <PrimaryButton
+              style={{ backgroundColor: isHovered ? hoverColor : color }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               <Button
                 onClick={primaryButtonFn || onConfirm}
-                style={{ backgroundColor: color }}
+                style={{ color: "white" }}
               >
                 {primaryButtonText}
               </Button>
