@@ -27,7 +27,7 @@ const MainContainer = styled("div")(
     position: isMobile ? "fixed" : "sticky",
     bottom: isMobile && isOpen ? 0 : "auto",
     left: isMobile ? (isOpen ? 0 : "-100%") : "auto", // Move off-screen when closed
-    width: isMobile && isOpen ? "100%" : isMobile ? "60px" : "auto",
+    width: isMobile ? "100%" : drawerWidth,
     boxShadow: isMobile ? "0px -2px 4px rgba(0, 0, 0, 0.1)" : "none",
     zIndex: isMobile ? 10000 : "auto",
     backgroundColor: isMobile
@@ -36,7 +36,7 @@ const MainContainer = styled("div")(
         : "white"
       : "transparent",
     height: isMobile ? (isOpen ? "100vh" : "auto") : "100%",
-    transition: "all 0.9s ease-in-out",
+    transition: "left 0.3s ease-in-out",
   })
 );
 
@@ -138,68 +138,12 @@ const LeftMenu = ({ isMobile }) => {
   return isAuthenticated ? (
     <>
       <MainContainer isMobile={isMobile} isOpen={isOpen} colorMode={colorMode}>
-        {isMobile ? (
-          isOpen ? (
-            <>
-              <MobileMenuButton onClick={toggleMenu}>
-                <CloseIcon />
-              </MobileMenuButton>
-              <MenuList>
-                <StyledMenuItemComponent
-                  to="/home"
-                  icon={<HomeIcon />}
-                  location={location.pathname}
-                  text="Home"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItemComponent
-                  to="/notifications"
-                  icon={<NotificationsIcon />}
-                  badgeContent={unreadNotificationsCount}
-                  location={location.pathname}
-                  text="Notifications"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItemComponent
-                  to="/profile/me"
-                  icon={<AccountCircleIcon />}
-                  location={location.pathname}
-                  text="Profile"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItemComponent
-                  to="/history"
-                  icon={<HistoryIcon />}
-                  location={location.pathname}
-                  text="Link-Ups"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItemComponent
-                  to="/messages"
-                  icon={<MessageIcon />}
-                  badgeContent={unreadMessagesCount}
-                  location={location.pathname}
-                  text="Messages"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItemComponent
-                  to="/settings"
-                  icon={<SettingsIcon />}
-                  location={location.pathname}
-                  text="Settings"
-                  toggleMenu={toggleMenu} // Pass toggleMenu function
-                />
-                <StyledMenuItem>
-                  <CustomUserButton />
-                </StyledMenuItem>
-              </MenuList>
-            </>
-          ) : (
-            <MobileMenuButton onClick={toggleMenu}>
-              <MenuIcon />
-            </MobileMenuButton>
-          )
-        ) : (
+        {isMobile && (
+          <MobileMenuButton onClick={toggleMenu}>
+            {isOpen ? <CloseIcon /> : <MenuIcon />}
+          </MobileMenuButton>
+        )}
+        {(isOpen || !isMobile) && (
           <>
             <LogoContainer>
               <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
@@ -210,6 +154,7 @@ const LeftMenu = ({ isMobile }) => {
                 icon={<HomeIcon />}
                 text="Home"
                 location={location.pathname}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/notifications"
@@ -217,18 +162,21 @@ const LeftMenu = ({ isMobile }) => {
                 text="Notifications"
                 badgeContent={unreadNotificationsCount}
                 location={location.pathname}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/profile/me"
                 icon={<AccountCircleIcon />}
                 text="Profile"
                 location={location.pathname}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/history"
                 icon={<HistoryIcon />}
                 text="Link-Ups"
                 location={location.pathname}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/messages"
@@ -236,12 +184,14 @@ const LeftMenu = ({ isMobile }) => {
                 text="Messages"
                 location={location.pathname}
                 badgeContent={unreadMessagesCount}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/settings"
                 icon={<SettingsIcon />}
                 text="Settings"
                 location={location.pathname}
+                toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItem>
                 <CustomUserButton />

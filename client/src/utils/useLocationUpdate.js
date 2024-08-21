@@ -8,43 +8,54 @@ const useLocationUpdate = () => {
   const loggedUser = useSelector((state) => state.loggedUser);
 
   const updateLocation = async (shareLocation) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            const resultAction = await dispatch(
-              fetchLocation({
-                lat: latitude,
-                lon: longitude,
-                allow_location: shareLocation,
-              })
+    if (!navigator.geolocation) {
+      console.error("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          // Fetch location data
+          const resultAction = await dispatch(
+            fetchLocation({
+              lat: latitude,
+              lon: longitude,
+              allow_location: shareLocation,
+            })
+          );
+
+          if (fetchLocation.fulfilled.match(resultAction)) {
+            // Post location data
+            const resultPostLocation = await postLocation(
+              loggedUser.user.id,
+              resultAction.payload.city,
+              resultAction.payload.country,
+              latitude,
+              longitude,
+              shareLocation
             );
 
-            if (fetchLocation.fulfilled.match(resultAction)) {
-              // Now that the location state is updated, call postLocation
-              const resultPostLocation = await postLocation(
-                loggedUser.user.id,
-                resultAction.payload.city,
-                resultAction.payload.country,
-                latitude,
-                longitude,
-                shareLocation
-              );
-
-              dispatch(updateCurrentUser(resultPostLocation.user));
-            } else {
-              console.error("Failed to fetch location:", resultAction.error);
-            }
-          } catch (error) {
-            console.error("Error fetching or posting location:", error);
+            // Update user with new location info
+            dispatch(updateCurrentUser(resultPostLocation.user));
+          } else {
+            console.error("Failed to fetch location:", resultAction.error);
           }
-        },
-        (error) => {
-          console.error("Error fetching geolocation:", error);
+        } catch (error) {
+          console.error("Error fetching or posting location:", error);
         }
-      );
-    }
+      },
+      (error) => {
+        console.error("Error fetching geolocation:", error);
+      },
+      {
+        // Optional: You can set specific options for geolocation
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    );
   };
 
   return { updateLocation };
