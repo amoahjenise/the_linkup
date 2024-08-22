@@ -12,6 +12,7 @@ import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
 import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
 import EmojiTooltip from "./EmojiTooltip";
+import { Tooltip } from "@mui/material";
 
 const compromise = nlp;
 
@@ -176,30 +177,40 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     switch (linkupItem.payment_option) {
       case "split":
         return (
-          <span
-            title="Lets split the bill!"
-            role="img"
-            aria-label="split the bill"
-            style={{ fontSize: "30px" }}
-          >
-            <PaymentOptionIcon>
-              <IoReceipt />
-              <IoReceipt />
-            </PaymentOptionIcon>
-          </span>
+          <Tooltip title="Lets split the bill!">
+            <span
+              role="img"
+              aria-label="split the bill"
+              style={{
+                fontSize: "30px",
+                fontFamily:
+                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              <PaymentOptionIcon>
+                <IoReceipt />
+                <IoReceipt />
+              </PaymentOptionIcon>
+            </span>
+          </Tooltip>
         );
       case "iWillPay":
         return (
-          <span
-            title="I'll pay!"
-            role="img"
-            aria-label="i'll pay"
-            style={{ fontSize: "30px" }}
-          >
-            <PaymentOptionIcon>
-              <IoReceipt />
-            </PaymentOptionIcon>
-          </span>
+          <Tooltip title="I'll pay!">
+            <span
+              role="img"
+              aria-label="i'll pay"
+              style={{
+                fontSize: "30px",
+                fontFamily:
+                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              <PaymentOptionIcon>
+                <IoReceipt />
+              </PaymentOptionIcon>
+            </span>{" "}
+          </Tooltip>
         );
       case "pleasePay":
         return (
