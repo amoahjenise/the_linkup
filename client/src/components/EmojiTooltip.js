@@ -6,7 +6,7 @@ const isEmojiSupported = (emoji) => {
   // Create a temporary element to test emoji rendering
   const testElement = document.createElement("div");
   testElement.style.fontSize = "50px";
-  testElement.style.visibility = "hidden";
+  testElement.style.visibility = "hidden"; 
   testElement.innerHTML = emoji;
   document.body.appendChild(testElement);
   const isSupported = testElement.offsetWidth > 0;
