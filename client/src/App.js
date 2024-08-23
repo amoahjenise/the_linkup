@@ -22,6 +22,7 @@ import {
   SettingsPage,
   PrivacyPolicyPage,
   CookieUsePage,
+  UserDataDeletionPage,
 } from "./pages";
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
@@ -45,6 +46,7 @@ const publicPages = [
   "/terms-of-service",
   "/privacy-policy",
   "/cookie-use",
+  "/data-deletion-instructions",
 ];
 
 // Define AppWrapper with conditional styling
@@ -67,6 +69,10 @@ const RoutesComponent = ({ isMobile, locationState }) => (
     <Route path="/terms-of-service" element={<TermsOfServicePage />} />
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
     <Route path="/cookie-use" element={<CookieUsePage />} />
+    <Route
+      path="/data-deletion-instructions"
+      element={<UserDataDeletionPage />}
+    />
     <Route
       path="/home"
       element={

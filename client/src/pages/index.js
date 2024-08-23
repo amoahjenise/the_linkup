@@ -11,3 +11,4 @@ export { default as TermsOfServicePage } from "./TermsOfServicePage";
 export { default as SettingsPage } from "./SettingsPage";
 export { default as PrivacyPolicyPage } from "./PrivacyPolicyPage";
 export { default as CookieUsePage } from "./CookieUsePage";
+export { default as UserDataDeletionPage } from "./UserDataDeletionPage";
