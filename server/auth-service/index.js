@@ -12,13 +12,17 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // Default to your front-end URL
+
+// Set allowed origins
+const ALLOWED_ORIGINS = [
+  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  "http://localhost:3000",
+];
 
 // Create an Express Router instance
 const router = express.Router();
 
 // Use helmet middleware to set security headers
-// Middleware
 router.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -50,7 +54,6 @@ router.use(
         "'self'",
         "https://challenges.cloudflare.com", // Cloudflare bot protection
       ],
-      // Add any other directives you may need
     },
   })
 );
@@ -58,15 +61,11 @@ router.use(
 // Use CORS middleware
 router.use(
   cors({
-    origin: [ALLOWED_ORIGIN],
+    origin: ALLOWED_ORIGINS,
     methods: ["POST", "GET"],
     optionsSuccessStatus: 200,
-    // credentials: true, // Allow credentials (cookies)
   })
 );
-
-// Middleware to parse JSON
-// router.use(express.json());
 
 // Routes for authentication
 router.use("/", authRoutes);
@@ -76,7 +75,7 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   async (req, res) => {
     let client; // Declare client variable for transaction
-    console.log("/api/webhooks api executed");
+    console.log("/api/webhooks API executed");
     try {
       // Begin transaction
       client = await pool.connect();
@@ -90,7 +89,6 @@ router.post(
 
       // Grab the headers and body
       const headers = req.headers;
-      // Convert the raw buffer into a string
       const payload = req.body;
 
       // Get the Svix headers for verification
@@ -102,9 +100,11 @@ router.post(
       if (!svix_id || !svix_timestamp || !svix_signature) {
         return res.status(400).json({
           success: false,
-          message: "Error occurred -- no svix headers",
+          message: "Error occurred -- no Svix headers",
         });
       }
+
+      console.log("svix headers are legit!");
 
       // Initiate Svix
       const wh = new Webhook(WEBHOOK_SECRET);
@@ -117,8 +117,13 @@ router.post(
       });
 
       // Grab the ID and TYPE of the Webhook
-      const { id, first_name, ...attributes } = evt.data;
+      const { id, first_name, last_name, ...attributes } = evt.data;
       const eventType = evt.type;
+
+      // Create formatted name as "First Name L."
+      // const formattedName = `${capitalizeFirstLetter(
+      //   first_name
+      // )} ${capitalizeFirstLetter(last_name.charAt(0))}.`;
 
       if (eventType === "user.created") {
         const phoneNumber = attributes.phone_numbers[0].phone_number;
@@ -126,21 +131,19 @@ router.post(
           id: id,
           phoneNumber: phoneNumber,
           name: first_name,
+          // name: capitalizeFirstLetter(formattedName),
         };
 
         console.log("createUser data:", user);
-        console.log("createUser client:", client);
 
         // Call createUser with transaction client
         const response = await createUser(user, client);
 
         // Call createSendbirdUser with transaction client
+        // const sendbirdUser = { id: response.id, name: formattedName };
         const sendbirdUser = { id: response.id, name: first_name };
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
-
-        console.log("createSendbirdUser sendbirdUser:", sendbirdUser);
-        console.log("createSendbirdUser client:", client);
 
         // Store Sendbird access token
         const sendbirdToken = sendbirdResponse.access_token;
@@ -149,7 +152,6 @@ router.post(
       }
 
       console.log(`Webhook with an ID of ${id} and type of ${eventType}`);
-      // Console log the full payload to view
       console.log("Webhook body:", evt.data);
 
       // Commit transaction
@@ -164,17 +166,15 @@ router.post(
       if (client) {
         await client.query("ROLLBACK");
 
-        // Delete the clerk user if creation fails
+        // Delete the Clerk user if creation fails
         if (err.message === "Error creating user") {
           await clerkClient.users.deleteUser(id);
         }
       }
 
-      // Console log and return error
       console.log("Webhook failed to verify. Error:", err.message);
       return res.status(400).json({ success: false, message: err.message });
     } finally {
-      // Release client back to the pool
       if (client) {
         client.release();
       }

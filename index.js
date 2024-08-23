@@ -37,9 +37,14 @@ const notificationRouter = require("./server/notification-service/index");
 const app = express();
 const server = http.createServer(app);
 
+const ALLOWED_ORIGINS = [
+  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  "http://localhost:3000",
+];
+
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: ALLOWED_ORIGINS,
     methods: ["POST", "GET", "PATCH", "DELETE"],
   },
 });
@@ -52,12 +57,16 @@ const linkupRequestIo = linkupRequestSocket(io);
 linkupRequestInitializeSocket(linkupRequestIo.of("/linkup-request")); // Use the correct namespace
 
 app.use("/api/auth/api/webhooks", bodyParser.raw({ type: "*/*" }));
+app.use("/api/user/api/webhooks", bodyParser.raw({ type: "*/*" }));
 
 app.use(express.json());
 
 app.use(
   cors({
-    origin: [process.env.ALLOWED_ORIGIN || "http://localhost:3000"],
+    origin: [
+      process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+      "http://localhost:3000",
+    ],
     methods: ["POST", "GET", "PATCH", "DELETE"],
   })
 );

@@ -16,7 +16,12 @@ CREATE TABLE IF NOT EXISTS users (
     avatar TEXT,
     clerk_user_id VARCHAR(255) UNIQUE,
     access_token VARCHAR(255),
-    city VARCHAR(255) 
+    city VARCHAR(255),
+    latitude NUMERIC,
+    longitude NUMERIC,
+    allow_location BOOLEAN DEFAULT FALSE,
+    country VARCHAR(255),
+    instagram_access_token VARCHAR(255)
 );
 
 -- Table: link_ups
@@ -48,16 +53,6 @@ CREATE TABLE IF NOT EXISTS link_up_requests (
     hidden BOOLEAN DEFAULT FALSE
 );
 
--- Table: images
-CREATE TABLE IF NOT EXISTS images (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    image_url TEXT,
-    is_avatar BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Table: conversations
 CREATE TABLE IF NOT EXISTS conversations (
     conversation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -80,5 +75,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     requester_id UUID REFERENCES users(id),
     link_up_id UUID REFERENCES link_ups(id),
-    hidden BOOLEAN DEFAULT FALSE
+    hidden BOOLEAN DEFAULT FALSE,
+    notification_type VARCHAR(255)
 );

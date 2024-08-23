@@ -1,14 +1,17 @@
 const socketIo = require("socket.io");
 const userSockets = require("../userSockets");
 
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
+const ALLOWED_ORIGINS = [
+  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  "http://localhost:3000",
+];
 
 const initSocketServer = (httpServer) => {
   console.log("Notification socket server initialized");
 
   const io = socketIo(httpServer, {
     cors: {
-      origin: ALLOWED_ORIGIN,
+      origin: ALLOWED_ORIGINS,
       methods: ["GET", "POST"],
     },
   });

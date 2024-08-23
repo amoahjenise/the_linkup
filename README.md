@@ -2,9 +2,9 @@ Certainly! Here's the updated documentation with the changes you requested:
 
 ---
 
-# luul
+# The Linkup
 
-LUUL React App Repository
+The Linkup React App Repository
 
 ---
 
@@ -91,7 +91,7 @@ For any inquiries, contributions, or support requests, please refer to the docum
 
 ### Introduction
 
-The recent update to the LUUL React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
+The recent update to the The Linkup React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
 
 ### Integration with Clerk for Authentication
 
@@ -107,7 +107,7 @@ The integration with Clerk for authentication enhances the user authentication p
 
 Webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database. This ensures that user data remains consistent across the application. The webhook implementation involves:
 
-1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in luul/server/auth-service/index.js, while the implementation for managing user deletion can be found in luul/server/user-management-service/index.js.
+1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in The Linkup/server/auth-service/index.js, while the implementation for managing user deletion can be found in The Linkup/server/user-management-service/index.js.
 
 2. **Verification and Event Handling**: Upon receiving webhook payloads, the application verifies the authenticity of the payloads and handles user creation and deletion events accordingly. User data is stored or removed from the PostgreSQL database based on the received events.
 
@@ -117,9 +117,9 @@ The client-side of the application has been updated to handle user authenticatio
 
 ### Conclusion
 
-The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the LUUL React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
+The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the The Linkup React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
 
-For detailed implementation and code examples, please refer to the updated documentation and codebase available in the LUUL React App repository.
+For detailed implementation and code examples, please refer to the updated documentation and codebase available in the The Linkup React App repository.
 
 ## Linkup Creation and Management
 
@@ -260,7 +260,7 @@ interfaces while keeping the data accessible for potential reactivation.
 
 ## Search Functionality
 
-The search functionality in the LUUL React App allows users to search for linkup events based on specific criteria such as activity type, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
+The search functionality in the The Linkup React App allows users to search for linkup events based on specific criteria such as activity type, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
 
 Implementation Details
 Client-Side Integration:
@@ -300,7 +300,7 @@ Users can refine their search queries by adjusting the input parameters in the S
 Refining search queries allows users to find more specific or relevant linkup events.
 
 Conclusion
-The search functionality in the LUUL React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
+The search functionality in the The Linkup React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
 
 ## Database Tables Documentation
 

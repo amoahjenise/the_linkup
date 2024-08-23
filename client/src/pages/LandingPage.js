@@ -8,6 +8,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 // Styled Components
 const Section = styled("section")(({ theme }) => ({
   height: "100%",
+  backgroundColor: "#E0F7FA", // Light teal background for a fresh look
 }));
 
 const RelativeDiv = styled("div")({
@@ -22,12 +23,14 @@ const AbsoluteDiv = styled("div")({
   width: "100%",
   height: "100%",
   zIndex: -10,
+  background: "linear-gradient(135deg, #00ACC1, #00838F)", // Cool gradient background
 });
 
 const BgBlackDiv = styled("div")({
   position: "fixed",
   inset: 0,
   zIndex: -10,
+  background: "rgba(0, 0, 0, 0.1)", // Light overlay for better text contrast
   mixBlendMode: "multiply",
 });
 
@@ -52,6 +55,7 @@ const Title = styled("h1")(({ theme }) => ({
   fontSize: "4rem",
   fontWeight: "bold",
   letterSpacing: "tight",
+  color: "#00796B", // Deep teal color
   [theme.breakpoints.up("sm")]: {
     fontSize: "6rem",
   },
@@ -61,6 +65,7 @@ const Subtitle = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(6),
   fontSize: "1.25rem",
   lineHeight: 2,
+  color: "#004D40", // Dark teal for better readability
 }));
 
 const ButtonContainerDiv = styled("div")(({ theme }) => ({
@@ -74,10 +79,29 @@ const ButtonContainerDiv = styled("div")(({ theme }) => ({
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
+  backgroundColor: "#00838F", // Cool teal button color
+  color: "#FFFFFF",
+  "&:hover": {
+    backgroundColor: "#00796B", // Slightly darker teal on hover
+  },
+  borderRadius: "20px", // Rounded corners for a softer look
+}));
+
+const OutlinedButton = styled(Button)(({ theme }) => ({
+  textTransform: "none",
+  padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
+  color: "#00838F", // Cool teal for the outlined button
+  borderColor: "#00838F",
+  borderRadius: "20px", // Rounded corners
+  "&:hover": {
+    borderColor: "#00796B", // Darker teal on hover
+    color: "#00796B",
+  },
 }));
 
 const Body2Typography = styled(Typography)(({ theme }) => ({
   fontSize: "0.875rem",
+  color: "#004D40", // Dark teal for text
 }));
 
 const LandingPage = () => {
@@ -100,12 +124,19 @@ const LandingPage = () => {
           <BgBlackDiv aria-hidden="true" />
           <ContentContainerDiv>
             <TextCenterDiv>
-              <Title>Welcome To Link-Up!</Title>
+              <Title>Welcome To The Linkup!</Title>
               <Subtitle>
-                Join our community to explore a wide range of activities and
-                events with like-minded individuals.
+                Whether you're looking to connect with new people or organize
+                meetups around your interests, The Linkup makes it easy. Create
+                a linkup, receive requests from others, chat to coordinate, and
+                decide who to meet up with.
               </Subtitle>
-              <Typography variant="subtitle2" component="small">
+              <Typography
+                variant="subtitle2"
+                component="small"
+                sx={{ marginTop: 2 }}
+                color={"#0097A7"} // Teal color for text links
+              >
                 By signing up, you agree to the{" "}
                 <a href="/terms-of-service">Terms of Service</a> and{" "}
                 <a href="/privacy-policy">Privacy Policy</a>, including{" "}
@@ -114,26 +145,24 @@ const LandingPage = () => {
               <ButtonContainerDiv>
                 <StyledButton
                   variant="contained"
-                  color="primary"
                   size="large"
                   onClick={() => navigate("/sign-up")}
                 >
                   Sign Up
                 </StyledButton>
-                <StyledButton
+                <OutlinedButton
                   variant="outlined"
-                  color="primary"
                   size="large"
                   onClick={() => navigate("/sign-in")}
                 >
                   Log In
-                </StyledButton>
+                </OutlinedButton>
               </ButtonContainerDiv>
             </TextCenterDiv>
           </ContentContainerDiv>
           <TextCenterDiv>
             <Body2Typography>
-              &copy; {new Date().getFullYear()} Link-Up. All rights reserved.
+              &copy; {new Date().getFullYear()} The Linkup. All rights reserved.
             </Body2Typography>
           </TextCenterDiv>
         </RelativeDiv>

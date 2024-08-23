@@ -53,12 +53,12 @@ const EnableLocation = () => {
         <StyledContainer>
           <Icon />
           <Typography variant="h5" gutterBottom>
-            In order to use Link-Up, please enable location sharing via
-            Settings.
+            To get the most out of The Linkup experience, please enable location
+            sharing in your settings.
           </Typography>
           <Typography variant="body1" color={secondaryTextColor}>
-            Location sharing allows us to provide you with the best experience
-            by connecting you with nearby people and events.
+            This feature helps us connect you with nearby people and events,
+            enhancing your experience.
           </Typography>
           <StyledButton
             variant="contained"

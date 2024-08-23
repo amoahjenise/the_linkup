@@ -9,15 +9,36 @@ const useLocationUpdate = () => {
 
   const updateLocation = async (shareLocation) => {
     if (!navigator.geolocation) {
-      console.error("Geolocation is not supported by this browser.");
+      alert("Geolocation is not supported by your device.");
       return;
     }
 
+    try {
+      const permission = await navigator.permissions.query({
+        name: "geolocation",
+      });
+
+      if (permission.state === "denied") {
+        alert(
+          "Location access is denied. Please enable it in your device settings."
+        );
+        return;
+      }
+
+      if (permission.state === "granted" || permission.state === "prompt") {
+        requestGeolocation(shareLocation);
+      }
+    } catch (error) {
+      console.error("Error checking location permission:", error);
+      alert("There was an error accessing location services.");
+    }
+  };
+
+  const requestGeolocation = (shareLocation) => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          // Fetch location data
           const resultAction = await dispatch(
             fetchLocation({
               lat: latitude,
@@ -27,7 +48,6 @@ const useLocationUpdate = () => {
           );
 
           if (fetchLocation.fulfilled.match(resultAction)) {
-            // Post location data
             const resultPostLocation = await postLocation(
               loggedUser.user.id,
               resultAction.payload.city,
@@ -37,7 +57,6 @@ const useLocationUpdate = () => {
               shareLocation
             );
 
-            // Update user with new location info
             dispatch(updateCurrentUser(resultPostLocation.user));
           } else {
             console.error("Failed to fetch location:", resultAction.error);
@@ -47,15 +66,33 @@ const useLocationUpdate = () => {
         }
       },
       (error) => {
-        console.error("Error fetching geolocation:", error);
+        handleGeolocationError(error);
       },
       {
-        // Optional: You can set specific options for geolocation
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0,
       }
     );
+  };
+
+  const handleGeolocationError = (error) => {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        alert(
+          "Location access denied. Please enable it in your device settings."
+        );
+        break;
+      case error.POSITION_UNAVAILABLE:
+        alert("Location information is unavailable. Please try again later.");
+        break;
+      case error.TIMEOUT:
+        alert("The request to get your location timed out. Please try again.");
+        break;
+      default:
+        alert("An unknown error occurred while fetching your location.");
+        break;
+    }
   };
 
   return { updateLocation };

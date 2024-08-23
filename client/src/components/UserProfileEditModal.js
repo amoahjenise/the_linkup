@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import AvatarUpdate from "../components/AvatarUpdate";
+import { useColorMode } from "@chakra-ui/react";
 
 // StyledPaper for the modal container
 const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
@@ -20,8 +21,8 @@ const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  color: colorMode === "dark" ? "#E0E0E0" : "#202124",
-  backgroundColor: colorMode === "dark" ? "#2D2D2D" : "#FFFFFF",
+  color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  dark mode text color
+  backgroundColor: colorMode === "dark" ? "#181818" : "#F2F2F2", //  dark/light mode background color
   [theme.breakpoints.down("sm")]: {
     width: "90%",
     maxWidth: "90%",
@@ -45,12 +46,11 @@ const AvatarContainer = styled("div")(({ theme }) => ({
 const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
   marginTop: theme.spacing(2),
   width: "100%",
-  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Set text color based on mode
   "& .MuiInputBase-input": {
-    color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Ensure input text color is applied
+    color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Input text color
   },
   "& .MuiInputLabel-root": {
-    color: colorMode === "dark" ? "#B0B0B0" : "#606060", // Label color
+    color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
   },
 }));
 
@@ -77,16 +77,16 @@ const StyledButton = styled(Button)(({ theme, colorMode, isCancel }) => ({
   },
   backgroundColor: isCancel
     ? colorMode === "dark"
-      ? "#757575" // Gray for Cancel in dark mode
-      : "#D32F2F" // Red for Cancel in light mode
-    : "#0097A7", // Teal for Save
+      ? "#B0B0B0" // Gray for Cancel in dark mode
+      : "#B0B0B0" // Gray for Cancel in light mode
+    : "#0097A7", // Color for Save
   color: "#FFFFFF",
   "&:hover": {
     backgroundColor: isCancel
       ? colorMode === "dark"
-        ? "#616161" // Darker gray for Cancel hover in dark mode
-        : "#C62828" // Darker red for Cancel hover in light mode
-      : "#007b86", // Darker teal for Save hover
+        ? "#9E9E9E" // Darker gray for Cancel hover in dark mode
+        : "#9E9E9E" // Darker gray for Cancel hover in light mode
+      : "#007b86", // Darker color for Save hover
   },
 }));
 
@@ -94,16 +94,11 @@ const StyledButton = styled(Button)(({ theme, colorMode, isCancel }) => ({
 const MAX_BIO_LENGTH = 160;
 const MIN_CHARS_REMAINING_TO_DISPLAY = 10;
 
-const UserProfileEditModal = ({
-  isOpen,
-  onClose,
-  userData,
-  onSave,
-  colorMode,
-}) => {
+const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
   const [editedBio, setEditedBio] = useState(userData.bio || "");
   const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null);
   const [editedName, setEditedName] = useState(userData.name || "");
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     if (isOpen) {
@@ -143,12 +138,12 @@ const UserProfileEditModal = ({
             InputProps={{
               readOnly: true,
               style: {
-                color: colorMode === "dark" ? "#B0B0B0" : "#909090",
-                backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
+                color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  text color
+                backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", //  background color for inputs
               },
             }}
             InputLabelProps={{
-              style: { color: colorMode === "dark" ? "#B0B0B0" : "#606060" },
+              style: { color: colorMode === "dark" ? "#B0B0B0" : "#333333" },
             }}
             fullWidth
             margin="normal"
@@ -161,12 +156,12 @@ const UserProfileEditModal = ({
             InputProps={{
               readOnly: true,
               style: {
-                color: colorMode === "dark" ? "#B0B0B0" : "#909090",
-                backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
+                color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  text color
+                backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", //  background color for inputs
               },
             }}
             InputLabelProps={{
-              style: { color: colorMode === "dark" ? "#757575" : "#B0B0B0" },
+              style: { color: colorMode === "dark" ? "#B0B0B0" : "#333333" },
             }}
             fullWidth
             margin="normal"

@@ -1,150 +1,92 @@
-import React, { useState } from "react";
+import React from "react";
+import { Grid, Card, CardMedia, Typography, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import CloseIcon from "@mui/icons-material/Close";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useColorMode } from "@chakra-ui/react";
-import { Dialog } from "@mui/material";
 
 // Styled components
-const Container = styled("div")({
+const StyledCard = styled(Card)(({ theme }) => ({
+  position: "relative",
+  boxShadow: theme.shadows[3],
+  overflow: "hidden",
+  border: `1px solid ${theme.palette.divider}`, // Line of separation
+}));
+
+const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
+  aspectRatio: "1 / 1", // Makes the card square
+  width: "100%",
+  objectFit: "cover", // Ensures the image covers the area without distortion
+}));
+
+const PlaceholderImage = "path/to/placeholder-image.jpg"; // Replace with your placeholder image
+
+const MessageBox = styled(Box)(({ theme, isLoggedUser }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-});
-
-const CardsContainer = styled("div")(({ theme, imagesPerLine }) => ({
-  display: "grid",
-  gap: theme.spacing(4),
-  maxWidth: "1200px",
-  margin: "auto",
-  padding: theme.spacing(3),
   justifyContent: "center",
-  gridTemplateColumns: `repeat(${imagesPerLine}, 160px)`,
-}));
-
-const Card = styled("div")(({ theme }) => ({
-  position: "relative",
-  width: "100%",
-  paddingTop: "100%",
-  overflow: "hidden",
-  cursor: "pointer",
-  transition: "transform 0.3s ease",
-  "&:hover": {
-    transform: "scale(1.05)",
-  },
-  borderWidth: "1px",
-  borderColor: "1px solid #D3D3D3",
-}));
-
-const CardImage = styled("img")({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
   height: "100%",
-  objectFit: "cover",
-  transition: "opacity 0.3s ease",
-});
-
-const Modal = styled(Dialog)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-const ModalContent = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: theme.palette.background.paper,
-  outline: "none",
-  padding: theme.spacing(2),
-  borderRadius: theme.spacing(1),
+  textAlign: "center",
+  padding: theme.spacing(4),
+  borderRadius: theme.shape.borderRadius,
   boxShadow: theme.shadows[5],
-  maxWidth: "80vw", // Adjust maximum width as needed
-  maxHeight: "80vh", // Adjust maximum height as needed
-  overflow: "auto",
+  backgroundColor: "rgba(224, 224, 224, 0.1)", // Updated to correct value
+  border: `1px solid ${
+    isLoggedUser ? theme.palette.primary.dark : theme.palette.grey[400]
+  }`,
+  position: "relative",
 }));
 
-const ModalImage = styled("img")({
-  maxWidth: "100%",
-  maxHeight: "100%",
-  objectFit: "contain", // Ensure the image fits inside the Dialog
-});
-
-const CloseIconStyled = styled(CloseIcon)(({ theme }) => ({
+const BouncingArrow = styled("div")(({ theme }) => ({
   position: "absolute",
-  top: theme.spacing(1),
-  right: theme.spacing(1),
-  cursor: "pointer",
+  bottom: "73%", // Adjust to position the arrow correctly
+  width: "0",
+  height: "0",
+  borderLeft: "15px solid transparent",
+  borderRight: "15px solid transparent",
+  borderBottom: `15px solid #c13584`, // Arrow color
+  animation: "bounce 3s infinite",
 }));
 
-const ImageGrid = ({ images, currentImageIndex, setCurrentImageIndex }) => {
-  const { colorMode } = useColorMode(); // Access color mode from Chakra UI
-  const [openModal, setOpenModal] = useState(false);
-
-  const handleOpenModal = () => {
-    setOpenModal(true);
+const ImageGrid = ({ images, isLoggedUserProfile, isMobile }) => {
+  const handleError = (event) => {
+    event.target.src = PlaceholderImage;
   };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
-
-  const handleClickImage = (index) => {
-    if (images[index]) {
-      setCurrentImageIndex(index);
-      handleOpenModal();
-    }
-  };
-
-  const isExtraSmall = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-  const isSmall = useMediaQuery((theme) =>
-    theme.breakpoints.between("sm", "lg")
-  );
-
-  let imagesPerLine = 5;
-  if (isExtraSmall) {
-    imagesPerLine = 2;
-  } else if (isSmall) {
-    imagesPerLine = 3;
-  }
-
-  const totalImages = images.length;
-  const numberOfBlanks = 10 - totalImages;
-  const filledImages = [...images, ...Array(numberOfBlanks).fill(null)];
-
-  // Define background gradient based on color mode
-  const blankSquareGradient =
-    colorMode === "dark"
-      ? "linear-gradient(135deg, rgba(34, 34, 34, 0.6) 0%, rgba(34, 34, 34, 0.4) 50%)"
-      : "linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(255, 255, 255, 0.8) 50%)";
 
   return (
-    <Container>
-      <CardsContainer imagesPerLine={imagesPerLine}>
-        {filledImages.map((image, index) => (
-          <Card
-            key={index}
-            style={{
-              background: image ? "" : blankSquareGradient,
-            }}
-            onClick={() => handleClickImage(index)}
-          >
-            {image && <CardImage src={image} alt={`${index + 1}`} />}
-          </Card>
-        ))}
-      </CardsContainer>
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <ModalContent>
-          <CloseIconStyled onClick={handleCloseModal} />
-          <ModalImage
-            src={images[currentImageIndex]}
-            alt={`${currentImageIndex + 1}`}
-          />
-        </ModalContent>
-      </Modal>
-    </Container>
+    <Grid container spacing={0.5}>
+      {images.length === 0 ? (
+        <Grid item xs={12}>
+          <MessageBox isLoggedUserProfile={isLoggedUserProfile}>
+            {isLoggedUserProfile && (
+              <>
+                <BouncingArrow />
+                <Typography variant="h6" gutterBottom>
+                  Connect to Instagram to see your photos!
+                </Typography>
+              </>
+            )}
+            {!isLoggedUserProfile && (
+              <Typography variant="h6" gutterBottom>
+                The user hasn't linked their account to Instagram yet.
+              </Typography>
+            )}
+          </MessageBox>
+        </Grid>
+      ) : (
+        images.map((image, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <StyledCard>
+              <StyledCardMedia
+                component="img"
+                alt={`Image ${index}`}
+                image={image}
+                title={`Image ${index}`}
+                onError={handleError}
+              />
+            </StyledCard>
+          </Grid>
+        ))
+      )}
+    </Grid>
   );
 };
 

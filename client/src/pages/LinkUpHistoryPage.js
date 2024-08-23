@@ -20,12 +20,29 @@ const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   width: "100%",
 }));
 
-const HistorySection = styled("div")(({ theme }) => ({
+const HistorySection = styled("div")(({ theme, isFilterBarOpen }) => ({
   flex: 2,
   overflowY: "auto",
   overflowX: "hidden",
   margin: "0 auto",
+  transition: "transform 0.3s ease",
+  transform: isFilterBarOpen ? "translateX(-300px)" : "translateX(0)", // Adjust based on FilterBar width
+  width: "100%", // Full width when FilterBar is hidden
 }));
+
+const FilterBarContainer = styled("div")(
+  ({ theme, isFilterBarOpen, isMobile }) => ({
+    position: isMobile ? "fixed" : "static",
+    right: isFilterBarOpen ? "0" : isMobile ? "-300px" : "0", // Off-screen when hidden on mobile
+    top: 0,
+    bottom: 0,
+    width: "300px", // Width of the FilterBar
+    backgroundColor: theme.palette.background.paper,
+    transition: "right 0.3s ease",
+    zIndex: 2, // Ensure it's above other content on mobile
+    flexShrink: 0,
+  })
+);
 
 const TopBarContainer = styled("div")(({ theme }) => ({
   position: "sticky",

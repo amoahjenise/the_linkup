@@ -124,7 +124,7 @@ const TermsOfServicePage = () => {
         <Subtitle variant="h6">6. Intellectual Property</Subtitle>
         <Text variant="body1">
           The Service and its original content, features, and functionality are
-          and will remain the exclusive property of Link-Up (LUUL) and its
+          and will remain the exclusive property of The Linkup and its
           licensors. The Service is protected by copyright, trademark, and other
           laws of both the United States and foreign countries.
         </Text>
@@ -164,20 +164,20 @@ const TermsOfServicePage = () => {
       <Section>
         <Subtitle variant="h6">10. Limitation of Liability</Subtitle>
         <Text variant="body1">
-          To the fullest extent permitted by law, Link-Up (LUUL) shall not be
-          liable for any indirect, incidental, special, consequential, or
-          punitive damages, or any loss of profits or revenues, whether incurred
-          directly or indirectly, or any loss of data, use, goodwill, or other
-          intangible losses, resulting from (a) your use or inability to use the
-          Service; (b) any unauthorized access to or use of our servers and/or
-          any personal information stored therein; (c) any interruption or
-          cessation of transmission to or from the Service; (d) any bugs,
-          viruses, trojan horses, or the like that may be transmitted to or
-          through the Service by any third party; (e) any errors or omissions in
-          any content or for any loss or damage incurred as a result of your use
-          of any content posted, emailed, transmitted, or otherwise made
-          available through the Service; and/or (f) the defamatory, offensive,
-          or illegal conduct of any third party.
+          To the fullest extent permitted by law, The Linkup shall not be liable
+          for any indirect, incidental, special, consequential, or punitive
+          damages, or any loss of profits or revenues, whether incurred directly
+          or indirectly, or any loss of data, use, goodwill, or other intangible
+          losses, resulting from (a) your use or inability to use the Service;
+          (b) any unauthorized access to or use of our servers and/or any
+          personal information stored therein; (c) any interruption or cessation
+          of transmission to or from the Service; (d) any bugs, viruses, trojan
+          horses, or the like that may be transmitted to or through the Service
+          by any third party; (e) any errors or omissions in any content or for
+          any loss or damage incurred as a result of your use of any content
+          posted, emailed, transmitted, or otherwise made available through the
+          Service; and/or (f) the defamatory, offensive, or illegal conduct of
+          any third party.
         </Text>
       </Section>
 
@@ -205,7 +205,14 @@ const TermsOfServicePage = () => {
         <Text variant="body1">
           If you have any questions about these Terms, please contact us at:
         </Text>
-        <Text variant="body1">[Contact Information Will Soon Be Provided]</Text>
+        <Typography variant="body1">
+          <a
+            href="mailto:info@thelinkup.ca"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            info@thelinkup.ca
+          </a>
+        </Typography>{" "}
       </Section>
     </RootContainer>
   );

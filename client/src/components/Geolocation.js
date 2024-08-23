@@ -41,7 +41,7 @@ const Geolocation = () => {
           showModal={modalOpen}
           setShowModal={setModalOpen}
           title="Enable Location Service"
-          content="To use LUUL, you'll need to grant access to your device's location."
+          content="For an optimal experience, please enable location access on your device."
           primaryAction={handleAllow}
           primaryActionLabel="Allow"
           secondaryAction={handleDeny}

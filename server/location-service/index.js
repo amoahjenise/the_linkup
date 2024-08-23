@@ -6,14 +6,17 @@ const cors = require("cors");
 const router = express.Router();
 
 // Configuration using environment variables
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "http://localhost:3000"; // Default to your front-end URL
+const ALLOWED_ORIGINS = [
+  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  "http://localhost:3000",
+];
 
 // Use helmet middleware to set security headers
 router.use(helmet());
 router.use(express.json());
 router.use(
   cors({
-    origin: [ALLOWED_ORIGIN],
+    origin: ALLOWED_ORIGINS,
     methods: ["POST", "GET", "PATCH", "DELETE"],
   })
 );

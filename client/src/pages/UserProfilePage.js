@@ -11,23 +11,27 @@ import {
   updateUserAvatar,
   updateUserName,
 } from "../api/usersAPI";
-import { getUserImages } from "../api/imagesAPI";
+import { getUserMedia } from "../api/instagramAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import ImageUploadModal from "../components/ImageUploadModal";
-import { useColorMode } from "@chakra-ui/react";
 import ProfileHeaderCard from "../components/ProfileHeaderCard";
-import ImageGridHeader from "../components/ImageGridHeader";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+// Extend Day.js with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Define styled components
-const UserProfilePageContainer = styled("div")(({ theme }) => ({
+const Container = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
   overflowY: "hidden",
-}));
+});
 
 const ProfileSection = styled("div")({
   display: "flex",
@@ -40,6 +44,7 @@ const ImageSection = styled("div")({
   alignItems: "center",
   overflowY: "auto",
   maxHeight: "60vh",
+  marginTop: "1px",
 });
 
 const EditButton = styled(IconButton)(({ theme }) => ({
@@ -51,210 +56,211 @@ const EditButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const UserProfilePage = ({ isMobile }) => {
-  let { id: userId } = useParams();
-  const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [profileImages, setProfileImages] = useState([]);
-  const [isImageUploadModalOpen, setImageUploadModalOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { addSnackbar } = useSnackbar();
-  const { colorMode } = useColorMode();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { id: userIdParam } = useParams();
+  const [state, setState] = useState({
+    userData: null,
+    profileImages: [],
+    isLoading: true,
+    isEditModalOpen: false,
+    isInstagramTokenUpdated: false, // New state to track Instagram token update
+  });
 
+  const handleSetProfileImages = (newImages) => {
+    setState((prevState) => ({
+      ...prevState,
+      profileImages: newImages,
+    }));
+  };
+
+  const { addSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const openImageUploadModal = () => {
-    setImageUploadModalOpen(true);
-  };
-
-  const closeImageUploadModal = () => {
-    setImageUploadModalOpen(false);
-  };
-
-  const isUserDataAvailable = userData !== null;
   const loggedUser = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
-  const isLoggedUserProfile = userId === "me" || userId === loggedUser.user.id;
-
-  if (userId === "me") {
-    userId = loggedUser.user.id;
-  }
+  const isLoggedUserProfile =
+    userIdParam === "me" || userIdParam === loggedUser.user.id;
+  const userId = userIdParam === "me" ? loggedUser.user.id : userIdParam;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userDataResponse = await getUserById(userId);
-
         if (userDataResponse.unauthorizedError) {
           dispatch({ type: "LOGOUT" });
           navigate("/");
           return;
         }
 
-        const newUserData = userDataResponse?.data?.user;
+        const userData = userDataResponse?.data?.user || {};
+        const { instagram_access_token } = userData;
 
-        if (newUserData) {
-          setUserData((prevUserData) => ({
-            ...prevUserData,
-            ...newUserData,
-          }));
-        }
-
-        if (!profileImages.length) {
-          const userImagesResponse = await getUserImages(userId);
-
-          if (userImagesResponse.data.success) {
-            const imageUrls = userImagesResponse.data.images.map(
-              (imageObj) => imageObj.image_url
+        let profileImages = [];
+        if (instagram_access_token) {
+          const instagramMediaResponse = await getUserMedia(
+            instagram_access_token
+          );
+          if (instagramMediaResponse.success) {
+            profileImages = instagramMediaResponse.data.data.map(
+              (imageObj) => imageObj.media_url
             );
-            setProfileImages(imageUrls);
           }
         }
+
+        setState((prevState) => ({
+          ...prevState,
+          userData,
+          profileImages,
+          isLoading: false,
+          isInstagramTokenUpdated: !!instagram_access_token, // Set to true if token exists
+        }));
       } catch (error) {
         console.error("Error fetching user data:", error);
-      } finally {
-        setIsLoading(false);
+        setState((prevState) => ({ ...prevState, isLoading: false }));
       }
     };
 
     fetchData();
-    return () => {
-      setUserData(null);
-    };
-  }, [dispatch, navigate, userId, profileImages.length]);
+    return () =>
+      setState({
+        userData: null,
+        profileImages: [],
+        isLoading: true,
+        isEditModalOpen: false,
+        isInstagramTokenUpdated: false,
+      });
+  }, [dispatch, navigate, userId]);
 
-  const renderEditButton = () => {
-    if (isLoggedUserProfile) {
-      return (
-        <EditButton onClick={() => setIsEditModalOpen(true)} size="large">
-          <EditIcon />
-        </EditButton>
-      );
+  useEffect(() => {
+    if (state.isInstagramTokenUpdated) {
+      const fetchInstagramMedia = async () => {
+        try {
+          const { instagram_access_token } = state.userData;
+          const instagramMediaResponse = await getUserMedia(
+            instagram_access_token
+          );
+          if (instagramMediaResponse.success) {
+            const profileImages = instagramMediaResponse.data.data.map(
+              (imageObj) => imageObj.media_url
+            );
+            setState((prevState) => ({
+              ...prevState,
+              profileImages,
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching Instagram media:", error);
+        }
+      };
+
+      fetchInstagramMedia();
+      setState((prevState) => ({
+        ...prevState,
+        isInstagramTokenUpdated: false,
+      }));
     }
-    return null;
-  };
-
-  const calculateAge = (dateOfBirth) => {
-    if (dateOfBirth) {
-      const birthDate = new Date(dateOfBirth);
-      const currentDate = new Date();
-      const age = currentDate.getFullYear() - birthDate.getFullYear();
-      return age;
-    }
-  };
-
-  const toggleEditModal = () => {
-    setIsEditModalOpen((prevIsOpen) => !prevIsOpen);
-  };
+  }, [state.isInstagramTokenUpdated, state.userData]);
 
   const handleSaveChanges = async (editedBio, editedAvatar, editedName) => {
     try {
-      let bioResponse = null;
-      let avatarResponse = null;
-      let nameResponse = null;
       let changesMade = false;
 
-      if (userData?.bio !== editedBio) {
-        bioResponse = await updateUserBio(userData?.id, editedBio);
-        if (bioResponse?.data?.success !== false) {
-          changesMade = true;
+      const updateIfChanged = async (field, newValue, updateFn, key) => {
+        if (state.userData?.[field] !== newValue) {
+          const response = await updateFn(state.userData?.id, newValue);
+          if (response?.data?.success !== false) {
+            changesMade = true;
+            setState((prevState) => ({
+              ...prevState,
+              userData: {
+                ...prevState.userData,
+                [key]: response?.data?.[key] || prevState.userData[key],
+              },
+            }));
+          }
         }
-      }
+      };
 
-      if (userData?.avatar !== editedAvatar) {
-        avatarResponse = await updateUserAvatar(userData?.id, editedAvatar);
-        if (avatarResponse?.data?.success !== false) {
-          changesMade = true;
-        }
-      }
+      await Promise.all([
+        updateIfChanged("bio", editedBio, updateUserBio, "bio"),
+        updateIfChanged("avatar", editedAvatar, updateUserAvatar, "avatar"),
+        updateIfChanged("name", editedName, updateUserName, "name"),
+      ]);
 
-      if (userData?.name !== editedName) {
-        nameResponse = await updateUserName(userData?.id, editedName);
-        if (nameResponse?.data?.success !== false) {
-          changesMade = true;
-        }
-      }
-
-      if (changesMade) {
-        console.log("bioResponse?.data?.bio", bioResponse?.data?.bio);
-        setUserData((prevUserData) => ({
-          ...prevUserData,
-          bio: bioResponse?.data?.bio,
-          avatar: avatarResponse?.data?.avatar || prevUserData.avatar,
-          name: nameResponse?.data?.name || prevUserData.name,
-        }));
-        addSnackbar("Profile updated!");
-      } else {
-        addSnackbar("No changes were made.");
-      }
-
-      setIsEditModalOpen(false);
+      addSnackbar(
+        changesMade ? "Profile updated successfully!" : "No changes detected.",
+        changesMade ? "success" : "info"
+      );
+      setState((prevState) => ({ ...prevState, isEditModalOpen: false }));
     } catch (error) {
-      console.error(error);
-      addSnackbar(error.message);
+      console.error("Error saving changes:", error);
+      addSnackbar("Failed to update profile.", "error");
     }
   };
 
+  const toggleEditModal = () =>
+    setState((prevState) => ({
+      ...prevState,
+      isEditModalOpen: !prevState.isEditModalOpen,
+    }));
+
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return 0;
+    const birthDate = dayjs(dateOfBirth);
+    const now = dayjs();
+    let age = now.diff(birthDate, "year");
+    if (
+      now.month() < birthDate.month() ||
+      (now.month() === birthDate.month() && now.date() < birthDate.date())
+    ) {
+      age -= 1;
+    }
+    return age;
+  };
+
   return (
-    <UserProfilePageContainer>
+    <Container>
       <TopNavBar title="Profile" />
-      {isLoading ? (
+      {state.isLoading ? (
         <LoadingSpinner />
       ) : (
         <ProfileSection>
           <ProfileHeaderCard
             isMobile={isMobile}
-            userData={userData}
+            userData={state.userData}
             userLocation={
               locationState.city && locationState.country
                 ? `${locationState.city}, ${locationState.country}`
                 : "Unknown Location"
             }
-            renderEditButton={renderEditButton}
+            renderEditButton={() =>
+              isLoggedUserProfile && (
+                <EditButton onClick={toggleEditModal} size="large">
+                  <EditIcon />
+                </EditButton>
+              )
+            }
             calculateAge={calculateAge}
+            setProfileImages={handleSetProfileImages}
           />
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <div>
-              {isLoggedUserProfile && (
-                <ImageGridHeader
-                  isImageUploadModalOpen={isImageUploadModalOpen}
-                  openImageUploadModal={openImageUploadModal}
-                />
-              )}
-              <ImageSection>
-                <ImageGrid
-                  images={profileImages || []}
-                  currentImageIndex={currentImageIndex}
-                  setCurrentImageIndex={setCurrentImageIndex}
-                />
-              </ImageSection>
-            </div>
-          )}
+          <ImageSection>
+            <ImageGrid
+              images={state.profileImages}
+              isMobile={isMobile}
+              isLoggedUserProfile={isLoggedUserProfile}
+            />
+          </ImageSection>
         </ProfileSection>
       )}
-      {isUserDataAvailable && (
+      {state.userData && (
         <UserProfileEditModal
-          isOpen={isEditModalOpen}
+          isOpen={state.isEditModalOpen}
           onClose={toggleEditModal}
-          userData={userData}
+          userData={state.userData}
           onSave={handleSaveChanges}
-          colorMode={colorMode}
         />
       )}
-      <ImageUploadModal
-        userId={userId}
-        isOpen={isImageUploadModalOpen}
-        onClose={closeImageUploadModal}
-        profileImages={profileImages}
-        setProfileImages={setProfileImages}
-        currentImageIndex={currentImageIndex}
-        setCurrentImageIndex={setCurrentImageIndex}
-        colorMode={colorMode}
-      />
-    </UserProfilePageContainer>
+    </Container>
   );
 };
 

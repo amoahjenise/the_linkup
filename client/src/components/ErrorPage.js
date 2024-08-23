@@ -46,7 +46,7 @@ const ErrorPage = ({ onRetry }) => {
 
   return (
     <ErrorContainer>
-      <LogoImage src={Logo} alt="LUUL Logo" />
+      <LogoImage src={Logo} alt="The Linkup Logo" />
       <ErrorMessage>Oops! Something went wrong.</ErrorMessage>
       <ErrorDescription>
         We're sorry, but we couldn't fetch the data from our servers.
