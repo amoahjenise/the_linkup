@@ -189,7 +189,7 @@ const App = () => {
           updateUnreadNotificationsCount(Number(notificationsCount.unreadCount))
         );
       } catch (error) {
-        console.error("Error during user data fetch:", error);
+        console.error("Error during user data fetch.", error);
       }
     };
     fetchData();
