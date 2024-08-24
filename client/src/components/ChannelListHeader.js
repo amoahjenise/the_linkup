@@ -25,7 +25,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   marginRight: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main, // Use theme primary color
+  background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
   color: theme.palette.primary.contrastText,
   borderRadius: "50%",
   padding: theme.spacing(1),
