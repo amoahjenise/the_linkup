@@ -281,13 +281,13 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     const startsWithVerb = doc.verbs().length > 0;
     const isVerbEndingWithIng = activity.endsWith("ing");
 
-    let activityPrefix = "";
+    let activityFormatted = "";
 
     if (activity) {
       if (isVerbEndingWithIng) {
-        activityPrefix = `for ${activity}`;
+        activityFormatted = `for ${activity}`;
       } else {
-        activityPrefix = `${startsWithVerb ? "to" : "for"} `;
+        activityFormatted = `${startsWithVerb ? "to" : "for"}  ${activity}`;
       }
     }
 
@@ -296,8 +296,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
         <Link to={`/profile/${creator_id}`} className={UserName}>
           {creator_name}
         </Link>{" "}
-        is trying to link up {activityPrefix}
-        {activity}.
+        is trying to link up {activityFormatted}.
       </p>
     );
   };
