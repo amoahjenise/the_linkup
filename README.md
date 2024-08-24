@@ -497,7 +497,7 @@ Columns:
     2. Perform various actions such as changing avatar, adding bio, uploading images, etc.
     3. Verify that the changes are reflected in the profile page.
 
-### Interacting with Link-Ups
+### Interacting with Linkups
 
 - **Scenario:** User interacts with other users' linkup events, including sending requests, chatting, accepting/declining requests, etc.
   - **Steps:**

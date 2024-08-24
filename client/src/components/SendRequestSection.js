@@ -23,7 +23,7 @@ const MessagesContainer = styled("div")(({ theme }) => ({
 const SendRequestSection = ({ linkupId, linkups, colorMode }) => {
   return (
     <Container>
-      <TopNavBar title="Request a Link-Up" />
+      <TopNavBar title="Request a Linkup" />
       <MessagesContainer>
         <SendRequest
           linkups={linkups}

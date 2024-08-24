@@ -115,12 +115,12 @@ const HorizontalMenu = ({
       const response = await closeLinkup(linkupItem.id);
       const message = response.success
         ? "Link-up closed successfully!"
-        : `Error closing the link-up: ${response.message}`;
+        : `Error closing the linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
     } catch (error) {
       console.error("An error occurred:", error);
-      addSnackbar("An error occurred while closing the link-up", {
+      addSnackbar("An error occurred while closing the linkup", {
         variant: "error",
       });
     } finally {
@@ -133,12 +133,12 @@ const HorizontalMenu = ({
       const response = await deleteLinkup(linkupItem.id);
       const message = response.success
         ? "Link-up deleted successfully!"
-        : `Error deleting link-up: ${response.message}`;
+        : `Error deleting linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
     } catch (error) {
       console.error("An error occurred:", error);
-      addSnackbar("An error occurred while deleting the link-up", {
+      addSnackbar("An error occurred while deleting the linkup", {
         variant: "error",
       });
     } finally {
@@ -193,12 +193,12 @@ const HorizontalMenu = ({
         {[
           {
             condition: showGoToItem,
-            label: "Go to link-up",
+            label: "Go to linkup",
             action: handleLinkupItemClick,
           },
           {
             condition: showGoToRequest,
-            label: "Go to link-up request",
+            label: "Go to linkup request",
             action: handleLinkupRequestClick,
           },
           {
@@ -206,7 +206,7 @@ const HorizontalMenu = ({
               showEditItem &&
               linkupItem.status !== "expired" &&
               linkupItem.status !== "closed",
-            label: "Edit this link-up",
+            label: "Edit this linkup",
             action: handleEditClick,
           },
           {
@@ -216,7 +216,7 @@ const HorizontalMenu = ({
               linkupItem.request_status !== "accepted" &&
               linkupItem.request_status !== "declined" &&
               linkupItem.request_status !== "closed",
-            label: "Accept link-up request",
+            label: "Accept linkup request",
             action: handleAcceptRequestClick,
           },
           {
@@ -226,7 +226,7 @@ const HorizontalMenu = ({
               linkupItem.request_status !== "accepted" &&
               linkupItem.request_status !== "declined" &&
               linkupItem.request_status !== "closed",
-            label: "Decline link-up request",
+            label: "Decline linkup request",
             action: handleDeclineRequestClick,
           },
           {
@@ -241,12 +241,12 @@ const HorizontalMenu = ({
           },
           {
             condition: showDeleteItem,
-            label: "Delete this link-up",
+            label: "Delete this linkup",
             action: handleDeleteClick,
           },
           {
             condition: showCloseItem,
-            label: "Close this link-up",
+            label: "Close this linkup",
             action: handleCloseClick,
           },
         ].map(
@@ -263,9 +263,9 @@ const HorizontalMenu = ({
         onClose={() => closeModal("isDeleteModalOpen")}
         onConfirm={handleDeleteConfirm}
         color="#fe9494"
-        modalTitle="Delete Link-Up?"
-        modalContentText="Are you sure you want to delete your link-up? If you delete your link-up, you will permanently lose everything."
-        primaryButtonText="Delete Link-Up"
+        modalTitle="Delete Linkup?"
+        modalContentText="Are you sure you want to delete your linkup? If you delete your linkup, you will permanently lose everything."
+        primaryButtonText="Delete"
         secondaryButtonText="Cancel"
       />
       <EditLinkupModal
@@ -278,9 +278,9 @@ const HorizontalMenu = ({
         onClose={() => closeModal("isCloseConfirmationOpen")}
         onConfirm={handleCloseConfirm}
         color="#99DFD6"
-        modalTitle="Close Link-Up?"
-        modalContentText="Are you sure you want to close this link-up? Once closed, no more requests can be received. This action cannot be undone."
-        primaryButtonText="Close Link-Up"
+        modalTitle="Close Linkup?"
+        modalContentText="Are you sure you want to close this linkup? Once closed, no more requests can be received. This action cannot be undone."
+        primaryButtonText="Close"
         secondaryButtonText="Cancel"
       />
     </div>
