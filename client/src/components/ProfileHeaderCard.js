@@ -20,7 +20,7 @@ const Container = styled("div")(({ theme }) => ({
   alignItems: "center",
   position: "sticky",
   top: 0,
-  borderBottom: "1px solid #FFDDC1", // Light peach color for border
+  borderBottom: "1px solid #e7e6e6", // Light peach color for border
 }));
 
 const Card = styled("div")(({ theme }) => ({
@@ -28,7 +28,7 @@ const Card = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   borderRadius: "8px",
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a floating effect
+  // boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a floating effect
 }));
 
 const AvatarSection = styled(Box)(({ theme }) => ({
