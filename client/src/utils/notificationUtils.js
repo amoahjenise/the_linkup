@@ -2,6 +2,12 @@
 
 export const requestNotificationPermission = () => {
   // This should be triggered by a user gesture
+
+  if (!("Notification" in window)) {
+    console.error("Notification API is not supported.");
+    return;
+  }
+
   if (Notification.permission !== "granted") {
     Notification.requestPermission()
       .then((permission) => {
