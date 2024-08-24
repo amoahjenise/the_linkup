@@ -6,7 +6,6 @@ import { useColorMode } from "@chakra-ui/react";
 // Styled components using MUI v5's styled API
 const FilterMain = styled("div")({
   flex: "1",
-  borderLeft: "1px solid #D3D3D3",
   top: 0,
   overflowY: "auto",
 });
