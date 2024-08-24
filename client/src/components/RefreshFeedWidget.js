@@ -35,9 +35,9 @@ const Icon = styled(FontAwesomeIcon)(({ theme }) => ({
 }));
 
 const RefreshButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: "#0097A7",
+  background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
   "&:hover": {
-    backgroundColor: "#007b86", // Slightly darker color on hover
+    background: "linear-gradient(120deg, #007b86, rgba(229, 235, 243, 1))",
   },
 }));
 

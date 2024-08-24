@@ -28,12 +28,14 @@ const Container = styled("div")(({ theme }) => ({
 }));
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
-  border: `1px solid ${colorMode === "light" ? "#d2d6dc" : "#2D3748"}`,
-  padding: "2rem",
+  border: `1px solid ${
+    colorMode === "light" ? "#d2d6dc" : "rgba(229, 235, 243, 0.2)"
+  }`,
+  padding: "1.5rem",
   borderRadius: "0.375rem",
   width: "32rem",
   backgroundColor:
-    colorMode === "light" ? "rgba(255, 255, 255, 1)" : "rgba(45, 55, 72, 1)",
+    colorMode === "light" ? "rgba(255, 255, 255, 1)" : "rgba(16, 28, 30, 0.2)",
   cursor: "pointer",
   overflow: "hidden",
   boxShadow: isHovered
@@ -79,21 +81,21 @@ const PostContent = styled("div")(({ theme, colorMode }) => ({
   // Date/Time style
   "& div:first-of-type": {
     fontWeight: "600", // semi bold
-    color: colorMode === "light" ? "#616871" : "#e1ebf6",
+    color: colorMode === "light" ? "#616871" : "#c3c4c4",
   },
   // Post Text style
   "& p": {
     marginTop: "6px",
     lineHeight: "1.5rem",
-    fontWeight: "600", // semi bold
-    color: colorMode === "light" ? "#282b2e" : "#e7f2ff",
+    fontWeight: "500", // semi bold
+    color: colorMode === "light" ? "#282b2e" : "white",
   },
   // Location style
   "& div:last-of-type": {
-    marginTop: "6px",
-    fontWeight: "475", // semi bold
+    marginTop: "5px",
+    fontWeight: "500", // semi bold
     fontSize: "0.95rem", // smaller font
-    color: colorMode === "light" ? "#4c5157" : "#e7f2ff",
+    color: colorMode === "light" ? "#282b2e" : "white",
   },
 }));
 
@@ -102,7 +104,6 @@ const PostInfo = styled("div")(({ theme }) => ({
   alignItems: "center",
   fontSize: "0.9rem",
   color: "#718096",
-  marginTop: "0.25rem",
 }));
 
 const OnlineIndicator = styled("span")(({ theme }) => ({
@@ -345,8 +346,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 name: creator_name,
                 avatar: avatar,
               }}
-              width="50px"
-              height="50px"
+              width="60px"
+              height="60px"
             />
             <div>
               <UserName>{creator_name}</UserName>

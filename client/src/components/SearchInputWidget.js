@@ -64,10 +64,15 @@ const SearchInput = ({ handleInputChange }) => {
           ref={inputRef} // Attach the ref to the input element
           type="search"
           name="search"
-          placeholder="Search Link-Up"
+          placeholder="Search Linkups"
           onChange={handleInputChange}
         />
-        <IconContainer>
+        <IconContainer
+          style={{
+            background:
+              "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
+          }}
+        >
           <Icon />
         </IconContainer>
       </InputContainer>

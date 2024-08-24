@@ -239,7 +239,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   return (
     <ModalOverlay>
       <ModalContainer>
-        <ModalTitle>Edit Link-Up</ModalTitle>
+        <ModalTitle>Edit Linkup</ModalTitle>
         <ModalForm onSubmit={handleUpdateLinkup}>
           <ModalLabel htmlFor="activity">Activity</ModalLabel>
           <ModalInput

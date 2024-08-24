@@ -139,7 +139,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         post.creator_id,
         linkupId,
         message,
-        channelUrl
+        channelUrl,
       );
 
       if (sendMessageResponse.message_id) {

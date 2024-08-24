@@ -82,7 +82,8 @@ const IconWithSpacing = styled("div")({
 });
 
 const LogoContainer = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(2),
+  display: "flex",
+  marginBottom: theme.spacing(4),
   [theme.breakpoints.down("md")]: {
     marginBottom: theme.spacing(2),
   },
@@ -90,8 +91,16 @@ const LogoContainer = styled("div")(({ theme }) => ({
 
 const Logo = styled("img")(({ theme }) => ({
   height: "50px",
-  marginBottom: theme.spacing(2),
-  backgroundColor: "#000",
+}));
+
+const LogoText = styled("div")(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  fontSize: "1.5rem", // Adjust font size as needed
+  fontWeight: "bold",
+  fontFamily: "'Poppins', sans-serif", // Use a stylish font (ensure the font is loaded)
+  letterSpacing: "0.5px", // Adjust letter spacing if needed
+  display: "flex",
+  alignItems: "center",
 }));
 
 const MobileMenuButton = styled("div")(({ theme }) => ({
@@ -171,6 +180,7 @@ const LeftMenu = ({ isMobile }) => {
           <>
             <LogoContainer>
               <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
+              <LogoText>The Linkup</LogoText>
             </LogoContainer>
             <MenuList>
               <StyledMenuItemComponent

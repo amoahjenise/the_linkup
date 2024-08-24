@@ -65,12 +65,12 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
 const CreateLinkUpButton = styled("button")(({ theme }) => ({
   borderRadius: "40px",
   cursor: "pointer",
-  transition: "background-color 0.3s ease",
-  backgroundColor: "#0097A7",
+  transition: "background 0.4s ease-in-out", // Adjusted to transition the entire background
+  background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
   fontWeight: "bold",
   color: "white",
   "&:hover": {
-    backgroundColor: "#007b86", // Slightly darker color on hover
+    background: "linear-gradient(120deg, #007b86, rgba(229, 235, 243, 1))",
   },
   width: "200px",
   height: "60px",
@@ -200,7 +200,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
   return (
     <WidgetContainer>
-      <CreateLinkUpTitle>Create a Link-Up</CreateLinkUpTitle>
+      <CreateLinkUpTitle>Create a Linkup</CreateLinkUpTitle>
       <Form onSubmit={handleCreateLinkUp}>
         <InputField
           type="text"
@@ -282,7 +282,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           </select>
         </CustomDropdown>
         <CenterElement>
-          <CreateLinkUpButton type="submit">Create</CreateLinkUpButton>
+          <CreateLinkUpButton type="submit">Post</CreateLinkUpButton>
         </CenterElement>{" "}
       </Form>
     </WidgetContainer>

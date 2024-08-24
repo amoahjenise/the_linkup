@@ -39,7 +39,8 @@ const getNotifications = async (req, res) => {
 };
 
 const createNotification = async (req, res) => {
-  const { creatorId, requesterId, type, content, linkupId } = req.body;
+  const { creatorId, requesterId, type, content, linkupId, linkupRequestId } =
+    req.body;
 
   const queryPath = path.join(
     __dirname,
@@ -48,7 +49,14 @@ const createNotification = async (req, res) => {
 
   const query = fs.readFileSync(queryPath, "utf8");
 
-  const values = [creatorId, requesterId, type, content, linkupId];
+  const values = [
+    creatorId,
+    requesterId,
+    type,
+    content,
+    linkupId,
+    linkupRequestId,
+  ];
 
   try {
     const { rows } = await pool.query(query, values);

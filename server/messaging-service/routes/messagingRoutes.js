@@ -3,6 +3,7 @@ const router = express.Router();
 const messagingController = require("../controllers/messagingController");
 
 router.post("/create-conversation", messagingController.createNewConversation);
+
 router.get(
   "/conversation/channel/:channelUrl",
   messagingController.getConversationByChannelUrl

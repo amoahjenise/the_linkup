@@ -38,6 +38,7 @@ const sendRequest = async (req, res) => {
 
     if (rows.length > 0) {
       // Save new conversation in db
+
       const conversationData = {
         sender_id: requesterId,
         receiver_id: creator_id,
@@ -57,6 +58,7 @@ const sendRequest = async (req, res) => {
         type: "linkup_request",
         linkupId: linkupId,
         content: `New link-up request from ${requesterName}`,
+        linkupRequestId: rows[0].id,
       };
 
       const notificationResponse = await axios.post(
@@ -125,6 +127,7 @@ const acceptRequest = async (req, res) => {
         type: "linkup_request_action",
         linkupId: linkupRequest.linkup_id,
         content: `${linkupRequest.creator_name} accepted your request for ${linkupRequest.activity}.`,
+        linkupRequestId: linkupRequestId,
       };
 
       const notificationResponse = await axios.post(
@@ -186,6 +189,7 @@ const declineRequest = async (req, res) => {
         type: "linkup_request_action",
         linkupId: linkupRequest.linkup_id,
         content: `${linkupRequest.creator_name} declined your request for ${linkupRequest.activity}.`,
+        linkupRequestId: linkupRequestId,
       };
 
       const notificationResponse = await axios.post(
