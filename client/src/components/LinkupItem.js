@@ -33,16 +33,14 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   borderRadius: "0.375rem",
   width: "32rem",
   backgroundColor:
-    colorMode === "light"
-      ? "rgba(200, 200, 200, 0.1)"
-      : "rgba(45, 55, 72, 0.1)", // Adjust background for dark mode
+    colorMode === "light" ? "rgba(255, 255, 255, 1)" : "rgba(45, 55, 72, 1)",
   cursor: "pointer",
   overflow: "hidden",
   boxShadow: isHovered
     ? colorMode === "light"
-      ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)" // Hover effect for light mode
-      : "0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7)" // Hover effect for dark mode
-    : "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)", // Default shadow
+      ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
+      : "0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7)"
+    : "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
   transition: "box-shadow 0.2s ease",
 }));
 
@@ -75,10 +73,28 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   marginLeft: "4px",
 }));
 
-const PostContent = styled("p")(({ theme }) => ({
-  fontSize: "0.95rem",
-  lineHeight: "1.25rem",
+const PostContent = styled("div")(({ theme, colorMode }) => ({
   marginTop: "1rem",
+  lineHeight: "1rem",
+  // Date/Time style
+  "& div:first-of-type": {
+    fontWeight: "600", // semi bold
+    color: colorMode === "light" ? "#616871" : "#e1ebf6",
+  },
+  // Post Text style
+  "& p": {
+    marginTop: "6px",
+    lineHeight: "1.5rem",
+    fontWeight: "600", // semi bold
+    color: colorMode === "light" ? "#282b2e" : "#e7f2ff",
+  },
+  // Location style
+  "& div:last-of-type": {
+    marginTop: "6px",
+    fontWeight: "475", // semi bold
+    fontSize: "0.95rem", // smaller font
+    color: colorMode === "light" ? "#4c5157" : "#e7f2ff",
+  },
 }));
 
 const PostInfo = styled("div")(({ theme }) => ({
@@ -104,6 +120,19 @@ const PaymentOptionIcon = styled("div")(({ theme }) => ({
 const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
   display: "inline-block",
 }));
+
+const formatDate = (date) => moment(date).format("ddd, MMM DD - h:mm A z");
+
+const capitalizeLocation = (location) =>
+  location
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const capitalizeFirstLetter = (string) => {
+  if (!string) return "";
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const { colorMode } = useColorMode(); // Use useColorMode hook
@@ -166,11 +195,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
 
     fetchUserLocation();
   }, [latitude, longitude]);
-
-  const capitalizeFirstLetter = (string) => {
-    if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
 
   // Function to render the appropriate icon based on the payment option
   const renderPaymentOptionIcon = () => {
@@ -256,30 +280,24 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     const startsWithVerb = doc.verbs().length > 0;
     const isVerbEndingWithIng = activity.endsWith("ing");
 
-    let activityText = "";
+    let activityPrefix = "";
 
     if (activity) {
       if (isVerbEndingWithIng) {
-        activityText = `for ${activity}`;
+        activityPrefix = `for ${activity}`;
       } else {
-        activityText = `${startsWithVerb ? "to" : "for"} ${activity}`;
+        activityPrefix = `${startsWithVerb ? "to" : "for"} `;
       }
     }
 
-    const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
-    const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
-
     return (
-      <span>
+      <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
-          <strong>{creator_name}</strong>
+          {creator_name}
         </Link>{" "}
-        is trying to link up <strong>{activityText}</strong> on{" "}
-        <strong>
-          {dateText} {timeText}
-        </strong>{" "}
-        at <strong>{capitalizeFirstLetter(location)}</strong>.
-      </span>
+        is trying to link up {activityPrefix}
+        {activity}.
+      </p>
     );
   };
 
@@ -359,7 +377,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
           </HorizontalMenuContainer>
         </UserInfo>
 
-        <PostContent>{renderLinkupItemText()}</PostContent>
+        <PostContent colorMode={colorMode}>
+          <div>{formatDate(date)}</div>
+          {renderLinkupItemText()}
+          <div>{capitalizeLocation(location)}</div>
+        </PostContent>
         <PostActionsContainer>
           {loggedUser.user.id !== linkupItem.creator_id && (
             <div>

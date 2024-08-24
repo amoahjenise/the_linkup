@@ -36,7 +36,7 @@ const linkupsReducer = (state = initialState, action) => {
       return {
         ...state,
         linkupList: action.payload, // Update the link-up list with the new data
-        successMessage: "Link-ups marked as expired!",
+        successMessage: "Linkups marked as expired!",
       };
     default:
       return state;

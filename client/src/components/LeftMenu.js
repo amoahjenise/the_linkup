@@ -201,7 +201,7 @@ const LeftMenu = ({ isMobile }) => {
               <StyledMenuItemComponent
                 to="/history"
                 icon={<HistoryIcon />}
-                text="Link-Ups"
+                text="Linkups"
                 colorMode={colorMode}
                 location={location.pathname}
                 toggleMenu={isMobile ? toggleMenu : null}

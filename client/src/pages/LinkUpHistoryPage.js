@@ -179,7 +179,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   const tabs = [
     {
       id: 0,
-      label: "My Link-Ups",
+      label: "My Linkups",
     },
     { id: 1, label: "Requests Sent" },
     { id: 2, label: "Requests Received" },
@@ -294,7 +294,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   useEffect(() => {
     // Create a filtered array based on the filter criteria
     if (activeTab === 0) {
-      // My Link-Ups
+      // My Linkups
       const filteredLinkups = linkups.list.filter((linkup) => {
         const createdAt = new Date(linkup.created_at);
         const today = new Date();
@@ -419,7 +419,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     <LinkupHistoryPageContainer>
       <HistorySection>
         <TopBarContainer>
-          <TopNavBar title="Link-Ups" />
+          <TopNavBar title="Linkups" />
         </TopBarContainer>
         {isLoading ? (
           <LoadingSpinner />
@@ -440,7 +440,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   key={tab.id}
                   label={
                     tab.id === 0
-                      ? `My Link-Ups (${linkups.filteredList.length})`
+                      ? `My Linkups (${linkups.filteredList.length})`
                       : tab.id === 1
                       ? `Sent Requests (${sentRequests.filteredList.length})`
                       : `Received Requests (${receivedRequests.filteredList.length})`
