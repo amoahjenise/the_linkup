@@ -156,7 +156,8 @@ const ProfileHeaderCard = ({
           />
           <StatisticsContainer>
             <StatisticsItem>
-              <Icon color="#F2A900">...</Icon> {/* Sun yellow for statistics */}
+              <Icon color="#F2A900">{userData.total_linkups}</Icon>{" "}
+              {/* Sun yellow for statistics */}
               <Typography
                 variant="body2"
                 align="center"
@@ -166,7 +167,8 @@ const ProfileHeaderCard = ({
               </Typography>
             </StatisticsItem>
             <StatisticsItem>
-              <Icon color="#FF6F61">...</Icon> {/* Coral for statistics */}
+              <Icon color="#FF6F61">{userData.completed_linkups}</Icon>{" "}
+              {/* Coral for statistics */}
               <Typography
                 variant="body2"
                 align="center"
@@ -176,7 +178,8 @@ const ProfileHeaderCard = ({
               </Typography>
             </StatisticsItem>
             <StatisticsItem>
-              <Icon color="#F2C20D">...</Icon>{" "}
+              {/* <Icon color="#F2A900">★★★★★</Icon>{" "} */}
+              <Icon color="#F2A900">...</Icon> {/* Sun yellow for statistics */}
               {/* Bright yellow for statistics */}
               <Typography
                 variant="body2"

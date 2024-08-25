@@ -22,24 +22,28 @@ const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
 
 const PlaceholderImage = "path/to/placeholder-image.jpg"; // Replace with your placeholder image
 
-const BouncingArrow = styled("div")(({ theme }) => ({
-  position: "absolute",
-  bottom: "30px", // Adjust positioning as needed
-  width: "0",
-  height: "0",
-  left: "47.6%", // Adjust positioning as needed
-  borderLeft: "15px solid transparent",
-  borderRight: "15px solid transparent",
-  borderBottom: `15px solid #c13584`, // Default arrow color for Instagram
-  animation: "bounce 1.5s infinite",
-  "&.twitter": {
-    borderBottomColor: "#1DA1F2", // Twitter blue
-    left: "56%", // Adjust positioning as needed
-  },
-  "&.facebook": {
-    borderBottomColor: "#3a5191", // Facebook blue
-    left: "38.5%", // Adjust positioning as needed
-  },
+const BouncingArrow = styled("div")(({ theme, isMobile }) => ({
+  ...(isMobile
+    ? {}
+    : {
+        position: "absolute",
+        bottom: "30px", // Adjust positioning as needed
+        width: "0",
+        height: "0",
+        left: "47.6%", // Adjust positioning as needed
+        borderLeft: "15px solid transparent",
+        borderRight: "15px solid transparent",
+        borderBottom: `15px solid #c13584`, // Default arrow color for Instagram
+        animation: "bounce 1.5s infinite",
+        "&.twitter": {
+          borderBottomColor: "#1DA1F2", // Twitter blue
+          left: "56%", // Adjust positioning as needed
+        },
+        "&.facebook": {
+          borderBottomColor: "#3a5191", // Facebook blue
+          left: "38.5%", // Adjust positioning as needed
+        },
+      }),
 }));
 
 const ArrowContainer = styled(Box)(({ theme }) => ({
@@ -66,25 +70,25 @@ const carouselSettings = {
   slidesToScroll: 1,
   arrows: false, // Disable default arrows
   autoplay: true, // Enable autoplay
-  autoplaySpeed: 6000, // Set speed for autoplay (3 seconds)
+  autoplaySpeed: 4500, // Set speed for autoplay (4.5 seconds)
 };
 
 const messages = [
   {
-    text: "Connect to Instagram to see your photos! (Coming Soon)",
+    text: "Connect to Instagram to see your photos!",
     arrowClass: "",
   },
   {
-    text: "Connect to Twitter X for updates! (Coming Soon)",
+    text: "Connect to Twitter X for updates!",
     arrowClass: "twitter",
   },
   {
-    text: "Connect to Facebook to see your photos! (Coming Soon)",
+    text: "Connect to Facebook to see your photos!",
     arrowClass: "facebook",
   },
 ];
 
-const ImageGrid = ({ images, isLoggedUserProfile }) => {
+const ImageGrid = ({ images, isMobile, isLoggedUserProfile }) => {
   const { colorMode } = useColorMode();
 
   const handleError = (event) => {
@@ -106,13 +110,17 @@ const ImageGrid = ({ images, isLoggedUserProfile }) => {
                       justifyContent="center"
                       alignItems="center"
                       height="100%" // Ensure full height for the card
+                      border="1px solid lightgrey" // Line of separation
                     >
                       <StyledCard colorMode={colorMode}>
                         <ArrowContainer>
                           <Typography variant="h6" gutterBottom>
                             {message.text}
                           </Typography>
-                          <BouncingArrow className={message.arrowClass} />
+                          <BouncingArrow
+                            className={message.arrowClass}
+                            isMobile={isMobile}
+                          />
                         </ArrowContainer>
                       </StyledCard>
                     </Box>

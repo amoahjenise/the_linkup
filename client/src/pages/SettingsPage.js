@@ -4,6 +4,7 @@ import DeactivateAccount from "../components/DeactivateAccount";
 import Settings from "../components/Settings";
 import { useColorMode } from "@chakra-ui/react";
 import LocationSharingSetting from "../components/LocationSharingSetting";
+import AccountSettings from "../components/AccountSettings"; // Import AccountSettings component
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -97,6 +98,9 @@ const SettingsPage = () => {
             setActiveSubSection={setActiveSubSection}
           />
         )}
+        {activeSubSection === "accountSettings" && (
+          <AccountSettings colorMode={colorMode} />
+        )}
       </RightSection>
 
       {/* SlidingSection is only shown on mobile */}
@@ -112,6 +116,9 @@ const SettingsPage = () => {
             activeSubSection={activeSubSection}
             setActiveSubSection={setActiveSubSection}
           />
+        )}
+        {activeSubSection === "accountSettings" && (
+          <AccountSettings colorMode={colorMode} />
         )}
       </SlidingSection>
     </SettingsPageContainer>

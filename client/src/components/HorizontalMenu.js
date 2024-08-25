@@ -20,13 +20,6 @@ const MoreIcon = styled(MoreHorizIcon)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-const PopoverPaper = styled("div")(({ theme, colorMode }) => ({
-  color: "white",
-  backgroundColor:
-    colorMode === "dark" ? "rgba(18, 78, 88, 0.95)" : "rgba(8, 98, 110, 0.75)",
-  boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.5)",
-}));
-
 const HorizontalMenu = ({
   showGoToItem,
   showGoToRequest,
