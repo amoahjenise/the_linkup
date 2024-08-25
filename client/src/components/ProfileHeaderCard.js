@@ -28,7 +28,7 @@ const Card = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   borderRadius: "8px",
-  // boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a floating effect
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a floating effect
 }));
 
 const AvatarSection = styled(Box)(({ theme }) => ({
@@ -66,7 +66,7 @@ const StatisticsItem = styled("div")(({ theme }) => ({
 }));
 
 const Icon = styled("p")(({ color }) => ({
-  fontSize: "1.5rem",
+  fontSize: "1.25rem",
   color: color,
 }));
 
@@ -178,8 +178,9 @@ const ProfileHeaderCard = ({
               </Typography>
             </StatisticsItem>
             <StatisticsItem>
-              {/* <Icon color="#F2A900">★★★★★</Icon>{" "} */}
-              <Icon color="#F2A900">...</Icon> {/* Sun yellow for statistics */}
+              {/* <Icon color="#F2A900">★★★★★</Icon> */}
+              <Icon color="#F2A900">...</Icon>
+              {/* Sun yellow for statistics */}
               {/* Bright yellow for statistics */}
               <Typography
                 variant="body2"

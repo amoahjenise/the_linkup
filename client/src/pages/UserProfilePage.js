@@ -36,6 +36,7 @@ const Container = styled("div")({
 const ProfileSection = styled("div")({
   display: "flex",
   flexDirection: "column",
+  overflowX: "hidden",
 });
 
 const ImageSection = styled("div")({
