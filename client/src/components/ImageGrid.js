@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Card, CardMedia, Typography, Box } from "@mui/material";
+import { Grid, CardMedia, Typography, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Slider from "react-slick";
 import { useColorMode } from "@chakra-ui/react";
@@ -11,7 +11,7 @@ const StyledCard = styled("div")(({ theme, colorMode }) => ({
   overflow: "hidden",
   border: `1px solid ${theme.palette.divider}`, // Line of separation
   padding: theme.spacing(2), // Add padding inside the card
-  backgroundColor: colorMode === "dark" ? "#2D3748" : "white",
+  backgroundColor: colorMode === "dark" ? "transparent" : "white",
 }));
 
 const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
@@ -84,7 +84,7 @@ const messages = [
   },
 ];
 
-const ImageGrid = ({ images, isLoggedUserProfile, isMobile }) => {
+const ImageGrid = ({ images, isLoggedUserProfile }) => {
   const { colorMode } = useColorMode();
 
   const handleError = (event) => {
@@ -95,33 +95,59 @@ const ImageGrid = ({ images, isLoggedUserProfile, isMobile }) => {
     <Grid container spacing={0.5}>
       {images.length === 0 ? (
         <Grid item xs={12}>
-          <CarouselContainer>
-            <Slider {...carouselSettings}>
-              {messages.map((message, index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100%" // Ensure full height for the card
-                >
-                  <StyledCard colorMode={colorMode}>
-                    <ArrowContainer>
-                      <Typography variant="h6" gutterBottom>
-                        {message.text}
-                      </Typography>
-                      <BouncingArrow className={message.arrowClass} />
-                    </ArrowContainer>
-                  </StyledCard>
-                </Box>
-              ))}
-            </Slider>
-          </CarouselContainer>
+          {isLoggedUserProfile && (
+            <Grid item xs={12}>
+              <CarouselContainer>
+                <Slider {...carouselSettings}>
+                  {messages.map((message, index) => (
+                    <Box
+                      key={index}
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      height="100%" // Ensure full height for the card
+                    >
+                      <StyledCard colorMode={colorMode}>
+                        <ArrowContainer>
+                          <Typography variant="h6" gutterBottom>
+                            {message.text}
+                          </Typography>
+                          <BouncingArrow className={message.arrowClass} />
+                        </ArrowContainer>
+                      </StyledCard>
+                    </Box>
+                  ))}
+                </Slider>
+              </CarouselContainer>
+            </Grid>
+          )}
+          {!isLoggedUserProfile && (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%" // Ensure full height for the card
+            >
+              <StyledCard
+                colorMode={colorMode}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  The user hasn't linked their account to Instagram yet.
+                </Typography>
+              </StyledCard>
+            </Box>
+          )}
         </Grid>
       ) : (
         images.map((image, index) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-            <StyledCard>
+            <StyledCard colorMode={colorMode}>
               <StyledCardMedia
                 component="img"
                 alt={`Image ${index}`}
