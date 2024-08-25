@@ -7,7 +7,7 @@ SELECT
 FROM
   users u
 LEFT JOIN
-  link_ups l ON u.id = l.creator_id
+  link_ups l ON u.id = l.creator_id AND l.status <> 'inactive'
 WHERE
   u.id = $1
 AND

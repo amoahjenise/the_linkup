@@ -65,7 +65,8 @@ const LocationSharingSetting = () => {
     <Section>
       <SectionTitle>Grant Access to Device Location</SectionTitle>
       <SectionContent>
-        To use Linkup, you'll need to grant access to your device's location:
+        To use The Linkup, you'll need to grant access to your device's
+        location:
       </SectionContent>
       <FormControlLabel
         control={
