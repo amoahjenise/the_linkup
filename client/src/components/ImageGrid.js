@@ -10,13 +10,13 @@ const StyledCard = styled("div")(({ theme, colorMode }) => ({
   boxShadow: theme.shadows[3],
   overflow: "hidden",
   border: `1px solid ${theme.palette.divider}`, // Line of separation
-  padding: theme.spacing(2), // Add padding inside the card
   backgroundColor: colorMode === "dark" ? "transparent" : "white",
 }));
 
 const StyledCardMedia = styled(CardMedia)(({ theme }) => ({
   aspectRatio: "1 / 1", // Makes the card square
   width: "100%",
+  height: "100%",
   objectFit: "cover", // Ensures the image covers the area without distortion
 }));
 
@@ -154,7 +154,7 @@ const ImageGrid = ({ images, isMobile, isLoggedUserProfile }) => {
         </Grid>
       ) : (
         images.map((image, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          <Grid item xs={4} sm={3} md={2} key={index}>
             <StyledCard colorMode={colorMode}>
               <StyledCardMedia
                 component="img"
