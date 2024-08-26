@@ -209,6 +209,7 @@ const HomePage = ({ isMobile }) => {
 
   const fetchLinkupRequests = useCallback(async () => {
     try {
+      dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
       if (!userId) return;
       const response = await getLinkupRequests(userId);
       if (response.success) {

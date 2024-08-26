@@ -184,7 +184,7 @@ const deleteLinkup = async (req, res) => {
     if (rowCount > 0) {
       // Emit the event to all connected users
       if (socketIo) {
-        socketIo.emit("linkupDeleted", { id: newLinkup.id, linkup: newLinkup });
+        socketIo.emit("linkupDeleted", { id: linkupId.id, linkup: linkupId });
       }
 
       res.json({
