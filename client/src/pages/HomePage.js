@@ -10,6 +10,7 @@ import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { IconButton } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
+import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -43,6 +44,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     overflowY: "auto",
     overflowX: "hidden",
     display: "block", // Make sure it's displayed by default
+
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
@@ -224,9 +226,10 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
+    dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
     fetchLinkupsAndPoll(1);
     scrollToTop();
-  }, [fetchLinkupsAndPoll]);
+  }, [dispatch, fetchLinkupsAndPoll]);
 
   const scrollToTop = () => {
     if (feedSectionRef.current) {
@@ -245,6 +248,7 @@ const HomePage = ({ isMobile }) => {
           linkupList={linkupList}
           isLoading={isFetchingNextPage}
           setShouldFetchLinkups={setShouldFetchLinkups}
+          onRefreshClick={refreshLinkups}
         />
       </StyledDiv>
       {!isMobile && (

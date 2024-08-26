@@ -68,19 +68,9 @@ const createLinkup = async (req, res) => {
     if (rowCount > 0) {
       const newLinkup = rows[0];
 
-      // Check if the socket exists for the given user
-      const sockets = socketIo.sockets;
-
-      const userSocket = Array.from(sockets.values()).find((socket) => {
-        return socket.userId === newLinkup.creator_id;
-      });
-
-      if (userSocket) {
-        // Emit the event to the user
-        userSocket.emit("linkupCreated", { id: newLinkup.id });
-
-        // Add the socket to the room
-        userSocket.join(`linkup-${newLinkup.id}`);
+      // Emit the event to all connected users
+      if (socketIo) {
+        socketIo.emit("linkupCreated", { id: newLinkup.id, linkup: newLinkup });
       }
 
       res.json({
@@ -192,6 +182,11 @@ const deleteLinkup = async (req, res) => {
     const { rowCount } = await pool.query(query, deleteLinkupQueryValues);
 
     if (rowCount > 0) {
+      // Emit the event to all connected users
+      if (socketIo) {
+        socketIo.emit("linkupDeleted", { id: newLinkup.id, linkup: newLinkup });
+      }
+
       res.json({
         success: true,
         message: "Linkup deleted successfully",

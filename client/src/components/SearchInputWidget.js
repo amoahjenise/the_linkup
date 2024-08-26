@@ -4,11 +4,10 @@ import { styled } from "@mui/material/styles";
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({
-  borderWidth: "1px",
-  border: "0.1px solid #lightgray",
   width: "100%",
-  padding: "6px 12px",
+  padding: "4px 12px",
   borderRadius: "24px",
+  borderWidth: "1px",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
   transition: "box-shadow 0.3s ease",
   "&:hover": {
@@ -31,7 +30,7 @@ const Input = styled("input")({
   padding: "0 16px",
   borderRadius: "24px",
   border: "none",
-  fontSize: "14px",
+  fontWeight: "semi-bold",
   outline: "none",
 });
 

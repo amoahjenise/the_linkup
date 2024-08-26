@@ -300,7 +300,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               aria-label="Payment Option"
               id="paymentOption"
             >
-              <option value="">Who Will Pay? (Optional)</option>{" "}
+              <option value="">Who's Paying? (Optional)</option>{" "}
               <option value="split">Split The Bill</option>
               <option value="iWillPay">I Will Pay</option>
               <option value="pleasePay">Please Pay</option>

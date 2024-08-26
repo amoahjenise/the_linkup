@@ -243,6 +243,7 @@ const UserProfilePage = ({ isMobile }) => {
             }
             calculateAge={calculateAge}
             setProfileImages={handleSetProfileImages}
+            isLoggedUserProfile={isLoggedUserProfile}
           />
           <ImageSection>
             <ImageGrid

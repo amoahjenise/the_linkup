@@ -6,9 +6,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { createLinkup } from "../api/linkUpAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { Tooltip, IconButton, Typography } from "@mui/material";
+import { Tooltip, IconButton, Button, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useColorMode } from "@chakra-ui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 
 // Styled components
 const WidgetContainer = styled("div")(({ theme }) => ({
@@ -20,23 +22,29 @@ const WidgetContainer = styled("div")(({ theme }) => ({
   backgroundColor: "rgba(200, 200, 200, 0.1)",
   borderRadius: "24px",
   borderWidth: "1px",
-  border: "0.1px solid #lightgray",
   overflow: "hidden",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
   transition: "box-shadow 0.3s ease",
   "&:hover": {
     boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
   },
+  fontFamily: "Arial, sans-serif", // Set font family
+}));
+
+const Header = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: theme.spacing(1),
+}));
+
+const Icon = styled(FontAwesomeIcon)(({ theme }) => ({
+  marginRight: theme.spacing(1),
 }));
 
 const CenterElement = styled("div")({
   textAlign: "center",
 });
-
-const CreateLinkUpTitle = styled("h2")(({ theme }) => ({
-  textAlign: "center",
-  marginBottom: theme.spacing(3),
-}));
 
 const Form = styled("form")(({ theme }) => ({
   display: "flex",
@@ -45,7 +53,6 @@ const Form = styled("form")(({ theme }) => ({
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
-  fontSize: "14px",
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
@@ -58,28 +65,22 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   backgroundColor:
     colorMode === "dark"
       ? "rgba(130, 131, 129, 0.12)"
-      : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
+      : "rgba(130, 131, 129, 0.12)",
   width: "100%",
 }));
 
-const CreateLinkUpButton = styled("button")(({ theme }) => ({
-  borderRadius: "40px",
-  cursor: "pointer",
-  transition: "background 0.4s ease-in-out", // Adjusted to transition the entire background
+const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
-  fontWeight: "bold",
-  color: "white",
   "&:hover": {
     background: "linear-gradient(120deg, #007b86, rgba(229, 235, 243, 1))",
   },
-  width: "200px",
-  height: "60px",
-  marginTop: theme.spacing(2),
+  color: "#fff",
+  borderRadius: "20px",
+  padding: theme.spacing(1, 4),
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  fontSize: "14px",
   padding: theme.spacing(1),
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
@@ -90,7 +91,8 @@ const InputField = styled("input")(({ theme, colorMode }) => ({
     borderColor: theme.palette.primary.main,
   },
   backgroundColor:
-    colorMode === "dark" ? "#2e2e2e" : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
+    colorMode === "dark" ? "#2e2e2e" : "rgba(130, 131, 129, 0.12)",
+  fontFamily: "Arial, sans-serif", // Set font family
 }));
 
 const InputWithIcon = styled("div")({
@@ -104,12 +106,11 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
   position: "absolute",
   right: theme.spacing(1),
   top: theme.spacing(0.8),
-  pointerEvents: "auto", // Allow clicking on the icon
+  pointerEvents: "auto",
   color: "lightgray",
 }));
 
 const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
-  fontSize: "14px",
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   color: colorMode === "dark" ? "grey" : "grey",
@@ -127,13 +128,14 @@ const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
     backgroundColor:
       colorMode === "dark"
         ? "rgba(130, 131, 129, 0.12)"
-        : "rgba(130, 131, 129, 0.12)", // Adjust background color based on mode
-    paddingRight: "2.5rem", // Ensure room for the arrow icon
+        : "rgba(130, 131, 129, 0.12)",
+    paddingRight: "2.5rem",
   },
   "& option": {
     color: colorMode === "dark" ? "white" : "black",
     backgroundColor: colorMode === "dark" ? "#2e2e2e" : "white",
   },
+  fontFamily: "Arial, sans-serif", // Set font family
 }));
 
 const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
@@ -200,7 +202,10 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
   return (
     <WidgetContainer>
-      <CreateLinkUpTitle>Create a Linkup</CreateLinkUpTitle>
+      <Header>
+        <Icon icon={faPlusCircle} />
+        <span>Create a Linkup</span>
+      </Header>
       <Form onSubmit={handleCreateLinkUp}>
         <InputField
           type="text"
@@ -252,7 +257,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           minDate={new Date()} // Set the minimum date to the current date
           minTime={minTime} // Set the minimum time to the current time
           maxTime={maxTime}
-          placeholderText="Select Date and Time"
+          placeholderText="Date and Time"
           required
           colorMode={colorMode} // Pass colorMode to styled component
         />
@@ -263,7 +268,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             required
           >
             <option value="" disabled>
-              Select Gender Preference
+              Gender Preference
             </option>
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -275,14 +280,20 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
           >
-            <option value="">Who Will Pay? (Optional)</option>
+            <option value="">Who's Paying? (Optional)</option>
             <option value="split">Split The Bill</option>
             <option value="iWillPay">I Will Pay</option>
             <option value="pleasePay">Please Pay</option>
           </select>
         </CustomDropdown>
         <CenterElement>
-          <CreateLinkUpButton type="submit">Post</CreateLinkUpButton>
+          <CreateLinkUpButton
+            type="submit"
+            aria-label="create-linkup"
+            size="large"
+          >
+            POST
+          </CreateLinkUpButton>
         </CenterElement>{" "}
       </Form>
     </WidgetContainer>

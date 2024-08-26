@@ -7,6 +7,7 @@ import {
   requestNotificationPermission,
   showNotification,
 } from "../utils/notificationUtils";
+import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
 const SocketContext = createContext();
 
@@ -43,8 +44,14 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     requestNotificationPermission(); // Request notification permission on mount
 
-    linkupManagementSocket.on("linkupCreated", (newLinkup) => {
-      // Handle new linkup created
+    linkupManagementSocket.on("linkupCreated", (data) => {
+      if (data.linkup.creator_id === userId) return;
+      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
+    });
+
+    linkupManagementSocket.on("linkupDeleted", (data) => {
+      if (data.linkup.creator_id === userId) return;
+      // dispatch(showUpdateFeedButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupExpired", (data) => {

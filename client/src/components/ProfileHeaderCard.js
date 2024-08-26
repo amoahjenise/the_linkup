@@ -89,6 +89,7 @@ const ProfileHeaderCard = ({
   renderEditButton,
   calculateAge,
   setProfileImages,
+  isLoggedUserProfile,
 }) => {
   const { colorMode } = useColorMode();
   const textColor = colorMode === "dark" ? "white" : "#333333"; // Adjusted text color
@@ -167,8 +168,7 @@ const ProfileHeaderCard = ({
               </Typography>
             </StatisticsItem>
             <StatisticsItem>
-              <Icon color="#FF6F61">{userData.completed_linkups}</Icon>{" "}
-              {/* Coral for statistics */}
+              <Icon color="#FF6F61">...</Icon> {/* Coral for statistics */}
               <Typography
                 variant="body2"
                 align="center"
@@ -195,7 +195,12 @@ const ProfileHeaderCard = ({
             <IconButton size="large">
               <FacebookIcon sx={{ color: "#3b5998" }} />
             </IconButton>
-            <IconButton size="large" onClick={redirectToInstagramLogin}>
+            <IconButton
+              size="large"
+              onClick={() => {
+                if (isLoggedUserProfile) redirectToInstagramLogin();
+              }}
+            >
               <InstagramIcon sx={{ color: "#C13584" }} />
             </IconButton>
             <IconButton size="large">
