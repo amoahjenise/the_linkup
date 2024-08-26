@@ -15,7 +15,7 @@ const Root = styled("div")({
 
 const ActionButton = styled("div")({
   fontSize: "14px",
-  margin: "0 20px",
+  margin: "0 10px",
   cursor: "pointer",
   "&:hover": {
     textDecoration: "underline",
@@ -81,7 +81,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
       <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
-        aria-label="Share post"
+        aria-label="Share"
         role="button"
         tabIndex="2"
         onClick={() => {
@@ -89,7 +89,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
         }}
       >
         <Icon icon={faShare} style={{ color: "blue" }} />
-        Share Post
+        Share
       </ActionButton>
     </Root>
   );
