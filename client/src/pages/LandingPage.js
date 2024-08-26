@@ -4,15 +4,32 @@ import { styled } from "@mui/material/styles";
 import { Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import videoSrc from "../assets/TheLinkupAppMarketing.mp4"; // Import your video file
 
 // Styled Components
 const Section = styled("section")(({ theme }) => ({
-  height: "100vh", // Ensure full viewport height
-  backgroundColor: "white", // Light teal background for a fresh look
-  display: "flex", // Use flexbox for centering
-  flexDirection: "column", // Stack children vertically
-  justifyContent: "center", // Center children vertically
-  alignItems: "center", // Center children horizontally
+  height: "100vh",
+  backgroundColor: "white",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+  padding: theme.spacing(2),
+  position: "relative",
+}));
+
+const TextCenterDiv = styled("div")(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(4),
+  marginTop: "auto",
+}));
+
+const Body2Typography = styled(Typography)(({ theme }) => ({
+  fontSize: "0.75rem",
+  color: "#004D40",
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "0.875rem",
+  },
 }));
 
 const AbsoluteDiv = styled("div")({
@@ -20,39 +37,44 @@ const AbsoluteDiv = styled("div")({
   width: "100%",
   height: "100%",
   zIndex: -10,
-  background: "linear-gradient(135deg, #00ACC1, #00838F)", // Cool gradient background
+  background: "linear-gradient(135deg, #00ACC1, #00838F)",
 });
 
 const BgBlackDiv = styled("div")({
   position: "fixed",
   inset: 0,
   zIndex: -10,
-  background: "rgba(0, 0, 0, 0.1)", // Light overlay for better text contrast
+  background: "rgba(0, 0, 0, 0.1)",
   mixBlendMode: "multiply",
 });
 
-const ContentContainerDiv = styled("div")(({ theme }) => ({
-  margin: "0 auto",
-  maxWidth: "100%", // Ensure full width on small screens
-  padding: `${theme.spacing(4)} ${theme.spacing(2)}`, // Adjust padding for smaller screens
-  [theme.breakpoints.up("sm")]: {
-    padding: `${theme.spacing(6)} ${theme.spacing(4)}`,
-  },
+const ContentWrapperDiv = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  maxWidth: "1200px",
+  width: "100%",
   [theme.breakpoints.up("md")]: {
-    padding: `${theme.spacing(10)} ${theme.spacing(6)}`,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 }));
 
-const TextCenterDiv = styled("div")(({ theme }) => ({
+const TextContentDiv = styled("div")(({ theme }) => ({
+  flex: 1,
   textAlign: "center",
-  marginBottom: theme.spacing(4),
+  [theme.breakpoints.up("md")]: {
+    textAlign: "left",
+    paddingRight: theme.spacing(4),
+  },
 }));
 
 const Title = styled("h1")(({ theme }) => ({
-  fontSize: "2.5rem", // Reduced font size for mobile
+  fontSize: "2.5rem",
   fontWeight: "bold",
   letterSpacing: "tight",
-  color: "#00796B", // Deep teal color
+  marginBottom: theme.spacing(6),
+  color: "#00796B",
   [theme.breakpoints.up("sm")]: {
     fontSize: "3rem",
   },
@@ -63,9 +85,9 @@ const Title = styled("h1")(({ theme }) => ({
 
 const Subtitle = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(4),
-  fontSize: "1rem", // Reduced font size for mobile
+  fontSize: "1rem",
   lineHeight: 1.5,
-  color: "#004D40", // Dark teal for better readability
+  color: "#004D40",
   [theme.breakpoints.up("sm")]: {
     fontSize: "1.25rem",
   },
@@ -75,52 +97,70 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 }));
 
 const ButtonContainerDiv = styled("div")(({ theme }) => ({
-  marginTop: theme.spacing(6),
+  marginTop: theme.spacing(4),
   display: "flex",
-  flexDirection: "column", // Stack buttons vertically on mobile
+  flexDirection: "column",
   alignItems: "center",
-  gap: theme.spacing(4),
+  gap: theme.spacing(2),
   [theme.breakpoints.up("sm")]: {
-    flexDirection: "row", // Align buttons horizontally on larger screens
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  [theme.breakpoints.up("md")]: {
+    justifyContent: "flex-start",
   },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
-  backgroundColor: "#00838F", // Cool teal button color
+  backgroundColor: "#00838F",
   color: "#FFFFFF",
   "&:hover": {
-    backgroundColor: "#00796B", // Slightly darker teal on hover
+    backgroundColor: "#00796B",
   },
-  borderRadius: "20px", // Rounded corners for a softer look
+  borderRadius: "20px",
   [theme.breakpoints.down("sm")]: {
-    width: "100%", // Full width buttons on small screens
+    width: "100%",
   },
 }));
 
 const OutlinedButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
-  color: "#00838F", // Cool teal for the outlined button
+  color: "#00838F",
   borderColor: "#00838F",
-  borderRadius: "20px", // Rounded corners
+  borderRadius: "20px",
   "&:hover": {
-    borderColor: "#00796B", // Darker teal on hover
+    borderColor: "#00796B",
     color: "#00796B",
   },
   [theme.breakpoints.down("sm")]: {
-    width: "100%", // Full width buttons on small screens
+    width: "100%",
   },
 }));
 
-const Body2Typography = styled(Typography)(({ theme }) => ({
-  fontSize: "0.75rem", // Smaller font size for mobile
-  color: "#004D40", // Dark teal for text
-  [theme.breakpoints.up("sm")]: {
-    fontSize: "0.875rem",
+const VideoContainer = styled("div")(({ theme }) => ({
+  width: "100%",
+  maxWidth: "600px",
+  borderRadius: "10px",
+  overflow: "hidden",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a polished look
+  marginTop: theme.spacing(4),
+  [theme.breakpoints.up("md")]: {
+    marginTop: 0,
+  },
+  order: 3, // Place video third on larger screens
+  [theme.breakpoints.down("sm")]: {
+    order: 2, // Place video between the title and buttons on mobile
   },
 }));
+
+const VideoElement = styled("video")({
+  width: "100%",
+  height: "auto",
+  outline: "none",
+});
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -140,51 +180,62 @@ const LandingPage = () => {
         <>
           <AbsoluteDiv />
           <BgBlackDiv aria-hidden="true" />
-          <ContentContainerDiv>
-            <Title>The Linkup</Title>
-            <Subtitle>
-              Connect with new people and organizing meetups around your
-              interests. Simply create a linkup, receive requests from others,
-              chat to coordinate, and choose who to meet up with.
-            </Subtitle>
+          <ContentWrapperDiv>
+            <TextContentDiv>
+              <Title>The Linkup</Title>
 
-            <Typography
-              variant="subtitle2"
-              component="small"
-              sx={{ marginTop: 2, color: "#0097A7" }} // Darker teal color for text links
-            >
-              By signing up, you agree to the{" "}
-              <a href="/terms-of-service" style={{ color: "#008492" }}>
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="/privacy-policy" style={{ color: "#008492" }}>
-                Privacy Policy
-              </a>
-              , including{" "}
-              <a href="/cookie-use" style={{ color: "#008492" }}>
-                Cookie Use
-              </a>
-              .
-            </Typography>
+              {/* Video Section */}
+              <VideoContainer>
+                <VideoElement controls>
+                  <source src={videoSrc} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </VideoElement>
+              </VideoContainer>
 
-            <ButtonContainerDiv>
-              <StyledButton
-                variant="contained"
-                size="large"
-                onClick={() => navigate("/sign-up")}
+              <Subtitle>
+                Connect with new people and organize meetups around your
+                interests. Simply create a linkup, receive requests from others,
+                chat to coordinate, and choose who to meet up with.
+              </Subtitle>
+              {/* Terms and Conditions */}
+              <Typography
+                variant="subtitle2"
+                component="small"
+                sx={{ marginTop: 2, color: "#0097A7" }} // Darker teal color for text links
               >
-                Sign Up
-              </StyledButton>
-              <OutlinedButton
-                variant="outlined"
-                size="large"
-                onClick={() => navigate("/sign-in")}
-              >
-                Log In
-              </OutlinedButton>
-            </ButtonContainerDiv>
-          </ContentContainerDiv>
+                By signing up, you agree to the{" "}
+                <a href="/terms-of-service" style={{ color: "#008492" }}>
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="/privacy-policy" style={{ color: "#008492" }}>
+                  Privacy Policy
+                </a>
+                , including{" "}
+                <a href="/cookie-use" style={{ color: "#008492" }}>
+                  Cookie Use
+                </a>
+                .
+              </Typography>
+              <ButtonContainerDiv>
+                <StyledButton
+                  variant="contained"
+                  size="large"
+                  onClick={() => navigate("/sign-up")}
+                >
+                  Sign Up
+                </StyledButton>
+                <OutlinedButton
+                  variant="outlined"
+                  size="large"
+                  onClick={() => navigate("/sign-in")}
+                >
+                  Log In
+                </OutlinedButton>
+              </ButtonContainerDiv>
+            </TextContentDiv>
+          </ContentWrapperDiv>
+          {/* Footer */}
           <TextCenterDiv>
             <Body2Typography>
               &copy; {new Date().getFullYear()} The Linkup. All rights reserved.
