@@ -8,7 +8,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 // Styled Components
 const Section = styled("section")(({ theme }) => ({
   height: "100vh", // Ensure full viewport height
-  backgroundColor: "#E0F7FA", // Light teal background for a fresh look
+  backgroundColor: "white", // Light teal background for a fresh look
   display: "flex", // Use flexbox for centering
   flexDirection: "column", // Stack children vertically
   justifyContent: "center", // Center children vertically
@@ -141,24 +141,33 @@ const LandingPage = () => {
           <AbsoluteDiv />
           <BgBlackDiv aria-hidden="true" />
           <ContentContainerDiv>
-            <Title>Welcome To The Linkup!</Title>
+            <Title>The Linkup</Title>
             <Subtitle>
-              Whether you're looking to connect with new people or organize
-              meetups around your interests, The Linkup makes it easy. Create a
-              linkup, receive requests from others, chat to coordinate, and
-              decide who to meet up with.
+              Connect with new people and organizing meetups around your
+              interests. Simply create a linkup, receive requests from others,
+              chat to coordinate, and choose who to meet up with.
             </Subtitle>
+
             <Typography
               variant="subtitle2"
               component="small"
-              sx={{ marginTop: 2 }}
-              color={"#0097A7"} // Teal color for text links
+              sx={{ marginTop: 2, color: "#0097A7" }} // Darker teal color for text links
             >
               By signing up, you agree to the{" "}
-              <a href="/terms-of-service">Terms of Service</a> and{" "}
-              <a href="/privacy-policy">Privacy Policy</a>, including{" "}
-              <a href="/cookie-use">Cookie Use</a>.
+              <a href="/terms-of-service" style={{ color: "#008492" }}>
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacy-policy" style={{ color: "#008492" }}>
+                Privacy Policy
+              </a>
+              , including{" "}
+              <a href="/cookie-use" style={{ color: "#008492" }}>
+                Cookie Use
+              </a>
+              .
             </Typography>
+
             <ButtonContainerDiv>
               <StyledButton
                 variant="contained"
