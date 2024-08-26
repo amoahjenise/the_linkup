@@ -75,15 +75,15 @@ const carouselSettings = {
 
 const messages = [
   {
-    text: "Connect to Instagram to see your photos!",
+    text: "Sync your Instagram photos!",
     arrowClass: "",
   },
   {
-    text: "Connect to Twitter X for updates!",
+    text: "Link your X account!",
     arrowClass: "twitter",
   },
   {
-    text: "Connect to Facebook to see your photos!",
+    text: "Sync your Facebook photos!",
     arrowClass: "facebook",
   },
 ];
@@ -145,7 +145,7 @@ const ImageGrid = ({ images, isMobile, isLoggedUserProfile }) => {
                   alignItems: "center",
                 }}
               >
-                <Typography variant="h6" gutterBottom>
+                <Typography style={{ padding: 8 }} variant="h6" gutterBottom>
                   The user hasn't linked their account to Instagram yet.
                 </Typography>
               </StyledCard>

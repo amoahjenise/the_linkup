@@ -20,15 +20,14 @@ const Container = styled("div")(({ theme }) => ({
   alignItems: "center",
   position: "sticky",
   top: 0,
-  borderBottom: "1px solid #e7e6e6", // Light peach color for border
 }));
 
 const Card = styled("div")(({ theme }) => ({
   width: "100%",
   display: "flex",
   flexDirection: "row",
-  borderRadius: "8px",
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for a floating effect
+  borderRadius: "1px",
+  borderBottom: "1px solid lightgray",
 }));
 
 const AvatarSection = styled(Box)(({ theme }) => ({
@@ -36,7 +35,7 @@ const AvatarSection = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: theme.spacing(2),
+  padding: theme.spacing(1),
   flex: 1,
 }));
 
@@ -54,8 +53,6 @@ const StatisticsContainer = styled(Box)(({ theme }) => ({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
-  marginTop: theme.spacing(1),
-  marginBottom: theme.spacing(1),
 }));
 
 const StatisticsItem = styled("div")(({ theme }) => ({
@@ -66,7 +63,7 @@ const StatisticsItem = styled("div")(({ theme }) => ({
 }));
 
 const Icon = styled("p")(({ color }) => ({
-  fontSize: "1.25rem",
+  fontSize: "1rem",
   color: color,
 }));
 
@@ -79,7 +76,7 @@ const LocationSection = styled(Box)(({ theme }) => ({
 
 const LocationText = styled(Typography)(({ theme }) => ({
   fontWeight: "normal",
-  color: "#FF6F61", // Warm coral color for location text
+  // color: "#FF6F61", // Warm coral color for location text
 }));
 
 const ProfileHeaderCard = ({
