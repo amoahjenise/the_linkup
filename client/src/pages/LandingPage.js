@@ -86,7 +86,7 @@ const Title = styled("h1")(({ theme }) => ({
   fontSize: "2.5rem",
   fontWeight: "bold",
   letterSpacing: "tight",
-  color: "#00796B",
+  color: "#00838F",
   [theme.breakpoints.up("sm")]: {
     fontSize: "3rem",
   },
