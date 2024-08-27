@@ -20,9 +20,9 @@ const Section = styled("section")(({ theme }) => ({
 }));
 
 const Logo = styled("img")({
-  width: "70px", // Adjusted size
-  height: "70px", // Adjusted size
-  marginRight: "20px", // Space between logo and title
+  width: "50px", // Adjusted size
+  height: "50px", // Adjusted size
+  marginRight: "10px", // Space between logo and title
 });
 
 const TitleContainer = styled("div")(({ theme }) => ({
