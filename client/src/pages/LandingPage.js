@@ -5,6 +5,7 @@ import { Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import videoSrc from "../assets/TheLinkupAppMarketing.mp4"; // Import your video file
+import logoSrc from "../assets/logo.png"; // Import your logo file
 
 // Styled Components
 const Section = styled("section")(({ theme }) => ({
@@ -16,6 +17,18 @@ const Section = styled("section")(({ theme }) => ({
   flexDirection: "column",
   padding: theme.spacing(2),
   position: "relative",
+}));
+
+const Logo = styled("img")({
+  width: "70px", // Adjusted size
+  height: "70px", // Adjusted size
+  marginRight: "20px", // Space between logo and title
+});
+
+const TitleContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  marginBottom: theme.spacing(6),
 }));
 
 const TextCenterDiv = styled("div")(({ theme }) => ({
@@ -73,7 +86,6 @@ const Title = styled("h1")(({ theme }) => ({
   fontSize: "2.5rem",
   fontWeight: "bold",
   letterSpacing: "tight",
-  marginBottom: theme.spacing(6),
   color: "#00796B",
   [theme.breakpoints.up("sm")]: {
     fontSize: "3rem",
@@ -182,7 +194,10 @@ const LandingPage = () => {
           <BgBlackDiv aria-hidden="true" />
           <ContentWrapperDiv>
             <TextContentDiv>
-              <Title>The Linkup</Title>
+              <TitleContainer>
+                <Logo src={logoSrc} alt="The Linkup Logo" />
+                <Title>The Linkup</Title>
+              </TitleContainer>
 
               {/* Video Section */}
               <VideoContainer>
