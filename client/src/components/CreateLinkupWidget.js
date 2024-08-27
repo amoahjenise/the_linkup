@@ -211,6 +211,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           type="text"
           placeholder="Activity"
           name="activity"
+          autoComplete="off" // Disable autocomplete
           required
         />
         <InputWithIcon>
@@ -218,6 +219,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             type="text"
             placeholder="Location"
             name="location"
+            autoComplete="off" // Disable autocomplete
             required
           />
           <Tooltip
