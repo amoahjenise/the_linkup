@@ -1,9 +1,26 @@
-coverage
-node_modules
-package-lock.json
+# Node Modules
+node_modules/
+client/node_modules/
+server/**/node_modules/
+
+# Environment Files
+.env
+client/.env
+server/**/.env
+
+# Coverage Reports
+coverage/
+
+# Logs
 *.log
+
+# Package Lock
+package-lock.json
+
+# Ignore everything by default
 .*
-!*/*.babelrc.js
+
+# Allow specific dotfiles
 !.dockerignore
 !.editorconfig
 !.eslintignore
@@ -11,6 +28,6 @@ package-lock.json
 !.gitignore
 !.gitlab-ci.yml
 !.npmignore
-!.storybook
 !.npmrc
 !.prettierignore
+!.storybook

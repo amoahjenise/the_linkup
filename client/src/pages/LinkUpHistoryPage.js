@@ -13,6 +13,58 @@ import { getUserLinkups } from "../api/linkUpAPI";
 import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
+import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+
+const PREFIX = "HistoryPage";
+const classes = {
+  widgetSection: `${PREFIX}-widgetSection`,
+  widgetButton: `${PREFIX}-widgetButton`,
+  widgetCloseButton: `${PREFIX}-widgetCloseButton`,
+  slideIn: `${PREFIX}-slideIn`,
+  slideOut: `${PREFIX}-slideOut`,
+};
+
+const StyledDiv = styled("div")(({ theme, colorMode }) => ({
+  [`&.${classes.widgetSection}`]: {
+    flex: "1",
+    overflowY: "auto",
+    overflowX: "hidden",
+    display: "block", // Make sure it's displayed by default
+    [theme.breakpoints.down("sm")]: {
+      position: "fixed",
+      top: 0,
+      right: 0,
+      width: "100%",
+      height: "100vh",
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
+      boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
+      transform: "translateX(100%)",
+      transition: "transform 0.3s ease",
+      zIndex: 2000,
+      overflowY: "auto",
+    },
+  },
+  [`&.${classes.widgetButton}`]: {
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    zIndex: 1100,
+  },
+  [`&.${classes.widgetCloseButton}`]: {
+    position: "absolute",
+    top: "10px",
+    left: "10px", // Position close button on the right side
+    zIndex: 1100,
+    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
+  },
+  [`&.${classes.slideIn}`]: {
+    transform: "translateX(0)",
+  },
+  [`&.${classes.slideOut}`]: {
+    transform: "translateX(100%)",
+  },
+}));
 
 // Styled components
 const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
@@ -20,12 +72,38 @@ const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   width: "100%",
 }));
 
-const HistorySection = styled("div")(({ theme }) => ({
+const HistorySection = styled("div")(({ theme, isFilterBarOpen }) => ({
   flex: 2,
   overflowY: "auto",
   overflowX: "hidden",
   margin: "0 auto",
+  transition: "transform 0.3s ease",
+  transform: isFilterBarOpen ? "translateX(-300px)" : "translateX(0)", // Adjust based on FilterBar width
+  width: "100%", // Full width when FilterBar is hidden
 }));
+
+const FilterBarContainer = styled("div")(
+  ({ theme, isFilterBarOpen, isMobile }) => ({
+    flex: "1",
+    overflowY: "auto",
+    overflowX: "hidden",
+    display: "block", // Make sure it's displayed by default
+    borderLeft: "1px solid #D3D3D3",
+    [theme.breakpoints.down("sm")]: {
+      position: "fixed",
+      top: 0,
+      right: 0,
+      width: "100%",
+      height: "100vh",
+      // backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
+      boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
+      transform: "translateX(100%)",
+      transition: "transform 0.3s ease",
+      zIndex: 2000,
+      overflowY: "auto",
+    },
+  })
+);
 
 const TopBarContainer = styled("div")(({ theme }) => ({
   position: "sticky",
@@ -68,6 +146,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
+  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
 
   const myLinkupsFiltersInitialState = {
     activeStatus: "Active",
@@ -100,7 +179,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   const tabs = [
     {
       id: 0,
-      label: "My Link-Ups",
+      label: "My Linkups",
     },
     { id: 1, label: "Requests Sent" },
     { id: 2, label: "Requests Received" },
@@ -215,7 +294,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   useEffect(() => {
     // Create a filtered array based on the filter criteria
     if (activeTab === 0) {
-      // My Link-Ups
+      // My Linkups
       const filteredLinkups = linkups.list.filter((linkup) => {
         const createdAt = new Date(linkup.created_at);
         const today = new Date();
@@ -332,11 +411,15 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     receivedRequests.list,
   ]);
 
+  const toggleWidget = () => {
+    setIsWidgetVisible(!isWidgetVisible);
+  };
+
   return (
     <LinkupHistoryPageContainer>
       <HistorySection>
         <TopBarContainer>
-          <TopNavBar title="Link-Ups" />
+          <TopNavBar title="Linkups" />
         </TopBarContainer>
         {isLoading ? (
           <LoadingSpinner />
@@ -357,7 +440,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   key={tab.id}
                   label={
                     tab.id === 0
-                      ? `My Link-Ups (${linkups.filteredList.length})`
+                      ? `My Linkups (${linkups.filteredList.length})`
                       : tab.id === 1
                       ? `Sent Requests (${sentRequests.filteredList.length})`
                       : `Received Requests (${receivedRequests.filteredList.length})`
@@ -410,55 +493,138 @@ const LinkUpHistoryPage = ({ isMobile }) => {
           </>
         )}
       </HistorySection>
-      <FilterBar
-        activeTab={activeTab}
-        activeStatus={
-          activeTab === 0
-            ? myLinkupsFilters.activeStatus
-            : activeTab === 1
-            ? sentRequestsFilters.activeStatus
-            : receivedRequestsFilters.activeStatus
-        }
-        onStatusChange={(newStatus) => {
-          if (activeTab === 0) {
-            updateFilters({ activeStatus: newStatus }, true);
-          } else if (activeTab === 1) {
-            setSentRequestsFilters((prevFilters) => ({
-              ...prevFilters,
-              activeStatus: newStatus,
-            }));
-          } else {
-            setReceivedRequestsFilters((prevFilters) => ({
-              ...prevFilters,
-              activeStatus: newStatus,
-            }));
-          }
-        }}
-        dateFilter={
-          activeTab === 0
-            ? myLinkupsFilters.dateFilter
-            : activeTab === 1
-            ? sentRequestsFilters.dateFilter
-            : receivedRequestsFilters.dateFilter
-        }
-        onDateFilterChange={(newDateFilter) => {
-          if (activeTab === 0) {
-            updateFilters({ dateFilter: newDateFilter }, true);
-          } else if (activeTab === 1) {
-            setSentRequestsFilters((prevFilters) => ({
-              ...prevFilters,
-              dateFilter: newDateFilter,
-            }));
-          } else {
-            setReceivedRequestsFilters((prevFilters) => ({
-              ...prevFilters,
-              dateFilter: newDateFilter,
-            }));
-          }
-        }}
-        statusOptions={activeTab === 0 ? statusOptions : requestsStatusOptions}
-      />
-
+      <FilterBarContainer>
+        {!isMobile && (
+          <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
+            <FilterBar
+              isMobile={isMobile}
+              activeTab={activeTab}
+              activeStatus={
+                activeTab === 0
+                  ? myLinkupsFilters.activeStatus
+                  : activeTab === 1
+                  ? sentRequestsFilters.activeStatus
+                  : receivedRequestsFilters.activeStatus
+              }
+              onStatusChange={(newStatus) => {
+                if (activeTab === 0) {
+                  updateFilters({ activeStatus: newStatus }, true);
+                } else if (activeTab === 1) {
+                  setSentRequestsFilters((prevFilters) => ({
+                    ...prevFilters,
+                    activeStatus: newStatus,
+                  }));
+                } else {
+                  setReceivedRequestsFilters((prevFilters) => ({
+                    ...prevFilters,
+                    activeStatus: newStatus,
+                  }));
+                }
+              }}
+              dateFilter={
+                activeTab === 0
+                  ? myLinkupsFilters.dateFilter
+                  : activeTab === 1
+                  ? sentRequestsFilters.dateFilter
+                  : receivedRequestsFilters.dateFilter
+              }
+              onDateFilterChange={(newDateFilter) => {
+                if (activeTab === 0) {
+                  updateFilters({ dateFilter: newDateFilter }, true);
+                } else if (activeTab === 1) {
+                  setSentRequestsFilters((prevFilters) => ({
+                    ...prevFilters,
+                    dateFilter: newDateFilter,
+                  }));
+                } else {
+                  setReceivedRequestsFilters((prevFilters) => ({
+                    ...prevFilters,
+                    dateFilter: newDateFilter,
+                  }));
+                }
+              }}
+              statusOptions={
+                activeTab === 0 ? statusOptions : requestsStatusOptions
+              }
+            />
+          </StyledDiv>
+        )}
+        {isMobile && (
+          <>
+            <IconButton
+              className={classes.widgetButton}
+              onClick={toggleWidget}
+              color="primary"
+            >
+              <MenuIcon />
+            </IconButton>
+            <StyledDiv
+              className={`${classes.widgetSection} ${
+                isWidgetVisible ? classes.slideIn : classes.slideOut
+              }`}
+              colorMode={colorMode}
+            >
+              <IconButton
+                className={classes.widgetCloseButton}
+                onClick={toggleWidget}
+              >
+                <CloseIcon />
+              </IconButton>
+              <FilterBar
+                isMobile={isMobile}
+                activeTab={activeTab}
+                activeStatus={
+                  activeTab === 0
+                    ? myLinkupsFilters.activeStatus
+                    : activeTab === 1
+                    ? sentRequestsFilters.activeStatus
+                    : receivedRequestsFilters.activeStatus
+                }
+                onStatusChange={(newStatus) => {
+                  if (activeTab === 0) {
+                    updateFilters({ activeStatus: newStatus }, true);
+                  } else if (activeTab === 1) {
+                    setSentRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      activeStatus: newStatus,
+                    }));
+                  } else {
+                    setReceivedRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      activeStatus: newStatus,
+                    }));
+                  }
+                }}
+                dateFilter={
+                  activeTab === 0
+                    ? myLinkupsFilters.dateFilter
+                    : activeTab === 1
+                    ? sentRequestsFilters.dateFilter
+                    : receivedRequestsFilters.dateFilter
+                }
+                onDateFilterChange={(newDateFilter) => {
+                  if (activeTab === 0) {
+                    updateFilters({ dateFilter: newDateFilter }, true);
+                  } else if (activeTab === 1) {
+                    setSentRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      dateFilter: newDateFilter,
+                    }));
+                  } else {
+                    setReceivedRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      dateFilter: newDateFilter,
+                    }));
+                  }
+                }}
+                statusOptions={
+                  activeTab === 0 ? statusOptions : requestsStatusOptions
+                }
+              />
+            </StyledDiv>
+          </>
+        )}
+      </FilterBarContainer>
       {isEditing && (
         <EditLinkupModal
           open={isEditModalOpen}

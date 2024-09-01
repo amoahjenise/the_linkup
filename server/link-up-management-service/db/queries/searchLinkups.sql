@@ -14,14 +14,14 @@ INNER JOIN users ON link_ups.creator_id = users.id
 CROSS JOIN active_linkups
 WHERE
   (
-    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1)
-    AND link_ups.status = 'active' -- Specify the table name for status
+    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1 OR location ILIKE $1)
+    AND link_ups.status = 'active'
     AND (gender_preference = $2 OR gender_preference = 'any')
   )
   OR
   (
-    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1)
-    AND link_ups.status = 'active' -- Specify the table name for status
+    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1 OR location ILIKE $1)
+    AND link_ups.status = 'active'
     AND creator_id = $3::uuid
   )
 ORDER BY link_ups.created_at DESC;

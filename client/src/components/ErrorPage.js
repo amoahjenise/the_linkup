@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
-import Logo from "../logo.png"; // Import the logo image
+import Logo from "../assets/logo.png"; // Import the logo image
 import { useColorMode } from "@chakra-ui/react";
 
 // Define styled components
@@ -46,7 +46,7 @@ const ErrorPage = ({ onRetry }) => {
 
   return (
     <ErrorContainer>
-      <LogoImage src={Logo} alt="LUUL Logo" />
+      <LogoImage src={Logo} alt="The Linkup Logo" />
       <ErrorMessage>Oops! Something went wrong.</ErrorMessage>
       <ErrorDescription>
         We're sorry, but we couldn't fetch the data from our servers.

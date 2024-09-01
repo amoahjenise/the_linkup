@@ -1,8 +1,13 @@
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
+import {
+  requestNotificationPermission,
+  showNotification,
+} from "../utils/notificationUtils";
+import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
 const SocketContext = createContext();
 
@@ -37,41 +42,39 @@ export const SocketProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    // Disconnect sockets if userId changes
-    return () => {
-      linkupManagementSocket.disconnect();
-      linkupRequestSocket.disconnect();
-      if (process.env.NODE_ENV === "development") {
-        console.log("Sockets disconnected due to userId change.");
-      }
-    };
-  }, [linkupManagementSocket, linkupRequestSocket, userId]);
+    requestNotificationPermission(); // Request notification permission on mount
 
-  useEffect(() => {
-    linkupManagementSocket.on("linkupCreated", (newLinkup) => {
-      // Handle new linkup created
+    linkupManagementSocket.on("linkupCreated", (data) => {
+      if (data.linkup.creator_id === userId) return;
+      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
+    });
+
+    linkupManagementSocket.on("linkupDeleted", (data) => {
+      if (data.linkup.creator_id === userId) return;
+      // dispatch(showUpdateFeedButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupExpired", (data) => {
       addSnackbar(data.message, { timeout: 7000 });
+      showNotification("Linkup Expired", data.message);
     });
 
     linkupRequestSocket.on("new-linkup-request", (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
+      showNotification("New Linkup Request", notification.content);
     });
 
     linkupRequestSocket.on("request-accepted", (notification) => {
-      console.log("request-accepted client side");
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
+      showNotification("Request Accepted", notification.content);
     });
 
     linkupRequestSocket.on("request-declined", (notification) => {
-      console.log("request-declined client side");
-
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
+      showNotification("Request Declined", notification.content);
     });
 
     return () => {

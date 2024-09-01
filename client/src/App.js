@@ -22,6 +22,7 @@ import {
   SettingsPage,
   PrivacyPolicyPage,
   CookieUsePage,
+  UserDataDeletionPage,
 } from "./pages";
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
@@ -45,6 +46,7 @@ const publicPages = [
   "/terms-of-service",
   "/privacy-policy",
   "/cookie-use",
+  "/data-deletion-instructions",
 ];
 
 // Define AppWrapper with conditional styling
@@ -68,6 +70,10 @@ const RoutesComponent = ({ isMobile, locationState }) => (
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
     <Route path="/cookie-use" element={<CookieUsePage />} />
     <Route
+      path="/data-deletion-instructions"
+      element={<UserDataDeletionPage />}
+    />
+    <Route
       path="/home"
       element={
         locationState.allow_location &&
@@ -80,6 +86,17 @@ const RoutesComponent = ({ isMobile, locationState }) => (
           <></>
         )
       }
+      // element={
+      //   locationState.allow_location &&
+      //   locationState.city &&
+      //   locationState.country ? (
+      //     <HomePage isMobile={isMobile} />
+      //   ) : locationState ? (
+      //     <Geolocation />
+      //   ) : (
+      //     <></>
+      //   )
+      // }
     />
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route
@@ -189,7 +206,7 @@ const App = () => {
           updateUnreadNotificationsCount(Number(notificationsCount.unreadCount))
         );
       } catch (error) {
-        console.error("Error during user data fetch:", error);
+        console.error("Error during user data fetch.", error);
       }
     };
     fetchData();

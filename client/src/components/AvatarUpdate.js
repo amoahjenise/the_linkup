@@ -26,9 +26,14 @@ const CameraIconButton = styled(IconButton)(
     right: 0,
     background: "#fff",
     borderRadius: "50%",
-    padding: theme.spacing(0.5),
+    padding: theme.spacing(1), // Adjust padding to center the icon
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
     display: isLoggedUserProfile ? "block" : "none",
+    width: theme.spacing(6), // Adjust width and height to create a perfect circle
+    height: theme.spacing(6),
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   })
 );
 
@@ -95,7 +100,7 @@ const AvatarUpdate = ({
             onClick={handleClick}
             size="large"
           >
-            <PhotoCameraIcon />
+            <PhotoCameraIcon fontSize="small" />
           </CameraIconButton>
         </>
       )}

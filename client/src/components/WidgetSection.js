@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import SearchInput from "./SearchInputWidget";
-import RefreshFeedWidget from "./RefreshFeedWidget";
+import WhatWouldYouLikeWidget from "./WhatWouldYouLikeWidget";
 import CreateLinkupForm from "./CreateLinkupWidget";
 import { styled } from "@mui/material/styles";
 import { searchLinkups } from "../api/linkUpAPI";
@@ -16,14 +16,14 @@ const WidgetSectionContainer = styled("div")(({ theme }) => ({
 }));
 
 const Widget = styled("div")(({ theme }) => ({
-  width: "100%",
-  marginBottom: theme.spacing(4), // Spacing between widgets
+  width: "95%",
+  marginBottom: theme.spacing(2), // Spacing between widgets
 }));
 
 const WidgetSection = ({
   setShouldFetchLinkups,
   scrollToTopCallback,
-  onRefreshClick,
+  onSubmitSuggestion,
   userId,
   gender,
 }) => {
@@ -60,9 +60,9 @@ const WidgetSection = ({
         <SearchInput handleInputChange={handleInputChange} />
       </Widget>
 
-      {/* Refresh Feed Component */}
+      {/* What would you like Component */}
       <Widget>
-        <RefreshFeedWidget onRefreshClick={onRefreshClick} />
+        <WhatWouldYouLikeWidget onSubmitSuggestion={onSubmitSuggestion} />
       </Widget>
 
       {/* Create Linkup Component */}

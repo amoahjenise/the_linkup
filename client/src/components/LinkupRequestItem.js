@@ -176,6 +176,24 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
     }
   };
 
+  const getPaymentOptionText = () => {
+    const subject = isMyLinkup ? "You" : post.creator_name;
+    switch (post.payment_option) {
+      case "split":
+        return `${subject} would like to split the bill for this activity.`;
+      case "pleasePay":
+        return `${subject} would like ${
+          isMyLinkup ? "the requester" : "you"
+        } to pay for this activity.`;
+      case "iWillPay":
+        return `${subject} ${
+          isMyLinkup ? "are" : "is"
+        } willing to pay the bill for this activity.`;
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     setIsMyLinkup(userId === post.creator_id);
   }, [post.creator_id, userId]);
@@ -194,12 +212,17 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         />
         <div>
           <RequestText>{renderLinkupItemText()}</RequestText>
-          {isMyLinkup ||
-            (post.status === "accepted" && (
-              <Typography variant="subtitle2" component="details">
-                <span>{post.location}</span>
-              </Typography>
-            ))}
+          {/* {isMyLinkup ||
+            (post.status === "accepted" && ( */}
+          <Typography variant="subtitle2" component="details">
+            <Typography variant="subtitle2" component="span" display="block">
+              Location: {post.location}
+            </Typography>
+            <Typography variant="subtitle2" component="span" display="block">
+              {getPaymentOptionText()}
+            </Typography>
+          </Typography>
+          {/* ))} */}
         </div>
       </div>
       <div>

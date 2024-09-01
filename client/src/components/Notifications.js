@@ -11,7 +11,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
 import { Typography } from "@mui/material";
-import { NotificationsNoneOutlined } from "@mui/icons-material";
 import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
 
 // Define styled components
@@ -34,19 +33,6 @@ const NoNotificationsContainer = styled("div")(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   boxShadow: theme.shadows[3],
 }));
-
-const NoNotificationsText = styled(Typography)(({ theme }) => ({
-  fontSize: "1.2rem",
-  textAlign: "center",
-  padding: "10px",
-  backgroundColor: "rgba(200, 200, 200, 0.1)",
-  borderRadius: "8px",
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-}));
-
-const Icon = styled("div")({
-  marginRight: "4px",
-});
 
 const Notifications = () => {
   const dispatch = useDispatch();

@@ -60,7 +60,7 @@ const StyledChip = styled(Chip)(({ theme, status }) => {
 });
 
 const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
-  const [menuAnchor, setMenuAnchor] = useState(null); // Added back menuAnchor
+  const [menuAnchor, setMenuAnchor] = useState(null);
 
   const {
     creator_id,
@@ -71,6 +71,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
     location,
     date,
     status,
+    payment_option,
   } = linkup;
 
   const formattedLocation = location
@@ -105,6 +106,19 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
         return <CancelOutlined />;
       default:
         return null;
+    }
+  };
+
+  const getPaymentOptionText = () => {
+    switch (payment_option) {
+      case "split":
+        return `You would like to split the bill for this activity.`;
+      case "pleasePay":
+        return `You would like the requester to pay for this activity.`;
+      case "iWillPay":
+        return `You are willing to pay the bill for this activity.`;
+      default:
+        return "";
     }
   };
 
@@ -178,7 +192,12 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
         />
       </LinkupDetails>
       <Typography variant="subtitle2" component="details">
-        <span>{formattedLocation}</span>
+        <Typography variant="subtitle2" component="span" display="block">
+          Location: {formattedLocation}
+        </Typography>
+        <Typography variant="subtitle2" component="span" display="block">
+          {getPaymentOptionText()}
+        </Typography>
       </Typography>
     </LinkupHistoryItemWrapper>
   );

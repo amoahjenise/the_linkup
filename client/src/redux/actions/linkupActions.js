@@ -7,7 +7,13 @@ import {
   UPDATE_LINKUP_SUCCESS,
   UPDATE_LINKUP_FAILURE,
   UPDATE_LINKUP_LIST,
+  SHOW_NEW_LINKUP_BUTTON
 } from "./actionTypes";
+
+export const showNewLinkupButton = (show) => ({
+  type: SHOW_NEW_LINKUP_BUTTON,
+  payload: show,
+});
 
 export const updateLinkupSuccess = (updatedLinkup) => ({
   type: UPDATE_LINKUP_SUCCESS,

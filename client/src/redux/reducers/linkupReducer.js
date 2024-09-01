@@ -5,11 +5,13 @@ import {
   SET_IS_LOADING,
   UPDATE_LINKUP_LIST,
   MARK_LINKUPS_AS_EXPIRED_SUCCESS,
+  SHOW_NEW_LINKUP_BUTTON,
 } from "../actions/actionTypes";
 
 const initialState = {
   linkupList: [],
   isLoading: false,
+  showNewLinkupButton: false,
   successMessage: "",
   error: "",
 };
@@ -36,7 +38,12 @@ const linkupsReducer = (state = initialState, action) => {
       return {
         ...state,
         linkupList: action.payload, // Update the link-up list with the new data
-        successMessage: "Link-ups marked as expired!",
+        successMessage: "Linkups marked as expired!",
+      };
+    case SHOW_NEW_LINKUP_BUTTON:
+      return {
+        ...state,
+        showNewLinkupButton: action.payload,
       };
     default:
       return state;

@@ -28,7 +28,7 @@ const createNewConversation = async (req, res) => {
 
   try {
     // Insert into conversations and get the conversation_id
-    const { rows } = await pool.query( 
+    const { rows } = await pool.query(
       queryConversation,
       queryValuesConversation
     );
@@ -93,7 +93,7 @@ const getLinkupByConversation = async (req, res) => {
 
     // Execute the SQL query using your database connection pool
     const { rows } = await pool.query(query, queryValues);
-
+    console.log(rows[0]);
     if (rows.length > 0) {
       res.json({
         success: true,

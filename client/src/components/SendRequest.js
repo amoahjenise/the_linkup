@@ -35,6 +35,7 @@ const LinkUpInfo = styled("div")(({ theme }) => ({
 
 const StyledTextField = styled(TextField)(({ theme, textColor }) => ({
   marginBottom: theme.spacing(2),
+  width: "90%",
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
       borderColor: "#D3D3D3",
@@ -47,7 +48,7 @@ const StyledTextField = styled(TextField)(({ theme, textColor }) => ({
     },
   },
   "& .MuiInputLabel-root": {
-    color: textColor,
+    color: "#B0B0B0", // Lighter gray color for label
   },
   "& .MuiInputBase-input": {
     color: textColor,
@@ -138,7 +139,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         post.creator_id,
         linkupId,
         message,
-        channelUrl
+        channelUrl,
       );
 
       if (sendMessageResponse.message_id) {

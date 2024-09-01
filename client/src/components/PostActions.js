@@ -7,6 +7,7 @@ import {
   faHeart,
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
+import { useSnackbar } from "../contexts/SnackbarContext";
 
 const Root = styled("div")({
   display: "flex",
@@ -14,7 +15,7 @@ const Root = styled("div")({
 
 const ActionButton = styled("div")({
   fontSize: "14px",
-  margin: "0 20px",
+  margin: "0 10px",
   cursor: "pointer",
   "&:hover": {
     textDecoration: "underline",
@@ -37,6 +38,8 @@ const Icon = styled(FontAwesomeIcon)({
 });
 
 const PostActions = ({ onRequestClick, disableRequest }) => {
+  const { addSnackbar } = useSnackbar();
+
   // Handle the request click event
   const handleRequestClick = () => {
     // Call the onRequestClick function when the request icon is clicked
@@ -61,34 +64,33 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
       </RequestButton>
 
       {/* Uncomment and add more action buttons if needed */}
-      {/* 
+
       <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Like"
         role="button"
         tabIndex="1"
+        onClick={() => {
+          addSnackbar("Like feature coming soon!");
+        }}
       >
-        <Icon
-          icon={faHeart}
-          style={{ color: "red" }}
-        />
+        <Icon icon={faHeart} style={{ color: "red" }} />
         Like
       </ActionButton>
       <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
-        aria-label="Share post"
+        aria-label="Share"
         role="button"
         tabIndex="2"
+        onClick={() => {
+          addSnackbar("Share post feature coming soon!");
+        }}
       >
-        <Icon
-          icon={faShare}
-          style={{ color: "blue" }}
-        />
-        Share Post
+        <Icon icon={faShare} style={{ color: "blue" }} />
+        Share
       </ActionButton>
-      */}
     </Root>
   );
 };

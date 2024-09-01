@@ -106,7 +106,7 @@ const RegistrationProcess = () => {
     checkRegistrationStatus();
   }, [registrationData.isRegistering, userData, user.id, dispatch, navigate]);
 
-  const handleLaunchLuul = async () => {
+  const handleLaunchingLinkup = async () => {
     try {
       const response = await updateUser({
         user: { ...userData, clerkUserId: user.id },
@@ -133,11 +133,11 @@ const RegistrationProcess = () => {
   const pageTitles = [
     "Welcome! First things first...",
     "Now it’s time to upload a photo!",
-    "You've completed the registration, you can start using LUUL!",
+    "You've completed the registration, you can start using The Linkup!",
   ];
 
   const pageSubTitles = [
-    "This is how you’ll appear on LUUL. You won't be able to change this later.",
+    "This is how you’ll appear on The Linkup. You won't be able to change this later.",
     "Let's add your first picture to display on your profile.",
     "",
   ];
@@ -183,7 +183,7 @@ const RegistrationProcess = () => {
             color="primary"
             onClick={
               registrationData.currentStep === 2
-                ? handleLaunchLuul
+                ? handleLaunchingLinkup
                 : handleNextStep
             }
             disabled={
@@ -193,7 +193,9 @@ const RegistrationProcess = () => {
             }
             colorMode={colorMode}
           >
-            {registrationData.currentStep === 2 ? "Launch LUUL" : "Continue"}
+            {registrationData.currentStep === 2
+              ? "Launch The Linkup"
+              : "Continue"}
           </ContinueButton>
         </ButtonContainer>
       </div>

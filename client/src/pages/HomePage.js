@@ -9,6 +9,8 @@ import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { IconButton } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import { useColorMode } from "@chakra-ui/react";
+import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -22,7 +24,7 @@ const classes = {
   slideOut: `${PREFIX}-slideOut`,
 };
 
-const StyledDiv = styled("div")(({ theme }) => ({
+const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.homePage}`]: {
     display: "flex",
     width: "100%",
@@ -32,7 +34,7 @@ const StyledDiv = styled("div")(({ theme }) => ({
     flex: "2",
     overflowY: "auto",
     borderRightWidth: "1px",
-    borderRightColor: "#D3D3D3",
+    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3", // Adjust border color based on mode
     [theme.breakpoints.down("sm")]: {
       flex: "1",
     },
@@ -42,17 +44,18 @@ const StyledDiv = styled("div")(({ theme }) => ({
     overflowY: "auto",
     overflowX: "hidden",
     display: "block", // Make sure it's displayed by default
+
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
-      top: "64px",
+      top: 0,
       right: 0,
       width: "100%",
-      height: "calc(100vh - 64px)",
-      backgroundColor: theme.palette.mode === "dark" ? "black" : "white",
+      height: "100vh",
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
-      zIndex: 1000,
+      zIndex: 2000,
       overflowY: "auto",
     },
   },
@@ -65,9 +68,9 @@ const StyledDiv = styled("div")(({ theme }) => ({
   [`&.${classes.widgetCloseButton}`]: {
     position: "absolute",
     top: "10px",
-    left: "10px",
+    left: "10px", // Position close button on the right side
     zIndex: 1100,
-    color: theme.palette.mode === "dark" ? "white" : "black",
+    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
   },
   [`&.${classes.slideIn}`]: {
     transform: "translateX(0)",
@@ -100,14 +103,18 @@ const HomePage = ({ isMobile }) => {
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
+  const { colorMode } = useColorMode();
 
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
       setIsFetchingNextPage(true);
       try {
         if (!userId) return;
+
         const adjustedPage = page - 1;
         const sqlOffset = adjustedPage * PAGE_SIZE;
+
+        // Fetch linkups from the API
         const response = await getLinkups(
           userId,
           gender,
@@ -116,13 +123,19 @@ const HomePage = ({ isMobile }) => {
           latitude,
           longitude
         );
+
         if (response.success) {
+          // Filter only active linkups
           const activeLinkups = response.linkupList.filter(
             (linkup) => linkup.status === "active"
           );
+
+          // Update the linkup list based on whether it's the first page or subsequent pages
           const updatedLinkupList =
             page === 1 ? activeLinkups : [...linkupList, ...activeLinkups];
-          const newLinkups = updatedLinkupList.filter(
+
+          // Filter out any old linkups and update only with newer data
+          const newLinkups = activeLinkups.filter(
             (newLinkup) =>
               !fetchedLinkupIds.includes(newLinkup.id) ||
               updatedLinkupList.some(
@@ -132,10 +145,16 @@ const HomePage = ({ isMobile }) => {
                     new Date(existingLinkup.updated_at)
               )
           );
+
+          // Sort the updated list by creation date, descending
           updatedLinkupList.sort(
             (a, b) => new Date(b.created_at) - new Date(a.created_at)
           );
+
+          // Dispatch updated linkups to Redux store
           dispatch(fetchLinkupsSuccess(updatedLinkupList));
+
+          // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
           const newFetchedLinkupIds = newLinkups.map((linkup) => linkup.id);
           setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
@@ -145,9 +164,8 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
-        setTimeout(() => {
-          setIsFetchingNextPage(false);
-        }, 300);
+        // Ensure fetching state is reset
+        setIsFetchingNextPage(false);
       }
     },
     [
@@ -191,6 +209,7 @@ const HomePage = ({ isMobile }) => {
 
   const fetchLinkupRequests = useCallback(async () => {
     try {
+      dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
       if (!userId) return;
       const response = await getLinkupRequests(userId);
       if (response.success) {
@@ -208,9 +227,10 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
+    dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
     fetchLinkupsAndPoll(1);
     scrollToTop();
-  }, [fetchLinkupsAndPoll]);
+  }, [dispatch, fetchLinkupsAndPoll]);
 
   const scrollToTop = () => {
     if (feedSectionRef.current) {
@@ -223,16 +243,17 @@ const HomePage = ({ isMobile }) => {
   };
 
   return (
-    <StyledDiv className={classes.homePage}>
+    <StyledDiv className={classes.homePage} colorMode={colorMode}>
       <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
         <FeedSection
           linkupList={linkupList}
           isLoading={isFetchingNextPage}
           setShouldFetchLinkups={setShouldFetchLinkups}
+          onRefreshClick={refreshLinkups}
         />
       </StyledDiv>
       {!isMobile && (
-        <StyledDiv className={classes.widgetSection}>
+        <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
           <WidgetSection
             setShouldFetchLinkups={setShouldFetchLinkups}
             scrollToTopCallback={scrollToTop}
@@ -255,6 +276,7 @@ const HomePage = ({ isMobile }) => {
             className={`${classes.widgetSection} ${
               isWidgetVisible ? classes.slideIn : classes.slideOut
             }`}
+            colorMode={colorMode}
           >
             <IconButton
               className={classes.widgetCloseButton}

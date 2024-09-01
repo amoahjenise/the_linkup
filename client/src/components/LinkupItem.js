@@ -10,6 +10,9 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkUpAPI";
 import { IoReceipt } from "react-icons/io5";
 import nlp from "compromise";
+import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
+import EmojiTooltip from "./EmojiTooltip";
+import { Tooltip } from "@mui/material";
 
 const compromise = nlp;
 
@@ -24,23 +27,25 @@ const Container = styled("div")(({ theme }) => ({
   borderBottom: "1px solid #D3D3D3",
 }));
 
-const CardContainer = styled("div")(({ theme }) => ({
-  border: "1px solid #d2d6dc",
-  padding: "2rem",
+const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
+  border: `1px solid ${
+    colorMode === "light" ? "#d2d6dc" : "rgba(229, 235, 243, 0.2)"
+  }`,
+  padding: "1.5rem",
   borderRadius: "0.375rem",
   width: "32rem",
-  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  backgroundColor:
+    colorMode === "light"
+      ? "rgba(255, 255, 255, 1)"
+      : "rgba(130, 131, 129, 0.12)",
   cursor: "pointer",
   overflow: "hidden",
-  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
+  boxShadow: isHovered
+    ? colorMode === "light"
+      ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
+      : "0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7)"
+    : "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
   transition: "box-shadow 0.2s ease",
-  "&:hover": {
-    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-  },
-}));
-
-const HighlightedCard = styled(CardContainer)(({ theme }) => ({
-  backgroundColor: "rgba(200, 200, 200, 0.2)",
 }));
 
 const HorizontalMenuContainer = styled("div")(({ theme }) => ({
@@ -72,10 +77,28 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   marginLeft: "4px",
 }));
 
-const PostContent = styled("p")(({ theme }) => ({
-  fontSize: "0.95rem",
-  lineHeight: "1.25rem",
+const PostContent = styled("div")(({ theme, colorMode }) => ({
   marginTop: "1rem",
+  lineHeight: "1rem",
+  // Date/Time style
+  "& div:first-of-type": {
+    fontWeight: "600", // semi bold
+    color: colorMode === "light" ? "#616871" : "#c3c4c4",
+  },
+  // Post Text style
+  "& p": {
+    marginTop: "6px",
+    lineHeight: "1.5rem",
+    fontWeight: "500", // semi bold
+    color: colorMode === "light" ? "#282b2e" : "white",
+  },
+  // Location style
+  "& div:last-of-type": {
+    marginTop: "5px",
+    fontWeight: "500", // semi bold
+    fontSize: "0.95rem", // smaller font
+    color: colorMode === "light" ? "#282b2e" : "white",
+  },
 }));
 
 const PostInfo = styled("div")(({ theme }) => ({
@@ -83,7 +106,6 @@ const PostInfo = styled("div")(({ theme }) => ({
   alignItems: "center",
   fontSize: "0.9rem",
   color: "#718096",
-  marginTop: "0.25rem",
 }));
 
 const OnlineIndicator = styled("span")(({ theme }) => ({
@@ -102,7 +124,21 @@ const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
   display: "inline-block",
 }));
 
+const formatDate = (date) => moment(date).format("ddd, MMM DD - h:mm A z");
+
+const capitalizeLocation = (location) =>
+  location
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const capitalizeFirstLetter = (string) => {
+  if (!string) return "";
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
+  const { colorMode } = useColorMode(); // Use useColorMode hook
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [distance, setDistance] = useState(null);
@@ -117,6 +153,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     avatar,
     latitude,
     longitude,
+    location,
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
@@ -167,46 +204,45 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     switch (linkupItem.payment_option) {
       case "split":
         return (
-          <span
-            title="Lets split the bill!"
-            role="img"
-            aria-label="split the bill"
-            style={{ fontSize: "30px" }}
-          >
-            <PaymentOptionIcon>
-              <IoReceipt />
-              <IoReceipt />
-            </PaymentOptionIcon>
-          </span>
-        );
-      case "iWillPay":
-        return (
-          <span
-            title="I'll pay!"
-            role="img"
-            aria-label="i'll pay"
-            style={{ fontSize: "30px" }}
-          >
-            <PaymentOptionIcon>
-              <IoReceipt />
-            </PaymentOptionIcon>
-          </span>
-        );
-      case "pleasePay":
-        return (
-          <PaymentOptionIconContainer>
+          <Tooltip title="Lets split the bill!">
             <span
-              title="Please pay"
               role="img"
-              aria-label="watery eyes"
+              aria-label="split the bill"
               style={{
-                fontSize: "20px",
+                fontSize: "30px",
                 fontFamily:
                   "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
               }}
             >
-              🥹
+              <PaymentOptionIcon>
+                <IoReceipt />
+                <IoReceipt />
+              </PaymentOptionIcon>
             </span>
+          </Tooltip>
+        );
+      case "iWillPay":
+        return (
+          <Tooltip title="I'll pay!">
+            <span
+              role="img"
+              aria-label="i'll pay"
+              style={{
+                fontSize: "30px",
+                fontFamily:
+                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+              }}
+            >
+              <PaymentOptionIcon>
+                <IoReceipt />
+              </PaymentOptionIcon>
+            </span>{" "}
+          </Tooltip>
+        );
+      case "pleasePay":
+        return (
+          <PaymentOptionIconContainer>
+            <EmojiTooltip />
           </PaymentOptionIconContainer>
         );
       default:
@@ -247,30 +283,23 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     const startsWithVerb = doc.verbs().length > 0;
     const isVerbEndingWithIng = activity.endsWith("ing");
 
-    let activityText = "";
+    let activityFormatted = "";
 
     if (activity) {
       if (isVerbEndingWithIng) {
-        activityText = `for ${activity}`;
+        activityFormatted = `for ${activity}`;
       } else {
-        activityText = `${startsWithVerb ? "to" : "for"} ${activity}`;
+        activityFormatted = `${startsWithVerb ? "to" : "for"}  ${activity}`;
       }
     }
 
-    const dateText = date ? `${moment(date).format("MMM DD, YYYY")}` : "";
-    const timeText = date ? `(${moment(date).format("h:mm A")})` : "";
-
     return (
-      <span>
+      <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
-          <strong>{creator_name}</strong>
+          {creator_name}
         </Link>{" "}
-        is trying to link up <strong>{activityText}</strong> on{" "}
-        <strong>
-          {dateText} {timeText}
-        </strong>
-        .
-      </span>
+        is trying to link up {activityFormatted}.
+      </p>
     );
   };
 
@@ -305,6 +334,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   return (
     <Container>
       <CardContainer
+        isHovered={isHovered}
+        colorMode={colorMode}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -316,8 +347,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 name: creator_name,
                 avatar: avatar,
               }}
-              width="50px"
-              height="50px"
+              width="60px"
+              height="60px"
             />
             <div>
               <UserName>{creator_name}</UserName>
@@ -348,7 +379,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
           </HorizontalMenuContainer>
         </UserInfo>
 
-        <PostContent>{renderLinkupItemText()}</PostContent>
+        <PostContent colorMode={colorMode}>
+          <div>{formatDate(date)}</div>
+          {renderLinkupItemText()}
+          <div>{capitalizeLocation(location)}</div>
+        </PostContent>
         <PostActionsContainer>
           {loggedUser.user.id !== linkupItem.creator_id && (
             <div>

@@ -52,7 +52,7 @@ const updateExpiredLinkups = async (io) => {
       console.log("Expired linkups updated successfully");
     }
   } catch (error) {
-    console.error("Error updating link-ups:", error);
+    console.error("Error updating linkups:", error);
   }
 };
 

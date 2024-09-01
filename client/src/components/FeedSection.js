@@ -5,6 +5,7 @@ import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import LoadingSpinner from "./LoadingSpinner";
 import { styled } from "@mui/material/styles";
+import NewLinkupButton from "./NewLinkupButton";  // Your new component
 
 const Root = styled("div")({
   position: "relative",
@@ -17,8 +18,9 @@ const LoadingContainer = styled("div")({
   minHeight: "100vh",
 });
 
-const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
+const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups, onRefreshClick }) => {
   const userSentRequests = useSelector((state) => state.userSentRequests);
+  const showNewLinkupButton = useSelector((state) => state.linkups.showNewLinkupButton);
 
   return (
     <Root>
@@ -42,6 +44,9 @@ const FeedSection = ({ linkupList, isLoading, setShouldFetchLinkups }) => {
                 )}
               />
             ))
+          )}
+          {showNewLinkupButton && (
+            <NewLinkupButton onClick={onRefreshClick} />
           )}
         </div>
       )}

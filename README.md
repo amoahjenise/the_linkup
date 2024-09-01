@@ -2,9 +2,9 @@ Certainly! Here's the updated documentation with the changes you requested:
 
 ---
 
-# luul
+# The Linkup
 
-LUUL React App Repository
+The Linkup React App Repository
 
 ---
 
@@ -70,28 +70,28 @@ For any inquiries, contributions, or support requests, please refer to the docum
 14. [Testing Scenarios](#testing-scenarios)
     - [User Registration](#user-registration)
     - [Enabling Location Sharing](#enabling-location-sharing)
-    - [Creating a Link-Up](#creating-a-link-up)
-    - [Editing a Link-Up](#editing-a-link-up)
+    - [Creating a Linkup](#creating-a-linkup)
+    - [Editing a Linkup](#editing-a-linkup)
     - [Refreshing the Feed](#refreshing-the-feed)
-    - [Searching for a Link-Up](#searching-for-a-link-up)
-    - [Deleting a Link-Up](#deleting-a-link-up)
-    - [Closing a Link-Up](#closing-a-link-up)
-    - [Accessing Link-Up History](#accessing-link-up-history)
+    - [Searching for a Linkup](#searching-for-a-linkup)
+    - [Deleting a Linkup](#deleting-a-linkup)
+    - [Closing a Linkup](#closing-a-linkup)
+    - [Accessing Linkup History](#accessing-linkup-history)
     - [Profile Page Actions](#profile-page-actions)
-    - [Interacting with Link-Ups](#interacting-with-link-ups)
+    - [Interacting with Linkups](#interacting-with-linkups)
     - [Handling Requests](#handling-requests)
     - [Account Management](#account-management)
-    - [Link-Up History Filters](#link-up-history-filters)
+    - [Linkup History Filters](#linkup-history-filters)
     - [Notifications](#notifications)
     - [Signing Out and Signing In](#signing-out-and-signing-in)
-    - [Link-Up Location Visibility](#link-up-location-visibility)
+    - [Linkup Location Visibility](#linkup-location-visibility)
     -
 
 ## Authentication
 
 ### Introduction
 
-The recent update to the LUUL React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
+The recent update to the The Linkup React App repository introduces the integration of Clerk for authentication. Clerk provides robust authentication services, enhancing the security and user experience of the application. Additionally, webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database.
 
 ### Integration with Clerk for Authentication
 
@@ -107,7 +107,7 @@ The integration with Clerk for authentication enhances the user authentication p
 
 Webhooks have been implemented to synchronize user creation and deletion events with the PostgreSQL database. This ensures that user data remains consistent across the application. The webhook implementation involves:
 
-1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in luul/server/auth-service/index.js, while the implementation for managing user deletion can be found in luul/server/user-management-service/index.js.
+1. **Webhook Endpoint Setup**: Webhook endpoints have been set up in the backend server to receive user creation and deletion events from Clerk.The implementation for webhook endpoints for user creation can be found in The Linkup/server/auth-service/index.js, while the implementation for managing user deletion can be found in The Linkup/server/user-management-service/index.js.
 
 2. **Verification and Event Handling**: Upon receiving webhook payloads, the application verifies the authenticity of the payloads and handles user creation and deletion events accordingly. User data is stored or removed from the PostgreSQL database based on the received events.
 
@@ -117,9 +117,9 @@ The client-side of the application has been updated to handle user authenticatio
 
 ### Conclusion
 
-The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the LUUL React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
+The integration of Clerk for authentication and the implementation of webhooks for user management enhance the security and functionality of the The Linkup React App. Users can now authenticate securely and seamlessly, while user data remains synchronized with the PostgreSQL database in real-time.
 
-For detailed implementation and code examples, please refer to the updated documentation and codebase available in the LUUL React App repository.
+For detailed implementation and code examples, please refer to the updated documentation and codebase available in the The Linkup React App repository.
 
 ## Linkup Creation and Management
 
@@ -260,7 +260,7 @@ interfaces while keeping the data accessible for potential reactivation.
 
 ## Search Functionality
 
-The search functionality in the LUUL React App allows users to search for linkup events based on specific criteria such as activity type, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
+The search functionality in the The Linkup React App allows users to search for linkup events based on specific criteria such as activity type, creator name, date/time, and payment option. This feature enhances user experience by enabling quick and efficient discovery of relevant linkup events.
 
 Implementation Details
 Client-Side Integration:
@@ -300,7 +300,7 @@ Users can refine their search queries by adjusting the input parameters in the S
 Refining search queries allows users to find more specific or relevant linkup events.
 
 Conclusion
-The search functionality in the LUUL React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
+The search functionality in the The Linkup React App enhances user experience by enabling quick and efficient discovery of relevant linkup events. By allowing users to search based on various criteria, the app provides a flexible and intuitive way to find linkup events that match their preferences.
 
 ## Database Tables Documentation
 
@@ -432,23 +432,23 @@ Columns:
     1. After registration, when prompted to enable location sharing, click on "Allow".
     2. Verify that the user can see the feed with location-based content.
 
-### Creating a Link-Up
+### Creating a Linkup
 
-- **Scenario:** User creates a new link-up event.
+- **Scenario:** User creates a new linkup event.
   - **Steps:**
     1. Navigate to the Home page.
-    2. Use the widget on the right side of the feed to create a link-up.
+    2. Use the widget on the right side of the feed to create a linkup.
     3. Input details such as activity, location, date/time, gender preference, and payment option.
-    4. Click on "Create" and verify that the link-up appears in the feed.
+    4. Click on "Create" and verify that the linkup appears in the feed.
 
-### Editing a Link-Up
+### Editing a Linkup
 
-- **Scenario:** User edits an existing link-up event.
+- **Scenario:** User edits an existing linkup event.
   - **Steps:**
     1. Navigate to the Home page.
-    2. Click on the horizontal menu on the link-up item and select "Edit this link-up".
+    2. Click on the horizontal menu on the linkup item and select "Edit this linkup".
     3. Modify each field and click on "Update".
-    4. Verify that the changes are reflected in the link-up details.
+    4. Verify that the changes are reflected in the linkup details.
 
 ### Refreshing the Feed
 
@@ -458,36 +458,36 @@ Columns:
     2. Trigger a manual refresh of the feed.
     3. Verify that the feed updates with the latest content.
 
-### Searching for a Link-Up
+### Searching for a Linkup
 
-- **Scenario:** User searches for a specific link-up event.
+- **Scenario:** User searches for a specific linkup event.
   - **Steps:**
     1. Use the search functionality to enter search criteria such as activity type, creator name, date/time, or payment option.
-    2. Verify that relevant link-up events are displayed based on the search criteria.
+    2. Verify that relevant linkup events are displayed based on the search criteria.
 
-### Deleting a Link-Up
+### Deleting a Linkup
 
-- **Scenario:** User deletes an existing link-up event.
+- **Scenario:** User deletes an existing linkup event.
   - **Steps:**
     1. Navigate to the Home page.
-    2. Click on the horizontal menu on the link-up item and select "Delete this link-up".
-    3. Confirm the deletion and verify that the link-up is removed from the feed.
+    2. Click on the horizontal menu on the linkup item and select "Delete this linkup".
+    3. Confirm the deletion and verify that the linkup is removed from the feed.
 
-### Closing a Link-Up
+### Closing a Linkup
 
-- **Scenario:** User closes an ongoing link-up event.
+- **Scenario:** User closes an ongoing linkup event.
   - **Steps:**
     1. Navigate to the Home page.
-    2. Click on the horizontal menu on the link-up item and select "Close this link-up".
-    3. Confirm the closure and verify that the link-up status is updated accordingly.
+    2. Click on the horizontal menu on the linkup item and select "Close this linkup".
+    3. Confirm the closure and verify that the linkup status is updated accordingly.
 
-### Accessing Link-Up History
+### Accessing Linkup History
 
-- **Scenario:** User accesses the link-up history page/tab.
+- **Scenario:** User accesses the linkup history page/tab.
   - **Steps:**
     1. Navigate to the Home page.
-    2. Click on the "Go to link-up" option from a specific link-up item.
-    3. Verify that the user is directed to the link-up history page/tab.
+    2. Click on the "Go to linkup" option from a specific linkup item.
+    3. Verify that the user is directed to the linkup history page/tab.
 
 ### Profile Page Actions
 
@@ -497,20 +497,20 @@ Columns:
     2. Perform various actions such as changing avatar, adding bio, uploading images, etc.
     3. Verify that the changes are reflected in the profile page.
 
-### Interacting with Link-Ups
+### Interacting with Linkups
 
-- **Scenario:** User interacts with other users' link-up events, including sending requests, chatting, accepting/declining requests, etc.
+- **Scenario:** User interacts with other users' linkup events, including sending requests, chatting, accepting/declining requests, etc.
   - **Steps:**
-    1. Access a specific link-up event.
+    1. Access a specific linkup event.
     2. Perform actions such as sending requests, initiating chats, accepting/declining requests, etc.
     3. Verify that the interactions are processed correctly and reflected in the UI.
 
 ### Handling Requests
 
-1. Receive incoming requests for link-up participation.
+1. Receive incoming requests for linkup participation.
 2. Accept or decline the requests based on user preferences.
 3. Verify that the status of the requests is updated accordingly and notifications are sent to the relevant users.
-4. Ensure that the link-up details are updated with the accepted participants.
+4. Ensure that the linkup details are updated with the accepted participants.
 
 ### Account Management
 
@@ -520,13 +520,13 @@ Columns:
     2. Perform actions such as deactivating/reactivating the account and enabling/disabling location sharing.
     3. Verify that the changes are applied correctly and reflected in the account settings.
 
-### Link-Up History Filters
+### Linkup History Filters
 
-- **Scenario:** User applies filters to the link-up history page/tab.
+- **Scenario:** User applies filters to the linkup history page/tab.
   - **Steps:**
-    1. Access the link-up history page/tab.
+    1. Access the linkup history page/tab.
     2. Apply various filters such as activity type, date/time, location, etc.
-    3. Verify that the link-up events are filtered based on the selected criteria.
+    3. Verify that the linkup events are filtered based on the selected criteria.
 
 ### Notifications
 
@@ -544,11 +544,11 @@ Columns:
     2. Sign back in using valid credentials.
     3. Verify that the sign-in process is smooth and the user's data is loaded correctly.
 
-### Link-Up Location Visibility
+### Linkup Location Visibility
 
-- **Scenario:** User verifies that link-up location details are visible only for users with accepted requests.
+- **Scenario:** User verifies that linkup location details are visible only for users with accepted requests.
   - **Steps:**
-    1. Access a link-up event as a user with an accepted request.
+    1. Access a linkup event as a user with an accepted request.
     2. Verify that the location details are visible.
-    3. Access the same link-up event as a user without an accepted request.
+    3. Access the same linkup event as a user without an accepted request.
     4. Verify that the location details are not visible.

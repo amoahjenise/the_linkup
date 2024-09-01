@@ -35,14 +35,6 @@ const ModalForm = styled("form")({
   flexDirection: "column",
 });
 
-const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  padding: theme.spacing(1),
-  borderRadius: "24px",
-  border: "1px solid #ccc",
-  width: "100%",
-}));
-
 const ModalLabel = styled("label")({
   fontSize: "13px",
   display: "flex",
@@ -70,14 +62,30 @@ const ButtonGroup = styled("div")(({ theme }) => ({
   height: "40px",
 }));
 
+const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(1),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  width: "100%",
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+  },
+}));
+
 const CustomDropdown = styled("div")(({ theme }) => ({
   fontSize: "14px",
   position: "relative",
   marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+  },
   "& select": {
     width: "100%",
     padding: theme.spacing(1),
-    border: "1px solid #ccc",
+    border: "1px solid transparent", // Remove border when not in focus
     appearance: "none",
     backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
     backgroundPosition: "right 12px center",
@@ -85,8 +93,8 @@ const CustomDropdown = styled("div")(({ theme }) => ({
     backgroundSize: "auto 20px",
     paddingRight: "2.5rem",
     "&:focus": {
-      outline: "none",
-      borderColor: theme.palette.primary.main,
+      border: "none", // Ensure border stays removed on focus
+      outline: "none", // Remove the outline when focused
     },
   },
 }));
@@ -109,7 +117,12 @@ const CancelButton = styled(Button)({
   width: "140px",
   border: "none",
   borderRadius: "4px",
-  backgroundColor: "#E0E0E0",
+  backgroundColor: "#f5f5f5",
+  color: "#9e9e9e",
+  "&:hover": {
+    backgroundColor: "#e0e0e0",
+    color: "#000",
+  },
 });
 
 const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
@@ -226,7 +239,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   return (
     <ModalOverlay>
       <ModalContainer>
-        <ModalTitle>Edit Link-Up</ModalTitle>
+        <ModalTitle>Edit Linkup</ModalTitle>
         <ModalForm onSubmit={handleUpdateLinkup}>
           <ModalLabel htmlFor="activity">Activity</ModalLabel>
           <ModalInput
@@ -260,7 +273,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             minDate={new Date()}
             minTime={minTime}
             maxTime={maxTime}
-            placeholderText="Select date and time"
+            placeholderText="Select Date and Time"
             id="date"
             required
           />
@@ -273,7 +286,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               id="genderPreference"
               required
             >
-              <option value="">Select Payment Option (Optional)</option>{" "}
+              <option value="">Select Gender Preference</option>{" "}
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="any">Any</option>
@@ -287,7 +300,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               aria-label="Payment Option"
               id="paymentOption"
             >
-              <option value="">Select Payment Option (Optional)</option>{" "}
+              <option value="">Who's Paying? (Optional)</option>{" "}
               <option value="split">Split The Bill</option>
               <option value="iWillPay">I Will Pay</option>
               <option value="pleasePay">Please Pay</option>

@@ -1,5 +1,5 @@
 {
-  "name": "luul",
+  "name": "The Linkup",
   "version": "1.0.0",
   "description": "",
   "engines": {
@@ -7,7 +7,9 @@
   },
   "scripts": {
     "init-db": "PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
-    "heroku-postbuild": "npm run build",
+    "client-install": "npm install --prefix client",
+    "client-build": "npm run build --prefix client",
+    "heroku-postbuild": "npm run client-install && npm run client-build && npm run build:server", 
     "build:server": "cd server/auth-service && npm install && cd ../user-management-service && npm install && cd ../link-up-management-service && npm install && cd ../link-up-request-service && npm install && cd ../notification-service && npm install && cd ../messaging-service && npm install && cd ../image-service && npm install && cd ../location-service && npm install",
     "build:client": "cd client && npm install && npm run build",
     "build": "npm run build:client && npm run build:server",

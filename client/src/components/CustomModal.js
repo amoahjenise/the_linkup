@@ -3,73 +3,92 @@ import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
 import { useColorMode, Heading, Text, Box } from "@chakra-ui/react";
 
+// Styled wrapper for the modal
 const ModalWrapper = styled("div")(({ theme, showModal }) => ({
   position: "fixed",
   top: 0,
   left: 0,
   width: "100%",
   height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backgroundColor: "rgba(0, 0, 0, 0.3)", // Slightly lighter overlay
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 999,
-  overflowY: "auto",
-  transition: "opacity 0.3s ease",
+  zIndex: 9999, // Higher z-index for prominence
   opacity: showModal ? 1 : 0,
   visibility: showModal ? "visible" : "hidden",
+  transition: "opacity 0.3s ease, visibility 0.3s ease",
 }));
 
+// Styled content area of the modal
 const ModalContent = styled("div")(({ theme, modalBackgroundColor }) => ({
   padding: theme.spacing(4),
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[5],
+  borderRadius: 8, // Slightly rounded corners
+  boxShadow: theme.shadows[10], // Higher shadow for more depth
   position: "relative",
   width: "90%",
-  maxWidth: "500px",
-  margin: "1.5rem auto",
+  maxWidth: 600,
   backgroundColor: modalBackgroundColor,
+  [theme.breakpoints.down("sm")]: {
+    width: "95%",
+  },
 }));
 
+// Header of the modal
 const ModalHeader = styled("header")(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  borderBottom: "1px solid #e5e7eb",
-  padding: theme.spacing(2),
+  borderBottom: `1px solid ${theme.palette.divider}`, // Use theme divider color
+  paddingBottom: theme.spacing(2),
+  marginBottom: theme.spacing(2),
 }));
 
+// Close button for the modal
 const CloseButton = styled("button")(({ theme, modalCloseButtonColor }) => ({
   background: "none",
   border: "none",
   cursor: "pointer",
   svg: {
     fill: modalCloseButtonColor,
+    transition: "fill 0.2s ease",
+    "&:hover": {
+      fill: theme.palette.text.primary,
+    },
   },
 }));
 
+// Main content of the modal
 const ModalMain = styled("main")(({ theme }) => ({
   padding: theme.spacing(2),
   textAlign: "center",
 }));
 
+// Footer of the modal
 const ModalFooter = styled("footer")(({ theme }) => ({
   display: "flex",
-  justifyContent: "center",
-  padding: theme.spacing(2),
-  borderTop: "1px solid #e5e7eb",
+  justifyContent: "flex-end",
+  gap: theme.spacing(1),
+  paddingTop: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
+// Styled button for actions
 const StyledButton = styled(Button)(({ theme, variant }) => ({
-  margin: theme.spacing(1),
-  padding: theme.spacing(1, 2),
-  width: "120px",
-  borderRadius: "9999px",
+  padding: theme.spacing(1, 3),
+  borderRadius: 24, // Rounded corners for buttons
   textTransform: "none",
-  backgroundColor: variant === "primary" ? "#3b82f6" : "#ef4444",
+  fontWeight: 500,
+  backgroundColor:
+    variant === "primary"
+      ? theme.palette.primary.main
+      : theme.palette.error.main,
   color: "#fff",
   "&:hover": {
-    backgroundColor: variant === "primary" ? "#2563eb" : "#dc2626",
+    backgroundColor:
+      variant === "primary"
+        ? theme.palette.primary.dark
+        : theme.palette.error.dark,
   },
 }));
 
@@ -85,8 +104,8 @@ const CustomModal = ({
 }) => {
   const { colorMode } = useColorMode();
 
-  const modalBackgroundColor = colorMode === "dark" ? "#1F1F1F" : "white";
-  const modalCloseButtonColor = colorMode === "dark" ? "white" : "black";
+  const modalBackgroundColor = colorMode === "dark" ? "#333" : "#fff";
+  const modalCloseButtonColor = colorMode === "dark" ? "#fff" : "#000";
 
   const handleClose = () => setShowModal(false);
 
@@ -100,7 +119,6 @@ const CustomModal = ({
           <Heading as="h2" size="md">
             {title}
           </Heading>
-
           <CloseButton
             onClick={handleClose}
             modalCloseButtonColor={modalCloseButtonColor}
@@ -108,16 +126,16 @@ const CustomModal = ({
             <svg
               className="fill-current"
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
             >
-              <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+              <path d="M18.36 5.64a1.25 1.25 0 0 0-1.77 0L12 8.77 7.41 4.18a1.25 1.25 0 0 0-1.77 1.77L10.23 12l-4.59 4.59a1.25 1.25 0 0 0 1.77 1.77L12 13.23l4.59 4.59a1.25 1.25 0 0 0 1.77-1.77L13.77 12l4.59-4.59a1.25 1.25 0 0 0 0-1.77z"></path>
             </svg>
           </CloseButton>
         </ModalHeader>
         <ModalMain>
-          <Box padding="2" textAlign="center">
+          <Box padding="2">
             <Text>{content}</Text>
           </Box>
         </ModalMain>

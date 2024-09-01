@@ -12,7 +12,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useColorMode } from "@chakra-ui/react";
-import logo from "../logo.png";
+import logo from "../assets/logo.png";
 import CustomUserButton from "./UserButton";
 import useSendbirdHandlers from "../handlers/useSendbirdHandlers";
 import { setUnreadMessagesCount } from "../redux/actions/messageActions";
@@ -26,13 +26,13 @@ const MainContainer = styled("div")(
     borderRight: "1px solid lightgrey",
     position: isMobile ? "fixed" : "sticky",
     bottom: isMobile && isOpen ? 0 : "auto",
-    left: isMobile ? (isOpen ? 0 : "-100%") : "auto", // Move off-screen when closed
+    left: isMobile ? (isOpen ? 0 : "-100%") : "auto",
     width: isMobile ? "100%" : drawerWidth,
     boxShadow: isMobile ? "0px -2px 4px rgba(0, 0, 0, 0.1)" : "none",
     zIndex: isMobile ? 10000 : "auto",
     backgroundColor: isMobile
       ? colorMode === "dark"
-        ? "#1e1e1e"
+        ? "#1A202C"
         : "white"
       : "transparent",
     height: isMobile ? (isOpen ? "100vh" : "auto") : "100%",
@@ -47,22 +47,23 @@ const MenuList = styled("ul")({
 });
 
 const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
+  marginBottom: theme.spacing(2),
   padding: theme.spacing(2),
   borderRadius: "100px",
   backgroundColor: isActive
     ? colorMode === "dark"
       ? "rgba(18, 28, 38, 0.9)"
-      : "transparent"
+      : "rgba(0, 0, 0, 0.1)"
     : "transparent",
   display: "flex",
   alignItems: "center",
   border: isActive
-    ? `2px solid ${colorMode === "dark" ? "transparent" : "#F1F1FA"}`
+    ? `2px solid ${colorMode === "dark" ? "#333" : "#F1F1FA"}`
     : "none",
   "&:hover": {
     backgroundColor:
-      colorMode === "dark" ? "rgba(18, 28, 38, 0.1)" : "rgba(18, 28, 38, 0.3)",
-    borderColor: colorMode === "dark" ? "#333" : "#CCC", // Adjust the border color on hover
+      colorMode === "dark" ? "rgba(18, 28, 38, 0.7)" : "rgba(18, 28, 38, 0.04)",
+    borderColor: colorMode === "dark" ? "#333" : "#CCC",
   },
 }));
 
@@ -70,12 +71,19 @@ const MenuItemLink = styled(Link)({
   textDecoration: "none",
   display: "flex",
   alignItems: "center",
-  width: "100%", // Ensure link occupies full width
-  color: "inherit", // Inherit color from StyledMenuItem
+  width: "100%",
+  color: "inherit",
+});
+
+const IconWithSpacing = styled("div")({
+  display: "flex",
+  alignItems: "center",
+  marginRight: "16px", // Adjust the spacing as needed
 });
 
 const LogoContainer = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(2),
+  display: "flex",
+  marginBottom: theme.spacing(4),
   [theme.breakpoints.down("md")]: {
     marginBottom: theme.spacing(2),
   },
@@ -83,8 +91,16 @@ const LogoContainer = styled("div")(({ theme }) => ({
 
 const Logo = styled("img")(({ theme }) => ({
   height: "50px",
-  marginBottom: theme.spacing(2),
-  backgroundColor: "#000",
+}));
+
+const LogoText = styled("div")(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  fontSize: "1.5rem", // Adjust font size as needed
+  fontWeight: "bold",
+  fontFamily: "'Poppins', sans-serif", // Use a stylish font (ensure the font is loaded)
+  letterSpacing: "0.5px", // Adjust letter spacing if needed
+  display: "flex",
+  alignItems: "center",
 }));
 
 const MobileMenuButton = styled("div")(({ theme }) => ({
@@ -102,9 +118,26 @@ const MobileMenuButton = styled("div")(({ theme }) => ({
   zIndex: 1100,
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
 }));
-
 const BadgeStyled = styled(Badge)(({ theme }) => ({
-  marginRight: theme.spacing(1),
+  "& .MuiBadge-dot": {
+    backgroundColor: theme.palette.error.main, // Badge dot color
+  },
+  "& .MuiBadge-badge": {
+    color: theme.palette.background.paper,
+    backgroundColor: theme.palette.error.main, // Badge background color
+    fontSize: "0.75rem", // Font size for the badge count
+    height: "20px", // Height of the badge
+    minWidth: "20px", // Minimum width of the badge
+    borderRadius: "50%", // Make the badge circular
+    padding: "0 6px", // Padding inside the badge
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    transform: "translate(50%, -50%)",
+  },
 }));
 
 const LeftMenu = ({ isMobile }) => {
@@ -147,6 +180,7 @@ const LeftMenu = ({ isMobile }) => {
           <>
             <LogoContainer>
               <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
+              <LogoText>The Linkup</LogoText>
             </LogoContainer>
             <MenuList>
               <StyledMenuItemComponent
@@ -154,6 +188,7 @@ const LeftMenu = ({ isMobile }) => {
                 icon={<HomeIcon />}
                 text="Home"
                 location={location.pathname}
+                colorMode={colorMode}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
@@ -161,6 +196,7 @@ const LeftMenu = ({ isMobile }) => {
                 icon={<NotificationsIcon />}
                 text="Notifications"
                 badgeContent={unreadNotificationsCount}
+                colorMode={colorMode}
                 location={location.pathname}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
@@ -168,13 +204,15 @@ const LeftMenu = ({ isMobile }) => {
                 to="/profile/me"
                 icon={<AccountCircleIcon />}
                 text="Profile"
+                colorMode={colorMode}
                 location={location.pathname}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/history"
                 icon={<HistoryIcon />}
-                text="Link-Ups"
+                text="Linkups"
+                colorMode={colorMode}
                 location={location.pathname}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
@@ -182,14 +220,15 @@ const LeftMenu = ({ isMobile }) => {
                 to="/messages"
                 icon={<MessageIcon />}
                 text="Messages"
-                location={location.pathname}
                 badgeContent={unreadMessagesCount}
+                colorMode={colorMode}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
               <StyledMenuItemComponent
                 to="/settings"
                 icon={<SettingsIcon />}
                 text="Settings"
+                colorMode={colorMode}
                 location={location.pathname}
                 toggleMenu={isMobile ? toggleMenu : null}
               />
@@ -210,17 +249,29 @@ const StyledMenuItemComponent = ({
   text,
   badgeContent,
   location,
+  colorMode,
   toggleMenu,
 }) => {
   const isActive = location === to;
   return (
-    <StyledMenuItem isActive={isActive}>
+    <StyledMenuItem isActive={isActive} colorMode={colorMode}>
       <MenuItemLink to={to} onClick={toggleMenu}>
-        {badgeContent ? (
-          <BadgeStyled badgeContent={badgeContent}>{icon}</BadgeStyled>
-        ) : (
-          icon
-        )}
+        <IconWithSpacing>
+          {badgeContent ? (
+            <BadgeStyled
+              badgeContent={badgeContent}
+              overlap="circular"
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              {icon}
+            </BadgeStyled>
+          ) : (
+            icon
+          )}
+        </IconWithSpacing>
         {text}
       </MenuItemLink>
     </StyledMenuItem>
