@@ -3,11 +3,13 @@ node_modules/
 client/node_modules/
 server/**/node_modules/
 
-# Ignore source code folders (Client and Server)
+# Ignore source code folders
 client/src/
 server/**/src/
+server/**/controllers/
+server/**/routes/
 
-# Ignore environment files
+# Environment Files
 .env
 client/.env
 server/**/.env
@@ -21,20 +23,18 @@ coverage/
 # Package Lock
 package-lock.json
 
+# Output build files from client
+!client/build
+
 # Ignore everything by default
 .*
 
 # Allow specific dotfiles
-!.dockerignore
+!.gitignore
 !.editorconfig
 !.eslintignore
 !.eslintrc
-!.gitignore
-!.gitlab-ci.yml
+!.dockerignore
 !.npmignore
 !.npmrc
 !.prettierignore
-!.storybook
-
-# Allow build folder in client
-!client/build/
