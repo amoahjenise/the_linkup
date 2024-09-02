@@ -9,10 +9,11 @@
     "init-db": "PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "client-install": "npm install --prefix client",
     "client-build": "npm run build --prefix client",
-    "heroku-postbuild": "npm install && npm run client-install && npm run client-build",
-    "build:server": "concurrently \"npm install --prefix server/auth-service\" \"npm install --prefix server/user-management-service\" \"npm install --prefix server/link-up-management-service\" \"npm install --prefix server/link-up-request-service\" \"npm install --prefix server/notification-service\" \"npm install --prefix server/messaging-service\" \"npm install --prefix server/image-service\" \"npm install --prefix server/location-service\"",
+    "server-install": "npm install --prefix server/auth-service && npm install --prefix server/user-management-service && npm install --prefix server/link-up-management-service && npm install --prefix server/link-up-request-service && npm install --prefix server/notification-service && npm install --prefix server/messaging-service && npm install --prefix server/image-service && npm install --prefix server/location-service",
+    "build:server": "npm run server-install",
     "build:client": "npm run client-install && npm run client-build",
     "build": "npm run build:client && npm run build:server",
+    "heroku-postbuild": "npm run build",
     "start": "node index.js",
     "start:client": "npm start --prefix client",
     "start:dev": "concurrently \"npm run start\" \"npm run start:client\""
