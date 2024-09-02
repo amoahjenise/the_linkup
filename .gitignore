@@ -3,7 +3,11 @@ node_modules/
 client/node_modules/
 server/**/node_modules/
 
-# Environment Files
+# Ignore source code folders (Client and Server)
+client/src/
+server/**/src/
+
+# Ignore environment files
 .env
 client/.env
 server/**/.env
@@ -31,3 +35,6 @@ package-lock.json
 !.npmrc
 !.prettierignore
 !.storybook
+
+# Allow build folder in client
+!client/build/
