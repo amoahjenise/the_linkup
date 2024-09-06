@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "./server/notification-service/.env" });
 const Pool = require("pg").Pool;
+const isProduction = process.env.NODE_ENV === "production";
 
 const pool = new Pool({
   host: process.env.POSTGRES_HOST,
@@ -7,9 +8,9 @@ const pool = new Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  ssl: {
-    rejectUnauthorized: false, // Add this line if the certificate is self-signed or not verifiable
-  },
+  ssl: isProduction
+    ? { rejectUnauthorized: false } // SSL enabled for production
+    : false, // SSL disabled for development
 });
 
 module.exports = {

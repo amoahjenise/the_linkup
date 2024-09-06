@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "./server/link-up-management-service/.env" });
 const { Pool } = require("pg");
+const isProduction = process.env.NODE_ENV === "production";
 
 // console.log("Loading .env from", require("path").resolve(".env"));
 
@@ -9,9 +10,9 @@ const pool = new Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  ssl: {
-    rejectUnauthorized: false, // Add this line if the certificate is self-signed or not verifiable
-  },
+  ssl: isProduction
+    ? { rejectUnauthorized: false } // SSL enabled for production
+    : false, // SSL disabled for development
 });
 
 module.exports = {
