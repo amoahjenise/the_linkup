@@ -5,7 +5,7 @@ import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
 import MultiStepProgressBar from "../components/MultiStepProgressBar/MultiStepProgressBar";
 import { useColorMode } from "@chakra-ui/react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import {
   nextStep,
   previousStep,
@@ -69,7 +69,7 @@ const RegistrationProcess = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useUser();
-
+  const clerk = useClerk();
   const registrationData = useSelector((state) => state.registration);
   const [userData, setUserData] = useState({
     dateOfBirth: "",
@@ -108,6 +108,24 @@ const RegistrationProcess = () => {
 
   const handleLaunchingLinkup = async () => {
     try {
+      if (clerk.user) {
+        if (userData.avatarURL) {
+          // Upload the image to Clerk
+          await clerk.user
+            .setProfileImage({ file: userData.avatarURL })
+            .then((res) =>
+              console.log("Profile image uploaded successfully:", res)
+            )
+            .catch((error) => {
+              console.error(
+                "An error occurred while uploading the profile image:",
+                error.errors
+              );
+              throw new Error("Failed to upload image");
+            });
+        }
+      }
+
       const response = await updateUser({
         user: { ...userData, clerkUserId: user.id },
       });

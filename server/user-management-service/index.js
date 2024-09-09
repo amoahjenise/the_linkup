@@ -7,7 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const { deleteUser } = require("./controllers/userController");
 
 const ALLOWED_ORIGINS = [
-  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
   "http://localhost:3000",
 ];
 
