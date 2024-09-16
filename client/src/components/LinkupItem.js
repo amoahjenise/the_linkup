@@ -28,24 +28,23 @@ const Container = styled("div")(({ theme }) => ({
 }));
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
-  border: `1px solid ${
-    colorMode === "light" ? "#d2d6dc" : "rgba(229, 235, 243, 0.2)"
-  }`,
+  border: `1px solid ${colorMode === "light" ? "#e0e0e0" : "#3a3a3a"}`,
   padding: "1.5rem",
-  borderRadius: "0.375rem",
-  width: "32rem",
-  backgroundColor:
-    colorMode === "light"
-      ? "rgba(255, 255, 255, 1)"
-      : "rgba(130, 131, 129, 0.12)",
+  borderRadius: "0.5rem", // Slightly rounded corners for a modern look
+  width: "100%", // Responsive width
+  maxWidth: "32rem", // Ensures it doesn't exceed this width
+  backgroundColor: colorMode === "light" ? "#ffffff" : "#10141a",
   cursor: "pointer",
   overflow: "hidden",
   boxShadow: isHovered
     ? colorMode === "light"
-      ? "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
-      : "0 3px 6px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7)"
-    : "0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.24)",
-  transition: "box-shadow 0.2s ease",
+      ? "0 8px 16px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1)"
+      : "0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.3)"
+    : "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.2)",
+  transition: "box-shadow 0.3s ease, transform 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-2px)", // Subtle lift effect on hover
+  },
 }));
 
 const HorizontalMenuContainer = styled("div")(({ theme }) => ({

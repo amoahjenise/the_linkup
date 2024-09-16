@@ -5,42 +5,42 @@ import { Close as CloseIcon } from "@mui/icons-material";
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: "relative",
-  width: "100%",
-  maxWidth: "none", // Remove maxWidth to match Instagram's full-width style
-  backgroundColor: "transparent", // Background color removed for image-only modal
-  boxShadow: "none", // Remove shadow for a cleaner look
-  padding: "0", // No padding
+  width: "80%", // Set width to 80% of the viewport
+  height: "80%", // Set height to 80% of the viewport
+  maxWidth: "none",
+  maxHeight: "none",
+  backgroundColor: "transparent",
+  boxShadow: "none",
+  padding: "0",
   outline: "none",
-  borderRadius: "0", // No border-radius
+  borderRadius: "0.5rem", // Slightly rounded corners for a cleaner look
   margin: "auto",
-  top: "0", // Position at the top
-  left: "0", // Align left
-  transform: "none", // No transformation
+  top: "10%", // Adjust positioning from the top
+  left: "10%", // Center horizontally with margin
+  transform: "none",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  height: "100vh", // Full viewport height
-  overflow: "hidden", // Hide overflow
+  overflow: "hidden",
 }));
 
 const StyledImage = styled("img")({
   width: "100%",
-  height: "auto",
-  maxHeight: "100%", // Ensure image doesn't exceed the viewport height
-  objectFit: "cover",
+  height: "100%",
+  objectFit: "contain", // Ensure the image fits within the container while maintaining its aspect ratio
 });
 
 const CloseButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
   top: theme.spacing(2),
   right: theme.spacing(2),
-  color: theme.palette.common.white, // Adjust to fit Instagram's theme
-  backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-  borderRadius: "50%", // Rounded button
+  color: theme.palette.common.white,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  borderRadius: "50%",
   padding: theme.spacing(1),
-  zIndex: 1000, // Ensure it stays above other elements
+  zIndex: 1000,
   "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker on hover
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
 }));
 
