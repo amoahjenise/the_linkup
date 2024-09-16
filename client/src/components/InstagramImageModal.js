@@ -4,7 +4,10 @@ import { styled } from "@mui/material/styles";
 import { Close as CloseIcon } from "@mui/icons-material";
 
 const ModalContainer = styled(Box)(({ theme }) => ({
-  position: "relative",
+  position: "absolute", // Make container position absolute
+  top: "50%", // Center vertically
+  left: "50%", // Center horizontally
+  transform: "translate(-50%, -50%)", // Adjust for centering
   width: "80vw", // Fixed width relative to viewport width
   height: "80vh", // Fixed height relative to viewport height
   maxWidth: "80vw", // Ensure max width does not exceed 80vw
@@ -14,10 +17,6 @@ const ModalContainer = styled(Box)(({ theme }) => ({
   padding: "0",
   outline: "none",
   borderRadius: "0.5rem",
-  margin: "auto",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
   overflow: "hidden",
 }));
 
@@ -29,8 +28,8 @@ const StyledImage = styled("img")({
 
 const CloseButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
-  top: theme.spacing(2),
-  right: theme.spacing(2),
+  top: theme.spacing(2), // Set close button at the top
+  right: theme.spacing(2), // Set close button at the right
   color: theme.palette.common.white,
   backgroundColor: "rgba(0, 0, 0, 0.5)",
   borderRadius: "50%",
