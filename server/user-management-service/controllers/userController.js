@@ -2,7 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const { pool } = require("../db");
+const axios = require("axios");
 
+const APP_ID = process.env.SENDBIRD_APP_ID;
+const API_TOKEN = process.env.SENDBIRD_API_TOKEN;
 const deactivateUser = async (req, res) => {
   const userId = req.params.userId;
 
@@ -210,6 +213,52 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
+// Update existing Sendbird user
+const updateSendbirdUser = async (req, res) => {
+  const userId = req.params.userId; // Declare userId before using it
+  const { imageUrl } = req.body; // Extract imageUrl from request body
+
+  console.log("userId", userId);
+  console.log("imageUrl", imageUrl);
+
+  try {
+    const response = await axios.put(
+      // Changed POST to PUT
+      `https://api-${APP_ID}.sendbird.com/v3/users/${userId}`, // Corrected variable name
+      {
+        profile_url: imageUrl,
+      },
+      {
+        headers: {
+          "Api-Token": API_TOKEN,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      // Ensure the response status is correct
+      // User successfully updated in Sendbird
+      res.json({
+        success: true,
+        message: "Sendbird user was updated successfully.",
+        response: response.data,
+      });
+    } else {
+      // Unexpected response
+      res.status(404).json({
+        success: false,
+        message: "Error updating Sendbird user.",
+        response: null,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating Sendbird user:", error); // Adjusted error log for clarity
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update Sendbird user" });
+  }
+};
+
 const updateUserName = async (req, res) => {
   const userId = req.params.userId;
   const { name } = req.body;
@@ -278,6 +327,7 @@ module.exports = {
   updateUser,
   updateUserBio,
   updateUserAvatar,
+  updateSendbirdUser,
   updateUserName,
   setUserStatusActive,
 };

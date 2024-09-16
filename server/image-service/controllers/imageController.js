@@ -61,8 +61,6 @@ const getUserMedia = async (accessToken) => {
     // Parse the response body as JSON
     const data = await response.json();
 
-    console.log("media", data);
-
     return {
       success: true,
       message: "Instagram media fetched successfully!",

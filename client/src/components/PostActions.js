@@ -65,7 +65,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
 
       {/* Uncomment and add more action buttons if needed */}
 
-      <ActionButton
+      {/* <ActionButton
         aria-expanded="false"
         aria-haspopup="menu"
         aria-label="Like"
@@ -90,7 +90,7 @@ const PostActions = ({ onRequestClick, disableRequest }) => {
       >
         <Icon icon={faShare} style={{ color: "blue" }} />
         Share
-      </ActionButton>
+      </ActionButton> */}
     </Root>
   );
 };

@@ -6,6 +6,7 @@ import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 import nlp from "compromise";
+import UserAvatar from "./UserAvatar";
 
 const compromise = nlp;
 
@@ -130,6 +131,22 @@ const CustomChannelHeader = ({
     }
   };
 
+  const renderUserData = () => {
+    if (isOperator) {
+      return {
+        id: linkup?.requester_id,
+        name: linkup?.requester_name,
+        avatar: linkup?.requester_avatar,
+      };
+    } else {
+      return {
+        id: linkup?.creator_id,
+        name: linkup?.creator_name,
+        avatar: linkup?.avatar,
+      };
+    }
+  };
+
   const renderAvatar = () => {
     if (isOperator) {
       return linkup?.requester_avatar;
@@ -147,7 +164,12 @@ const CustomChannelHeader = ({
           <ChannelInfo>
             {operator && (
               <>
-                <StyledAvatar src={renderAvatar()} alt={renderName()} />
+                {/* <StyledAvatar src={renderAvatar()} alt={renderName()} /> */}
+                <UserAvatar
+                  userData={renderUserData()}
+                  width="60px"
+                  height="60px"
+                />
                 <Box>
                   <Nickname>{renderName()}</Nickname>
                   <Box>{renderLinkupItemText()}</Box>

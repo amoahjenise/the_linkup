@@ -1,15 +1,11 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { Typography, IconButton, CardHeader, Box } from "@mui/material";
+import { Typography, CardHeader, Box } from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import InstagramIcon from "@mui/icons-material/Instagram";
 import UserAvatar from "./UserAvatar";
 import { useColorMode } from "@chakra-ui/react";
 import {
   getUserMedia,
-  redirectToInstagramLogin,
   postInstagramAccessToken,
   getAccessToken,
 } from "../api/instagramAPI";
@@ -37,10 +33,6 @@ const AvatarSection = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   padding: theme.spacing(1),
   flex: 1,
-}));
-
-const SocialButtons = styled(Box)(({ theme }) => ({
-  marginTop: theme.spacing(1),
 }));
 
 const EditButton = styled("div")(({ theme }) => ({
@@ -188,22 +180,6 @@ const ProfileHeaderCard = ({
               </Typography>
             </StatisticsItem>
           </StatisticsContainer>
-          <SocialButtons>
-            <IconButton size="large">
-              <FacebookIcon sx={{ color: "#3b5998" }} />
-            </IconButton>
-            <IconButton
-              size="large"
-              onClick={() => {
-                if (isLoggedUserProfile) redirectToInstagramLogin();
-              }}
-            >
-              <InstagramIcon sx={{ color: "#C13584" }} />
-            </IconButton>
-            <IconButton size="large">
-              <TwitterIcon sx={{ color: "#1DA1F2" }} />
-            </IconButton>
-          </SocialButtons>
         </AvatarSection>
         <EditButton>{renderEditButton && renderEditButton()}</EditButton>
       </Card>

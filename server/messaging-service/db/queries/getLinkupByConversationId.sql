@@ -3,6 +3,7 @@ SELECT
   operator_users.*, 
   requester_users.name   AS requester_name, 
   requester_users.avatar AS requester_avatar, 
+  requester_users.status AS requester_status, 
   link_ups.*, 
   link_up_requests.id AS request_id, 
   link_up_requests.status AS request_status

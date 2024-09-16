@@ -7,8 +7,9 @@ const userRoutes = require("./routes/userRoutes");
 const { deleteUser } = require("./controllers/userController");
 
 const ALLOWED_ORIGINS = [
-  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
   "http://localhost:3000",
+  "https://img.clerk.com",
 ];
 
 const router = express.Router(); // Create a router instance
@@ -54,7 +55,7 @@ router.use(
 router.use(
   cors({
     origin: ALLOWED_ORIGINS,
-    methods: ["POST", "GET", "PATCH"],
+    methods: ["PUT", "POST", "GET", "PATCH"],
     optionsSuccessStatus: 200,
     // credentials: true, // Enable credentials for all routes
   })

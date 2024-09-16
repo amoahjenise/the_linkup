@@ -15,7 +15,7 @@ const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
 
 // Set allowed origins
 const ALLOWED_ORIGINS = [
-  process.env.ALLOWED_ORIGIN || "https://13b0-70-52-4-231.ngrok-free.app",
+  process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
   "http://localhost:3000",
 ];
 
@@ -117,7 +117,7 @@ router.post(
       });
 
       // Grab the ID and TYPE of the Webhook
-      const { id, first_name, last_name, ...attributes } = evt.data;
+      const { id, first_name, last_name, publicUrl, ...attributes } = evt.data;
       const eventType = evt.type;
 
       // Create formatted name as "First Name L."
@@ -141,7 +141,11 @@ router.post(
 
         // Call createSendbirdUser with transaction client
         // const sendbirdUser = { id: response.id, name: formattedName };
-        const sendbirdUser = { id: response.id, name: first_name };
+        const sendbirdUser = {
+          id: response.id,
+          name: first_name,
+          imageUrl: publicUrl,
+        };
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
 

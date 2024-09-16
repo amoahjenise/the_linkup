@@ -9,6 +9,7 @@ import {
   getUserById,
   updateUserBio,
   updateUserAvatar,
+  updateSendbirdUser,
   updateUserName,
 } from "../api/usersAPI";
 import { getUserMedia } from "../api/instagramAPI";
@@ -20,6 +21,7 @@ import ProfileHeaderCard from "../components/ProfileHeaderCard";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { useClerk } from "@clerk/clerk-react";
 
 // Extend Day.js with plugins
 dayjs.extend(utc);
@@ -65,6 +67,8 @@ const UserProfilePage = ({ isMobile }) => {
     isEditModalOpen: false,
     isInstagramTokenUpdated: false, // New state to track Instagram token update
   });
+
+  const clerk = useClerk();
 
   const handleSetProfileImages = (newImages) => {
     setState((prevState) => ({
@@ -187,6 +191,25 @@ const UserProfilePage = ({ isMobile }) => {
         updateIfChanged("avatar", editedAvatar, updateUserAvatar, "avatar"),
         updateIfChanged("name", editedName, updateUserName, "name"),
       ]);
+
+      if (clerk.user) {
+        if (editedAvatar) {
+          // Upload the image to Clerk
+          await clerk.user
+            .setProfileImage({ file: editedAvatar })
+            .then((res) => {
+              updateSendbirdUser(userId, clerk.user.imageUrl);
+              console.log("Profile image uploaded successfully:", res);
+            })
+            .catch((error) => {
+              console.error(
+                "An error occurred while uploading the profile image:",
+                error.errors
+              );
+              throw new Error("Failed to upload image");
+            });
+        }
+      }
 
       addSnackbar(
         changesMade ? "Profile updated successfully!" : "No changes detected.",

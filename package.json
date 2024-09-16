@@ -1,5 +1,5 @@
 {
-  "name": "The Linkup",
+  "name": "thelinkup",
   "version": "1.0.0",
   "description": "",
   "engines": {
@@ -9,12 +9,13 @@
     "init-db": "PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f server/initdb-scripts/01_create_tables.sql",
     "client-install": "npm install --prefix client",
     "client-build": "npm run build --prefix client",
-    "heroku-postbuild": "npm run client-install && npm run client-build && npm run build:server", 
-    "build:server": "cd server/auth-service && npm install && cd ../user-management-service && npm install && cd ../link-up-management-service && npm install && cd ../link-up-request-service && npm install && cd ../notification-service && npm install && cd ../messaging-service && npm install && cd ../image-service && npm install && cd ../location-service && npm install",
-    "build:client": "cd client && npm install && npm run build",
+    "server-install": "npm install --prefix server/auth-service && npm install --prefix server/user-management-service && npm install --prefix server/link-up-management-service && npm install --prefix server/link-up-request-service && npm install --prefix server/notification-service && npm install --prefix server/messaging-service && npm install --prefix server/image-service && npm install --prefix server/location-service",
+    "build:server": "npm run server-install",
+    "build:client": "npm run client-install && npm run client-build",
     "build": "npm run build:client && npm run build:server",
+    "heroku-postbuild": "npm run build",
     "start": "node index.js",
-    "start:client": "cd client && npm start",
+    "start:client": "npm start --prefix client",
     "start:dev": "concurrently \"npm run start\" \"npm run start:client\""
   },
   "dependencies": {

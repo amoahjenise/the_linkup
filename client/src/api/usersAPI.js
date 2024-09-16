@@ -221,6 +221,19 @@ export const updateUserAvatar = async (userId, avatar) => {
   }
 };
 
+export const updateSendbirdUser = async (userId, imageUrl) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/api/user/update-sendbird-user/${userId}`,
+      { imageUrl }
+    );
+    return response.data; // Return only the response data
+  } catch (error) {
+    console.error("Failed to update the Sendbird user:", error);
+    return handleError(error, "Failed to update the Sendbird user."); // Ensure handleError is defined
+  }
+};
+
 export const updateUserName = async (userId, name) => {
   try {
     const response = await axios.patch(
