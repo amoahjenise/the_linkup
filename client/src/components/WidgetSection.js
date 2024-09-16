@@ -61,9 +61,9 @@ const WidgetSection = ({
       </Widget>
 
       {/* What would you like Component */}
-      <Widget>
+      {/* <Widget>
         <WhatWouldYouLikeWidget onSubmitSuggestion={onSubmitSuggestion} />
-      </Widget>
+      </Widget> */}
 
       {/* Create Linkup Component */}
       <Widget>
