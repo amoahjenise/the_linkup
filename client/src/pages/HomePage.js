@@ -130,33 +130,48 @@ const HomePage = ({ isMobile }) => {
             (linkup) => linkup.status === "active"
           );
 
-          // Update the linkup list based on whether it's the first page or subsequent pages
-          const updatedLinkupList =
-            page === 1 ? activeLinkups : [...linkupList, ...activeLinkups];
+          // Calculate distance for each linkup
+          const calculateDistance = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a =
+              0.5 -
+              Math.cos(dLat) / 2 +
+              (Math.cos(lat1 * (Math.PI / 180)) *
+                Math.cos(lat2 * (Math.PI / 180)) *
+                (1 - Math.cos(dLon))) /
+                2;
+            return R * 2 * Math.asin(Math.sqrt(a)); // Distance in km
+          };
 
-          // Filter out any old linkups and update only with newer data
-          const newLinkups = activeLinkups.filter(
-            (newLinkup) =>
-              !fetchedLinkupIds.includes(newLinkup.id) ||
-              updatedLinkupList.some(
-                (existingLinkup) =>
-                  existingLinkup.id === newLinkup.id &&
-                  new Date(newLinkup.updated_at) >
-                    new Date(existingLinkup.updated_at)
-              )
-          );
+          const updatedLinkupList = activeLinkups.map((linkup) => ({
+            ...linkup,
+            distance: calculateDistance(
+              latitude,
+              longitude,
+              linkup.latitude,
+              linkup.longitude
+            ),
+          }));
 
-          // Sort the updated list by creation date, descending
-          updatedLinkupList.sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-          );
+          // Sort the updated list by distance, then by creation date
+          updatedLinkupList.sort((a, b) => {
+            if (a.distance !== b.distance) {
+              return a.distance - b.distance;
+            } else {
+              return new Date(b.created_at) - new Date(a.created_at);
+            }
+          });
 
           // Dispatch updated linkups to Redux store
           dispatch(fetchLinkupsSuccess(updatedLinkupList));
 
           // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
-          const newFetchedLinkupIds = newLinkups.map((linkup) => linkup.id);
+          const newFetchedLinkupIds = updatedLinkupList.map(
+            (linkup) => linkup.id
+          );
           setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
         } else {
           console.error("Error fetching linkups:", response.message);
@@ -168,15 +183,7 @@ const HomePage = ({ isMobile }) => {
         setIsFetchingNextPage(false);
       }
     },
-    [
-      dispatch,
-      fetchedLinkupIds,
-      gender,
-      latitude,
-      linkupList,
-      longitude,
-      userId,
-    ]
+    [dispatch, fetchedLinkupIds, gender, latitude, longitude, userId]
   );
 
   const handleScroll = useCallback(() => {
