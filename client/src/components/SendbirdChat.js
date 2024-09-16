@@ -68,6 +68,8 @@ export default function SendbirdChat() {
           linkupResponse.linkup.request_status !== "accepted"
         ) {
           setMessageInputDisabled(true);
+        } else if (linkupResponse.linkup.requester_status === "inactive") {
+          setMessageInputDisabled(true);
         } else {
           setMessageInputDisabled(false);
         }
@@ -77,7 +79,7 @@ export default function SendbirdChat() {
     };
 
     fetchChannelData();
-  }, [currentChannel, getGroupChannel, userId]);
+  }, [currentChannel]);
 
   return (
     <SendbirdChatWrapper>

@@ -9,6 +9,7 @@ import {
   getUserById,
   updateUserBio,
   updateUserAvatar,
+  updateSendbirdUser,
   updateUserName,
 } from "../api/usersAPI";
 import { getUserMedia } from "../api/instagramAPI";
@@ -191,17 +192,15 @@ const UserProfilePage = ({ isMobile }) => {
         updateIfChanged("name", editedName, updateUserName, "name"),
       ]);
 
-      // Initialize Clerk with your Clerk publishable key
-      // const clerk = new Clerk(process.env.REACT_APP_CLERK_PUBLISHABLE_KEY);
-
       if (clerk.user) {
         if (editedAvatar) {
           // Upload the image to Clerk
           await clerk.user
             .setProfileImage({ file: editedAvatar })
-            .then((res) =>
-              console.log("Profile image uploaded successfully:", res)
-            )
+            .then((res) => {
+              updateSendbirdUser(userId, clerk.user.imageUrl);
+              console.log("Profile image uploaded successfully:", res);
+            })
             .catch((error) => {
               console.error(
                 "An error occurred while uploading the profile image:",

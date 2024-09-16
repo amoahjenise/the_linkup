@@ -66,11 +66,9 @@ const ImageGrid = ({ images, isMobile, isLoggedUserProfile }) => {
                 Connect Instagram
               </ConnectButton>
             ) : (
-              <StyledCard colorMode={colorMode}>
-                <Typography style={{ padding: 8 }} variant="h6" gutterBottom>
-                  The user hasn't linked their account to Instagram yet.
-                </Typography>
-              </StyledCard>
+              <Typography style={{ padding: 8 }} variant="h6" gutterBottom>
+                The user hasn't linked their account to Instagram yet.
+              </Typography>
             )}
           </Box>
         </Grid>

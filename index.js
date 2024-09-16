@@ -67,7 +67,7 @@ app.use(
       process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
       "http://localhost:3000",
     ],
-    methods: ["POST", "GET", "PATCH", "DELETE"],
+    methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
   })
 );
 

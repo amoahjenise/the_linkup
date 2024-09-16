@@ -21,4 +21,6 @@ router.patch("/update-user-name/:userId", userController.updateUserName); // Use
 // Route for update an existing user
 router.patch("/update-user", userController.updateUser);
 
+router.put("/update-sendbird-user/:userId", userController.updateSendbirdUser);
+
 module.exports = router;
