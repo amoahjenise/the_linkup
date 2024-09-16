@@ -26,7 +26,6 @@ const LogoContainer = styled("div")(({ theme }) => ({
 const Logo = styled("img")(({ theme }) => ({
   height: "50px",
   marginBottom: theme.spacing(2),
-  backgroundColor: "#000", // Set the background color to black
 }));
 
 const ModalHeader = styled("div")(({ theme, color }) => ({
@@ -41,15 +40,6 @@ const IconContainer = styled("div")(({ theme }) => ({
   paddingTop: theme.spacing(6),
   display: "flex",
   justifyContent: "center",
-}));
-
-const Icon = styled("div")(({ theme, color }) => ({
-  width: theme.spacing(8),
-  height: theme.spacing(8),
-  backgroundColor: color,
-  color: "white",
-  padding: theme.spacing(2),
-  borderRadius: "50%",
 }));
 
 const ContentContainer = styled("div")(({ theme }) => ({
