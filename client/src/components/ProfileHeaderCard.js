@@ -24,6 +24,9 @@ const Card = styled("div")(({ theme }) => ({
   flexDirection: "row",
   borderRadius: "1px",
   borderBottom: "1px solid lightgray",
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width on small screens (mobile view)
+  },
 }));
 
 const AvatarSection = styled(Box)(({ theme }) => ({
