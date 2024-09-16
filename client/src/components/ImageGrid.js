@@ -3,8 +3,7 @@ import { Grid, CardMedia, Typography, Button, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
 import { redirectToInstagramLogin } from "../api/instagramAPI";
-import ImageModal from "./ImageModal"; // Import the modal component
-
+import InstagramImageModal from "./InstagramImageModal";
 // Styled components
 const StyledCard = styled("div")(({ theme, colorMode }) => ({
   position: "relative",
@@ -104,7 +103,7 @@ const ImageGrid = ({ images, isMobile, isLoggedUserProfile }) => {
         )}
       </Grid>
       {selectedImage && (
-        <ImageModal
+        <InstagramImageModal
           open={openModal}
           onClose={handleCloseModal}
           imageSrc={selectedImage}
