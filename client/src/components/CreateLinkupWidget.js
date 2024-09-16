@@ -70,9 +70,9 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
 }));
 
 const CreateLinkUpButton = styled(Button)(({ theme }) => ({
-  background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
+  background: "linear-gradient(20deg, #0097A7, rgba(229, 235, 243, 1))",
   "&:hover": {
-    background: "linear-gradient(120deg, #007b86, rgba(229, 235, 243, 1))",
+    background: "linear-gradient(20deg, #007b86, rgba(229, 235, 243, 1))",
   },
   color: "#fff",
   borderRadius: "20px",

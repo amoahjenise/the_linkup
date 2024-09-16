@@ -155,13 +155,18 @@ const HomePage = ({ isMobile }) => {
             ),
           }));
 
-          // Sort the updated list by distance, then by creation date
+          // Sort the updated list by distance, then by scheduled date
           updatedLinkupList.sort((a, b) => {
+            // Compare distances
             if (a.distance !== b.distance) {
               return a.distance - b.distance;
-            } else {
-              return new Date(b.created_at) - new Date(a.created_at);
             }
+            // If distances are the same, compare scheduled times
+            const now = new Date();
+            const timeDifferenceA = new Date(a.scheduled_at) - now;
+            const timeDifferenceB = new Date(b.scheduled_at) - now;
+
+            return timeDifferenceA - timeDifferenceB; // Sort by upcoming time
           });
 
           // Dispatch updated linkups to Redux store

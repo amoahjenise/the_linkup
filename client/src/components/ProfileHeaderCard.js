@@ -19,7 +19,7 @@ const Container = styled("div")(({ theme }) => ({
 }));
 
 const Card = styled("div")(({ theme }) => ({
-  width: "100%",
+  width: "50%",
   display: "flex",
   flexDirection: "row",
   borderRadius: "1px",

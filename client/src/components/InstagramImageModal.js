@@ -5,19 +5,16 @@ import { Close as CloseIcon } from "@mui/icons-material";
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: "relative",
-  width: "80%", // Set width to 80% of the viewport
-  height: "80%", // Set height to 80% of the viewport
-  maxWidth: "none",
-  maxHeight: "none",
+  width: "80vw", // Fixed width relative to viewport width
+  height: "80vh", // Fixed height relative to viewport height
+  maxWidth: "80vw", // Ensure max width does not exceed 80vw
+  maxHeight: "80vh", // Ensure max height does not exceed 80vh
   backgroundColor: "transparent",
   boxShadow: "none",
   padding: "0",
   outline: "none",
-  borderRadius: "0.5rem", // Slightly rounded corners for a cleaner look
+  borderRadius: "0.5rem",
   margin: "auto",
-  top: "10%", // Adjust positioning from the top
-  left: "10%", // Center horizontally with margin
-  transform: "none",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

@@ -33,7 +33,7 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   borderRadius: "0.5rem", // Slightly rounded corners for a modern look
   width: "100%", // Responsive width
   maxWidth: "32rem", // Ensures it doesn't exceed this width
-  backgroundColor: colorMode === "light" ? "#ffffff" : "#10141a",
+  backgroundColor: colorMode === "light" ? "#ffffff" : "rgba(0, 23, 46, 1)",
   cursor: "pointer",
   overflow: "hidden",
   boxShadow: isHovered
