@@ -5,30 +5,43 @@ import { Close as CloseIcon } from "@mui/icons-material";
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: "relative",
-  width: "80%",
-  maxWidth: "900px",
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[5],
-  padding: theme.spacing(2),
+  width: "100%",
+  maxWidth: "none", // Remove maxWidth to match Instagram's full-width style
+  backgroundColor: "transparent", // Background color removed for image-only modal
+  boxShadow: "none", // Remove shadow for a cleaner look
+  padding: "0", // No padding
   outline: "none",
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: "0", // No border-radius
   margin: "auto",
-  top: "10%", // Adjust this to position the modal vertically if needed
-  transform: "translateY(-10%)", // Adjust this to keep the modal in view
+  top: "0", // Position at the top
+  left: "0", // Align left
+  transform: "none", // No transformation
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh", // Full viewport height
+  overflow: "hidden", // Hide overflow
 }));
 
 const StyledImage = styled("img")({
   width: "100%",
   height: "auto",
-  maxHeight: "80vh",
+  maxHeight: "100%", // Ensure image doesn't exceed the viewport height
   objectFit: "cover",
 });
 
 const CloseButton = styled(IconButton)(({ theme }) => ({
   position: "absolute",
-  top: theme.spacing(1),
-  right: theme.spacing(1),
-  color: theme.palette.grey[700],
+  top: theme.spacing(2),
+  right: theme.spacing(2),
+  color: theme.palette.common.white, // Adjust to fit Instagram's theme
+  backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  borderRadius: "50%", // Rounded button
+  padding: theme.spacing(1),
+  zIndex: 1000, // Ensure it stays above other elements
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker on hover
+  },
 }));
 
 const InstagramImageModal = ({ open, onClose, imageSrc }) => (
