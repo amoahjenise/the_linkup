@@ -13,6 +13,7 @@ import banner from "../assets/Banner.jpg"; // Import the local banner image
 // Styled components
 const Container = styled("div")(({ theme }) => ({
   display: "grid",
+  height: "100%",
   gridTemplateColumns: "1fr",
   borderBottom: `1px solid ${theme.palette.divider}`,
   textAlign: "center",
@@ -20,12 +21,12 @@ const Container = styled("div")(({ theme }) => ({
   position: "relative",
 }));
 
-const PromoSection = styled(Box)(({ theme, colorMode, promoHeight }) => ({
+const PromoSection = styled(Box)(({ theme, colorMode }) => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
   alignItems: "center",
   padding: theme.spacing(6),
-  height: promoHeight, // Control height dynamically
+  height: "360px",
   color: theme.palette.text.primary,
   position: "relative",
   background:

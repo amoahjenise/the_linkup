@@ -47,6 +47,7 @@ const ImageSection = styled("div")({
   alignItems: "center",
   overflowY: "auto",
   maxHeight: "60vh",
+  height: "100%",
   marginTop: "1px",
 });
 
