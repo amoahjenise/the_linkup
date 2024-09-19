@@ -13,7 +13,8 @@ const CustomAppBar = styled(AppBar)(({ theme, colorMode }) => ({
       ? `1px solid white`
       : `1px solid ${theme.palette.divider}`,
   color: colorMode === "dark" ? "white" : "black",
-  backgroundColor: colorMode === "dark" ? "black" : "rgba(255, 255, 255, 0.99)",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.97)",
 }));
 
 const HeaderText = styled(Typography)(({ theme }) => ({

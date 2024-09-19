@@ -12,39 +12,44 @@ import { useColorMode } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 
-// Styled components
-const WidgetContainer = styled("div")(({ theme }) => ({
+// Styled components for iOS-like design
+const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   flex: "1",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  padding: theme.spacing(2, 0),
-  backgroundColor: "rgba(200, 200, 200, 0.1)",
+  padding: theme.spacing(2),
   borderRadius: "24px",
   borderWidth: "1px",
-  overflow: "hidden",
-  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "box-shadow 0.3s ease",
+  fontFamily:
+    "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
+  color: theme.palette.text.primary,
   "&:hover": {
-    boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
+    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
   },
-  fontFamily: "Arial, sans-serif", // Set font family
+  backgroundColor: colorMode === "dark" ? "rgba(200, 200, 200, 0.1)" : "white",
 }));
 
 const Header = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  marginBottom: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+  color: "#0097A7", // iOS blue for header icons and text
+  fontWeight: "600",
+  fontSize: "18px",
 }));
 
 const Icon = styled(FontAwesomeIcon)(({ theme }) => ({
   marginRight: theme.spacing(1),
+  color: "#0097A7", // iOS blue color
 }));
 
-const CenterElement = styled("div")({
-  textAlign: "center",
-});
+// const CenterElement = styled("div")({
+//   textAlign: "center",
+// });
 
 const Form = styled("form")(({ theme }) => ({
   display: "flex",
@@ -55,6 +60,12 @@ const Form = styled("form")(({ theme }) => ({
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
+  paddingLeft: theme.spacing(1.5), // Align text within inputs
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor:
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.1)"
+      : "rgba(130, 131, 129, 0.03)",
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${
     colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
@@ -62,26 +73,20 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.12)"
-      : "rgba(130, 131, 129, 0.12)",
   width: "100%",
 }));
 
 const CreateLinkUpButton = styled(Button)(({ theme }) => ({
-  background: "linear-gradient(20deg, #0097A7, rgba(229, 235, 243, 1))",
+  background: "#0097A7",
   "&:hover": {
-    background: "linear-gradient(20deg, #007b86, rgba(229, 235, 243, 1))",
+    background: "#007b86",
   },
   color: "#fff",
   borderRadius: "20px",
   padding: theme.spacing(1, 4),
 }));
 
-const InputField = styled("input")(({ theme, colorMode }) => ({
-  width: "100%",
-  padding: theme.spacing(1),
+const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${
@@ -90,9 +95,44 @@ const InputField = styled("input")(({ theme, colorMode }) => ({
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
+  position: "relative",
+  "& select": {
+    width: "100%",
+    padding: theme.spacing(1.2),
+    backgroundSize: "auto 20px",
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(130, 131, 129, 0.1)"
+        : "rgba(130, 131, 129, 0.03)",
+    paddingRight: "0.5rem",
+  },
+  "& option": {
+    color: colorMode === "dark" ? "white" : "black",
+    backgroundColor: colorMode === "dark" ? "#2e2e2e" : "white",
+  },
+  fontFamily: "Arial, sans-serif", // Consistent font family
+  fontWeight: 400, // Consistent font weight
+}));
+
+const InputField = styled("input")(({ theme, colorMode }) => ({
+  width: "100%",
+  padding: theme.spacing(1),
+  fontFamily: "Arial, sans-serif", // Consistent font family
+  fontWeight: 400, // Consistent font weight
+  paddingLeft: theme.spacing(1.5), // Align text within inputs
+  marginBottom: theme.spacing(2),
+  color: colorMode === "dark" ? "white" : "black", // Text color
   backgroundColor:
-    colorMode === "dark" ? "#2e2e2e" : "rgba(130, 131, 129, 0.12)",
-  fontFamily: "Arial, sans-serif", // Set font family
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.1)"
+      : "rgba(130, 131, 129, 0.03)",
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+  },
 }));
 
 const InputWithIcon = styled("div")({
@@ -108,34 +148,6 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
   top: theme.spacing(0.8),
   pointerEvents: "auto",
   color: "lightgray",
-}));
-
-const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
-  marginBottom: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  color: colorMode === "dark" ? "grey" : "grey",
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`,
-  "&:focus": {
-    borderColor: theme.palette.primary.main,
-  },
-  position: "relative",
-  "& select": {
-    width: "100%",
-    padding: theme.spacing(1),
-    backgroundSize: "auto 20px",
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(130, 131, 129, 0.12)"
-        : "rgba(130, 131, 129, 0.12)",
-    paddingRight: "2.5rem",
-  },
-  "& option": {
-    color: colorMode === "dark" ? "white" : "black",
-    backgroundColor: colorMode === "dark" ? "#2e2e2e" : "white",
-  },
-  fontFamily: "Arial, sans-serif", // Set font family
 }));
 
 const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
@@ -201,7 +213,13 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   };
 
   return (
-    <WidgetContainer>
+    <WidgetContainer colorMode={colorMode}>
+      <style>
+        {` 
+                    ::placeholder { 
+                        color: grey; 
+                    }`}
+      </style>
       <Header>
         <Icon icon={faPlusCircle} />
         <span>Create a Linkup</span>
@@ -213,6 +231,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           name="activity"
           autoComplete="off" // Disable autocomplete
           required
+          colorMode={colorMode}
         />
         <InputWithIcon>
           <InputField
@@ -221,6 +240,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             name="location"
             autoComplete="off" // Disable autocomplete
             required
+            colorMode={colorMode}
           />
           <Tooltip
             title={
@@ -268,8 +288,15 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             value={genderPreference}
             onChange={(e) => setGenderPreference(e.target.value)}
             required
+            style={{
+              color: genderPreference
+                ? colorMode === "dark"
+                  ? "white"
+                  : "black"
+                : "grey", // Grey for placeholder, white for selected
+            }}
           >
-            <option value="" disabled>
+            <option value="" disabled hidden>
               Gender Preference
             </option>
             <option value="male">Male</option>
@@ -281,6 +308,13 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           <select
             value={paymentOption}
             onChange={(e) => setPaymentOption(e.target.value)}
+            style={{
+              color: genderPreference
+                ? colorMode === "dark"
+                  ? "white"
+                  : "black"
+                : "grey", // Grey for placeholder, white for selected
+            }}
           >
             <option value="">Who's Paying? (Optional)</option>
             <option value="split">Split The Bill</option>
@@ -288,15 +322,15 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
             <option value="pleasePay">Please Pay</option>
           </select>
         </CustomDropdown>
-        <CenterElement>
-          <CreateLinkUpButton
-            type="submit"
-            aria-label="create-linkup"
-            size="large"
-          >
-            POST
-          </CreateLinkUpButton>
-        </CenterElement>{" "}
+        {/* <CenterElement> */}
+        <CreateLinkUpButton
+          type="submit"
+          aria-label="create-linkup"
+          size="large"
+        >
+          POST
+        </CreateLinkUpButton>
+        {/* </CenterElement>{" "} */}
       </Form>
     </WidgetContainer>
   );

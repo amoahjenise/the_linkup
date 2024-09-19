@@ -28,22 +28,27 @@ const Container = styled("div")(({ theme }) => ({
 }));
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
-  border: `1px solid ${colorMode === "light" ? "#e0e0e0" : "#3a3a3a"}`,
+  border: `1px solid ${
+    colorMode === "light" ? "none" : "rgba(229, 235, 243, 0.2)"
+  }`,
   padding: "1.5rem",
-  borderRadius: "0.5rem", // Slightly rounded corners for a modern look
-  width: "100%", // Responsive width
-  maxWidth: "32rem", // Ensures it doesn't exceed this width
-  backgroundColor: colorMode === "light" ? "#ffffff" : "rgba(0, 23, 46, 1)",
-  cursor: "pointer",
-  overflow: "hidden",
+  borderRadius: "1.5rem", // Large rounded corners for a soft feel
+  width: "100%",
+  background:
+    colorMode === "light"
+      ? "#ffffff"
+      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))",
+  backdropFilter: "blur(10px)", // Glass-like background effect
   boxShadow: isHovered
     ? colorMode === "light"
-      ? "0 8px 16px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1)"
-      : "0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.3)"
-    : "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.2)",
-  transition: "box-shadow 0.3s ease, transform 0.3s ease",
+      ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // Subtle, professional shadow on hover for light mode
+      : "0 12px 24px rgba(255, 255, 255, 0.05), 0 4px 6px rgba(255, 255, 255, 0.05)" // Subtle shadow for dark mode
+    : colorMode === "light"
+    ? "0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05)" // Subtle shadow for light mode
+    : "0 8px 16px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(255, 255, 255, 0.1)", // Subtle shadow for dark mode
+  transition: "transform 0.2s ease, box-shadow 0.2s ease",
   "&:hover": {
-    transform: "translateY(-2px)", // Subtle lift effect on hover
+    transform: "translateY(-2px)", // Slight floating effect
   },
 }));
 
