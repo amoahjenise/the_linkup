@@ -3,7 +3,12 @@ import { styled } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
 import UserAvatar from "./UserAvatar";
 import { useColorMode } from "@chakra-ui/react";
-import banner from "../assets/Banner.jpg";
+import {
+  getUserMedia,
+  postInstagramAccessToken,
+  getAccessToken,
+} from "../api/instagramAPI";
+import banner from "../assets/Banner.jpg"; // Import the local banner image
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({
@@ -15,24 +20,22 @@ const Container = styled("div")(({ theme }) => ({
   position: "relative",
 }));
 
-const PromoSection = styled(Box)(
-  ({ theme, colorMode, promoHeight, isVisible }) => ({
-    display: isVisible ? "grid" : "none", // Hide when not visible
-    gridTemplateColumns: "1fr 1fr",
-    alignItems: "center",
-    padding: theme.spacing(6),
-    height: promoHeight, // Control height dynamically
-    color: theme.palette.text.primary,
-    position: "relative",
-    background:
-      colorMode === "light"
-        ? `linear-gradient(to right, rgba(0, 0, 0, 1) 45%, transparent 70%), url(${banner})`
-        : `linear-gradient(to right, rgba(0, 0, 0, 0.98) 46%, transparent 70%), url(${banner})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center top",
-    transition: "height 0.5s ease-out, display 0.5s ease-out", // Smooth collapse
-  })
-);
+const PromoSection = styled(Box)(({ theme, colorMode, promoHeight }) => ({
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  alignItems: "center",
+  padding: theme.spacing(6),
+  height: promoHeight, // Control height dynamically
+  color: theme.palette.text.primary,
+  position: "relative",
+  background:
+    colorMode === "light"
+      ? `linear-gradient(to right, rgba(0, 0, 0, 1) 45%, transparent 70%), url(${banner})`
+      : `linear-gradient(to right, rgba(0, 0, 0, 0.98) 46%, transparent 70%), url(${banner})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  transition: "height 0.5s ease-out", // Smooth collapse
+}));
 
 const TextContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -82,19 +85,58 @@ const ProfileHeaderCard = ({
   renderEditButton,
   calculateAge,
   setProfileImages,
-  promoHeight,
-  isPromoVisible,
-  promoRef,
 }) => {
   const { colorMode } = useColorMode();
-  const textColor = colorMode === "dark" ? "white" : "#333333";
+  const textColor = colorMode === "dark" ? "white" : "#333333"; // Adjusted text color
+  const [promoHeight, setPromoHeight] = useState("400px");
+  const promoRef = useRef();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const newHeight = Math.max(100, 400 - scrollTop); // Minimum height of 100px
+      setPromoHeight(`${newHeight}px`);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchInstagramMedia = async (code) => {
+      try {
+        const accessToken = await getAccessToken(code);
+        await postInstagramAccessToken(userData.id, accessToken); // Save the access token to the backend
+        const instagramMediaResponse = await getUserMedia(accessToken);
+
+        if (instagramMediaResponse.success) {
+          const instagramImageUrls = instagramMediaResponse.data.data.map(
+            (imageObj) => imageObj.media_url
+          );
+          setProfileImages(instagramImageUrls); // Update profile images
+        }
+      } catch (error) {
+        console.error("Error fetching Instagram media:", error);
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      fetchInstagramMedia(code);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [userData, setProfileImages]);
 
   return (
     <Container>
       <PromoSection
         colorMode={colorMode}
         promoHeight={promoHeight}
-        isVisible={isPromoVisible} // Control visibility
         ref={promoRef}
       >
         <TextContainer>
@@ -108,6 +150,7 @@ const ProfileHeaderCard = ({
           >
             {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
             {userLocation}
+            {/* • Online 6 days ago */}
           </Typography>
           <Typography variant="h4" sx={{ color: "white", fontWeight: "bold" }}>
             {userData?.bio}
@@ -127,7 +170,7 @@ const ProfileHeaderCard = ({
               {userData?.name}, {calculateAge(userData?.date_of_birth)}
             </Typography>
             <Typography variant="body2" sx={{ color: textColor }}>
-              {userData?.total_linkups} Created Linkups
+              {userData.total_linkups} Created Linkups
             </Typography>
           </InnerHeaderContainer>
           <Box sx={{ marginLeft: "auto" }}>{renderEditButton()}</Box>
