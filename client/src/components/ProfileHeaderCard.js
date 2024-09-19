@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { Typography, CardHeader, Box } from "@mui/material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { Typography, Box } from "@mui/material";
 import UserAvatar from "./UserAvatar";
 import { useColorMode } from "@chakra-ui/react";
 import {
@@ -9,76 +8,90 @@ import {
   postInstagramAccessToken,
   getAccessToken,
 } from "../api/instagramAPI";
+import banner from "../assets/Banner.jpg"; // Import the local banner image
 
+// Styled components
 const Container = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
+  display: "grid",
+  gridTemplateColumns: "1fr",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  textAlign: "center",
+  color: theme.palette.text.primary,
+  position: "relative",
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(1),
+  },
+}));
+
+const PromoSection = styled(Box)(({ theme, colorMode }) => ({
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
   alignItems: "center",
-  position: "sticky",
-  top: 0,
+  padding: theme.spacing(6),
+  height: "400px",
+  color: theme.palette.text.primary,
+  position: "relative",
+  background:
+    colorMode === "light"
+      ? `linear-gradient(to right, rgba(0, 0, 0, 1) 45%, transparent 70%), url(${banner})`
+      : `linear-gradient(to right, rgba(0, 0, 0, 0.98) 46%, transparent 70%), url(${banner})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center top",
+  overflow: "hidden",
+  [theme.breakpoints.down("sm")]: {
+    gridTemplateColumns: "1fr",
+  },
 }));
 
-const Card = styled("div")(({ theme }) => ({
-  width: "100%",
-  display: "flex",
-  flexDirection: "row",
-  borderRadius: "1px",
-  borderBottom: "1px solid lightgray",
-}));
-
-const AvatarSection = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: theme.spacing(1),
-  flex: 1,
-}));
-
-const EditButton = styled("div")(({ theme }) => ({
+const TextContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  marginLeft: "-5rem",
+  color: theme.palette.text.primary,
+  zIndex: 1, // Ensure text is above the background image
 }));
 
-const StatisticsContainer = styled(Box)(({ theme }) => ({
+const AvatarContainer = styled(Box)(({ theme }) => ({
+  position: "relative",
+  width: "100px",
+  height: "100px",
+  borderRadius: "50%",
+  overflow: "hidden",
+  border: "2px solid white",
+  marginRight: theme.spacing(3),
+}));
+
+const InnerHeaderContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
+  flexDirection: "column",
+  justifyContent: "center",
+  textAlign: "left",
 }));
 
-const StatisticsItem = styled("div")(({ theme }) => ({
+const ProfileContent = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: theme.spacing(2),
+  width: "100%",
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+}));
+
+const ProfileContentContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  marginRight: theme.spacing(2),
-}));
-
-const Icon = styled("p")(({ color }) => ({
-  fontSize: "1rem",
-  color: color,
-}));
-
-const LocationSection = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  marginTop: theme.spacing(1),
-  marginBottom: theme.spacing(1),
-}));
-
-const LocationText = styled(Typography)(({ theme }) => ({
-  fontWeight: "normal",
-  // color: "#FF6F61", // Warm coral color for location text
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: "rgba(255,255,255,0.1)",
 }));
 
 const ProfileHeaderCard = ({
-  isMobile,
   userData,
   userLocation,
   renderEditButton,
   calculateAge,
   setProfileImages,
-  isLoggedUserProfile,
 }) => {
   const { colorMode } = useColorMode();
   const textColor = colorMode === "dark" ? "white" : "#333333"; // Adjusted text color
@@ -112,77 +125,44 @@ const ProfileHeaderCard = ({
 
   return (
     <Container>
-      <Card>
-        <AvatarSection>
-          <CardHeader
-            title={
-              <>
-                <Typography
-                  variant="h5"
-                  sx={{ color: textColor, fontWeight: "bold" }}
-                >
-                  {userData?.name}, {calculateAge(userData?.date_of_birth)}
-                </Typography>
-                <LocationSection>
-                  <LocationOnIcon sx={{ color: "#FF6F61" }} />
-                  <LocationText sx={{ color: textColor }}>
-                    {userLocation}
-                  </LocationText>
-                </LocationSection>
-              </>
-            }
-            subheader={
-              <Typography
-                variant="body2"
-                sx={{ color: textColor, fontWeight: "bold" }}
-                gutterBottom
-              >
-                {userData?.bio}
-              </Typography>
-            }
-            avatar={
-              <UserAvatar userData={userData} width="100px" height="100px" />
-            }
-          />
-          <StatisticsContainer>
-            <StatisticsItem>
-              <Icon color="#F2A900">{userData.total_linkups}</Icon>{" "}
-              {/* Sun yellow for statistics */}
-              <Typography
-                variant="body2"
-                align="center"
-                sx={{ color: textColor }}
-              >
-                Created Linkups
-              </Typography>
-            </StatisticsItem>
-            <StatisticsItem>
-              <Icon color="#FF6F61">...</Icon> {/* Coral for statistics */}
-              <Typography
-                variant="body2"
-                align="center"
-                sx={{ color: textColor }}
-              >
-                Completed Linkups
-              </Typography>
-            </StatisticsItem>
-            <StatisticsItem>
-              {/* <Icon color="#F2A900">★★★★★</Icon> */}
-              <Icon color="#F2A900">...</Icon>
-              {/* Sun yellow for statistics */}
-              {/* Bright yellow for statistics */}
-              <Typography
-                variant="body2"
-                align="center"
-                sx={{ color: textColor }}
-              >
-                Linkup Rating Score
-              </Typography>
-            </StatisticsItem>
-          </StatisticsContainer>
-        </AvatarSection>
-        <EditButton>{renderEditButton && renderEditButton()}</EditButton>
-      </Card>
+      <PromoSection colorMode={colorMode}>
+        <TextContainer>
+          <Typography
+            variant="body1"
+            sx={{
+              color: "white",
+              marginBottom: "1.5rem",
+              fontWeight: "500",
+            }}
+          >
+            {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
+            {userLocation}
+            {/* • Online 6 days ago */}
+          </Typography>
+          <Typography variant="h4" sx={{ color: "white", fontWeight: "bold" }}>
+            {userData?.bio}
+          </Typography>
+        </TextContainer>
+      </PromoSection>
+      <ProfileContentContainer>
+        <ProfileContent>
+          <AvatarContainer>
+            <UserAvatar userData={userData} width="100px" height="100px" />
+          </AvatarContainer>
+          <InnerHeaderContainer>
+            <Typography
+              variant="h6"
+              sx={{ color: textColor, fontWeight: "bold" }}
+            >
+              {userData?.name}, {calculateAge(userData?.date_of_birth)}
+            </Typography>
+            <Typography variant="body2" sx={{ color: textColor }}>
+              {userData.total_linkups} Created Linkups
+            </Typography>
+          </InnerHeaderContainer>
+          <Box sx={{ marginLeft: "auto" }}>{renderEditButton()}</Box>
+        </ProfileContent>
+      </ProfileContentContainer>
     </Container>
   );
 };

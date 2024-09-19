@@ -3,11 +3,6 @@ node_modules/
 client/node_modules/
 server/**/node_modules/
 
-# Ignore source code folders
-client/src/
-server/**/src/
-server/**/controllers/
-server/**/routes/
 
 # Environment Files
 .env

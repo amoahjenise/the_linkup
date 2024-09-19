@@ -23,12 +23,9 @@ const LogoImage = styled("img")(({ theme }) => ({
 
 const ErrorMessage = styled("h1")(({ theme }) => ({
   fontSize: 24,
-  color: theme.palette.primary.main,
 }));
 
-const ErrorDescription = styled("p")(({ theme }) => ({
-  color: theme.palette.text.secondary,
-}));
+const ErrorDescription = styled("p")(({ theme }) => ({}));
 
 const RetryButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
