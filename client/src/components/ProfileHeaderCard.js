@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
 import UserAvatar from "./UserAvatar";
@@ -85,25 +85,11 @@ const ProfileHeaderCard = ({
   renderEditButton,
   calculateAge,
   setProfileImages,
+  promoHeight,
+  promoRef,
 }) => {
   const { colorMode } = useColorMode();
   const textColor = colorMode === "dark" ? "white" : "#333333"; // Adjusted text color
-  const [promoHeight, setPromoHeight] = useState("400px");
-  const promoRef = useRef();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const newHeight = Math.max(100, 400 - scrollTop); // Minimum height of 100px
-      setPromoHeight(`${newHeight}px`);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   useEffect(() => {
     const fetchInstagramMedia = async (code) => {
@@ -134,11 +120,7 @@ const ProfileHeaderCard = ({
 
   return (
     <Container>
-      <PromoSection
-        colorMode={colorMode}
-        promoHeight={promoHeight}
-        ref={promoRef}
-      >
+      <PromoSection colorMode={colorMode}>
         <TextContainer>
           <Typography
             variant="body1"

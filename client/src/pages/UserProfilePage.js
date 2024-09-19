@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
+import { IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import ImageGrid from "../components/ImageGrid";
 import {
   getUserById,
@@ -20,8 +22,6 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { useClerk } from "@clerk/clerk-react";
-import { Button } from "@mui/material";
-import { useColorMode } from "@chakra-ui/react";
 
 // Extend Day.js with plugins
 dayjs.extend(utc);
@@ -32,33 +32,29 @@ const Container = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  overflowX: "auto",
+  overflowY: "hidden",
 });
 
 const ProfileSection = styled("div")({
   display: "flex",
   flexDirection: "column",
+  overflowX: "hidden",
 });
 
 const ImageSection = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  overflowY: "auto",
   maxHeight: "60vh",
   marginTop: "1px",
 });
 
-const SubscribeButton = styled(Button)(({ theme, colorMode }) => ({
-  color: colorMode === "light" ? "black" : "white",
-  borderRadius: "20px",
-  padding: theme.spacing(1, 3),
-  textTransform: "none",
-  border: `1px solid ${
-    colorMode === "light" ? "white" : theme.palette.divider
-  }`,
-  boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`,
+const EditButton = styled(IconButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 0, 0, 0.2)",
+  color: theme.palette.primary.contrastText,
   "&:hover": {
-    boxShadow: `0 4px 8px rgba(0, 0, 0, 0.2)`,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
 }));
 
@@ -69,12 +65,8 @@ const UserProfilePage = ({ isMobile }) => {
     profileImages: [],
     isLoading: true,
     isEditModalOpen: false,
-    isInstagramTokenUpdated: false,
+    isInstagramTokenUpdated: false, // New state to track Instagram token update
   });
-
-  const [promoHeight, setPromoHeight] = useState("400px");
-  const [isPromoVisible, setIsPromoVisible] = useState(true);
-  const promoRef = useRef();
 
   const clerk = useClerk();
 
@@ -94,8 +86,6 @@ const UserProfilePage = ({ isMobile }) => {
   const isLoggedUserProfile =
     userIdParam === "me" || userIdParam === loggedUser.user.id;
   const userId = userIdParam === "me" ? loggedUser.user.id : userIdParam;
-
-  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +117,7 @@ const UserProfilePage = ({ isMobile }) => {
           userData,
           profileImages,
           isLoading: false,
-          isInstagramTokenUpdated: !!instagram_access_token,
+          isInstagramTokenUpdated: !!instagram_access_token, // Set to true if token exists
         }));
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -204,6 +194,7 @@ const UserProfilePage = ({ isMobile }) => {
 
       if (clerk.user) {
         if (editedAvatar) {
+          // Upload the image to Clerk
           await clerk.user
             .setProfileImage({ file: editedAvatar })
             .then((res) => {
@@ -251,58 +242,42 @@ const UserProfilePage = ({ isMobile }) => {
     return age;
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const newHeight = Math.max(0, 400 - scrollTop); // Minimum height of 0px
-
-      setPromoHeight(`${newHeight}px`);
-
-      if (newHeight <= 0) {
-        setIsPromoVisible(false);
-      } else {
-        setIsPromoVisible(true);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <Container>
-      <TopNavBar />
-      <ProfileSection>
-        <ProfileHeaderCard
-          isMobile={isMobile}
-          userData={state.userData}
-          userLocation={
-            locationState.city && locationState.country
-              ? `${locationState.city}, ${locationState.country}`
-              : "Unknown Location"
-          }
-          renderEditButton={() =>
-            isLoggedUserProfile && (
-              <SubscribeButton onClick={toggleEditModal} colorMode={colorMode}>
-                Edit
-              </SubscribeButton>
-            )
-          }
-          calculateAge={calculateAge}
-          setProfileImages={handleSetProfileImages}
-          promoRef={promoRef}
-          promoHeight={promoHeight}
-          isPromoVisible={isPromoVisible}
-        />
-        <ImageSection>
-          <ImageGrid
-            images={state.profileImages}
+      <TopNavBar title="Profile" />
+      {state.isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <ProfileSection>
+          <ProfileHeaderCard
             isMobile={isMobile}
+            userData={state.userData}
+            userLocation={
+              locationState.city && locationState.country
+                ? `${locationState.city}, ${locationState.country}`
+                : "Unknown Location"
+            }
+            renderEditButton={() =>
+              isLoggedUserProfile && (
+                <EditButton onClick={toggleEditModal} size="large">
+                  <EditIcon />
+                </EditButton>
+              )
+            }
+            calculateAge={calculateAge}
+            setProfileImages={handleSetProfileImages}
             isLoggedUserProfile={isLoggedUserProfile}
           />
-        </ImageSection>
-      </ProfileSection>
-      {state.isEditModalOpen && (
+          <ImageSection>
+            <ImageGrid
+              images={state.profileImages}
+              isMobile={isMobile}
+              isLoggedUserProfile={isLoggedUserProfile}
+            />
+          </ImageSection>
+        </ProfileSection>
+      )}
+      {state.userData && (
         <UserProfileEditModal
           isOpen={state.isEditModalOpen}
           onClose={toggleEditModal}
