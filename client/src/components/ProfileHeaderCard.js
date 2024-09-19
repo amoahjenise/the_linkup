@@ -25,7 +25,7 @@ const PromoSection = styled(Box)(({ theme, colorMode }) => ({
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
   alignItems: "center",
-  padding: theme.spacing(6),
+  padding: theme.spacing(0, 6),
   height: "360px",
   color: theme.palette.text.primary,
   position: "relative",

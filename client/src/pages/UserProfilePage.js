@@ -45,7 +45,6 @@ const ImageSection = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  overflowY: "auto",
   maxHeight: "60vh",
   height: "100%",
   marginTop: "1px",
