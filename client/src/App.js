@@ -57,6 +57,7 @@ const AppWrapper = styled("div", {
   ...(isAuthenticated && {
     display: "flex",
     height: "100vh",
+    overflow: "hidden",
   }),
 }));
 

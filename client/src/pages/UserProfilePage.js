@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
@@ -32,26 +32,23 @@ const Container = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  overflowY: "hidden",
+  overflowX: "auto",
 });
 
 const ProfileSection = styled("div")({
   display: "flex",
   flexDirection: "column",
-  overflowX: "hidden",
 });
 
 const ImageSection = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  overflowY: "auto",
   maxHeight: "60vh",
   marginTop: "1px",
 });
 
 const SubscribeButton = styled(Button)(({ theme, colorMode }) => ({
-  // backgroundColor: "#FF6F61",
   color: colorMode === "light" ? "black" : "white",
   borderRadius: "20px",
   padding: theme.spacing(1, 3),
@@ -59,9 +56,9 @@ const SubscribeButton = styled(Button)(({ theme, colorMode }) => ({
   border: `1px solid ${
     colorMode === "light" ? "white" : theme.palette.divider
   }`,
-  boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`, // Subtle shadow
+  boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`,
   "&:hover": {
-    boxShadow: `0 4px 8px rgba(0, 0, 0, 0.2)`, // Enhanced shadow on hover
+    boxShadow: `0 4px 8px rgba(0, 0, 0, 0.2)`,
   },
 }));
 
@@ -72,8 +69,12 @@ const UserProfilePage = ({ isMobile }) => {
     profileImages: [],
     isLoading: true,
     isEditModalOpen: false,
-    isInstagramTokenUpdated: false, // New state to track Instagram token update
+    isInstagramTokenUpdated: false,
   });
+
+  const [promoHeight, setPromoHeight] = useState("400px");
+  const [isPromoVisible, setIsPromoVisible] = useState(true);
+  const promoRef = useRef();
 
   const clerk = useClerk();
 
@@ -126,7 +127,7 @@ const UserProfilePage = ({ isMobile }) => {
           userData,
           profileImages,
           isLoading: false,
-          isInstagramTokenUpdated: !!instagram_access_token, // Set to true if token exists
+          isInstagramTokenUpdated: !!instagram_access_token,
         }));
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -203,7 +204,6 @@ const UserProfilePage = ({ isMobile }) => {
 
       if (clerk.user) {
         if (editedAvatar) {
-          // Upload the image to Clerk
           await clerk.user
             .setProfileImage({ file: editedAvatar })
             .then((res) => {
@@ -251,44 +251,58 @@ const UserProfilePage = ({ isMobile }) => {
     return age;
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const newHeight = Math.max(0, 400 - scrollTop); // Minimum height of 0px
+
+      setPromoHeight(`${newHeight}px`);
+
+      if (newHeight <= 0) {
+        setIsPromoVisible(false);
+      } else {
+        setIsPromoVisible(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <Container>
-      <TopNavBar title="Profile" />
-      {state.isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <ProfileSection>
-          <ProfileHeaderCard
+      <TopNavBar />
+      <ProfileSection>
+        <ProfileHeaderCard
+          isMobile={isMobile}
+          userData={state.userData}
+          userLocation={
+            locationState.city && locationState.country
+              ? `${locationState.city}, ${locationState.country}`
+              : "Unknown Location"
+          }
+          renderEditButton={() =>
+            isLoggedUserProfile && (
+              <SubscribeButton onClick={toggleEditModal} colorMode={colorMode}>
+                Edit
+              </SubscribeButton>
+            )
+          }
+          calculateAge={calculateAge}
+          setProfileImages={handleSetProfileImages}
+          promoRef={promoRef}
+          promoHeight={promoHeight}
+          isPromoVisible={isPromoVisible}
+        />
+        <ImageSection>
+          <ImageGrid
+            images={state.profileImages}
             isMobile={isMobile}
-            userData={state.userData}
-            userLocation={
-              locationState.city && locationState.country
-                ? `${locationState.city}, ${locationState.country}`
-                : "Unknown Location"
-            }
-            renderEditButton={() =>
-              isLoggedUserProfile && (
-                <SubscribeButton
-                  onClick={toggleEditModal}
-                  colorMode={colorMode}
-                >
-                  Edit
-                </SubscribeButton>
-              )
-            }
-            calculateAge={calculateAge}
-            setProfileImages={handleSetProfileImages}
+            isLoggedUserProfile={isLoggedUserProfile}
           />
-          <ImageSection>
-            <ImageGrid
-              images={state.profileImages}
-              isMobile={isMobile}
-              isLoggedUserProfile={isLoggedUserProfile}
-            />
-          </ImageSection>
-        </ProfileSection>
-      )}
-      {state.userData && (
+        </ImageSection>
+      </ProfileSection>
+      {state.isEditModalOpen && (
         <UserProfileEditModal
           isOpen={state.isEditModalOpen}
           onClose={toggleEditModal}
