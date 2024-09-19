@@ -170,7 +170,7 @@ const ProfileHeaderCard = ({
               {userData?.name}, {calculateAge(userData?.date_of_birth)}
             </Typography>
             <Typography variant="body2" sx={{ color: textColor }}>
-              {userData.total_linkups} Created Linkups
+              {userData?.total_linkups} Created Linkups
             </Typography>
           </InnerHeaderContainer>
           <Box sx={{ marginLeft: "auto" }}>{renderEditButton()}</Box>
