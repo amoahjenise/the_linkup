@@ -9,7 +9,6 @@ import {
   getAccessToken,
 } from "../api/instagramAPI";
 import banner from "../assets/Banner.jpg"; // Import the local banner image
-import Spiral from "../assets/Spiral.jpg"; // Import the local banner image
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({
