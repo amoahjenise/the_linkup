@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import videoSrc from "../assets/TheLinkupAppMarketing.mp4"; // Import your video file
+// import videoSrc from "../assets/TheLinkupAppMarketing.mp4"; // Import your video file
 import logoSrc from "../assets/logo.png"; // Import your logo file
+import LandingPageImage from "../assets/LandingPageImage.png";
 
 // Styled Components
 const PageContainer = styled("div")({
@@ -192,10 +193,11 @@ const LandingPage = () => {
         </LeftColumn>
         <RightColumn>
           <VideoContainer>
-            <VideoElement controls>
+            <img src={LandingPageImage} alt={"screenshot"} />
+            {/* <VideoElement controls>
               <source src={videoSrc} type="video/mp4" />
               Your browser does not support the video tag.
-            </VideoElement>
+            </VideoElement> */}
           </VideoContainer>
         </RightColumn>
       </ContentContainer>
