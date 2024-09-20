@@ -57,7 +57,7 @@ const sendRequest = async (req, res) => {
         requesterId: requesterId,
         type: "linkup_request",
         linkupId: linkupId,
-        content: `New link-up request from ${requesterName}`,
+        content: `New linkup request from ${requesterName}`,
         linkupRequestId: rows[0].id,
       };
 
@@ -103,7 +103,7 @@ const sendRequest = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to request link-up",
+      message: "Failed to request linkup",
       error: error.message,
     });
   }

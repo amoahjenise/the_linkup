@@ -65,7 +65,7 @@ const HorizontalMenu = ({
         payload: { id: linkupItem.request_id, status: "accepted" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request accepted.");
+      addSnackbar("Linkup request accepted.");
     } catch (error) {
       addSnackbar(error.message);
     }
@@ -80,7 +80,7 @@ const HorizontalMenu = ({
         payload: { id: linkupItem.request_id, status: "declined" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request declined.");
+      addSnackbar("Linkup request declined.");
     } catch (error) {
       addSnackbar(error.message);
     }
@@ -107,7 +107,7 @@ const HorizontalMenu = ({
     try {
       const response = await closeLinkup(linkupItem.id);
       const message = response.success
-        ? "Link-up closed successfully!"
+        ? "Linkup closed successfully!"
         : `Error closing the linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
@@ -125,7 +125,7 @@ const HorizontalMenu = ({
     try {
       const response = await deleteLinkup(linkupItem.id);
       const message = response.success
-        ? "Link-up deleted successfully!"
+        ? "Linkup deleted successfully!"
         : `Error deleting linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);

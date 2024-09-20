@@ -50,6 +50,7 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   "&:hover": {
     transform: "translateY(-2px)", // Slight floating effect
   },
+  cursor: "pointer",
 }));
 
 const HorizontalMenuContainer = styled("div")(({ theme }) => ({
@@ -59,6 +60,11 @@ const HorizontalMenuContainer = styled("div")(({ theme }) => ({
 const UserName = styled("div")(({ theme }) => ({
   fontSize: "1rem",
   fontWeight: "bold",
+}));
+
+const Name = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
 }));
 
 const UserInfo = styled("div")(({ theme }) => ({
@@ -112,9 +118,12 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
-const OnlineIndicator = styled("span")(({ theme }) => ({
-  height: "0.75rem",
-  marginRight: "0.125rem",
+const OnlineIndicator = styled("div")(({ isOnline }) => ({
+  // width: "0.5rem",
+  // height: "0.5rem",
+  // borderRadius: "50%",
+  // backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
+  // marginLeft: "0.5rem", // Space between username and indicator
 }));
 
 const PaymentOptionIcon = styled("div")(({ theme }) => ({
@@ -161,6 +170,19 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
+  const [isOnline, setIsOnline] = useState(false); // State for online status
+
+  useEffect(() => {
+    // Simulate online status
+    const fetchOnlineStatus = async () => {
+      // You can replace this with actual API call to fetch online status
+      const response = await fetch(`/api/users/${creator_id}/status`);
+      const data = await response.json();
+      setIsOnline(data.isOnline);
+    };
+
+    fetchOnlineStatus();
+  }, [creator_id]);
 
   useEffect(() => {
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -168,7 +190,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
 
       const R = 6371; // Radius of the Earth in kilometers
       const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon2 - lon1);
+      const dLon = toRadians(lon1 - lon2);
       const a =
         Math.sin(dLat) * Math.sin(dLat) +
         Math.cos(toRadians(lat1)) *
@@ -301,8 +323,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
       <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
           {creator_name}
-        </Link>{" "}
-        is trying to link up {activityFormatted}.
+        </Link>
+        {" is trying to link up " + activityFormatted + "."}
       </p>
     );
   };
@@ -355,7 +377,10 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               height="60px"
             />
             <div>
-              <UserName>{creator_name}</UserName>
+              <Name>
+                <UserName>{creator_name}</UserName>
+                <OnlineIndicator isOnline={isOnline} />
+              </Name>
               <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>
               </PostInfo>

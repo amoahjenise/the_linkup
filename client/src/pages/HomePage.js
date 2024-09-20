@@ -130,7 +130,7 @@ const HomePage = ({ isMobile }) => {
             (linkup) => linkup.status === "active"
           );
 
-          // Calculate distance for each linkup
+          // Calculate distance and recency for each linkup
           const calculateDistance = (lat1, lon1, lat2, lon2) => {
             const R = 6371; // Radius of the Earth in km
             const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -153,14 +153,21 @@ const HomePage = ({ isMobile }) => {
               linkup.latitude,
               linkup.longitude
             ),
+            recency: Date.now() - new Date(linkup.created_at).getTime(), // Recency in milliseconds
           }));
 
-          // Sort the updated list by distance, then by scheduled date
+          // Sort the updated list by recency, then by distance, then by scheduled time
           updatedLinkupList.sort((a, b) => {
-            // Compare distances
-            if (a.distance !== b.distance) {
-              return a.distance - b.distance;
+            // Compare recency (newer linkups should come first)
+            if (a.recency !== b.recency) {
+              return a.recency - b.recency; // Sort by recency (lower is newer)
             }
+
+            // Compare distances (closer linkups should come first)
+            if (a.distance !== b.distance) {
+              return a.distance - b.distance; // Sort by distance
+            }
+
             // If distances are the same, compare scheduled times
             const now = new Date();
             const timeDifferenceA = new Date(a.scheduled_at) - now;
@@ -169,12 +176,23 @@ const HomePage = ({ isMobile }) => {
             return timeDifferenceA - timeDifferenceB; // Sort by upcoming time
           });
 
+          // Separate user's linkups
+          const userLinkups = updatedLinkupList.filter(
+            (linkup) => linkup.created_by === userId
+          );
+          const otherLinkups = updatedLinkupList.filter(
+            (linkup) => linkup.created_by !== userId
+          );
+
+          // Combine them, ensuring user linkups appear with the same priority
+          const combinedLinkups = [...userLinkups, ...otherLinkups];
+
           // Dispatch updated linkups to Redux store
-          dispatch(fetchLinkupsSuccess(updatedLinkupList));
+          dispatch(fetchLinkupsSuccess(combinedLinkups));
 
           // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
-          const newFetchedLinkupIds = updatedLinkupList.map(
+          const newFetchedLinkupIds = combinedLinkups.map(
             (linkup) => linkup.id
           );
           setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
@@ -184,7 +202,6 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
-        // Ensure fetching state is reset
         setIsFetchingNextPage(false);
       }
     },

@@ -13,6 +13,7 @@ import {
   sendInvitation,
 } from "../api/sendbirdAPI";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
+import { getLinkupStatus } from "../api/linkUpAPI";
 
 const SendRequestContainer = styled("div")({
   display: "flex",
@@ -106,15 +107,38 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
     const aUsers = [requesterId, post.creator_id];
 
     try {
+      const response = await getLinkupStatus(post.id);
+      let message = "";
+
+      switch (response.linkupStatus) {
+        case "expired":
+          message = "This linkup has expired.";
+          break;
+        case "closed":
+          message =
+            "This linkup was closed and can no longer receive requests.";
+          break;
+        case "inactive":
+          message = "This linkup was deleted.";
+          break;
+        default:
+          // If the status is valid, continue processing
+          break;
+      }
+
+      // If message is set, show snackbar and exit
+      if (message) {
+        addSnackbar(message, { timeout: 7000 });
+        return;
+      }
+
       const existingRequest = await getRequestByLinkupIdAndSenderId(
         linkupId,
         requesterId
       );
 
-      console.log("existingRequest.linkupRequest", existingRequest);
-
       if (existingRequest.linkupRequest) {
-        addSnackbar("You have already sent a request for this link-up.");
+        addSnackbar("You have already sent a request for this linkup.");
         return;
       }
 
@@ -139,7 +163,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         post.creator_id,
         linkupId,
         message,
-        channelUrl,
+        channelUrl
       );
 
       if (sendMessageResponse.message_id) {

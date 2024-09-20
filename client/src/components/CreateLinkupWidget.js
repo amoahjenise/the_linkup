@@ -197,7 +197,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
       if (response.success) {
         updateLinkupList(response.newLinkup);
-        addSnackbar("Link-up created successfully!");
+        addSnackbar("Linkup created successfully!");
         e.target.reset();
         setSelectedDate(null);
         setGenderPreference("");
