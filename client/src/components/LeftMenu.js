@@ -47,7 +47,7 @@ const MenuList = styled("ul")({
 });
 
 const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
-  marginBottom: theme.spacing(1),
+  marginBottom: theme.spacing(2),
   padding: theme.spacing(2),
   borderRadius: "8px", // Slight rounding for the clean look
   backgroundColor: isActive
