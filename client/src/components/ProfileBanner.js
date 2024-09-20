@@ -12,7 +12,7 @@ const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
   height: "360px",
   background:
     colorMode === "light"
-      ? `linear-gradient(to right, rgba(0, 0, 0, 1) 48%, transparent 70%), url(${banner})`
+      ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 49%, transparent 79%), url(${banner})`
       : `linear-gradient(to right, rgba(0, 0, 0, 0.98) 48%, transparent 70%), url(${banner})`,
   backgroundSize: "cover",
   backgroundPosition: "center top",
