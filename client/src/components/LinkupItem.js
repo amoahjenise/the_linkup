@@ -29,22 +29,37 @@ const Container = styled("div")(({ theme }) => ({
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   border: `1px solid ${
-    colorMode === "light" ? "none" : "rgba(229, 235, 243, 0.2)"
+    colorMode === "light"
+      ? "rgba(229, 235, 243, 1)" // Light border for light mode
+      : "rgba(229, 235, 243, 0.2)" // Subtle border for dark mode
   }`,
   padding: "1.5rem",
   borderRadius: "1.5rem", // Large rounded corners for a soft feel
   width: "100%",
   background:
     colorMode === "light"
-      ? "#ffffff"
-      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))",
+      ? "#ffffff" // Solid white background for light mode
+      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))", // Subtle gradient for dark mode
   backdropFilter: "blur(10px)", // Glass-like background effect
-  boxShadow: isHovered
-    ? "0 4px 10px rgba(0, 0, 0, 0.15)"
-    : "0 2px 5px rgba(0, 0, 0, 0.1)", // Soft shadows
+
+  // Box shadow for light mode
+  boxShadow:
+    colorMode === "light"
+      ? isHovered
+        ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // More defined shadow on hover
+        : "0 4px 8px rgba(0, 0, 0, 0.05)" // Subtle shadow when not hovered
+      : isHovered
+      ? "0 12px 24px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2)" // Stronger shadow on hover for dark mode
+      : "none", // No shadow by default in dark mode
+
   transition: "transform 0.2s ease, box-shadow 0.2s ease",
+
   "&:hover": {
     transform: "translateY(-2px)", // Subtle hover effect
+    boxShadow:
+      colorMode === "light"
+        ? "0 12px 24px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.025)" // Hover shadow for light mode
+        : "0 12px 24px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(80, 80, 0, 0.025)", // Hover shadow for dark mode
   },
   cursor: "pointer",
 }));
