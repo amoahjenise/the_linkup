@@ -108,27 +108,27 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
 
     try {
       const response = await getLinkupStatus(post.id);
-      let message = "";
+      let displayMessage = "";
 
       switch (response.linkupStatus) {
         case "expired":
-          message = "This linkup has expired.";
+          displayMessage = "This linkup has expired.";
           break;
         case "closed":
-          message =
+          displayMessage =
             "This linkup was closed and can no longer receive requests.";
           break;
         case "inactive":
-          message = "This linkup was deleted.";
+          displayMessage = "This linkup was deleted.";
           break;
         default:
           // If the status is valid, continue processing
           break;
       }
 
-      // If message is set, show snackbar and exit
-      if (message) {
-        addSnackbar(message, { timeout: 7000 });
+      // If displayMessage is set, show snackbar and exit
+      if (displayMessage) {
+        addSnackbar(displayMessage, { timeout: 7000 });
         return;
       }
 
