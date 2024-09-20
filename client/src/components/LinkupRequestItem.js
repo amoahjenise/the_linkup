@@ -20,70 +20,68 @@ const compromise = nlp;
 
 const LinkupRequestItemContainer = styled("div")(({ theme }) => ({
   padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  borderRadius: "12px",
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+  marginBottom: theme.spacing(1),
+  borderBottom: "1px solid #D3D3D3",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  transition: "transform 0.2s ease",
-  "&:hover": {
-    transform: "scale(1.02)",
-    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.1)",
-  },
 }));
 
 const StatusChip = styled(Chip)(({ theme, status }) => ({
   width: "110px",
-  borderRadius: "8px",
-  fontWeight: "bold",
+  marginRight: "auto",
   backgroundColor:
     status === "pending"
-      ? "#f4b400" // MacOS-style yellow
+      ? "#f1c40f"
       : status === "accepted"
-      ? "#73FFAE" // Soft green for accepted
-      : "#FFB6C1", // Light pink for declined
-  color: theme.palette.text.primary,
-  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      ? "rgb(115, 255, 174, 0.9)"
+      : "pink",
+  color: theme.palette.text.secondary,
 }));
 
 const AcceptButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  borderColor: theme.palette.primary.main,
-  borderRadius: "8px",
-  padding: "6px 12px",
-  fontWeight: "500",
-  textTransform: "none",
+  backgroundColor: "transparent",
+  color: "#00BFFF",
+  borderColor: "#00BFFF",
+  borderWidth: "1px",
+  border: "0.1px solid #ccc",
+  marginRight: theme.spacing(2),
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
   "&:hover": {
-    backgroundColor: theme.palette.action.hover,
+    color: "#00BFFF",
+    backgroundColor: "rgb(0, 191, 255, 0.1)",
   },
 }));
 
 const DeclineButton = styled(Button)(({ theme }) => ({
-  color: theme.palette.error.main,
-  borderColor: theme.palette.error.main,
-  borderRadius: "8px",
-  padding: "6px 12px",
-  fontWeight: "500",
-  textTransform: "none",
+  backgroundColor: "transparent",
+  color: "#FF0000",
+  borderColor: "#FF0000",
+  borderWidth: "1px",
+  border: "0.1px solid #ccc",
+  marginRight: theme.spacing(2),
+  cursor: "pointer",
+  transition: "background-color 0.3s ease",
   "&:hover": {
-    backgroundColor: theme.palette.action.hover,
+    color: "#FF0000",
+    backgroundColor: "rgb(255, 0, 67, 0.2)",
   },
 }));
 
 const ButtonGroup = styled("div")(({ theme }) => ({
   display: "flex",
+  marginTop: theme.spacing(1),
   "& > *": {
     marginRight: theme.spacing(1),
   },
 }));
 
-const RequestText = styled(Typography)(({ theme }) => ({
+const RequestText = styled("p")(({ theme }) => ({
   margin: 0,
-  color: theme.palette.text.secondary,
-  fontSize: "14px",
-  fontWeight: "400",
+  marginBottom: theme.spacing(1),
+  marginTop: theme.spacing(1),
+  marginRight: theme.spacing(1),
 }));
 
 const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {

@@ -86,6 +86,7 @@ const IconWithSpacing = styled("div")({
   display: "flex",
   alignItems: "center",
   marginRight: "16px", // Adjust the spacing as needed
+  marginTop: "10px",
 });
 
 const LogoContainer = styled("div")(({ theme }) => ({
