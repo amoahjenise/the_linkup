@@ -12,7 +12,9 @@ const ProfileContentContainer = styled(Box)(({ theme, colorMode }) => ({
   alignItems: "center",
   justifyContent: "space-between", // Ensure even spacing
   borderTop: `1px solid ${theme.palette.divider}`,
-  borderBottom: `1px solid ${colorMode === "dark" ? "white" : "#333333"}`,
+  borderBottom: `1px solid ${
+    colorMode === "dark" ? "white" : `${theme.palette.divider}`
+  }`,
   backgroundColor: colorMode === "dark" ? "#333333" : "white",
   width: "100%",
   padding: theme.spacing(2),
