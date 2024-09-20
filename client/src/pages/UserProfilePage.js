@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import { IconButton } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import ImageGrid from "../components/ImageGrid";
 import {
   getUserById,
@@ -12,49 +10,59 @@ import {
   updateSendbirdUser,
   updateUserName,
 } from "../api/usersAPI";
-import { getUserMedia } from "../api/instagramAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
 import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import ProfileHeaderCard from "../components/ProfileHeaderCard";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { useClerk } from "@clerk/clerk-react";
+import { Box, Button } from "@mui/material";
+import { useColorMode } from "@chakra-ui/react";
+import {
+  getUserMedia,
+  postInstagramAccessToken,
+  getAccessToken,
+} from "../api/instagramAPI";
+import ProfileBanner from "../components/ProfileBanner";
+import ProfileInfoBar from "../components/ProfileInfoBar";
 
 // Extend Day.js with plugins
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// Define styled components
-const Container = styled("div")({
+// Styled components
+const Container = styled(Box)(({ theme }) => ({
+  overflowX: "auto",
+  width: "100%",
+}));
+
+const Content = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  overflowY: "hidden",
-});
-
-const ProfileSection = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  overflowX: "hidden",
+  height: "100%",
 });
 
 const ImageSection = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  maxHeight: "60vh",
-  height: "100%",
   marginTop: "1px",
 });
 
-const EditButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: "rgba(0, 0, 0, 0.2)",
-  color: theme.palette.primary.contrastText,
+const EditButton = styled(Button)(({ theme, colorMode }) => ({
+  color: colorMode === "light" ? "black" : "white",
+  borderRadius: "20px",
+  padding: theme.spacing(1, 3),
+  textTransform: "none",
+  border: `1px solid ${
+    colorMode === "light" ? "white" : theme.palette.divider
+  }`,
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
   },
 }));
 
@@ -65,27 +73,48 @@ const UserProfilePage = ({ isMobile }) => {
     profileImages: [],
     isLoading: true,
     isEditModalOpen: false,
-    isInstagramTokenUpdated: false, // New state to track Instagram token update
+    isInstagramTokenUpdated: false,
   });
 
   const clerk = useClerk();
-
-  const handleSetProfileImages = (newImages) => {
-    setState((prevState) => ({
-      ...prevState,
-      profileImages: newImages,
-    }));
-  };
-
-  const { addSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
+  const { addSnackbar } = useSnackbar();
 
   const loggedUser = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
+  const userId = userIdParam === "me" ? loggedUser.user.id : userIdParam;
   const isLoggedUserProfile =
     userIdParam === "me" || userIdParam === loggedUser.user.id;
-  const userId = userIdParam === "me" ? loggedUser.user.id : userIdParam;
+
+  useEffect(() => {
+    const fetchInstagramMedia = async (code) => {
+      try {
+        const accessToken = await getAccessToken(code);
+        await postInstagramAccessToken(userId, accessToken);
+        const instagramMediaResponse = await getUserMedia(accessToken);
+
+        if (instagramMediaResponse.success) {
+          const instagramImageUrls = instagramMediaResponse.data.data.map(
+            (imageObj) => imageObj.media_url
+          );
+          setState((prevState) => ({
+            ...prevState,
+            profileImages: instagramImageUrls,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching Instagram media:", error);
+      }
+    };
+
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (code) {
+      fetchInstagramMedia(code);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [userId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,7 +146,7 @@ const UserProfilePage = ({ isMobile }) => {
           userData,
           profileImages,
           isLoading: false,
-          isInstagramTokenUpdated: !!instagram_access_token, // Set to true if token exists
+          isInstagramTokenUpdated: !!instagram_access_token,
         }));
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -148,10 +177,7 @@ const UserProfilePage = ({ isMobile }) => {
             const profileImages = instagramMediaResponse.data.data.map(
               (imageObj) => imageObj.media_url
             );
-            setState((prevState) => ({
-              ...prevState,
-              profileImages,
-            }));
+            setState((prevState) => ({ ...prevState, profileImages }));
           }
         } catch (error) {
           console.error("Error fetching Instagram media:", error);
@@ -169,7 +195,6 @@ const UserProfilePage = ({ isMobile }) => {
   const handleSaveChanges = async (editedBio, editedAvatar, editedName) => {
     try {
       let changesMade = false;
-
       const updateIfChanged = async (field, newValue, updateFn, key) => {
         if (state.userData?.[field] !== newValue) {
           const response = await updateFn(state.userData?.id, newValue);
@@ -192,23 +217,14 @@ const UserProfilePage = ({ isMobile }) => {
         updateIfChanged("name", editedName, updateUserName, "name"),
       ]);
 
-      if (clerk.user) {
-        if (editedAvatar) {
-          // Upload the image to Clerk
-          await clerk.user
-            .setProfileImage({ file: editedAvatar })
-            .then((res) => {
-              updateSendbirdUser(userId, clerk.user.imageUrl);
-              console.log("Profile image uploaded successfully:", res);
-            })
-            .catch((error) => {
-              console.error(
-                "An error occurred while uploading the profile image:",
-                error.errors
-              );
-              throw new Error("Failed to upload image");
-            });
-        }
+      if (clerk.user && editedAvatar) {
+        await clerk.user
+          .setProfileImage({ file: editedAvatar })
+          .then(() => updateSendbirdUser(userId, clerk.user.imageUrl))
+          .catch((error) => {
+            console.error("Error uploading profile image:", error.errors);
+            throw new Error("Failed to upload image");
+          });
       }
 
       addSnackbar(
@@ -222,20 +238,23 @@ const UserProfilePage = ({ isMobile }) => {
     }
   };
 
-  const toggleEditModal = () =>
+  const toggleEditModal = () => {
+    console.log("Before toggle:", state.isEditModalOpen); // Debugging line
     setState((prevState) => ({
       ...prevState,
       isEditModalOpen: !prevState.isEditModalOpen,
     }));
+    console.log("After toggle:", !state.isEditModalOpen); // Debugging line
+  };
 
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 0;
     const birthDate = dayjs(dateOfBirth);
-    const now = dayjs();
-    let age = now.diff(birthDate, "year");
+    let age = dayjs().diff(birthDate, "year");
     if (
-      now.month() < birthDate.month() ||
-      (now.month() === birthDate.month() && now.date() < birthDate.date())
+      dayjs().month() < birthDate.month() ||
+      (dayjs().month() === birthDate.month() &&
+        dayjs().date() < birthDate.date())
     ) {
       age -= 1;
     }
@@ -248,40 +267,45 @@ const UserProfilePage = ({ isMobile }) => {
       {state.isLoading ? (
         <LoadingSpinner />
       ) : (
-        <ProfileSection>
-          <ProfileHeaderCard
-            isMobile={isMobile}
+        <>
+          <ProfileBanner
             userData={state.userData}
             userLocation={
               locationState.city && locationState.country
                 ? `${locationState.city}, ${locationState.country}`
                 : "Unknown Location"
             }
+            calculateAge={calculateAge}
+            colorMode={colorMode}
+          />
+          <ProfileInfoBar
+            userData={state.userData}
+            calculateAge={calculateAge}
             renderEditButton={() =>
               isLoggedUserProfile && (
-                <EditButton onClick={toggleEditModal} size="large">
-                  <EditIcon />
+                <EditButton onClick={toggleEditModal} colorMode={colorMode}>
+                  Edit Profile
                 </EditButton>
               )
             }
-            calculateAge={calculateAge}
-            setProfileImages={handleSetProfileImages}
-            isLoggedUserProfile={isLoggedUserProfile}
+            colorMode={colorMode}
           />
-          <ImageSection>
-            <ImageGrid
-              images={state.profileImages}
-              isMobile={isMobile}
-              isLoggedUserProfile={isLoggedUserProfile}
-            />
-          </ImageSection>
-        </ProfileSection>
+          <Content>
+            <ImageSection>
+              <ImageGrid
+                images={state.profileImages}
+                isMobile={isMobile}
+                isLoggedUserProfile={isLoggedUserProfile}
+              />
+            </ImageSection>
+          </Content>
+        </>
       )}
-      {state.userData && (
+      {state.isEditModalOpen && (
         <UserProfileEditModal
           isOpen={state.isEditModalOpen}
-          onClose={toggleEditModal}
           userData={state.userData}
+          onClose={toggleEditModal}
           onSave={handleSaveChanges}
         />
       )}
