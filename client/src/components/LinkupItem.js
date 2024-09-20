@@ -40,15 +40,11 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
       : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))",
   backdropFilter: "blur(10px)", // Glass-like background effect
   boxShadow: isHovered
-    ? colorMode === "light"
-      ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // Subtle, professional shadow on hover for light mode
-      : "0 12px 24px rgba(255, 255, 255, 0.05), 0 4px 6px rgba(255, 255, 255, 0.05)" // Subtle shadow for dark mode
-    : colorMode === "light"
-    ? "0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05)" // Subtle shadow for light mode
-    : "0 8px 16px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(255, 255, 255, 0.1)", // Subtle shadow for dark mode
+    ? "0 4px 10px rgba(0, 0, 0, 0.15)"
+    : "0 2px 5px rgba(0, 0, 0, 0.1)", // Soft shadows
   transition: "transform 0.2s ease, box-shadow 0.2s ease",
   "&:hover": {
-    transform: "translateY(-2px)", // Slight floating effect
+    transform: "translateY(-2px)", // Subtle hover effect
   },
   cursor: "pointer",
 }));

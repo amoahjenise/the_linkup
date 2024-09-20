@@ -47,23 +47,26 @@ const MenuList = styled("ul")({
 });
 
 const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(1),
   padding: theme.spacing(2),
-  borderRadius: "100px",
+  borderRadius: "8px", // Slight rounding for the clean look
   backgroundColor: isActive
     ? colorMode === "dark"
-      ? "rgba(18, 28, 38, 0.9)"
-      : "rgba(0, 0, 0, 0.1)"
+      ? "rgba(18, 28, 38, 0.8)" // Slightly more muted for a clean look
+      : "rgba(0, 0, 0, 0.07)"
     : "transparent",
   display: "flex",
   alignItems: "center",
   border: isActive
-    ? `2px solid ${colorMode === "dark" ? "#333" : "#F1F1FA"}`
-    : "none",
+    ? `2px solid ${colorMode === "dark" ? "#333" : "#DDD"}`
+    : "1px solid transparent",
+  flexGrow: 1, // Make the item grow to fit its content
+  minWidth: "0", // Prevent overflow by letting text wrap
+  maxWidth: "100%", // Ensure the item doesn't exceed its container width
   "&:hover": {
     backgroundColor:
-      colorMode === "dark" ? "rgba(18, 28, 38, 0.7)" : "rgba(18, 28, 38, 0.04)",
-    borderColor: colorMode === "dark" ? "#333" : "#CCC",
+      colorMode === "dark" ? "rgba(18, 28, 38, 0.5)" : "rgba(0, 0, 0, 0.05)",
+    borderColor: colorMode === "dark" ? "#444" : "#CCC",
   },
 }));
 
@@ -73,6 +76,10 @@ const MenuItemLink = styled(Link)({
   alignItems: "center",
   width: "100%",
   color: "inherit",
+  flexGrow: 1, // Allow the link to grow and take up available space
+  whiteSpace: "nowrap", // Prevent text from collapsing
+  overflow: "hidden", // Hide overflow
+  textOverflow: "ellipsis", // Use ellipsis when text overflows
 });
 
 const IconWithSpacing = styled("div")({

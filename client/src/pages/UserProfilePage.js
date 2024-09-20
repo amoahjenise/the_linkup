@@ -33,23 +33,24 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 // Styled components
+// Styled components
 const Container = styled(Box)(({ theme }) => ({
-  overflowX: "auto",
-  width: "100%",
+  overflowY: "auto", // Allow vertical scrolling only if content overflows
+  height: "100vh", // Make container occupy full viewport height
+  width: "100%", // Ensure it takes up full width
 }));
 
 const Content = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "100%",
 });
 
 const ImageSection = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  marginTop: "1px",
+  marginTop: "1px", // Minimize margin to avoid extra scroll space
 });
 
 const EditButton = styled(Button)(({ theme, colorMode }) => ({

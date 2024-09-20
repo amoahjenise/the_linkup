@@ -21,7 +21,7 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
   borderRadius: "24px",
   borderWidth: "1px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "box-shadow 0.3s ease",
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
