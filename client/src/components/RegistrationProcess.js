@@ -83,11 +83,6 @@ const RegistrationProcess = () => {
     const checkRegistrationStatus = async () => {
       if (!registrationData.isRegistering) {
         try {
-          if (!user) {
-            console.error("User is not defined");
-            return;
-          }
-
           if (userData?.user?.gender && userData?.user?.date_of_birth) {
             navigate("/home");
             return;
