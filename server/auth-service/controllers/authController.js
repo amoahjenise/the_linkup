@@ -95,7 +95,7 @@ const storeSendbirdAccessToken = async (id, token, client) => {
 const createSendbirdUser = async (user) => {
   console.log("user", user);
 
-  const { id, name, imageUrl } = user;
+  const { id, name } = user;
 
   try {
     const response = await axios.post(
@@ -103,7 +103,7 @@ const createSendbirdUser = async (user) => {
       {
         user_id: id,
         nickname: name,
-        profile_url: imageUrl,
+        profile_url: "",
         issue_access_token: true,
       },
       {

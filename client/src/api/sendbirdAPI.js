@@ -8,7 +8,7 @@ const handleError = (error) => {
   throw error;
 };
 
-export const createUser = async (userId, name, profileImageUrl) => {
+export const createUser = async (userId, name) => {
   try {
     const response = await axios.post(
       `https://api-${APP_ID}.sendbird.com/v3/users`,

@@ -12,6 +12,32 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
+const fetch = require("node-fetch"); // Ensure you have fetch imported
+
+// Define the function to update Sendbird user image
+const updateSendbirdUserImage = async (userId, publicUrl) => {
+  const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
+
+  const response = await fetch(sendbirdApiUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Token": process.env.SENDBIRD_API_TOKEN, // Ensure you have your Sendbird API token in your environment
+    },
+    body: JSON.stringify({
+      profile_url: publicUrl, // Update with the new public URL from Clerk
+    }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(
+      `Failed to update Sendbird user image URL: ${errorResponse.message}`
+    );
+  }
+
+  return response.json();
+};
 
 // Set allowed origins
 const ALLOWED_ORIGINS = [
@@ -70,6 +96,7 @@ router.use(
 // Routes for authentication
 router.use("/", authRoutes);
 
+// Webhook handler
 router.post(
   "/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
@@ -121,17 +148,16 @@ router.post(
       const eventType = evt.type;
 
       // Create formatted name as "First Name L."
-      // const formattedName = `${capitalizeFirstLetter(
-      //   first_name
-      // )} ${capitalizeFirstLetter(last_name.charAt(0))}.`;
+      const formattedName = `${capitalizeFirstLetter(
+        first_name
+      )} ${capitalizeFirstLetter(last_name.charAt(0))}.`;
 
       if (eventType === "user.created") {
         const phoneNumber = attributes.phone_numbers[0].phone_number;
         const user = {
           id: id,
           phoneNumber: phoneNumber,
-          name: first_name,
-          // name: capitalizeFirstLetter(formattedName),
+          name: formattedName,
         };
 
         console.log("createUser data:", user);
@@ -140,12 +166,11 @@ router.post(
         const response = await createUser(user, client);
 
         // Call createSendbirdUser with transaction client
-        // const sendbirdUser = { id: response.id, name: formattedName };
         const sendbirdUser = {
           id: response.id,
           name: first_name,
-          imageUrl: publicUrl,
         };
+
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
 
@@ -153,6 +178,13 @@ router.post(
         const sendbirdToken = sendbirdResponse.access_token;
         await storeSendbirdAccessToken(response.id, sendbirdToken, client);
         console.log("Sendbird access token stored", sendbirdToken);
+      } else if (eventType === "user.updated") {
+        // Update Sendbird user image URL
+        const sendbirdUpdateResponse = await updateSendbirdUserImage(
+          id,
+          publicUrl
+        );
+        console.log("Sendbird user image updated.", sendbirdUpdateResponse);
       }
 
       console.log(`Webhook with an ID of ${id} and type of ${eventType}`);
