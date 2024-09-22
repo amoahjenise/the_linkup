@@ -24,11 +24,6 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-// Example usage:
-const example = "hello world";
-const capitalized = capitalizeFirstLetter(example);
-console.log(capitalized); // Output: "Hello world"
-
 // Create an Express Router instance
 const router = express.Router();
 
