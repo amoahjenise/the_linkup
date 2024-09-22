@@ -14,6 +14,31 @@ const ALLOWED_ORIGINS = [
 
 const router = express.Router(); // Create a router instance
 
+// Define the function to update Sendbird user image
+const updateSendbirdUserImage = async (userId, publicUrl) => {
+  const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
+
+  const response = await fetch(sendbirdApiUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Token": process.env.SENDBIRD_API_TOKEN, // Ensure you have your Sendbird API token in your environment
+    },
+    body: JSON.stringify({
+      profile_url: publicUrl, // Update with the new public URL from Clerk
+    }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(
+      `Failed to update Sendbird user image URL: ${errorResponse.message}`
+    );
+  }
+
+  return response.json();
+};
+
 // Use helmet middleware to set security headers
 // Middleware
 router.use(
@@ -101,7 +126,7 @@ router.post(
       });
 
       // Grab the ID and TYPE of the Webhook
-      const { id } = evt.data;
+      const { id, publicUrl } = evt.data;
       const eventType = evt.type;
 
       if (eventType === "user.deleted") {
@@ -124,6 +149,13 @@ router.post(
           // Send error response to webhook
           res.status(500).json({ success: false, message: error.message });
         }
+      } else if (eventType === "user.updated") {
+        // Update Sendbird user image URL
+        const sendbirdUpdateResponse = await updateSendbirdUserImage(
+          id,
+          publicUrl
+        );
+        console.log("Sendbird user image updated.", sendbirdUpdateResponse);
       }
     } catch (err) {
       // Console log and return error

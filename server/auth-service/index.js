@@ -12,32 +12,6 @@ const {
 } = require("./controllers/authController");
 const { pool } = require("./db"); // Import your PostgreSQL connection pool
 const { clerkClient } = require("@clerk/clerk-sdk-node"); // Import Clerk SDK
-const fetch = require("node-fetch"); // Ensure you have fetch imported
-
-// Define the function to update Sendbird user image
-const updateSendbirdUserImage = async (userId, publicUrl) => {
-  const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
-
-  const response = await fetch(sendbirdApiUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Api-Token": process.env.SENDBIRD_API_TOKEN, // Ensure you have your Sendbird API token in your environment
-    },
-    body: JSON.stringify({
-      profile_url: publicUrl, // Update with the new public URL from Clerk
-    }),
-  });
-
-  if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(
-      `Failed to update Sendbird user image URL: ${errorResponse.message}`
-    );
-  }
-
-  return response.json();
-};
 
 // Set allowed origins
 const ALLOWED_ORIGINS = [
@@ -178,13 +152,6 @@ router.post(
         const sendbirdToken = sendbirdResponse.access_token;
         await storeSendbirdAccessToken(response.id, sendbirdToken, client);
         console.log("Sendbird access token stored", sendbirdToken);
-      } else if (eventType === "user.updated") {
-        // Update Sendbird user image URL
-        const sendbirdUpdateResponse = await updateSendbirdUserImage(
-          id,
-          publicUrl
-        );
-        console.log("Sendbird user image updated.", sendbirdUpdateResponse);
       }
 
       console.log(`Webhook with an ID of ${id} and type of ${eventType}`);
