@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Webhook } = require("svix");
 const userRoutes = require("./routes/userRoutes");
-const { deleteUser } = require("./controllers/userController");
+const { getUserById, deleteUser } = require("./controllers/userController");
 
 const ALLOWED_ORIGINS = [
   process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
@@ -130,6 +130,16 @@ router.post(
       const eventType = evt.type;
 
       if (eventType === "user.deleted") {
+        // Check if the user exists in the database
+        const userExists = await getUserById(id);
+        if (!userExists.success) {
+          console.error("User not found:", userExists.message);
+          return res.status(404).json({
+            success: false,
+            message: "User not found, cannot delete.",
+          });
+        }
+
         try {
           const response = await deleteUser(id);
           // Send success response to webhook
