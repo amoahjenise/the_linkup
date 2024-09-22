@@ -4,7 +4,7 @@ WITH active_linkups AS (
   WHERE
     (link_ups.creator_id = $3::uuid OR
     (link_ups.creator_id != $3::uuid AND
-    (link_ups.gender_preference = $2 OR link_ups.gender_preference = 'any')))
+    $2 = ANY(link_ups.gender_preference)))  -- Remove 'any'
     AND link_ups.hidden <> true
     AND link_ups.status = 'active'
 )
@@ -16,7 +16,7 @@ WHERE
   (
     (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1 OR location ILIKE $1)
     AND link_ups.status = 'active'
-    AND (gender_preference = $2 OR gender_preference = 'any')
+    AND $2 = ANY(link_ups.gender_preference)  -- Remove 'any'
   )
   OR
   (

@@ -47,6 +47,7 @@ const publicPages = [
   "/privacy-policy",
   "/cookie-use",
   "/data-deletion-instructions",
+  "/registration",
 ];
 
 // Define AppWrapper with conditional styling

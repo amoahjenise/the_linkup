@@ -8,6 +8,13 @@ import { updateLinkup } from "../api/linkUpAPI";
 import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
+// import { PrimeReactContext } from "primereact/api";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+import { Dropdown } from "primereact/dropdown";
+import { MultiSelect } from "primereact/multiselect";
+import { useColorMode } from "@chakra-ui/react";
+import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
 
 const ModalOverlay = styled("div")({
   flex: "1",
@@ -43,7 +50,7 @@ const ModalLabel = styled("label")({
   color: "#6B7280",
 });
 
-const ModalInput = styled("input")(({ theme }) => ({
+const ModalInput = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
   fontSize: "14px",
   padding: theme.spacing(1),
@@ -53,6 +60,8 @@ const ModalInput = styled("input")(({ theme }) => ({
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
+  backgroundColor:
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.4)" : "rgba(130, 131, 129, 0.03)",
 }));
 
 const ButtonGroup = styled("div")(({ theme }) => ({
@@ -62,7 +71,7 @@ const ButtonGroup = styled("div")(({ theme }) => ({
   height: "40px",
 }));
 
-const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
+const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
@@ -71,32 +80,14 @@ const DatePickerStyled = styled(DatePicker)(({ theme }) => ({
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
+  backgroundColor:
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.4)" : "rgba(130, 131, 129, 0.03)",
 }));
 
 const CustomDropdown = styled("div")(({ theme }) => ({
-  fontSize: "14px",
-  position: "relative",
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
-  "&:focus": {
-    borderColor: theme.palette.primary.main,
-  },
-  "& select": {
-    width: "100%",
-    padding: theme.spacing(1),
-    border: "1px solid transparent", // Remove border when not in focus
-    appearance: "none",
-    backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.293 8.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>')`,
-    backgroundPosition: "right 12px center",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "auto 20px",
-    paddingRight: "2.5rem",
-    "&:focus": {
-      border: "none", // Ensure border stays removed on focus
-      outline: "none", // Remove the outline when focused
-    },
-  },
+  textAlign: "start",
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -129,16 +120,28 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
-
+  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
   const [selectedDate, setSelectedDate] = useState(editingLinkup?.linkup?.date);
   const [activity, setActivity] = useState(editingLinkup?.linkup?.activity);
   const [location, setLocation] = useState(editingLinkup?.linkup?.location);
   const [genderPreference, setGenderPreference] = useState(
-    editingLinkup?.linkup?.gender_preference
+    Array.isArray(editingLinkup?.linkup?.gender_preference)
+      ? editingLinkup.linkup.gender_preference
+      : []
   );
   const [paymentOption, setPaymentOption] = useState(
     editingLinkup?.linkup?.payment_option || ""
   );
+
+  // Gender options for MultiSelect
+  const genderOptions = [
+    { key: "male", value: "Man" },
+    { key: "female", value: "Woman" },
+    ...customGenderOptions.map((gender) => ({
+      key: gender.toLowerCase(),
+      value: gender,
+    })),
+  ];
 
   const [isFormModified, setIsFormModified] = useState(false);
   const { addSnackbar } = useSnackbar();
@@ -174,7 +177,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   };
 
   const handleGenderPreferenceChange = (e) => {
-    setGenderPreference(e.target.value);
+    setGenderPreference(e.value); // e.value will always be an array in MultiSelect
     setIsFormModified(true);
   };
 
@@ -249,7 +252,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             id="activity"
             value={activity}
             onChange={handleActivityChange}
+            autoComplete="off" // Disable autocomplete
             required
+            colorMode={colorMode}
           />
           <ModalLabel htmlFor="location">Location</ModalLabel>
           <ModalInput
@@ -259,7 +264,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             id="location"
             value={location}
             onChange={handleLocationChange}
+            autoComplete="off" // Disable autocomplete
             required
+            colorMode={colorMode}
           />
           <ModalLabel htmlFor="date">Date and Time</ModalLabel>
           <DatePickerStyled
@@ -276,35 +283,65 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             placeholderText="Select Date and Time"
             id="date"
             required
+            colorMode={colorMode}
           />
-          <ModalLabel htmlFor="genderPreference">Gender Preference</ModalLabel>
+          <ModalLabel htmlFor="genderPreference">Visible to who?</ModalLabel>
           <CustomDropdown>
-            <select
-              value={genderPreference}
-              onChange={handleGenderPreferenceChange}
-              aria-label="Gender Preference"
-              id="genderPreference"
-              required
-            >
-              <option value="">Select Gender Preference</option>{" "}
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="any">Any</option>
-            </select>
+            <MultiSelect
+              value={genderPreference} // Ensure this is always an array
+              options={genderOptions}
+              onChange={handleGenderPreferenceChange} // Update state on change
+              optionLabel="value"
+              maxSelectedLabels={3}
+              className="p-multiselect"
+              panelClassName="multi-select-panel" // Add a custom class
+              style={{
+                width: "100%",
+                border: `1px solid ${
+                  colorMode === "dark" ? "#4a4a4a" : "#ddd"
+                }`,
+                backgroundColor:
+                  colorMode === "dark"
+                    ? "rgba(0, 0, 0, 0.4)"
+                    : "rgba(130, 131, 129, 0.03)",
+                color: genderPreference.length
+                  ? colorMode === "dark"
+                    ? "white"
+                    : "black"
+                  : "grey",
+              }}
+            />
           </CustomDropdown>
           <ModalLabel htmlFor="paymentOption">Payment Option</ModalLabel>
           <CustomDropdown>
-            <select
-              value={paymentOption}
-              onChange={handlePaymentOptionChange}
-              aria-label="Payment Option"
+            <Dropdown
               id="paymentOption"
-            >
-              <option value="">Who's Paying? (Optional)</option>{" "}
-              <option value="split">Split The Bill</option>
-              <option value="iWillPay">I Will Pay</option>
-              <option value="pleasePay">Please Pay</option>
-            </select>
+              aria-label="Payment Option"
+              value={paymentOption}
+              options={[
+                { label: "Who's Paying? (Optional)", value: "" },
+                { label: "Split The Bill", value: "split" },
+                { label: "I Will Pay", value: "iWillPay" },
+                { label: "Please Pay", value: "pleasePay" },
+              ]}
+              onChange={handlePaymentOptionChange}
+              className="w-full md:w-14rem"
+              style={{
+                width: "100%",
+                border: `1px solid ${
+                  colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
+                }`,
+                backgroundColor:
+                  colorMode === "dark"
+                    ? "rgba(0, 0, 0, 0.4)"
+                    : "rgba(130, 131, 129, 0.03)",
+                color: genderPreference.length
+                  ? colorMode === "dark"
+                    ? "white"
+                    : "black"
+                  : "grey",
+              }}
+            />
           </CustomDropdown>
           <ButtonGroup>
             <StyledButton type="submit">Update</StyledButton>

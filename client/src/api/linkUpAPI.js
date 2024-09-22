@@ -10,6 +10,11 @@ const handleError = (error) => {
   throw error;
 };
 
+// Convert gender array to string format for API requests
+const formatGender = (gender) => {
+  return Array.isArray(gender) ? `{${gender.join(",")}}` : gender;
+};
+
 export const searchLinkups = async (
   searchTerm,
   userId,
@@ -23,7 +28,7 @@ export const searchLinkups = async (
       {
         params: {
           search_term: searchTerm,
-          gender: gender,
+          gender: formatGender(gender), // Format gender for API
         },
       }
     );
@@ -46,7 +51,7 @@ export const getLinkups = async (
       `${BASE_URL}/api/linkup/linkups/${userId}`,
       {
         params: {
-          gender: gender,
+          gender: formatGender(gender), // Format gender for API
           offset: sqlOffset,
           pageSize: pageSize,
           latitude: latitude,
