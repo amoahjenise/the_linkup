@@ -129,7 +129,7 @@ router.post(
       // Create formatted name as "First Name L."
       const formattedName = `${capitalizeFirstLetter(
         first_name
-      )} ${capitalizeFirstLetter(last_name)}.`;
+      )} ${capitalizeFirstLetter(last_name)}`;
 
       if (eventType === "user.created") {
         const phoneNumber = attributes.phone_numbers[0].phone_number;
@@ -147,7 +147,7 @@ router.post(
         // Call createSendbirdUser with transaction client
         const sendbirdUser = {
           id: response.id,
-          name: first_name,
+          name: formattedName,
         };
 
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);

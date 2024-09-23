@@ -93,7 +93,7 @@ router.post(
   async function (req, res) {
     try {
       // Check if the 'Signing Secret' from the Clerk Dashboard was correctly provided
-      const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET_KEY;
+      const WEBHOOK_SECRET = process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY;
       if (!WEBHOOK_SECRET) {
         throw new Error("You need a CLERK_WEBHOOK_SECRET_KEY in your .env");
       }
