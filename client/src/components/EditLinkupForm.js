@@ -8,13 +8,10 @@ import { updateLinkup } from "../api/linkUpAPI";
 import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-// import { PrimeReactContext } from "primereact/api";
-import "primereact/resources/primereact.min.css";
-import "primeicons/primeicons.css";
-import { Dropdown } from "primereact/dropdown";
 import { MultiSelect } from "primereact/multiselect";
+import { Dropdown } from "primereact/dropdown";
 import { useColorMode } from "@chakra-ui/react";
-import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
+import { customGenderOptions } from "../utils/customGenderOptions";
 
 const ModalOverlay = styled("div")({
   flex: "1",
@@ -116,11 +113,17 @@ const CancelButton = styled(Button)({
   },
 });
 
+const ErrorText = styled("p")(({ theme }) => ({
+  color: theme.palette.error.main,
+  fontSize: "12px",
+  margin: "8px 0 0",
+}));
+
 const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
-  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
+  const { colorMode } = useColorMode();
   const [selectedDate, setSelectedDate] = useState(editingLinkup?.linkup?.date);
   const [activity, setActivity] = useState(editingLinkup?.linkup?.activity);
   const [location, setLocation] = useState(editingLinkup?.linkup?.location);
@@ -132,6 +135,9 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   const [paymentOption, setPaymentOption] = useState(
     editingLinkup?.linkup?.payment_option || ""
   );
+  const [isFormModified, setIsFormModified] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const { addSnackbar } = useSnackbar();
 
   // Gender options for MultiSelect
   const genderOptions = [
@@ -142,9 +148,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       value: gender,
     })),
   ];
-
-  const [isFormModified, setIsFormModified] = useState(false);
-  const { addSnackbar } = useSnackbar();
 
   const maxTime = new Date();
   maxTime.setHours(23);
@@ -161,29 +164,25 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       : minTimeDefault
     : currentDate;
 
-  const handleActivityChange = (e) => {
-    setActivity(e.target.value);
-    setIsFormModified(true);
-  };
-
-  const handleLocationChange = (e) => {
-    setLocation(e.target.value);
-    setIsFormModified(true);
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setIsFormModified(true);
-  };
-
-  const handleGenderPreferenceChange = (e) => {
-    setGenderPreference(e.value); // e.value will always be an array in MultiSelect
-    setIsFormModified(true);
-  };
-
   const handleUpdateLinkup = useCallback(
     async (e) => {
       e.preventDefault();
+
+      // Reset form errors
+      setFormErrors({});
+      const errors = {};
+
+      if (!activity.trim()) errors.activity = "Activity is required.";
+      if (!location.trim()) errors.location = "Location is required.";
+      if (!selectedDate) errors.date = "Date is required.";
+      if (genderPreference.length === 0) {
+        errors.genderPreference = "Please select at least one gender.";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        return;
+      }
 
       if (!isFormModified) {
         onClose();
@@ -202,7 +201,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
 
       try {
         const response = await updateLinkup(id, updatedLinkup);
-
         if (response.success) {
           setShouldFetchLinkups(true);
           dispatch(updateLinkupSuccess(response.linkup));
@@ -234,11 +232,6 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
     onClose();
   }, [dispatch, onClose]);
 
-  const handlePaymentOptionChange = (e) => {
-    setPaymentOption(e.target.value);
-    setIsFormModified(true);
-  };
-
   return (
     <ModalOverlay>
       <ModalContainer>
@@ -251,11 +244,16 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             name="activity"
             id="activity"
             value={activity}
-            onChange={handleActivityChange}
-            autoComplete="off" // Disable autocomplete
+            onChange={(e) => {
+              setActivity(e.target.value);
+              setIsFormModified(true);
+            }}
+            autoComplete="off"
             required
             colorMode={colorMode}
           />
+          {formErrors.activity && <ErrorText>{formErrors.activity}</ErrorText>}
+
           <ModalLabel htmlFor="location">Location</ModalLabel>
           <ModalInput
             type="text"
@@ -263,15 +261,23 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             name="location"
             id="location"
             value={location}
-            onChange={handleLocationChange}
-            autoComplete="off" // Disable autocomplete
+            onChange={(e) => {
+              setLocation(e.target.value);
+              setIsFormModified(true);
+            }}
+            autoComplete="off"
             required
             colorMode={colorMode}
           />
+          {formErrors.location && <ErrorText>{formErrors.location}</ErrorText>}
+
           <ModalLabel htmlFor="date">Date and Time</ModalLabel>
           <DatePickerStyled
             selected={new Date(selectedDate)}
-            onChange={handleDateChange}
+            onChange={(date) => {
+              setSelectedDate(date);
+              setIsFormModified(true);
+            }}
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={15}
@@ -285,16 +291,22 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             required
             colorMode={colorMode}
           />
+          {formErrors.date && <ErrorText>{formErrors.date}</ErrorText>}
+
           <ModalLabel htmlFor="genderPreference">Visible to who?</ModalLabel>
           <CustomDropdown>
             <MultiSelect
-              value={genderPreference} // Ensure this is always an array
+              value={genderPreference}
               options={genderOptions}
-              onChange={handleGenderPreferenceChange} // Update state on change
+              onChange={(e) => {
+                setGenderPreference(e.value);
+                setIsFormModified(true);
+              }}
               optionLabel="value"
               maxSelectedLabels={3}
-              className="p-multiselect"
-              panelClassName="multi-select-panel" // Add a custom class
+              className={`p-multiselect ${
+                formErrors.genderPreference ? "error" : ""
+              }`} // Add error class conditionally
               style={{
                 width: "100%",
                 border: `1px solid ${
@@ -304,14 +316,13 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
                   colorMode === "dark"
                     ? "rgba(0, 0, 0, 0.4)"
                     : "rgba(130, 131, 129, 0.03)",
-                color: genderPreference.length
-                  ? colorMode === "dark"
-                    ? "white"
-                    : "black"
-                  : "grey",
               }}
             />
+            {formErrors.genderPreference && (
+              <ErrorText>{formErrors.genderPreference}</ErrorText>
+            )}
           </CustomDropdown>
+
           <ModalLabel htmlFor="paymentOption">
             Who's Paying? (Optional)
           </ModalLabel>
@@ -326,25 +337,24 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
                 { label: "I Will Pay", value: "iWillPay" },
                 { label: "Please Pay", value: "pleasePay" },
               ]}
-              onChange={handlePaymentOptionChange}
+              onChange={(e) => {
+                setPaymentOption(e.value);
+                setIsFormModified(true);
+              }}
               className="w-full md:w-14rem"
               style={{
                 width: "100%",
                 border: `1px solid ${
-                  colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
+                  colorMode === "dark" ? "#4a4a4a" : "#ddd"
                 }`,
                 backgroundColor:
                   colorMode === "dark"
                     ? "rgba(0, 0, 0, 0.4)"
                     : "rgba(130, 131, 129, 0.03)",
-                color: genderPreference.length
-                  ? colorMode === "dark"
-                    ? "white"
-                    : "black"
-                  : "grey",
               }}
             />
           </CustomDropdown>
+
           <ButtonGroup>
             <StyledButton type="submit">Update</StyledButton>
             <CancelButton onClick={handleCancelClick}>Cancel</CancelButton>

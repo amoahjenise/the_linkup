@@ -127,6 +127,12 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
   color: "lightgray",
 }));
 
+const ErrorText = styled("p")(({ theme }) => ({
+  color: theme.palette.error.main,
+  fontSize: "12px",
+  margin: "8px 0 0",
+}));
+
 const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState([]);
@@ -137,6 +143,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
   const { colorMode } = useColorMode(); // Use Chakra UI's color mode
   const { changeTheme } = useContext(PrimeReactContext);
   const [currentTheme, setCurrentTheme] = useState(""); // Initialize as an empty string
+  const [formErrors, setFormErrors] = useState({}); // Track form errors
 
   useEffect(() => {
     const themeLink = document.getElementById("theme-link");
@@ -175,15 +182,28 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
-    const activity = e.target.activity.value;
-    const location = capitalizeFirstLetter(e.target.location.value);
 
+    // Reset form errors
+    setFormErrors({});
+
+    // Custom validation
+    const errors = {};
+    if (genderPreference.length === 0) {
+      errors.genderPreference = "Please select at least one gender preference.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    // If valid, proceed with submission
     try {
       const response = await createLinkup({
         creator_id: id,
         creator_name: name,
-        location: location,
-        activity: activity,
+        location: e.target.location.value,
+        activity: e.target.activity.value,
         date: selectedDate,
         gender_preference: genderPreference,
         payment_option: paymentOption,
@@ -290,19 +310,18 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
         {/* MultiSelect for gender preference */}
         <CustomDropdown>
           <MultiSelect
-            required
+            id="gender-preference"
             value={genderPreference}
             options={genderOptions}
             onChange={(e) => setGenderPreference(e.value)}
             optionLabel="value"
-            placeholder="Visible to who?" // Corrected placeholder
-            maxSelectedLabels={3}
-            className="p-multiselect"
+            placeholder="Visible to who?"
+            className={`p-multiselect ${
+              formErrors.genderPreference ? "error" : ""
+            }`}
             style={{
               width: "100%",
-              border: `1px solid ${
-                colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
-              }`,
+              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
               backgroundColor:
                 colorMode === "dark"
                   ? "rgba(130, 131, 129, 0.1)"
@@ -314,6 +333,10 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
                 : "grey",
             }}
           />
+          {/* Display error message if no gender is selected */}
+          {formErrors.genderPreference && (
+            <ErrorText>{formErrors.genderPreference}</ErrorText>
+          )}
         </CustomDropdown>
         <CustomDropdown>
           <Dropdown
