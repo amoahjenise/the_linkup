@@ -152,7 +152,7 @@ router.post(
 
       if (eventType === "user.deleted") {
         try {
-          const response = await deleteUser(userExists.user.id);
+          const response = await deleteUser(userExists.user.clerk_user_id);
           if (response.success) {
             return res
               .status(200)
