@@ -20,21 +20,22 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 
 const router = express.Router(); // Create a router instance
 
-const updateSendbirdUserImage = async (userId, publicUrl) => {
+const updateSendbirdUserImage = async (userId, imageUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${userId}`;
-  console.log("sendbirdApiUrl", sendbirdApiUrl);
+  console.log("SENDBIRD_API_TOKEN", SENDBIRD_API_TOKEN);
   try {
-    const response = await axios({
-      method: "PUT",
-      url: sendbirdApiUrl,
-      headers: {
-        "Content-Type": "application/json",
-        "Api-Token": process.env.SENDBIRD_API_TOKEN,
+    const response = await axios.put(
+      sendbirdApiUrl,
+      {
+        profile_url: imageUrl,
       },
-      data: {
-        profile_url: publicUrl, // Update with the new public URL from Clerk
-      },
-    });
+      {
+        headers: {
+          "Api-Token": SENDBIRD_API_TOKEN,
+        },
+      }
+    );
+
     console.log("response.data", response.data);
 
     return response.data; // Axios automatically parses JSON responses
