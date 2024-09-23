@@ -79,7 +79,7 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const RequestBestPractices = styled("div")(({ theme }) => ({
+const RequestBestPractices = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   flexDirection: "column", // Stack items vertically
   fontSize: "16px",
@@ -87,8 +87,11 @@ const RequestBestPractices = styled("div")(({ theme }) => ({
   alignItems: "flex-start", // Align text to the left
   padding: theme.spacing(2),
   border: `1px solid ${theme.palette.grey[300]}`, // Add a border
-  borderRadius: "8px", // Rounded corners
-  backgroundColor: theme.palette.background.paper, // Background color
+  borderRadius: "8px", // Rounded corners'
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor:
+    colorMode === "dark" ? "black" : theme.palette.background.paper,
+
   marginTop: theme.spacing(2),
 }));
 
