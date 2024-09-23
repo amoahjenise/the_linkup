@@ -32,6 +32,7 @@ const MainSection = styled("div")(({ theme }) => ({
 const LinkUpInfo = styled("div")(({ theme }) => ({
   marginBottom: theme.spacing(2),
   fontSize: "20px",
+  textAlign: "center", // Center text
 }));
 
 const StyledTextField = styled(TextField)(({ theme, textColor }) => ({
@@ -78,15 +79,18 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const RequestBestPractices = styled("div")({
+const RequestBestPractices = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column", // Stack items vertically
   fontSize: "16px",
   justifyContent: "center",
   alignItems: "flex-start", // Align text to the left
-  padding: "16px", // Add padding for spacing
-  lineHeight: "1.5", // Improve readability with line height
-});
+  padding: theme.spacing(2),
+  border: `1px solid ${theme.palette.grey[300]}`, // Add a border
+  borderRadius: "8px", // Rounded corners
+  backgroundColor: theme.palette.background.paper, // Background color
+  marginTop: theme.spacing(2),
+}));
 
 const SendRequest = ({ linkupId, linkups, colorMode }) => {
   const dispatch = useDispatch();
@@ -125,11 +129,9 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
           displayMessage = "This linkup was deleted.";
           break;
         default:
-          // If the status is valid, continue processing
           break;
       }
 
-      // If displayMessage is set, show snackbar and exit
       if (displayMessage) {
         addSnackbar(displayMessage, { timeout: 7000 });
         return;
@@ -153,7 +155,6 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
       const channelUrl = channelResponse.channel_url;
 
       await sendInvitation(channelUrl, [requesterId], post.creator_id);
-
       const sendMessageResponse = await sendMessage(
         requesterId,
         channelUrl,
@@ -197,18 +198,16 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         <LinkUpInfo>
           <div>{renderPostText()}</div>
           <RequestBestPractices>
-            <strong>To boost your chances of receiving a response:</strong>
+            <strong>To increase your chances of getting a response:</strong>
             <div>
               <strong>1. Personalize Your Message:</strong> Mention a specific
-              detail about the event to show your genuine interest.
+              detail about the event, like your favorite club.
             </div>
             <div>
-              <strong>2. Be Friendly:</strong> Use a warm and approachable tone
-              to create a welcoming atmosphere.
+              <strong>2. Be Friendly:</strong> Use a warm, approachable tone.
             </div>
             <div>
-              <strong>3. Keep It Brief:</strong> Get to the point quickly to
-              respect their time.
+              <strong>3. Keep It Brief:</strong> Get to the point quickly.
             </div>
             <div>
               <strong>4. Share Your Availability:</strong> Let them know when
@@ -216,7 +215,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
             </div>
             <div>
               <strong>5. Encourage Engagement:</strong> End with an open-ended
-              question to spark a conversation.
+              question to encourage a reply.
             </div>
           </RequestBestPractices>
         </LinkUpInfo>
