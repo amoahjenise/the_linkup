@@ -27,6 +27,7 @@ const MainSection = styled("div")(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   padding: theme.spacing(2),
+  marginTop: theme.spacing(2),
 }));
 
 const LinkUpInfo = styled("div")(({ theme }) => ({
@@ -89,9 +90,7 @@ const RequestBestPractices = styled("div")(({ theme, colorMode }) => ({
   border: `1px solid ${theme.palette.grey[300]}`, // Add a border
   borderRadius: "8px", // Rounded corners'
   color: colorMode === "dark" ? "white" : "black",
-  backgroundColor:
-    colorMode === "dark" ? "black" : theme.palette.background.paper,
-
+  backgroundColor: "black",
   marginTop: theme.spacing(2),
 }));
 
@@ -204,20 +203,14 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
             <strong>To increase your chances of getting a response:</strong>
             <div>
               <strong>1. Personalize Your Message:</strong> Mention a specific
-              detail about the event, like your favorite club.
+              detail about the event.
             </div>
             <div>
-              <strong>2. Be Friendly:</strong> Use a warm, approachable tone.
-            </div>
-            <div>
-              <strong>3. Keep It Brief:</strong> Get to the point quickly.
-            </div>
-            <div>
-              <strong>4. Share Your Availability:</strong> Let them know when
+              <strong>2. Share Your Availability:</strong> Let them know when
               you’re free to meet up.
             </div>
             <div>
-              <strong>5. Encourage Engagement:</strong> End with an open-ended
+              <strong>3. Encourage Engagement:</strong> End with an open-ended
               question to encourage a reply.
             </div>
           </RequestBestPractices>
