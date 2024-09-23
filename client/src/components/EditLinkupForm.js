@@ -312,14 +312,16 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               }}
             />
           </CustomDropdown>
-          <ModalLabel htmlFor="paymentOption">Payment Option</ModalLabel>
+          <ModalLabel htmlFor="paymentOption">
+            Who's Paying? (Optional)
+          </ModalLabel>
           <CustomDropdown>
             <Dropdown
               id="paymentOption"
-              aria-label="Payment Option"
+              aria-label="Who's Paying?"
               value={paymentOption}
               options={[
-                { label: "Who's Paying? (Optional)", value: "" },
+                { label: "", value: "" },
                 { label: "Split The Bill", value: "split" },
                 { label: "I Will Pay", value: "iWillPay" },
                 { label: "Please Pay", value: "pleasePay" },

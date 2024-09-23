@@ -290,6 +290,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
         {/* MultiSelect for gender preference */}
         <CustomDropdown>
           <MultiSelect
+            required
             value={genderPreference}
             options={genderOptions}
             onChange={(e) => setGenderPreference(e.value)}
@@ -318,13 +319,13 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           <Dropdown
             value={paymentOption}
             options={[
-              { label: "Who's Paying? (Optional)", value: "" },
+              { label: "", value: "" },
               { label: "Split The Bill", value: "split" },
               { label: "I Will Pay", value: "iWillPay" },
               { label: "Please Pay", value: "pleasePay" },
             ]}
             onChange={(e) => setPaymentOption(e.value)}
-            placeholder="Who's Paying? (Optional)"
+            placeholder="Who's Paying?"
             className="w-full md:w-14rem"
             style={{
               width: "100%",
