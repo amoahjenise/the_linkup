@@ -4,7 +4,7 @@ WITH active_linkups AS (
   WHERE
     (link_ups.creator_id = $1::uuid OR
     (link_ups.creator_id != $1::uuid AND
-    $2 = ANY(link_ups.gender_preference)))  -- Remove 'any'
+    link_ups.gender_preference && $2::text[]))  -- Changed to array overlap
     AND link_ups.hidden <> true
     AND link_ups.status = 'active'
 ),
@@ -27,7 +27,7 @@ linkups_with_distance AS (
   WHERE
     (link_ups.creator_id = $1::uuid OR
     (link_ups.creator_id != $1::uuid AND
-    $2 = ANY(link_ups.gender_preference)))  -- Remove 'any'
+    link_ups.gender_preference && $2::text[]))  -- Changed to array overlap
     AND link_ups.hidden <> true
     AND link_ups.status = 'active'
 )
