@@ -99,7 +99,7 @@ const RegistrationProcess = () => {
             dispatch(setIsRegistering(true));
           }
         } catch (error) {
-          alert(`An unknown error occurred. Please try again later.`);
+          // alert(`An unknown error occurred. Please try again later.`);
           console.log(`Error fetching user data: ${error.message}`);
         }
       }
