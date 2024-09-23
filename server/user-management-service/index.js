@@ -91,12 +91,10 @@ router.post(
     try {
       const WEBHOOK_SECRET = process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY;
       if (!WEBHOOK_SECRET) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Missing Clerk webhook secret key.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Missing Clerk webhook secret key.",
+        });
       }
 
       const headers = req.headers;
@@ -113,6 +111,8 @@ router.post(
         });
       }
 
+      console.log("svix headers are legit bruh!");
+
       const wh = new Webhook(WEBHOOK_SECRET);
       const evt = wh.verify(payload, {
         "svix-id": svix_id,
@@ -123,6 +123,8 @@ router.post(
       const { id, publicUrl } = evt.data;
       const eventType = evt.type;
 
+      console.log("eventType:", eventType);
+
       if (eventType === "user.deleted") {
         const userExists = await getUserById(id);
         if (!userExists.success) {
@@ -131,6 +133,8 @@ router.post(
             message: "User not found, cannot delete.",
           });
         }
+
+        console.log("user exists:", userExists);
 
         try {
           const response = await deleteUser(id);
@@ -151,6 +155,8 @@ router.post(
         }
       } else if (eventType === "user.updated") {
         try {
+          console.log("updateSendbirdUserImage:", publicUrl);
+
           const sendbirdUpdateResponse = await updateSendbirdUserImage(
             id,
             publicUrl

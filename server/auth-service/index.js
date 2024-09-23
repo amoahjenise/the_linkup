@@ -110,8 +110,6 @@ router.post(
         });
       }
 
-      console.log("svix headers are legit!");
-
       // Initiate Svix
       const wh = new Webhook(WEBHOOK_SECRET);
 
