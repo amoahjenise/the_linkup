@@ -78,11 +78,14 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const LocationDetails = styled("span")({
+const RequestBestPractices = styled("div")({
   display: "flex",
+  flexDirection: "column", // Stack items vertically
   fontSize: "16px",
   justifyContent: "center",
-  alignItems: "center",
+  alignItems: "flex-start", // Align text to the left
+  padding: "16px", // Add padding for spacing
+  lineHeight: "1.5", // Improve readability with line height
 });
 
 const SendRequest = ({ linkupId, linkups, colorMode }) => {
@@ -193,9 +196,29 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         <StyledAvatar alt={post.creator_name} src={post.avatar} />
         <LinkUpInfo>
           <div>{renderPostText()}</div>
-          <LocationDetails>
-            Location details will be provided if the request gets accepted.
-          </LocationDetails>
+          <RequestBestPractices>
+            <strong>To boost your chances of receiving a response:</strong>
+            <div>
+              <strong>1. Personalize Your Message:</strong> Mention a specific
+              detail about the event to show your genuine interest.
+            </div>
+            <div>
+              <strong>2. Be Friendly:</strong> Use a warm and approachable tone
+              to create a welcoming atmosphere.
+            </div>
+            <div>
+              <strong>3. Keep It Brief:</strong> Get to the point quickly to
+              respect their time.
+            </div>
+            <div>
+              <strong>4. Share Your Availability:</strong> Let them know when
+              you’re free to meet up.
+            </div>
+            <div>
+              <strong>5. Encourage Engagement:</strong> End with an open-ended
+              question to spark a conversation.
+            </div>
+          </RequestBestPractices>
         </LinkUpInfo>
         <StyledTextField
           label="Message"
