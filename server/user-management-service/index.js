@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const { Webhook } = require("svix");
 const userRoutes = require("./routes/userRoutes");
 const { getUserById, deleteUser } = require("./controllers/userController");
+const axios = require("axios");
 
 const ALLOWED_ORIGINS = [
   process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
@@ -16,29 +17,30 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 
 const router = express.Router(); // Create a router instance
 
-// Define the function to update Sendbird user image
 const updateSendbirdUserImage = async (userId, publicUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
 
-  const response = await fetch(sendbirdApiUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Api-Token": process.env.SENDBIRD_API_TOKEN, // Ensure you have your Sendbird API token in your environment
-    },
-    body: JSON.stringify({
-      profile_url: publicUrl, // Update with the new public URL from Clerk
-    }),
-  });
+  try {
+    const response = await axios({
+      method: "PUT",
+      url: sendbirdApiUrl,
+      headers: {
+        "Content-Type": "application/json",
+        "Api-Token": process.env.SENDBIRD_API_TOKEN,
+      },
+      data: {
+        profile_url: publicUrl, // Update with the new public URL from Clerk
+      },
+    });
 
-  if (!response.ok) {
-    const errorResponse = await response.json();
+    return response.data; // Axios automatically parses JSON responses
+  } catch (error) {
     throw new Error(
-      `Failed to update Sendbird user image URL: ${errorResponse.message}`
+      `Failed to update Sendbird user image URL: ${
+        error.response?.data?.message || error.message
+      }`
     );
   }
-
-  return response.json();
 };
 
 // Middleware
@@ -131,7 +133,7 @@ router.post(
         "svix-signature": svix_signature,
       });
 
-      const { id, publicUrl } = evt.data;
+      const { id, image_url } = evt.data;
       const eventType = evt.type;
 
       console.log("eventType:", eventType);
@@ -166,11 +168,11 @@ router.post(
         }
       } else if (eventType === "user.updated") {
         try {
-          console.log("updateSendbirdUserImage:", publicUrl);
+          console.log("updateSendbirdUserImage:", updateSendbirdUserImage);
 
           const sendbirdUpdateResponse = await updateSendbirdUserImage(
             id,
-            publicUrl
+            image_url
           );
           return res.status(200).json({
             success: true,
