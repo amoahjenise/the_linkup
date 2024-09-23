@@ -21,7 +21,7 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 const router = express.Router(); // Create a router instance
 
 const updateSendbirdUserImage = async (userId, publicUrl) => {
-  const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
+  const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${userId}`;
   console.log("sendbirdApiUrl", sendbirdApiUrl);
   try {
     const response = await axios({
