@@ -19,7 +19,7 @@ const router = express.Router(); // Create a router instance
 
 const updateSendbirdUserImage = async (userId, publicUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APPLICATION_ID}.sendbird.com/v3/users/${userId}`;
-
+  console.log("sendbirdApiUrl", sendbirdApiUrl);
   try {
     const response = await axios({
       method: "PUT",
@@ -32,6 +32,7 @@ const updateSendbirdUserImage = async (userId, publicUrl) => {
         profile_url: publicUrl, // Update with the new public URL from Clerk
       },
     });
+    console.log("response.data", response.data);
 
     return response.data; // Axios automatically parses JSON responses
   } catch (error) {
