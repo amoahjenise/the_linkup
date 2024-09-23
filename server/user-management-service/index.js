@@ -4,7 +4,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Webhook } = require("svix");
 const userRoutes = require("./routes/userRoutes");
-const { deleteUser } = require("./controllers/userController");
+const {
+  getUserByClerkIdForWebhook,
+  deleteUser,
+} = require("./controllers/userController");
 const axios = require("axios");
 
 const ALLOWED_ORIGINS = [
@@ -16,28 +19,6 @@ const ALLOWED_ORIGINS = [
 console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 
 const router = express.Router(); // Create a router instance
-
-const getUserByClerkId = async (clerkUserId) => {
-  console.log("Inside getUserByClerkId", clerkUserId);
-
-  const queryPath = path.join(__dirname, "./db/queries/getUserByClerkId.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [clerkUserId];
-
-  try {
-    const { rows, rowCount } = await pool.query(query, queryValues);
-    console.log("rows[0]", rows[0]);
-
-    if (rowCount > 0) {
-      return { success: true, user: rows[0] }; // Return user data if found
-    } else {
-      return { success: false, user: null, message: "User not found" }; // Return error if not found
-    }
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw new Error("Failed to fetch user");
-  }
-};
 
 const updateSendbirdUserImage = async (userId, imageUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${userId}`;
@@ -157,7 +138,7 @@ router.post(
 
       console.log("eventType:", eventType);
 
-      const userExists = await getUserByClerkId(id); // Fetch the user
+      const userExists = await getUserByClerkIdForWebhook(id); // Fetch the user
       console.log("userExists", userExists);
 
       if (!userExists.success) {
