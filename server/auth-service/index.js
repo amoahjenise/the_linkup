@@ -129,7 +129,7 @@ router.post(
       // Create formatted name as "First Name L."
       const formattedName = `${capitalizeFirstLetter(
         first_name
-      )} ${capitalizeFirstLetter(last_name.charAt(0))}.`;
+      )} ${capitalizeFirstLetter(last_name)}.`;
 
       if (eventType === "user.created") {
         const phoneNumber = attributes.phone_numbers[0].phone_number;

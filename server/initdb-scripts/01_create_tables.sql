@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     phone_number VARCHAR(15) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
-    gender VARCHAR(10),
+    gender TEXT,  -- Changed to TEXT without limit
     date_of_birth DATE,
     password VARCHAR(255) NOT NULL,
     link_up_score INT DEFAULT 0,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS link_ups (
     location VARCHAR(255),
     activity VARCHAR(255),
     date TIMESTAMP,
-    gender_preference VARCHAR(10),
+    gender_preference TEXT[],  -- Changed to a TEXT array
     payment_option VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

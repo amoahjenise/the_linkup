@@ -106,7 +106,7 @@ const RegistrationProcess = () => {
     };
 
     checkRegistrationStatus();
-  }, [registrationData.isRegistering, userData, user, dispatch, navigate]);
+  }, [registrationData.isRegistering, userData, user.id, dispatch, navigate]);
 
   const handleLaunchingLinkup = async () => {
     try {
