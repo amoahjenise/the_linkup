@@ -250,15 +250,17 @@ const UserProfilePage = ({ isMobile }) => {
 
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 0;
+
     const birthDate = dayjs(dateOfBirth);
-    let age = dayjs().diff(birthDate, "year");
-    if (
-      dayjs().month() < birthDate.month() ||
-      (dayjs().month() === birthDate.month() &&
-        dayjs().date() < birthDate.date())
-    ) {
+    const today = dayjs();
+
+    let age = today.diff(birthDate, "year");
+
+    // Check if the current date is before the birthday in the current year
+    if (today.isBefore(birthDate.add(age, "year"))) {
       age -= 1;
     }
+
     return age;
   };
 
