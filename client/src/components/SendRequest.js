@@ -88,9 +88,9 @@ const RequestBestPractices = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
   border: `1px solid ${theme.palette.grey[300]}`, // Add a border
   borderRadius: "8px", // Rounded corners'
-  color: colorMode === "dark" ? "black" : "white",
+  color: colorMode === "dark" ? "white" : "black",
   backgroundColor:
-    colorMode === "dark" ? theme.palette.background.paper : "black",
+    colorMode === "dark" ? "black" : theme.palette.background.paper,
 
   marginTop: theme.spacing(2),
 }));
@@ -200,7 +200,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         <StyledAvatar alt={post.creator_name} src={post.avatar} />
         <LinkUpInfo>
           <div>{renderPostText()}</div>
-          <RequestBestPractices>
+          <RequestBestPractices colorMode={colorMode}>
             <strong>To increase your chances of getting a response:</strong>
             <div>
               <strong>1. Personalize Your Message:</strong> Mention a specific
