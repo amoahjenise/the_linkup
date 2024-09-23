@@ -15,13 +15,7 @@ const formatGender = (gender) => {
   return Array.isArray(gender) ? `{${gender.join(",")}}` : gender;
 };
 
-export const searchLinkups = async (
-  searchTerm,
-  userId,
-  gender,
-  sqlOffset,
-  pageSize
-) => {
+export const searchLinkups = async (searchTerm, userId, gender) => {
   try {
     const response = await axios.get(
       `${BASE_URL}/api/linkup/linkups/search/${userId}`,
