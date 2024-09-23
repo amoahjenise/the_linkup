@@ -168,7 +168,7 @@ router.post(
         }
       } else if (eventType === "user.updated") {
         try {
-          console.log("updateSendbirdUserImage:", updateSendbirdUserImage);
+          console.log("updateSendbirdUserImage:", image_url);
 
           const sendbirdUpdateResponse = await updateSendbirdUserImage(
             id,
