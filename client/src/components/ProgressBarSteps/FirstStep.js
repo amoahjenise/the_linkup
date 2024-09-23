@@ -127,7 +127,7 @@ const FirstStep = ({ userData, setUserData }) => {
 
     setUserData((prevUserData) => ({
       ...prevUserData,
-      gender: suggestion.toLowerCase(), // Set gender to the selected suggestion
+      gender: suggestion, // Set gender to the selected suggestion
     }));
   };
 

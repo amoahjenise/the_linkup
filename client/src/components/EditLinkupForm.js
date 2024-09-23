@@ -177,7 +177,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
   };
 
   const handleGenderPreferenceChange = (e) => {
-    setGenderPreference(e.key); // e.value will always be an array in MultiSelect
+    setGenderPreference(e.value); // e.value will always be an array in MultiSelect
     setIsFormModified(true);
   };
 

@@ -129,13 +129,13 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
-const OnlineIndicator = styled("div")(({ isOnline }) => ({
-  // width: "0.5rem",
-  // height: "0.5rem",
-  // borderRadius: "50%",
-  // backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
-  // marginLeft: "0.5rem", // Space between username and indicator
-}));
+// const OnlineIndicator = styled("div")(({ isOnline }) => ({
+//   width: "0.5rem",
+//   height: "0.5rem",
+//   borderRadius: "50%",
+//   backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
+//   marginLeft: "0.5rem", // Space between username and indicator
+// }));
 
 const PaymentOptionIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -181,19 +181,19 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
-  const [isOnline, setIsOnline] = useState(false); // State for online status
+  // const [isOnline, setIsOnline] = useState(false); // State for online status
 
-  useEffect(() => {
-    // Simulate online status
-    const fetchOnlineStatus = async () => {
-      // You can replace this with actual API call to fetch online status
-      const response = await fetch(`/api/users/${creator_id}/status`);
-      const data = await response.json();
-      setIsOnline(data.isOnline);
-    };
+  // useEffect(() => {
+  //   // Simulate online status
+  //   const fetchOnlineStatus = async () => {
+  //     // You can replace this with actual API call to fetch online status
+  //     const response = await fetch(`/api/users/${creator_id}/status`);
+  //     const data = await response.json();
+  //     setIsOnline(data.isOnline);
+  //   };
 
-    fetchOnlineStatus();
-  }, [creator_id]);
+  //   fetchOnlineStatus();
+  // }, [creator_id]);
 
   useEffect(() => {
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -390,7 +390,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             <div>
               <Name>
                 <UserName>{creator_name}</UserName>
-                <OnlineIndicator isOnline={isOnline} />
+                {/* <OnlineIndicator isOnline={isOnline} /> */}
               </Name>
               <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>

@@ -292,7 +292,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           <MultiSelect
             value={genderPreference}
             options={genderOptions}
-            onChange={(e) => setGenderPreference(e.key)}
+            onChange={(e) => setGenderPreference(e.value)}
             optionLabel="value"
             placeholder="Visible to who?" // Corrected placeholder
             maxSelectedLabels={3}
