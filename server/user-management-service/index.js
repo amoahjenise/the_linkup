@@ -4,10 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Webhook } = require("svix");
 const userRoutes = require("./routes/userRoutes");
-const {
-  getUserByClerkId,
-  deleteUser,
-} = require("./controllers/userController");
+const { deleteUser } = require("./controllers/userController");
 const axios = require("axios");
 
 const ALLOWED_ORIGINS = [
@@ -20,25 +17,41 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 
 const router = express.Router(); // Create a router instance
 
+const getUserByClerkId = async (clerkUserId) => {
+  const queryPath = path.join(__dirname, "./db/queries/getUserByClerkId.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [clerkUserId];
+
+  try {
+    const { rows, rowCount } = await pool.query(query, queryValues);
+
+    if (rowCount > 0) {
+      return { success: true, user: rows[0] }; // Return user data if found
+    } else {
+      return { success: false, user: null, message: "User not found" }; // Return error if not found
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user");
+  }
+};
+
 const updateSendbirdUserImage = async (userId, imageUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${userId}`;
-  console.log("SENDBIRD_API_TOKEN", SENDBIRD_API_TOKEN);
+  console.log("SENDBIRD_API_TOKEN", process.env.SENDBIRD_API_TOKEN); // Fix the reference
+
   try {
     const response = await axios.put(
       sendbirdApiUrl,
-      {
-        profile_url: imageUrl,
-      },
+      { profile_url: imageUrl },
       {
         headers: {
-          "Api-Token": SENDBIRD_API_TOKEN,
+          "Api-Token": process.env.SENDBIRD_API_TOKEN,
         },
       }
     );
 
-    console.log("response.data", response.data);
-
-    return response.data; // Axios automatically parses JSON responses
+    return response.data;
   } catch (error) {
     throw new Error(
       `Failed to update Sendbird user image URL: ${
@@ -129,8 +142,6 @@ router.post(
         });
       }
 
-      console.log("svix headers are legit bruh!");
-
       const wh = new Webhook(WEBHOOK_SECRET);
       const evt = wh.verify(payload, {
         "svix-id": svix_id,
@@ -143,28 +154,25 @@ router.post(
 
       console.log("eventType:", eventType);
 
+      const userExists = await getUserByClerkId(id); // Fetch the user
+      if (!userExists.success) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found, cannot proceed.",
+        });
+      }
+
       if (eventType === "user.deleted") {
-        const userExists = await getUserByClerkId(id);
-        if (!userExists.success) {
-          return res.status(404).json({
-            success: false,
-            message: "User not found, cannot delete.",
-          });
-        }
-
-        console.log("user exists:", userExists);
-
         try {
-          const response = await deleteUser(id);
+          const response = await deleteUser(userExists.user.id);
           if (response.success) {
             return res
               .status(200)
               .json({ success: true, message: "User deleted successfully" });
           } else {
-            return res.status(500).json({
-              success: false,
-              message: "Error deleting user",
-            });
+            return res
+              .status(500)
+              .json({ success: false, message: "Error deleting user" });
           }
         } catch (error) {
           return res
@@ -173,10 +181,8 @@ router.post(
         }
       } else if (eventType === "user.updated") {
         try {
-          console.log("updateSendbirdUserImage:", image_url);
-
           const sendbirdUpdateResponse = await updateSendbirdUserImage(
-            id,
+            userExists.user.id,
             image_url
           );
           return res.status(200).json({
