@@ -12,6 +12,8 @@ const ALLOWED_ORIGINS = [
   "https://img.clerk.com",
 ];
 
+console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
+
 const router = express.Router(); // Create a router instance
 
 // Define the function to update Sendbird user image
@@ -82,6 +84,15 @@ router.use(
     optionsSuccessStatus: 200,
   })
 );
+
+// Webhook handler
+// ...
+
+// Middleware to handle JSON and URL-encoded form data
+router.use(express.json());
+
+// Define and use the route files for users
+router.use("/", userRoutes);
 
 // Webhook handler
 router.post(
@@ -184,12 +195,6 @@ router.post(
     }
   }
 );
-
-// Middleware to handle JSON and URL-encoded form data
-router.use(express.json());
-
-// Define and use the route files for users
-router.use("/", userRoutes);
 
 // Export the router
 module.exports = router;
