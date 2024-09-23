@@ -4,7 +4,10 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Webhook } = require("svix");
 const userRoutes = require("./routes/userRoutes");
-const { getUserById, deleteUser } = require("./controllers/userController");
+const {
+  getUserByClerkId,
+  deleteUser,
+} = require("./controllers/userController");
 const axios = require("axios");
 
 const ALLOWED_ORIGINS = [
@@ -140,7 +143,7 @@ router.post(
       console.log("eventType:", eventType);
 
       if (eventType === "user.deleted") {
-        const userExists = await getUserById(id);
+        const userExists = await getUserByClerkId(id);
         if (!userExists.success) {
           return res.status(404).json({
             success: false,
