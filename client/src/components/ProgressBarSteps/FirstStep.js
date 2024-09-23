@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import { customGenderOptions } from "../../utils/customGenderOptions"; // Import the reusable gender options
+import { useColorMode } from "@chakra-ui/react";
 
 // Define styled components
 const FormContainer = styled("div")(({ theme }) => ({
@@ -63,6 +64,7 @@ const FirstStep = ({ userData, setUserData }) => {
   const [customInputValue, setCustomInputValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [error, setError] = useState("");
+  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
 
   useEffect(() => {
     // Set custom input value based on userData.gender
@@ -182,11 +184,28 @@ const FirstStep = ({ userData, setUserData }) => {
             onBlur={handleBlur}
             required
             style={{ display: "block" }}
+            autoComplete="off"
           />
 
           {/* Display suggestions if available */}
           {suggestions.length > 0 && (
-            <SuggestionList>
+            <SuggestionList
+              style={{
+                width: "100%",
+                border: `1px solid ${
+                  colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
+                }`,
+                backgroundColor:
+                  colorMode === "dark"
+                    ? "rgba(130, 131, 129, 0.1)"
+                    : "rgba(130, 131, 129, 0.03)",
+                // color: genderPreference.length
+                //   ? colorMode === "dark"
+                //     ? "white"
+                //     : "black"
+                //   : "grey",
+              }}
+            >
               {suggestions.map((suggestion, index) => (
                 <SuggestionItem
                   key={index}

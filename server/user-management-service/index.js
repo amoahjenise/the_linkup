@@ -39,7 +39,6 @@ const updateSendbirdUserImage = async (userId, publicUrl) => {
   return response.json();
 };
 
-// Use helmet middleware to set security headers
 // Middleware
 router.use(
   helmet.contentSecurityPolicy({
@@ -72,7 +71,6 @@ router.use(
         "'self'",
         "https://challenges.cloudflare.com", // Cloudflare bot protection
       ],
-      // Add any other directives you may need
     },
   })
 );
@@ -82,7 +80,6 @@ router.use(
     origin: ALLOWED_ORIGINS,
     methods: ["PUT", "POST", "GET", "PATCH"],
     optionsSuccessStatus: 200,
-    // credentials: true, // Enable credentials for all routes
   })
 );
 
@@ -92,48 +89,43 @@ router.post(
   bodyParser.raw({ type: "application/json" }),
   async function (req, res) {
     try {
-      // Check if the 'Signing Secret' from the Clerk Dashboard was correctly provided
       const WEBHOOK_SECRET = process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY;
       if (!WEBHOOK_SECRET) {
-        throw new Error("You need a CLERK_WEBHOOK_SECRET_KEY in your .env");
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Missing Clerk webhook secret key.",
+          });
       }
 
-      // Grab the headers and body
       const headers = req.headers;
       const payload = req.body;
 
-      // Get the Svix headers for verification
       const svix_id = headers["svix-id"];
       const svix_timestamp = headers["svix-timestamp"];
       const svix_signature = headers["svix-signature"];
 
-      // If there are missing Svix headers, error out
       if (!svix_id || !svix_timestamp || !svix_signature) {
         return res.status(400).json({
           success: false,
-          message: "Error occurred -- no svix headers",
+          message: "Error occurred -- missing svix headers",
         });
       }
 
-      // Initiate Svix
       const wh = new Webhook(WEBHOOK_SECRET);
-
-      // Attempt to verify the incoming webhook
       const evt = wh.verify(payload, {
         "svix-id": svix_id,
         "svix-timestamp": svix_timestamp,
         "svix-signature": svix_signature,
       });
 
-      // Grab the ID and TYPE of the Webhook
       const { id, publicUrl } = evt.data;
       const eventType = evt.type;
 
       if (eventType === "user.deleted") {
-        // Check if the user exists in the database
         const userExists = await getUserById(id);
         if (!userExists.success) {
-          console.error("User not found:", userExists.message);
           return res.status(404).json({
             success: false,
             message: "User not found, cannot delete.",
@@ -142,34 +134,46 @@ router.post(
 
         try {
           const response = await deleteUser(id);
-          // Send success response to webhook
           if (response.success) {
-            console.log("User deleted successfully from database", response);
-            res.status(200).json({ success: true, message: "User deleted" });
+            return res
+              .status(200)
+              .json({ success: true, message: "User deleted successfully" });
           } else {
-            // Handle scenario where deleteUser function fails
-            console.error("Error deleting user:", response.message);
-            res.status(500).json({
+            return res.status(500).json({
               success: false,
               message: "Error deleting user",
             });
           }
         } catch (error) {
-          console.error("Error deleting user:", error.message);
-          // Send error response to webhook
-          res.status(500).json({ success: false, message: error.message });
+          return res
+            .status(500)
+            .json({ success: false, message: error.message });
         }
       } else if (eventType === "user.updated") {
-        // Update Sendbird user image URL
-        const sendbirdUpdateResponse = await updateSendbirdUserImage(
-          id,
-          publicUrl
-        );
-        console.log("Sendbird user image updated.", sendbirdUpdateResponse);
+        try {
+          const sendbirdUpdateResponse = await updateSendbirdUserImage(
+            id,
+            publicUrl
+          );
+          return res.status(200).json({
+            success: true,
+            message: "Sendbird user image updated.",
+            data: sendbirdUpdateResponse,
+          });
+        } catch (error) {
+          return res.status(500).json({
+            success: false,
+            message: "Failed to update Sendbird user image.",
+            error: error.message,
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: `Unhandled event type: ${eventType}`,
+        });
       }
     } catch (err) {
-      // Console log and return error
-      console.log("Webhook failed to verify. Error:", err.message);
       return res.status(400).json({ success: false, message: err.message });
     }
   }

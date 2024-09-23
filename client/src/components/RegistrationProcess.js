@@ -83,21 +83,21 @@ const RegistrationProcess = () => {
     const checkRegistrationStatus = async () => {
       if (!registrationData.isRegistering) {
         try {
-          if (userData?.user?.gender && userData?.user?.date_of_birth) {
-            navigate("/home");
-            return;
-          }
+          // if (userData?.user?.gender && userData?.user?.date_of_birth) {
+          //   navigate("/home");
+          //   return;
+          // }
 
-          const response = await getUserByClerkId(user.id);
-          if (
-            response.success &&
-            response.user.gender &&
-            response.user.date_of_birth
-          ) {
-            navigate("/home");
-          } else {
-            dispatch(setIsRegistering(true));
-          }
+          // const response = await getUserByClerkId(user.id);
+          // if (
+          //   response.success &&
+          //   response.user.gender &&
+          //   response.user.date_of_birth
+          // ) {
+          //   navigate("/home");
+          // } else {
+          dispatch(setIsRegistering(true));
+          // }
         } catch (error) {
           // alert(`An unknown error occurred. Please try again later.`);
           console.log(`Error fetching user data: ${error.message}`);
