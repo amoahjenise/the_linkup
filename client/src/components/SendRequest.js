@@ -89,8 +89,9 @@ const RequestBestPractices = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
   border: `1px solid ${theme.palette.grey[300]}`, // Add a border
   borderRadius: "8px", // Rounded corners'
-  color: "white",
-  backgroundColor: "black",
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor:
+    colorMode === "dark" ? "black" : theme.palette.background.paper,
   marginTop: theme.spacing(2),
 }));
 
