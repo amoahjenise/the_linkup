@@ -18,12 +18,15 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 const router = express.Router(); // Create a router instance
 
 const getUserByClerkId = async (clerkUserId) => {
+  console.log("Inside getUserByClerkId", clerkUserId);
+
   const queryPath = path.join(__dirname, "./db/queries/getUserByClerkId.sql");
   const query = fs.readFileSync(queryPath, "utf8");
   const queryValues = [clerkUserId];
 
   try {
     const { rows, rowCount } = await pool.query(query, queryValues);
+    console.log("rows[0]", rows[0]);
 
     if (rowCount > 0) {
       return { success: true, user: rows[0] }; // Return user data if found
@@ -155,7 +158,11 @@ router.post(
       console.log("eventType:", eventType);
 
       const userExists = await getUserByClerkId(id); // Fetch the user
+      console.log("userExists", userExists);
+
       if (!userExists.success) {
+        console.log("User not found, cannot proceed.");
+
         return res.status(404).json({
           success: false,
           message: "User not found, cannot proceed.",
@@ -181,10 +188,15 @@ router.post(
         }
       } else if (eventType === "user.updated") {
         try {
+          console.log("Reached user.updated.");
+
           const sendbirdUpdateResponse = await updateSendbirdUserImage(
             userExists.user.id,
             image_url
           );
+
+          console.log("sendbirdUpdateResponse", sendbirdUpdateResponse);
+
           return res.status(200).json({
             success: true,
             message: "Sendbird user image updated.",
