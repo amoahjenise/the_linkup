@@ -26,8 +26,10 @@ const MainSection = styled("div")(({ theme }) => ({
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  padding: theme.spacing(2),
-  marginTop: theme.spacing(2),
+  marginTop: theme.spacing(6),
+  [theme.breakpoints.down("md")]: {
+    marginTop: theme.spacing(10),
+  },
 }));
 
 const LinkUpInfo = styled("div")(({ theme }) => ({
