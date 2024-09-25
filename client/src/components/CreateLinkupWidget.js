@@ -133,7 +133,11 @@ const ErrorText = styled("p")(({ theme }) => ({
   margin: "8px 0 0",
 }));
 
-const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
+const CreateLinkupWidget = ({
+  setIsWidgetVisible = () => {}, // Default function to do nothing
+  setShouldFetchLinkups,
+  scrollToTopCallback,
+}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState([]);
   const [paymentOption, setPaymentOption] = useState("");
@@ -216,6 +220,7 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
         setSelectedDate(null);
         setGenderPreference([]);
         setPaymentOption("");
+        setIsWidgetVisible(false);
         setShouldFetchLinkups(true);
         scrollToTopCallback();
       } else {

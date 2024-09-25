@@ -51,6 +51,7 @@ const StyledHamburgerMenu = styled(Menu)(({ colorMode }) => ({
     width: "180px", // Set a fixed width
     maxWidth: "90%", // Allow it to shrink on smaller screens
   },
+  zIndex: 2100,
 }));
 
 const StyledHamburgerMenuItem = styled(MenuItem)(({ colorMode }) => ({
@@ -307,14 +308,6 @@ const LeftMenu = ({ isMobile }) => {
         }}
         colorMode={colorMode}
       >
-        {/* <StyledHamburgerMenuItem
-          onClick={() => {
-            handleMenuClose();
-          }}
-          colorMode={colorMode}
-        >
-          Create a Linkup
-        </StyledHamburgerMenuItem> */}
         <StyledHamburgerMenuItem
           component={Link}
           to="/settings"
