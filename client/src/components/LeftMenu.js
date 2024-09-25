@@ -181,9 +181,21 @@ const BadgeStyled = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const FooterMenuButton = ({ to, icon }) => (
+const FooterMenuButton = ({ to, icon, badgeContent }) => (
   <Link to={to}>
-    <IconWithSpacing>{icon}</IconWithSpacing>
+    <IconWithSpacing>
+      {badgeContent ? (
+        <BadgeStyled
+          badgeContent={badgeContent}
+          overlap="circular"
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          {icon}
+        </BadgeStyled>
+      ) : (
+        icon
+      )}
+    </IconWithSpacing>
   </Link>
 );
 
@@ -280,13 +292,26 @@ const LeftMenu = ({ isMobile }) => {
           </MenuList>
         </MainContainer>
       )}
-      {isMobile && ( // Render the footer only if in mobile mode
+      {!isMobile && (
+        <MainContainer colorMode={colorMode}>
+          {/* Existing Logo and MenuList */}
+        </MainContainer>
+      )}
+      {isMobile && (
         <FooterContainer colorMode={colorMode}>
           <FooterMenuButton to="/home" icon={<HomeIcon />} />
-          <FooterMenuButton to="/notifications" icon={<NotificationsIcon />} />
+          <FooterMenuButton
+            to="/notifications"
+            icon={<NotificationsIcon />}
+            badgeContent={unreadNotificationsCount} // Pass badge content here
+          />
           <FooterMenuButton to="/profile/me" icon={<AccountCircleIcon />} />
           <FooterMenuButton to="/history" icon={<HistoryIcon />} />
-          <FooterMenuButton to="/messages" icon={<MessageIcon />} />
+          <FooterMenuButton
+            to="/messages"
+            icon={<MessageIcon />}
+            badgeContent={unreadMessagesCount} // Pass badge content here
+          />
           <IconButton onClick={handleMenuOpen}>
             <MenuIcon
               style={{ color: colorMode === "dark" ? "white" : "black" }}
