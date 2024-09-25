@@ -50,15 +50,16 @@ const publicPages = [
   "/registration",
 ];
 
-// Define AppWrapper with conditional styling
 const AppWrapper = styled("div", {
   shouldForwardProp: (prop) => prop !== "isAuthenticated",
 })(({ theme, isAuthenticated }) => ({
-  // Apply additional styles if authenticated
   ...(isAuthenticated && {
     display: "flex",
     height: "100vh",
     overflow: "hidden",
+    "@media (max-width: 900px)": {
+      paddingBottom: "60px", // Add padding for footer
+    },
   }),
 }));
 

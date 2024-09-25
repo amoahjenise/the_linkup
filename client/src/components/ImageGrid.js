@@ -24,6 +24,7 @@ const PlaceholderImage = "path/to/placeholder-image.jpg"; // Replace with your p
 
 const ConnectButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(10),
   backgroundColor: "#C13584", // Instagram brand color
   color: "#FFFFFF",
   borderRadius: "5px",

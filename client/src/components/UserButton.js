@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { logout } from "../redux/actions/authActions";
 import { loggingOut } from "../redux/actions/logoutActions";
-
 import { useSnackbar } from "../contexts/SnackbarContext";
 
 const CustomUserButton = () => {
