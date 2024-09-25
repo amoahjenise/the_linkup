@@ -292,25 +292,26 @@ const LeftMenu = ({ isMobile }) => {
           </MenuList>
         </MainContainer>
       )}
-      {!isMobile && (
-        <MainContainer colorMode={colorMode}>
-          {/* Existing Logo and MenuList */}
-        </MainContainer>
-      )}
-      {isMobile && (
+      {isMobile && ( // Render the footer only if in mobile mode
         <FooterContainer colorMode={colorMode}>
           <FooterMenuButton to="/home" icon={<HomeIcon />} />
           <FooterMenuButton
             to="/notifications"
-            icon={<NotificationsIcon />}
-            badgeContent={unreadNotificationsCount} // Pass badge content here
+            icon={
+              <Badge badgeContent={unreadNotificationsCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            }
           />
           <FooterMenuButton to="/profile/me" icon={<AccountCircleIcon />} />
           <FooterMenuButton to="/history" icon={<HistoryIcon />} />
           <FooterMenuButton
             to="/messages"
-            icon={<MessageIcon />}
-            badgeContent={unreadMessagesCount} // Pass badge content here
+            icon={
+              <Badge badgeContent={unreadMessagesCount} color="error">
+                <MessageIcon />
+              </Badge>
+            }
           />
           <IconButton onClick={handleMenuOpen}>
             <MenuIcon
@@ -319,6 +320,7 @@ const LeftMenu = ({ isMobile }) => {
           </IconButton>
         </FooterContainer>
       )}
+
       <StyledHamburgerMenu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
