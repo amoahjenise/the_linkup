@@ -14,7 +14,7 @@ import { getLinkupByConversation } from "../api/messagingAPI";
 
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
-  height: "100vh",
+  // height: "100vh",
 }));
 
 const ChannelListWrap = styled("div")(({ theme }) => ({
@@ -33,7 +33,7 @@ const MobileContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "100vh",
+  height: "87vh",
 }));
 
 const BackButton = styled("button")(({ theme }) => ({
@@ -146,11 +146,7 @@ const SendbirdChat = () => {
             />
           </ChannelListWrap>
           <ConversationWrap>
-            {currentChannel ? (
-              renderConversation()
-            ) : (
-              <div>Select a channel to start chatting.</div>
-            )}
+            {currentChannel && <>{renderConversation()}</>}
           </ConversationWrap>
         </>
       ) : (
@@ -171,7 +167,7 @@ const SendbirdChat = () => {
               <BackButton onClick={() => setCurrentChannel(null)}>
                 Back
               </BackButton>
-              {renderConversation()}
+              <ConversationWrap>{renderConversation()}</ConversationWrap>
             </>
           )}
         </MobileContainer>
