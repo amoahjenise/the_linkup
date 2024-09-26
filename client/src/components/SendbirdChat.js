@@ -11,7 +11,6 @@ import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
-import { background } from "@chakra-ui/react";
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({

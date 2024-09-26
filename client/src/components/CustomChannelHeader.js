@@ -23,6 +23,7 @@ const Header = styled(Box)(({ theme }) => ({
 }));
 
 const BackButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.main,
   marginRight: theme.spacing(1),
 }));
 

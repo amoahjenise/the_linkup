@@ -161,7 +161,7 @@ const App = () => {
     "--sendbird-dark-secondary-300": "#259c72",
     "--sendbird-dark-secondary-400": "#027d69",
     "--sendbird-dark-secondary-500": "#066858",
-    "--sendbird-dark-background-600": "#1f2733",
+    "--sendbird-dark-background-600": "black", // Sendbird Container background in dark mode
     "--sendbird-dark-background-700": "#1b2330",
     "--sendbird-light-onlight-04": "#cbcbcb", // text disabled color in light mode
     "--sendbird-dark-ondark-04": "#e6e6e6", // text disabled color in dark mode
