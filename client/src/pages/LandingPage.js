@@ -83,7 +83,7 @@ const LeftColumn = styled("div")(({ theme }) => ({
 
 const LeftSubsectionContainer = styled("div")(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
-    paddingTop: theme.spacing(25), // Additional spacing on top for better aesthetics
+    paddingTop: theme.spacing(15), // Additional spacing on top for better aesthetics
   },
 }));
 
