@@ -26,16 +26,15 @@ const StyledDiv = styled("div")(({ theme, colorMode, isWidgetVisible }) => ({
     position: "relative",
   },
   [`&.${classes.feedSection}`]: {
-    flex: "2",
+    flex: 2,
     overflowY: "auto",
-    borderRightWidth: "1px",
-    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
+    borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
     [theme.breakpoints.down("sm")]: {
-      flex: "1",
+      flex: 1,
     },
   },
   [`&.${classes.widgetSection}`]: {
-    flex: "1",
+    flex: 1,
     overflowY: "auto",
     display: "block",
     [theme.breakpoints.down("md")]: {
@@ -61,9 +60,9 @@ const MobileCreateButton = styled("div")(({ theme }) => ({
   alignItems: "center",
   width: "60px",
   height: "60px",
-  backgroundColor: "rgba(0, 151, 167, 0.7)", // 70% opacity
+  backgroundColor: "rgba(0, 151, 167, 0.7)",
   "&:hover": {
-    backgroundColor: "rgba(0, 123, 134, 0.7)", // Adjusted hover color with transparency
+    backgroundColor: "rgba(0, 123, 134, 0.7)",
   },
   color: theme.palette.primary.contrastText,
   borderRadius: "50%",
@@ -142,16 +141,9 @@ const HomePage = ({ isMobile }) => {
           }));
 
           updatedLinkupList.sort((a, b) => {
-            if (a.recency !== b.recency) {
-              return a.recency - b.recency;
-            }
-            if (a.distance !== b.distance) {
-              return a.distance - b.distance;
-            }
-            const now = new Date();
-            const timeDifferenceA = new Date(a.scheduled_at) - now;
-            const timeDifferenceB = new Date(b.scheduled_at) - now;
-            return timeDifferenceA - timeDifferenceB;
+            if (a.recency !== b.recency) return a.recency - b.recency;
+            if (a.distance !== b.distance) return a.distance - b.distance;
+            return new Date(a.scheduled_at) - new Date(b.scheduled_at);
           });
 
           const userLinkups = updatedLinkupList.filter(
@@ -252,46 +244,19 @@ const HomePage = ({ isMobile }) => {
         ref={feedSectionRef}
         colorMode={colorMode}
       >
-        <FeedSection
-          linkupList={linkupList}
-          isLoading={isFetchingNextPage}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-        />
+        <FeedSection linkupList={linkupList} refreshLinkups={refreshLinkups} />
       </StyledDiv>
-
-      {!isMobile && (
-        <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
-          <WidgetSection
-            setShouldFetchLinkups={setShouldFetchLinkups}
-            scrollToTopCallback={scrollToTop}
-            onRefreshClick={refreshLinkups}
-            userId={userId}
-            gender={gender}
-          />
-        </StyledDiv>
-      )}
-
+      <StyledDiv
+        className={classes.widgetSection}
+        colorMode={colorMode}
+        isWidgetVisible={isWidgetVisible}
+      >
+        <WidgetSection toggleWidget={toggleWidget} />
+      </StyledDiv>
       {isMobile && (
-        <>
-          <MobileCreateButton onClick={toggleWidget}>
-            {isWidgetVisible ? <CloseIcon /> : <AddIcon />}
-          </MobileCreateButton>
-          <StyledDiv
-            className={classes.widgetSection}
-            isWidgetVisible={isWidgetVisible}
-            colorMode={colorMode}
-            style={{ display: isWidgetVisible ? "block" : "none" }}
-          >
-            <WidgetSection
-              setIsWidgetVisible={setIsWidgetVisible}
-              setShouldFetchLinkups={setShouldFetchLinkups}
-              scrollToTopCallback={scrollToTop}
-              onRefreshClick={refreshLinkups}
-              userId={userId}
-              gender={gender}
-            />
-          </StyledDiv>
-        </>
+        <MobileCreateButton onClick={toggleWidget}>
+          {isWidgetVisible ? <CloseIcon /> : <AddIcon />}
+        </MobileCreateButton>
       )}
     </StyledDiv>
   );

@@ -13,7 +13,10 @@ import { getUserLinkups } from "../api/linkUpAPI";
 import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
-import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import {
+  Close as CloseIcon,
+  ArrowBack as ArrowIcon,
+} from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 const PREFIX = "HistoryPage";
 const classes = {
@@ -67,6 +70,14 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     transform: "translateX(100%)",
   },
 }));
+
+const WidgetButton = styled(ArrowIcon)(({ theme, colorMode }) => ({
+  position: "fixed",
+  height: "100%",
+  right: "20px",
+  color: colorMode === "dark" ? "light-blue" : theme.palette.primary,
+}));
+
 const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
@@ -507,6 +518,81 @@ const LinkUpHistoryPage = ({ isMobile }) => {
               }
             />
           </StyledDiv>
+        )}
+        {isMobile && (
+          <>
+            <IconButton
+              className={classes.widgetButton}
+              onClick={toggleWidget}
+              color="primary"
+            >
+              <WidgetButton colorMode={colorMode} />
+            </IconButton>
+            <StyledDiv
+              className={`${classes.widgetSection} ${
+                isWidgetVisible ? classes.slideIn : classes.slideOut
+              }`}
+              colorMode={colorMode}
+            >
+              <IconButton
+                className={classes.widgetCloseButton}
+                onClick={toggleWidget}
+              >
+                <CloseIcon />
+              </IconButton>
+              <FilterBar
+                isMobile={isMobile}
+                activeTab={activeTab}
+                activeStatus={
+                  activeTab === 0
+                    ? myLinkupsFilters.activeStatus
+                    : activeTab === 1
+                    ? sentRequestsFilters.activeStatus
+                    : receivedRequestsFilters.activeStatus
+                }
+                onStatusChange={(newStatus) => {
+                  if (activeTab === 0) {
+                    updateFilters({ activeStatus: newStatus }, true);
+                  } else if (activeTab === 1) {
+                    setSentRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      activeStatus: newStatus,
+                    }));
+                  } else {
+                    setReceivedRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      activeStatus: newStatus,
+                    }));
+                  }
+                }}
+                dateFilter={
+                  activeTab === 0
+                    ? myLinkupsFilters.dateFilter
+                    : activeTab === 1
+                    ? sentRequestsFilters.dateFilter
+                    : receivedRequestsFilters.dateFilter
+                }
+                onDateFilterChange={(newDateFilter) => {
+                  if (activeTab === 0) {
+                    updateFilters({ dateFilter: newDateFilter }, true);
+                  } else if (activeTab === 1) {
+                    setSentRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      dateFilter: newDateFilter,
+                    }));
+                  } else {
+                    setReceivedRequestsFilters((prevFilters) => ({
+                      ...prevFilters,
+                      dateFilter: newDateFilter,
+                    }));
+                  }
+                }}
+                statusOptions={
+                  activeTab === 0 ? statusOptions : requestsStatusOptions
+                }
+              />
+            </StyledDiv>
+          </>
         )}
       </FilterBarContainer>
       {isEditing && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -11,14 +11,18 @@ import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
+import { background } from "@chakra-ui/react";
 
+// Styled components
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
-  // height: "100vh",
+  height: "100%",
+  width: "100%",
 }));
 
 const ChannelListWrap = styled("div")(({ theme }) => ({
   borderRight: "1px solid lightgrey",
+  height: "100%",
   overflowY: "auto",
 }));
 
@@ -33,24 +37,12 @@ const MobileContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "87vh",
-}));
-
-const BackButton = styled("button")(({ theme }) => ({
-  margin: theme.spacing(1),
-  padding: theme.spacing(1, 2),
-  background: "#0097A7",
-  "&:hover": {
-    background: "#007b86",
-  },
-  color: "#fff",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
+  height: "100%",
 }));
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
-  width: "100%", // Set to full width for mobile view
+  width: "100%", // Full width for mobile
+  // borderRight: "1px solid lightgrey",
 }));
 
 const SendbirdChat = () => {
@@ -60,16 +52,21 @@ const SendbirdChat = () => {
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
 
   const globalStore = useSendbirdStateContext();
-  const getGroupChannel = sendbirdSelectors.getGetGroupChannel(globalStore);
+
+  // Move the selector call to a separate function
+  const getGroupChannel = useCallback(() => {
+    return sendbirdSelectors.getGetGroupChannel(globalStore);
+  }, [globalStore]);
+
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
 
-  const handleChannelSelect = (channel) => {
+  const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
-  };
+  }, []);
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -81,7 +78,7 @@ const SendbirdChat = () => {
         );
         setLinkup(linkupResponse.linkup);
 
-        const channel = await getGroupChannel(currentChannel._url);
+        const channel = await getGroupChannel()(currentChannel._url); // Call the selector function
         const operator = channel?.members.find(
           (member) => member.role === "operator"
         );
@@ -99,12 +96,12 @@ const SendbirdChat = () => {
             linkupResponse.linkup.requester_status === "inactive"
         );
       } catch (error) {
-        console.error("Error fetching channel:", error);
+        console.error("Error fetching channel data:", error);
       }
     };
 
     fetchChannelData();
-  }, [currentChannel, getGroupChannel, userId]);
+  }, [currentChannel, getGroupChannel, userId, isOperator]);
 
   const renderConversation = () => (
     <>
@@ -118,6 +115,8 @@ const SendbirdChat = () => {
             channel={currentChannel}
             onActionClick={() => setShowSettings(true)}
             isOperator={isOperator}
+            isMobile={isMobile}
+            setCurrentChannel={setCurrentChannel}
           />
         )}
       />
@@ -163,12 +162,7 @@ const SendbirdChat = () => {
               renderHeader={() => <ChannelListHeader />}
             />
           ) : (
-            <>
-              <BackButton onClick={() => setCurrentChannel(null)}>
-                Back
-              </BackButton>
-              <ConversationWrap>{renderConversation()}</ConversationWrap>
-            </>
+            <ConversationWrap>{renderConversation()}</ConversationWrap>
           )}
         </MobileContainer>
       )}

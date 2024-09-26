@@ -325,7 +325,11 @@ const CreateLinkupWidget = ({
               formErrors.genderPreference ? "error" : ""
             }`}
             style={{
-              width: "100%",
+              width: "100%", // Ensure full width
+              maxWidth: "400px", // Set a max width to prevent overflow
+              overflow: "hidden", // Prevent overflow
+              whiteSpace: "nowrap", // Prevent wrapping
+              textOverflow: "ellipsis", // Add ellipsis for overflow text
               border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
               backgroundColor:
                 colorMode === "dark"
@@ -337,6 +341,18 @@ const CreateLinkupWidget = ({
                   : "black"
                 : "grey",
             }}
+            // Add a dropdown style for scrolling if needed
+            itemTemplate={(option) => (
+              <div
+                style={{
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {option.value}
+              </div>
+            )}
           />
           {/* Display error message if no gender is selected */}
           {formErrors.genderPreference && (
