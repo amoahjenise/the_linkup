@@ -69,6 +69,7 @@ const RegistrationProcess = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useUser();
+  console.log("User from Clerk:", user);
   const clerk = useClerk();
   const registrationData = useSelector((state) => state.registration);
   const [userData, setUserData] = useState({
@@ -86,6 +87,7 @@ const RegistrationProcess = () => {
             navigate("/home");
             return;
           }
+
           const response = await getUserByClerkId(user.id);
           if (
             response.success &&
@@ -97,14 +99,14 @@ const RegistrationProcess = () => {
             dispatch(setIsRegistering(true));
           }
         } catch (error) {
-          alert(`An unknown error occurred. Please try again later.`);
+          // alert(`An unknown error occurred. Please try again later.`);
           console.log(`Error fetching user data: ${error.message}`);
         }
       }
     };
 
     checkRegistrationStatus();
-  }, [registrationData.isRegistering, userData, user.id, dispatch, navigate]);
+  }, [registrationData.isRegistering, userData, user?.id, dispatch, navigate]);
 
   const handleLaunchingLinkup = async () => {
     try {

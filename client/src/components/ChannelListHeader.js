@@ -13,7 +13,6 @@ const HeaderContainer = styled(Box)(({ theme }) => ({
   borderBottomWidth: "1px",
   borderBottomColor: "lightgrey",
   borderBottomStyle: "solid",
-  cursor: "pointer", // Indicate that the container is clickable
   transition: "background-color 0.3s ease", // Smooth transition for hover effect
   "&:hover": {
     backgroundColor: theme.palette.action.hover, // Highlight background on hover
@@ -29,11 +28,13 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   color: theme.palette.primary.contrastText,
   borderRadius: "50%",
   padding: theme.spacing(1),
+  cursor: "pointer", // Indicate that the container is clickable
 }));
 
 const TextWrapper = styled(Box)({
   display: "flex",
   flexDirection: "column",
+  cursor: "default", // Indicate that the container is clickable
 });
 
 const Title = styled(Typography)(({ theme }) => ({
@@ -47,19 +48,19 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 
 const ChannelListHeader = () => {
   return (
-    <Link to="/home" style={{ textDecoration: "none" }}>
-      <HeaderContainer>
+    <HeaderContainer>
+      <Link to="/home" style={{ textDecoration: "none" }}>
         <IconWrapper>
           <ChatBubbleIcon />
         </IconWrapper>
-        <TextWrapper>
-          <Title variant="h4">Discover New Linkups</Title>
-          <Subtitle variant="body2">
-            Check the feed to link up with people!
-          </Subtitle>
-        </TextWrapper>
-      </HeaderContainer>
-    </Link>
+      </Link>
+      <TextWrapper>
+        <Title variant="h4">Discover New Linkups</Title>
+        <Subtitle variant="body2">
+          Check the feed to link up with people!
+        </Subtitle>
+      </TextWrapper>
+    </HeaderContainer>
   );
 };
 

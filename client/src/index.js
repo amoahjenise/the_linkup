@@ -10,6 +10,7 @@ import { SnackbarProvider } from "./contexts/SnackbarContext";
 import Modal from "react-modal";
 import { SocketProvider } from "./contexts/SocketContext";
 import { ClerkProvider } from "@clerk/clerk-react";
+import { PrimeReactProvider } from "primereact/api";
 
 Modal.setAppElement("#root");
 
@@ -27,7 +28,9 @@ root.render(
                 <ColorModeScript
                   initialColorMode={theme.config.initialColorMode}
                 />
-                <App />
+                <PrimeReactProvider>
+                  <App />
+                </PrimeReactProvider>
               </ChakraProvider>
             </React.StrictMode>
           </SocketProvider>

@@ -1,42 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 import SBConversation from "@sendbird/uikit-react/GroupChannel";
 import SBChannelList from "@sendbird/uikit-react/GroupChannelList";
 import SBChannelSettings from "@sendbird/uikit-react/ChannelSettings";
 import sendbirdSelectors from "@sendbird/uikit-react/sendbirdSelectors";
 import useSendbirdStateContext from "@sendbird/uikit-react/useSendbirdStateContext";
-import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
-import { getLinkupByConversation } from "../api/messagingAPI";
 import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
+import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
+import { getLinkupByConversation } from "../api/messagingAPI";
 
-const SendbirdChatWrapper = styled("div")(({ theme }) => ({
-  height: "calc(100vh - 60px)",
+// Styled components
+const Container = styled("div")(({ theme }) => ({
   display: "flex",
-  borderWidth: "0px",
+  height: "100%",
+  width: "100%",
 }));
 
-const ConversationWrap = styled("div")({
-  borderWidth: "0px",
-  borderLeftColor: "lightgrey",
-  borderLeftWidth: "1px",
-});
+const ChannelListWrap = styled("div")(({ theme }) => ({
+  borderRight: "1px solid lightgrey",
+  height: "100%",
+  overflowY: "auto",
+}));
 
-const SettingsPanelWrap = styled("div")({
-  flex: "0 0 auto",
-});
+const ConversationWrap = styled("div")(({ theme }) => ({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  overflowY: "auto",
+}));
 
-export default function SendbirdChat() {
-  const [showSettings, setShowSettings] = useState(false);
+const MobileContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  height: "100%",
+}));
+
+const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
+  width: "100%", // Full width for mobile
+}));
+
+const SendbirdChat = () => {
   const [currentChannel, setCurrentChannel] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const isMobile = useMediaQuery("(max-width:600px)");
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
-  const [isOperator, setIsOperator] = useState(null);
-  const [linkup, setLinkup] = useState(null);
+
+  const globalStore = useSendbirdStateContext();
+
+  // Move the selector call to a separate function
+  const getGroupChannel = useCallback(() => {
+    return sendbirdSelectors.getGetGroupChannel(globalStore);
+  }, [globalStore]);
+
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
-  const globalStore = useSendbirdStateContext();
-  const getGroupChannel = sendbirdSelectors.getGetGroupChannel(globalStore);
+
+  const [linkup, setLinkup] = useState(null);
+  const [isOperator, setIsOperator] = useState(false);
+
+  const handleChannelSelect = useCallback((channel) => {
+    setCurrentChannel(channel);
+  }, []);
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -48,79 +76,96 @@ export default function SendbirdChat() {
         );
         setLinkup(linkupResponse.linkup);
 
-        const channel = await getGroupChannel(currentChannel._url);
+        const channel = await getGroupChannel()(currentChannel._url); // Call the selector function
         const operator = channel?.members.find(
           (member) => member.role === "operator"
         );
-        const isOperatorValue = operator && operator.userId === userId;
-        setIsOperator(isOperatorValue);
+        setIsOperator(operator && operator.userId === userId);
 
         const response = await getChannelFirstTwoMessages(
           currentChannel._url,
           channel.createdAt
         );
-
-        if (linkupResponse.linkup.request_status === "declined") {
-          setMessageInputDisabled(true);
-        } else if (
-          !isOperatorValue &&
-          response.messages.length === 1 &&
-          linkupResponse.linkup.request_status !== "accepted"
-        ) {
-          setMessageInputDisabled(true);
-        } else if (linkupResponse.linkup.requester_status === "inactive") {
-          setMessageInputDisabled(true);
-        } else {
-          setMessageInputDisabled(false);
-        }
+        setMessageInputDisabled(
+          linkupResponse.linkup.request_status === "declined" ||
+            (!isOperator &&
+              response.messages.length === 1 &&
+              linkupResponse.linkup.request_status !== "accepted") ||
+            linkupResponse.linkup.requester_status === "inactive"
+        );
       } catch (error) {
-        console.error("Error fetching channel:", error);
+        console.error("Error fetching channel data:", error);
       }
     };
 
     fetchChannelData();
-  }, [currentChannel]);
+  }, [currentChannel, getGroupChannel, userId, isOperator]);
+
+  const renderConversation = () => (
+    <>
+      <SBConversation
+        channelUrl={currentChannel._url}
+        onChatHeaderActionClick={() => setShowSettings(true)}
+        disabled={isMessageInputDisabled}
+        renderChannelHeader={() => (
+          <CustomChannelHeader
+            linkup={linkup}
+            channel={currentChannel}
+            onActionClick={() => setShowSettings(true)}
+            isOperator={isOperator}
+            isMobile={isMobile}
+            setCurrentChannel={setCurrentChannel}
+          />
+        )}
+      />
+      {showSettings && (
+        <SBChannelSettings
+          channelUrl={currentChannel?._url}
+          onCloseClick={() => setShowSettings(false)}
+        />
+      )}
+    </>
+  );
 
   return (
-    <SendbirdChatWrapper>
-      <div className="sendbird-app__wrap">
-        <div style={{ borderWidth: "0px" }}>
-          <SBChannelList
-            allowProfileEdit={false}
-            isMessageReceiptStatusEnabled={true}
-            isTypingIndicatorEnabled={true}
-            selectedChannelUrl={currentChannel?._url}
-            onChannelCreated={(channel) => setCurrentChannel(channel)}
-            onChannelSelect={(channel) => setCurrentChannel(channel)}
-            renderHeader={() => <ChannelListHeader />}
-          />
-        </div>
-        <ConversationWrap className="sendbird-app__conversation-wrap">
-          {currentChannel?._url && (
-            <SBConversation
-              channelUrl={currentChannel._url}
-              onChatHeaderActionClick={() => setShowSettings(true)}
-              disabled={isMessageInputDisabled}
-              renderChannelHeader={() => (
-                <CustomChannelHeader
-                  linkup={linkup}
-                  channel={currentChannel}
-                  onActionClick={() => setShowSettings(true)}
-                  isOperator={isOperator}
-                />
-              )}
+    <Container>
+      {!isMobile ? (
+        <>
+          <ChannelListWrap>
+            <SBChannelList
+              allowProfileEdit={false}
+              isMessageReceiptStatusEnabled
+              isTypingIndicatorEnabled
+              selectedChannelUrl={currentChannel?._url}
+              onChannelCreated={setCurrentChannel}
+              onChannelSelect={handleChannelSelect}
+              renderHeader={() => <ChannelListHeader />}
             />
+          </ChannelListWrap>
+          <ConversationWrap>
+            {currentChannel && <>{renderConversation()}</>}
+          </ConversationWrap>
+        </>
+      ) : (
+        <MobileContainer>
+          {!currentChannel ? (
+            <FullWidthChannelList
+              allowProfileEdit={false}
+              isMessageReceiptStatusEnabled
+              isTypingIndicatorEnabled
+              selectedChannelUrl={currentChannel?._url}
+              disableAutoSelect
+              onChannelCreated={setCurrentChannel}
+              onChannelSelect={handleChannelSelect}
+              renderHeader={() => <ChannelListHeader />}
+            />
+          ) : (
+            <ConversationWrap>{renderConversation()}</ConversationWrap>
           )}
-        </ConversationWrap>
-      </div>
-      {showSettings && (
-        <SettingsPanelWrap>
-          <SBChannelSettings
-            channelUrl={currentChannel?._url}
-            onCloseClick={() => setShowSettings(false)}
-          />
-        </SettingsPanelWrap>
+        </MobileContainer>
       )}
-    </SendbirdChatWrapper>
+    </Container>
   );
-}
+};
+
+export default SendbirdChat;

@@ -3,22 +3,28 @@ import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import videoSrc from "../assets/TheLinkupAppMarketing.mp4"; // Import your video file
-import logoSrc from "../assets/logo.png"; // Import your logo file
+import { useColorMode } from "@chakra-ui/react";
+import logoSrc from "../assets/logo.png";
+import LandingPageImage from "../assets/LandingPageImage.png";
+import Banner from "../assets/Banner3.jpg";
+import AppDarkMode from "../assets/AppDarkMode.png";
+import AppLightMode from "../assets/AppLightMode.png";
 
 // Styled Components
 const PageContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   minHeight: "100vh",
-  background: "linear-gradient(135deg, #a2c2e4 0%, #f7d3c0 100%)", // Soft green-yellow gradient
-  padding: "20px", // Added padding for a relaxed, open feel
+  background: `url(${Banner}) no-repeat center center fixed`, // Use the background image
+  backgroundSize: "cover",
+  padding: "20px",
 });
 
 const Logo = styled("img")({
-  width: "30px", // Adjusted size for summer feel
+  width: "30px",
   height: "30px",
   marginRight: "10px",
+  filter: "invert(1)", // This will turn the logo white
 });
 
 const ContentContainer = styled("main")(({ theme }) => ({
@@ -27,34 +33,73 @@ const ContentContainer = styled("main")(({ theme }) => ({
   padding: theme.spacing(4),
   justifyContent: "center",
   alignItems: "center",
+  flexDirection: "column",
+  backgroundColor: "transparent",
   [theme.breakpoints.up("md")]: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  flexDirection: "column",
-  backgroundColor: "transparent", // Transparent to show the gradient
-}));
-
-const LeftColumn = styled("div")(({ theme }) => ({
-  flex: 1,
-  textAlign: "center",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("md")]: {
-    textAlign: "left",
-    paddingRight: theme.spacing(4),
+  [theme.breakpoints.down("sm")]: {
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
+    height: "calc(100vh - 80px)", // Adjust height minus the footer
   },
 }));
 
 const RightColumn = styled("div")(({ theme }) => ({
   flex: 1,
-  display: "flex",
-  justifyContent: "center",
+  display: "none", // Hide by default (for mobile)
+  justifyContent: "center", // Align content to the right
   alignItems: "center",
   padding: theme.spacing(2),
   marginTop: theme.spacing(4),
   [theme.breakpoints.up("md")]: {
+    display: "flex", // Show on larger screens
     marginTop: 0,
   },
+  [theme.breakpoints.down("sm")]: {
+    display: "none", // Ensure it's hidden in mobile view
+  },
+}));
+
+const ResponsiveImage = styled("img")({
+  maxHeight: "570px",
+  maxWidth: "auto", // Optional: limit max width if needed
+  borderRadius: "8px", // Optional: add some styling
+});
+
+const LeftColumn = styled("div")(({ theme }) => ({
+  flex: 1,
+  textAlign: "center",
+  padding: theme.spacing(3), // Slightly increased padding for a more spacious feel
+  backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle, semi-transparent white
+  backdropFilter: "blur(10px)", // Adds a slight blur for a macOS-like frosted glass effect
+  borderRadius: "8px", // Rounded corners for a cleaner appearance
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
+  cursor: "default",
+  [theme.breakpoints.up("md")]: {
+    textAlign: "left",
+    paddingRight: theme.spacing(5), // Adjusted for more space on larger screens
+  },
+  [theme.breakpoints.down("sm")]: {
+    paddingTop: theme.spacing(10), // Additional spacing for mobile
+    paddingBottom: theme.spacing(3), // Added bottom padding for balance
+    backgroundColor: "transparent", // Remove background in mobile mode
+    backdropFilter: "none", // Disable blur on mobile
+    boxShadow: "none", // Remove shadow in mobile mode
+  },
+}));
+
+const LeftSubsectionContainer = styled("div")(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    paddingTop: theme.spacing(15), // Additional spacing on top for better aesthetics
+  },
+}));
+
+const LeftSubsection = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2), // Consistent padding all around
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
 }));
 
 const Footer = styled("footer")(({ theme }) => ({
@@ -63,27 +108,28 @@ const Footer = styled("footer")(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   borderTop: "1px solid #e0e0e0",
-  color: "#004D40",
+  color: "#FFFFFF", // Light color for readability
   backgroundColor: "transparent",
 }));
 
 const Title = styled("h1")(({ theme }) => ({
   fontSize: "2.5rem",
   fontWeight: "bold",
-  color: "#00796B", // Same type of green, but bolder for summer
+  color: "#FFFFFF", // Bright white to contrast with the background
   [theme.breakpoints.up("sm")]: {
     fontSize: "3rem",
   },
   [theme.breakpoints.up("md")]: {
     fontSize: "4rem",
   },
-  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.2)", // Adds a light shadow for depth
+  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)", // Stronger shadow for better contrast
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(4),
-  fontSize: "1.1rem",
-  color: "#004D40", // Deep green for subtler text
+  fontSize: "1.5rem",
+  fontWeight: "bold",
+  color: "#FFFFFF", // Light pastel for a subtle contrast
   [theme.breakpoints.up("sm")]: {
     fontSize: "1.3rem",
   },
@@ -95,25 +141,25 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
-  backgroundColor: "#00796B", // Summer green
-  color: "#FFFFFF",
+  backgroundColor: "#FFFFFF", // White button for contrast
+  color: "#00796B",
   "&:hover": {
-    backgroundColor: "#004D40",
+    backgroundColor: "#FFEBEE",
   },
-  borderRadius: "30px", // Rounded button for a playful look
+  borderRadius: "30px",
   marginRight: theme.spacing(2),
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for a summer feel
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
 }));
 
 const OutlinedButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
-  color: "#00796B",
-  borderColor: "#00796B",
-  borderRadius: "30px", // Rounded edges
+  color: "#FFFFFF",
+  borderColor: "#FFFFFF", // White border for subtle styling
+  borderRadius: "30px",
   "&:hover": {
-    borderColor: "#004D40",
-    color: "#004D40",
+    borderColor: "#FFEBEE",
+    color: "#FFEBEE",
   },
   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
 }));
@@ -123,20 +169,12 @@ const VideoContainer = styled("div")(({ theme }) => ({
   maxWidth: "600px",
   overflow: "hidden",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  // borderRadius: "15px", // Rounded corners for softness
 }));
-
-const VideoElement = styled("video")({
-  width: "100%",
-  height: "100%",
-  outline: "none",
-  objectFit: "cover",
-  // borderRadius: "15px",
-});
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const { colorMode } = useColorMode(); // Use Chakra UI's colorMode
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -146,33 +184,36 @@ const LandingPage = () => {
 
   return (
     <PageContainer>
-      {/* Main Content */}
       <ContentContainer>
         <LeftColumn>
           <Title>The Linkup</Title>
-          <Subtitle>
-            Connect with new people and organize meetups around your interests.
-          </Subtitle>
-          {/* Terms and Conditions */}
-          <Typography
-            variant="subtitle2"
-            component="small"
-            sx={{ marginTop: 2, color: "#004D40" }}
-          >
-            By signing up, you agree to the{" "}
-            <a href="/terms-of-service" style={{ color: "#00796B" }}>
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy-policy" style={{ color: "#00796B" }}>
-              Privacy Policy
-            </a>
-            , including{" "}
-            <a href="/cookie-use" style={{ color: "#00796B" }}>
-              Cookie Use
-            </a>
-            .
-          </Typography>
+          <LeftSubsectionContainer>
+            <LeftSubsection>
+              <Subtitle>
+                Connect with new people and organize meetups around your
+                interests.
+              </Subtitle>
+              <Typography
+                variant="subtitle2"
+                component="small"
+                sx={{ marginTop: 2, color: "#FFFFFF" }}
+              >
+                By signing up, you agree to the{" "}
+                <a href="/terms-of-service" style={{ color: "#7bbda2" }}>
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a href="/privacy-policy" style={{ color: "#7bbda2" }}>
+                  Privacy Policy
+                </a>
+                , including{" "}
+                <a href="/cookie-use" style={{ color: "#7bbda2" }}>
+                  Cookie Use
+                </a>
+                .
+              </Typography>
+            </LeftSubsection>
+          </LeftSubsectionContainer>
           <div style={{ marginTop: "20px" }}>
             <StyledButton
               variant="contained"
@@ -190,17 +231,15 @@ const LandingPage = () => {
             </OutlinedButton>
           </div>
         </LeftColumn>
+
         <RightColumn>
-          <VideoContainer>
-            <VideoElement controls>
-              <source src={videoSrc} type="video/mp4" />
-              Your browser does not support the video tag.
-            </VideoElement>
-          </VideoContainer>
+          <ResponsiveImage
+            src={colorMode === "dark" ? AppDarkMode : AppLightMode}
+            alt="App Mode"
+          />
         </RightColumn>
       </ContentContainer>
 
-      {/* Footer */}
       <Footer>
         <Logo src={logoSrc} alt="The Linkup Logo" />
         <Typography variant="body2">

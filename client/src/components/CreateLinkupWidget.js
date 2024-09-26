@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { createLinkup } from "../api/linkUpAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
@@ -11,6 +10,12 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useColorMode } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { MultiSelect } from "primereact/multiselect";
+import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
+import { PrimeReactContext } from "primereact/api";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+import { Dropdown } from "primereact/dropdown";
 
 // Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
@@ -21,7 +26,6 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
   borderRadius: "24px",
   borderWidth: "1px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "box-shadow 0.3s ease",
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
@@ -44,12 +48,8 @@ const Header = styled("div")(({ theme }) => ({
 
 const Icon = styled(FontAwesomeIcon)(({ theme }) => ({
   marginRight: theme.spacing(1),
-  color: "#0097A7", // iOS blue color
+  color: "#0097A7",
 }));
-
-// const CenterElement = styled("div")({
-//   textAlign: "center",
-// });
 
 const Form = styled("form")(({ theme }) => ({
   display: "flex",
@@ -86,32 +86,9 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1, 4),
 }));
 
-const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
+const CustomDropdown = styled("div")(({ theme }) => ({
   marginBottom: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`,
-  "&:focus": {
-    borderColor: theme.palette.primary.main,
-  },
-  position: "relative",
-  "& select": {
-    width: "100%",
-    padding: theme.spacing(1.2),
-    backgroundSize: "auto 20px",
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(130, 131, 129, 0.1)"
-        : "rgba(130, 131, 129, 0.03)",
-    paddingRight: "0.5rem",
-  },
-  "& option": {
-    color: colorMode === "dark" ? "white" : "black",
-    backgroundColor: colorMode === "dark" ? "#2e2e2e" : "white",
-  },
-  fontFamily: "Arial, sans-serif", // Consistent font family
-  fontWeight: 400, // Consistent font weight
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
@@ -150,14 +127,42 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
   color: "lightgray",
 }));
 
-const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
+const ErrorText = styled("p")(({ theme }) => ({
+  color: theme.palette.error.main,
+  fontSize: "12px",
+  margin: "8px 0 0",
+}));
+
+const CreateLinkupWidget = ({
+  setIsWidgetVisible = () => {}, // Default function to do nothing
+  setShouldFetchLinkups,
+  scrollToTopCallback,
+}) => {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [genderPreference, setGenderPreference] = useState("");
+  const [genderPreference, setGenderPreference] = useState([]);
   const [paymentOption, setPaymentOption] = useState("");
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id, name } = loggedUser?.user || {};
   const { addSnackbar } = useSnackbar();
   const { colorMode } = useColorMode(); // Use Chakra UI's color mode
+  const { changeTheme } = useContext(PrimeReactContext);
+  const [currentTheme, setCurrentTheme] = useState(""); // Initialize as an empty string
+  const [formErrors, setFormErrors] = useState({}); // Track form errors
+
+  useEffect(() => {
+    const themeLink = document.getElementById("theme-link");
+    const initialTheme = themeLink.getAttribute("href").includes("dark")
+      ? "bootstrap4-dark-blue"
+      : "bootstrap4-light-blue";
+    setCurrentTheme(initialTheme);
+
+    const newTheme =
+      colorMode === "dark" ? "bootstrap4-dark-blue" : "bootstrap4-light-blue";
+
+    changeTheme(initialTheme, newTheme, "theme-link", () => {
+      setCurrentTheme(newTheme);
+    });
+  }, [colorMode, changeTheme]);
 
   const maxTime = new Date();
   maxTime.setHours(23);
@@ -181,15 +186,28 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
-    const activity = e.target.activity.value;
-    const location = capitalizeFirstLetter(e.target.location.value);
 
+    // Reset form errors
+    setFormErrors({});
+
+    // Custom validation
+    const errors = {};
+    if (genderPreference.length === 0) {
+      errors.genderPreference = "Please select at least one gender preference.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    // If valid, proceed with submission
     try {
       const response = await createLinkup({
         creator_id: id,
         creator_name: name,
-        location: location,
-        activity: activity,
+        location: e.target.location.value,
+        activity: e.target.activity.value,
         date: selectedDate,
         gender_preference: genderPreference,
         payment_option: paymentOption,
@@ -197,11 +215,12 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
 
       if (response.success) {
         updateLinkupList(response.newLinkup);
-        addSnackbar("Link-up created successfully!");
+        addSnackbar("Linkup created successfully!");
         e.target.reset();
         setSelectedDate(null);
-        setGenderPreference("");
+        setGenderPreference([]);
         setPaymentOption("");
+        setIsWidgetVisible(false);
         setShouldFetchLinkups(true);
         scrollToTopCallback();
       } else {
@@ -211,6 +230,16 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
       addSnackbar(error.message);
     }
   };
+
+  // Gender options for MultiSelect
+  const genderOptions = [
+    { key: "male", value: "Man" },
+    { key: "female", value: "Woman" },
+    ...customGenderOptions.map((gender) => ({
+      key: gender.toLowerCase(),
+      value: gender,
+    })),
+  ];
 
   return (
     <WidgetContainer colorMode={colorMode}>
@@ -283,45 +312,83 @@ const CreateLinkupWidget = ({ setShouldFetchLinkups, scrollToTopCallback }) => {
           required
           colorMode={colorMode} // Pass colorMode to styled component
         />
-        <CustomDropdown colorMode={colorMode}>
-          <select
+        {/* MultiSelect for gender preference */}
+        <CustomDropdown>
+          <MultiSelect
+            id="gender-preference"
             value={genderPreference}
-            onChange={(e) => setGenderPreference(e.target.value)}
-            required
+            options={genderOptions}
+            onChange={(e) => setGenderPreference(e.value)}
+            optionLabel="value"
+            placeholder="Visible to who?"
+            className={`p-multiselect ${
+              formErrors.genderPreference ? "error" : ""
+            }`}
             style={{
-              color: genderPreference
+              width: "100%", // Ensure full width
+              maxWidth: "400px", // Set a max width to prevent overflow
+              overflow: "hidden", // Prevent overflow
+              whiteSpace: "nowrap", // Prevent wrapping
+              textOverflow: "ellipsis", // Add ellipsis for overflow text
+              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
+              backgroundColor:
+                colorMode === "dark"
+                  ? "rgba(130, 131, 129, 0.1)"
+                  : "rgba(130, 131, 129, 0.03)",
+              color: genderPreference.length
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
-                : "grey", // Grey for placeholder, white for selected
+                : "grey",
             }}
-          >
-            <option value="" disabled hidden>
-              Gender Preference
-            </option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="any">Any</option>
-          </select>
+            // Add a dropdown style for scrolling if needed
+            itemTemplate={(option) => (
+              <div
+                style={{
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {option.value}
+              </div>
+            )}
+          />
+          {/* Display error message if no gender is selected */}
+          {formErrors.genderPreference && (
+            <ErrorText>{formErrors.genderPreference}</ErrorText>
+          )}
         </CustomDropdown>
-        <CustomDropdown colorMode={colorMode}>
-          <select
+        <CustomDropdown>
+          <Dropdown
             value={paymentOption}
-            onChange={(e) => setPaymentOption(e.target.value)}
+            options={[
+              { label: "", value: "" },
+              { label: "Split The Bill", value: "split" },
+              { label: "I Will Pay", value: "iWillPay" },
+              { label: "Please Pay", value: "pleasePay" },
+            ]}
+            onChange={(e) => setPaymentOption(e.value)}
+            placeholder="Who's Paying?"
+            className="w-full md:w-14rem"
             style={{
-              color: genderPreference
+              width: "100%",
+              border: `1px solid ${
+                colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
+              }`,
+              backgroundColor:
+                colorMode === "dark"
+                  ? "rgba(130, 131, 129, 0.1)"
+                  : "rgba(130, 131, 129, 0.03)",
+              color: genderPreference.length
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
-                : "grey", // Grey for placeholder, white for selected
+                : "grey",
             }}
-          >
-            <option value="">Who's Paying? (Optional)</option>
-            <option value="split">Split The Bill</option>
-            <option value="iWillPay">I Will Pay</option>
-            <option value="pleasePay">Please Pay</option>
-          </select>
+          />
         </CustomDropdown>
+
         {/* <CenterElement> */}
         <CreateLinkUpButton
           type="submit"

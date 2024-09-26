@@ -29,27 +29,39 @@ const Container = styled("div")(({ theme }) => ({
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   border: `1px solid ${
-    colorMode === "light" ? "none" : "rgba(229, 235, 243, 0.2)"
+    colorMode === "light"
+      ? "rgba(229, 235, 243, 1)" // Light border for light mode
+      : "rgba(229, 235, 243, 0.2)" // Subtle border for dark mode
   }`,
   padding: "1.5rem",
   borderRadius: "1.5rem", // Large rounded corners for a soft feel
   width: "100%",
   background:
     colorMode === "light"
-      ? "#ffffff"
-      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))",
+      ? "#ffffff" // Solid white background for light mode
+      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))", // Subtle gradient for dark mode
   backdropFilter: "blur(10px)", // Glass-like background effect
-  boxShadow: isHovered
-    ? colorMode === "light"
-      ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // Subtle, professional shadow on hover for light mode
-      : "0 12px 24px rgba(255, 255, 255, 0.05), 0 4px 6px rgba(255, 255, 255, 0.05)" // Subtle shadow for dark mode
-    : colorMode === "light"
-    ? "0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05)" // Subtle shadow for light mode
-    : "0 8px 16px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(255, 255, 255, 0.1)", // Subtle shadow for dark mode
+
+  // Box shadow for light mode
+  boxShadow:
+    colorMode === "light"
+      ? isHovered
+        ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // More defined shadow on hover
+        : "0 4px 8px rgba(0, 0, 0, 0.05)" // Subtle shadow when not hovered
+      : isHovered
+      ? "0 12px 24px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2)" // Stronger shadow on hover for dark mode
+      : "none", // No shadow by default in dark mode
+
   transition: "transform 0.2s ease, box-shadow 0.2s ease",
+
   "&:hover": {
-    transform: "translateY(-2px)", // Slight floating effect
+    transform: "translateY(-2px)", // Subtle hover effect
+    boxShadow:
+      colorMode === "light"
+        ? "0 12px 24px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.025)" // Hover shadow for light mode
+        : "0 12px 24px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(80, 80, 0, 0.025)", // Hover shadow for dark mode
   },
+  cursor: "pointer",
 }));
 
 const HorizontalMenuContainer = styled("div")(({ theme }) => ({
@@ -59,6 +71,11 @@ const HorizontalMenuContainer = styled("div")(({ theme }) => ({
 const UserName = styled("div")(({ theme }) => ({
   fontSize: "1rem",
   fontWeight: "bold",
+}));
+
+const Name = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
 }));
 
 const UserInfo = styled("div")(({ theme }) => ({
@@ -112,10 +129,13 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
-const OnlineIndicator = styled("span")(({ theme }) => ({
-  height: "0.75rem",
-  marginRight: "0.125rem",
-}));
+// const OnlineIndicator = styled("div")(({ isOnline }) => ({
+//   width: "0.5rem",
+//   height: "0.5rem",
+//   borderRadius: "50%",
+//   backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
+//   marginLeft: "0.5rem", // Space between username and indicator
+// }));
 
 const PaymentOptionIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -161,6 +181,19 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
+  // const [isOnline, setIsOnline] = useState(false); // State for online status
+
+  // useEffect(() => {
+  //   // Simulate online status
+  //   const fetchOnlineStatus = async () => {
+  //     // You can replace this with actual API call to fetch online status
+  //     const response = await fetch(`/api/users/${creator_id}/status`);
+  //     const data = await response.json();
+  //     setIsOnline(data.isOnline);
+  //   };
+
+  //   fetchOnlineStatus();
+  // }, [creator_id]);
 
   useEffect(() => {
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -168,7 +201,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
 
       const R = 6371; // Radius of the Earth in kilometers
       const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon2 - lon1);
+      const dLon = toRadians(lon1 - lon2);
       const a =
         Math.sin(dLat) * Math.sin(dLat) +
         Math.cos(toRadians(lat1)) *
@@ -301,8 +334,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
       <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
           {creator_name}
-        </Link>{" "}
-        is trying to link up {activityFormatted}.
+        </Link>
+        {" is trying to link up " + activityFormatted + "."}
       </p>
     );
   };
@@ -355,7 +388,10 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               height="60px"
             />
             <div>
-              <UserName>{creator_name}</UserName>
+              <Name>
+                <UserName>{creator_name}</UserName>
+                {/* <OnlineIndicator isOnline={isOnline} /> */}
+              </Name>
               <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>
               </PostInfo>

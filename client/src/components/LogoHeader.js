@@ -29,11 +29,11 @@ const LogoHeader = () => {
   return (
     <MainContainer>
       {/* Uncomment this to include the logo */}
-      {/* <LogoContainer>
+      <LogoContainer>
         <LogoImage src={logo} alt="Logo" />
-      </LogoContainer> */}
+      </LogoContainer>
       <Title variant="h4" component="h1">
-        LINK-UP
+        The Linkup
       </Title>
     </MainContainer>
   );

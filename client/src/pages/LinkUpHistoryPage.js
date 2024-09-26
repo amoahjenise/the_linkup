@@ -13,9 +13,11 @@ import { getUserLinkups } from "../api/linkUpAPI";
 import { getSentRequests, getReceivedRequests } from "../api/linkupRequestAPI";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
-import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import {
+  Close as CloseIcon,
+  ArrowBack as ArrowIcon,
+} from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-
 const PREFIX = "HistoryPage";
 const classes = {
   widgetSection: `${PREFIX}-widgetSection`,
@@ -29,34 +31,37 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.widgetSection}`]: {
     flex: "1",
     overflowY: "auto",
-    overflowX: "hidden",
-    display: "block", // Make sure it's displayed by default
+    display: "block",
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
       right: 0,
       width: "100%",
       height: "100vh",
-      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
-      zIndex: 2000,
+      zIndex: 1000,
       overflowY: "auto",
     },
   },
   [`&.${classes.widgetButton}`]: {
-    position: "absolute",
-    top: "20px",
+    position: "fixed",
+    bottom: "20px",
     right: "20px",
     zIndex: 1100,
+    backgroundColor: colorMode === "dark" ? "#1A202C" : "white",
+    borderRadius: "50%",
+    boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+    padding: "10px",
   },
   [`&.${classes.widgetCloseButton}`]: {
     position: "absolute",
     top: "10px",
-    left: "10px", // Position close button on the right side
+    left: "10px",
     zIndex: 1100,
-    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
+    color: colorMode === "dark" ? "white" : "black",
   },
   [`&.${classes.slideIn}`]: {
     transform: "translateX(0)",
@@ -66,44 +71,30 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
 }));
 
-// Styled components
+const WidgetButton = styled(ArrowIcon)(({ theme, colorMode }) => ({
+  position: "fixed",
+  height: "100%",
+  right: "10px",
+  color: colorMode === "dark" ? "light-blue" : theme.palette.primary,
+}));
+
 const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
 }));
 
-const HistorySection = styled("div")(({ theme, isFilterBarOpen }) => ({
-  flex: 2,
-  overflowY: "auto",
-  overflowX: "hidden",
-  margin: "0 auto",
-  transition: "transform 0.3s ease",
-  transform: isFilterBarOpen ? "translateX(-300px)" : "translateX(0)", // Adjust based on FilterBar width
-  width: "100%", // Full width when FilterBar is hidden
+const HistorySection = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
 }));
 
-const FilterBarContainer = styled("div")(
-  ({ theme, isFilterBarOpen, isMobile }) => ({
-    flex: "1",
-    overflowY: "auto",
-    overflowX: "hidden",
-    display: "block", // Make sure it's displayed by default
-    borderLeft: "1px solid #D3D3D3",
-    [theme.breakpoints.down("sm")]: {
-      position: "fixed",
-      top: 0,
-      right: 0,
-      width: "100%",
-      height: "100vh",
-      // backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
-      boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
-      transform: "translateX(100%)",
-      transition: "transform 0.3s ease",
-      zIndex: 2000,
-      overflowY: "auto",
-    },
-  })
-);
+const FilterBarContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  overflowY: "auto",
+  borderLeft: "1px solid #D3D3D3",
+  padding: theme.spacing(1, 2),
+}));
 
 const TopBarContainer = styled("div")(({ theme }) => ({
   position: "sticky",
@@ -114,11 +105,10 @@ const TopBarContainer = styled("div")(({ theme }) => ({
 const TabBar = styled(Tabs)(({ theme }) => ({
   borderBottomWidth: "1px",
   borderBottomColor: "1px solid #D3D3D3",
-  position: "sticky", // Make the tabs bar sticky
-  top: 65, // Stick it bellow the top bar
-  zIndex: 1, // Ensure it's above other content
+  position: "sticky",
+  top: 65,
+  zIndex: 1,
 }));
-
 const LinkUpHistoryPage = ({ isMobile }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -184,7 +174,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     { id: 1, label: "Requests Sent" },
     { id: 2, label: "Requests Received" },
   ];
-
   const color =
     colorMode === "dark"
       ? "white" // Dark mode text color white
@@ -208,20 +197,17 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     if (isMyLinkups) {
       setMyLinkupsFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
     } else if (activeTab === 1) {
-      // Requests Sent
       setSentRequestsFilters((prevFilters) => ({
         ...prevFilters,
         ...newFilters,
       }));
     } else if (activeTab === 2) {
-      // Requests Received
       setReceivedRequestsFilters((prevFilters) => ({
         ...prevFilters,
         ...newFilters,
       }));
     }
   };
-
   const fetchLinkups = useCallback(async () => {
     try {
       const userLinkupsResponse = await getUserLinkups(userId);
@@ -267,7 +253,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
       }, 300);
     }
   }, [userId]);
-
   useEffect(() => {
     switch (location.pathname) {
       case "/history":
@@ -290,11 +275,8 @@ const LinkUpHistoryPage = ({ isMobile }) => {
       setShouldFetchLinkups(false);
     }
   }, [dispatch, fetchLinkups, shouldFetchLinkups]);
-
   useEffect(() => {
-    // Create a filtered array based on the filter criteria
     if (activeTab === 0) {
-      // My Linkups
       const filteredLinkups = linkups.list.filter((linkup) => {
         const createdAt = new Date(linkup.created_at);
         const today = new Date();
@@ -318,14 +300,11 @@ const LinkUpHistoryPage = ({ isMobile }) => {
               createdAt >= thirtyDaysAgo))
         );
       });
-
-      // Update the filteredLinkupList state with the filtered array
       setLinkups((prevLinkups) => ({
         ...prevLinkups,
         filteredList: filteredLinkups,
       }));
     } else if (activeTab === 1) {
-      // Requests Sent
       const filteredSentRequests = sentRequests.list.filter((request) => {
         const createdAt = new Date(request.created_at);
         const today = new Date();
@@ -334,13 +313,11 @@ const LinkUpHistoryPage = ({ isMobile }) => {
         const thirtyDaysAgo = new Date(today);
         thirtyDaysAgo.setDate(today.getDate() - 30);
 
-        // Check if the request status matches the selected status filter
         if (
           sentRequestsFilters.activeStatus === "All" ||
           request.status.toLowerCase() ===
             sentRequestsFilters.activeStatus.toLowerCase()
         ) {
-          // Check if the date filter matches
           if (
             sentRequestsFilters.dateFilter === "All" ||
             (sentRequestsFilters.dateFilter === "Today" &&
@@ -362,7 +339,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
         filteredList: filteredSentRequests,
       }));
     } else if (activeTab === 2) {
-      // Requests Received
       const filteredReceivedRequests = receivedRequests.list.filter(
         (request) => {
           const createdAt = new Date(request.created_at);
@@ -372,13 +348,11 @@ const LinkUpHistoryPage = ({ isMobile }) => {
           const thirtyDaysAgo = new Date(today);
           thirtyDaysAgo.setDate(today.getDate() - 30);
 
-          // Check if the request status matches the selected status filter
           if (
             receivedRequestsFilters.activeStatus === "All" ||
             request.status.toLowerCase() ===
               receivedRequestsFilters.activeStatus.toLowerCase()
           ) {
-            // Check if the date filter matches
             if (
               receivedRequestsFilters.dateFilter === "All" ||
               (receivedRequestsFilters.dateFilter === "Today" &&
@@ -410,7 +384,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     sentRequests.list,
     receivedRequests.list,
   ]);
-
   const toggleWidget = () => {
     setIsWidgetVisible(!isWidgetVisible);
   };
@@ -466,28 +439,24 @@ const LinkUpHistoryPage = ({ isMobile }) => {
             )}
             {activeTab === 1 && (
               <div>
-                <div>
-                  {sentRequests.filteredList.map((request) => (
-                    <LinkupRequestItem
-                      key={request.id}
-                      post={request}
-                      setShouldFetchLinkups={setShouldFetchLinkups}
-                    />
-                  ))}
-                </div>
+                {sentRequests.filteredList.map((request) => (
+                  <LinkupRequestItem
+                    key={request.id}
+                    post={request}
+                    setShouldFetchLinkups={setShouldFetchLinkups}
+                  />
+                ))}
               </div>
             )}
             {activeTab === 2 && (
               <div>
-                <div>
-                  {receivedRequests.filteredList.map((request) => (
-                    <LinkupRequestItem
-                      key={request.id}
-                      post={request}
-                      setShouldFetchLinkups={setShouldFetchLinkups}
-                    />
-                  ))}
-                </div>
+                {receivedRequests.filteredList.map((request) => (
+                  <LinkupRequestItem
+                    key={request.id}
+                    post={request}
+                    setShouldFetchLinkups={setShouldFetchLinkups}
+                  />
+                ))}
               </div>
             )}
           </>
@@ -556,7 +525,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
               onClick={toggleWidget}
               color="primary"
             >
-              <MenuIcon />
+              <WidgetButton colorMode={colorMode} />
             </IconButton>
             <StyledDiv
               className={`${classes.widgetSection} ${

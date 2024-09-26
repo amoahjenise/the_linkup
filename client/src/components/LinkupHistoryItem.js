@@ -145,7 +145,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
       status === "completed" ||
       status === "expired"
     ) {
-      return `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText} with a gender preference for ${gender_preference}.`;
+      return `You are trying to link up ${activityText.toLowerCase()} on ${dateText} ${timeText}.`;
     } else if (status === "expired") {
       return `Link up ${activityText.toLowerCase()} on ${dateText} ${timeText} has expired.`;
     } else {

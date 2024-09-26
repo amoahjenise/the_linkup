@@ -6,6 +6,29 @@ const axios = require("axios");
 
 const APP_ID = process.env.SENDBIRD_APP_ID;
 const API_TOKEN = process.env.SENDBIRD_API_TOKEN;
+
+const getUserByClerkIdForWebhook = async (clerkUserId) => {
+  console.log("Inside getUserByClerkId", clerkUserId);
+
+  const queryPath = path.join(__dirname, "../db/queries/getUserByClerkId.sql");
+  const query = fs.readFileSync(queryPath, "utf8");
+  const queryValues = [clerkUserId];
+
+  try {
+    const { rows, rowCount } = await pool.query(query, queryValues);
+    console.log("rows[0]", rows[0]);
+
+    if (rowCount > 0) {
+      return { success: true, user: rows[0] }; // Return user data if found
+    } else {
+      return { success: false, user: null, message: "User not found" }; // Return error if not found
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user");
+  }
+};
+
 const deactivateUser = async (req, res) => {
   const userId = req.params.userId;
 
@@ -324,6 +347,7 @@ module.exports = {
   deleteUser,
   getUserById,
   getUserByClerkId,
+  getUserByClerkIdForWebhook,
   updateUser,
   updateUserBio,
   updateUserAvatar,

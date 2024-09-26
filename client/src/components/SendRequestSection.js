@@ -18,6 +18,7 @@ const MessagesContainer = styled("div")(({ theme }) => ({
   alignItems: "center",
   overflowY: "auto",
   width: "100%",
+  padding: theme.spacing(4),
 }));
 
 const SendRequestSection = ({ linkupId, linkups, colorMode }) => {

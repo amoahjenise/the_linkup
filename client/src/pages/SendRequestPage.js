@@ -8,10 +8,7 @@ import { useColorMode } from "@chakra-ui/react";
 // Styled Components
 const SendRequestPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
-  width: "50%",
-  [theme.breakpoints.down("md")]: {
-    width: "100%", // Set to 100% in mobile mode
-  },
+  width: "100%", // Set to 100% in mobile mode
 }));
 
 const SendRequestPage = () => {

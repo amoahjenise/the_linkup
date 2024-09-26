@@ -102,8 +102,12 @@ const DeactivateAccount = ({ colorMode }) => {
     <Section>
       <SectionTitle>Deactivate Your Account</SectionTitle>
       <SectionContent>
-        We are sorry to see you leave. Are you sure you want to deactivate your
-        account?
+        We’re sorry to hear that you want to deactivate your account. Please
+        note that your account will be deactivated, not deleted. While your
+        account is deactivated: You will no longer appear in searches. Your
+        linkups and requests will be hidden from view. However, any previous
+        messages you initiated with users will still be visible to those with
+        whom you’ve conversed, although the chat input will be disabled.
       </SectionContent>
       <SectionContent>To confirm, type "CONFIRM" below:</SectionContent>
       <StyledTextField
@@ -111,6 +115,7 @@ const DeactivateAccount = ({ colorMode }) => {
         value={confirmation}
         onChange={(e) => setConfirmation(e.target.value)}
         textColor={inputTextColor}
+        autoComplete="off"
       />
       <StyledButton
         variant="contained"

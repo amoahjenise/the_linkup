@@ -1,7 +1,8 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { Avatar, Box, Typography } from "@mui/material";
-import HorizontalMenu from "./HorizontalMenu"; // Adjust the path as necessary
+import { Box, Typography, IconButton } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import HorizontalMenu from "./HorizontalMenu";
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
@@ -10,6 +11,7 @@ import UserAvatar from "./UserAvatar";
 
 const compromise = nlp;
 
+// Styled components for cleaner structure
 const Header = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -18,32 +20,55 @@ const Header = styled(Box)(({ theme }) => ({
   borderBottomWidth: "1px",
   borderBottom: "0.1px solid #lightgray",
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
+  top: 0,
+  position: "sticky",
 }));
 
-const ChannelInfo = styled(Box)(({ theme }) => ({
+const BackButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.primary.main,
+  marginRight: theme.spacing(1),
+}));
+
+const ChannelInfoContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  flexGrow: 1,
 }));
 
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  marginRight: theme.spacing(2),
-  width: theme.spacing(7),
-  height: theme.spacing(7),
+const InfoBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  marginLeft: theme.spacing(1.5),
 }));
 
 const Nickname = styled(Typography)(({ theme }) => ({
-  fontWeight: "bold",
-  fontSize: "1.2rem",
+  fontWeight: 600,
+  fontSize: "1.1rem",
+}));
+
+const ActivityText = styled(Typography)(({ theme }) => ({
+  fontSize: "0.9rem",
+  marginTop: theme.spacing(0.5),
 }));
 
 const Status = styled(Typography)(({ theme, statusColor }) => ({
   display: "inline-block",
+  textAlign: "center",
   padding: theme.spacing(0.5, 1),
-  borderRadius: theme.shape.borderRadius,
-  fontWeight: "bold",
+  borderRadius: "12px", // Rounded corners for a pill-shaped button
+  fontWeight: 600, // Slightly bolder text for emphasis
+  fontSize: "0.85rem", // Adjusted font size for better readability
   textTransform: "capitalize",
   backgroundColor: statusColor.background,
   color: statusColor.color,
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  border: `1px solid ${theme.palette.divider}`, // Border for a sharper outline
+  transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transitions
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover, // Light hover effect for interaction feedback
+    color: statusColor.hoverColor || statusColor.color, // Optional hover color
+  },
+  width: "50%",
 }));
 
 const statusColors = {
@@ -56,32 +81,33 @@ const statusColors = {
 const CustomChannelHeader = ({
   linkup,
   channel,
-  onActionClick,
   isOperator,
   loading,
+  isMobile,
+  setCurrentChannel,
 }) => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
 
-  const operator = channel.members.find((member) => member.role === "operator");
+  const operator = channel?.members?.find(
+    (member) => member.role === "operator"
+  );
 
   const fetchLinkupRequest = useCallback(async () => {
     try {
       if (linkup && shouldFetchLinkups) {
-        // Fetch the linkup request by linkup id and sender id
         const response = await getRequestByLinkupIdAndSenderId(
           linkup.id,
           linkup.requester_id
         );
-        setLinkupRequestStatus(response.linkupRequest.status); // Update the status using linkupRequest.status
+        setLinkupRequestStatus(response.linkupRequest.status);
       }
     } catch (error) {
       console.error("An error occurred:", error);
     }
   }, [linkup, shouldFetchLinkups]);
 
-  // useEffect to set initial linkup request status on mount
   useEffect(() => {
     if (linkup) setLinkupRequestStatus(linkup.request_status);
   }, [linkup]);
@@ -114,22 +140,15 @@ const CustomChannelHeader = ({
           ).format("h:mm A")})`
         : "";
 
-      if (isOperator) {
-        return `Would like to join you ${activityText} scheduled for ${dateText}`;
-      } else {
-        return `You sent a request for the linkup event: ${linkup.activity} scheduled for ${dateText}`;
-      }
+      return isOperator
+        ? `Would like to join you ${activityText} scheduled for ${dateText}`
+        : `You sent a request for the linkup event: ${linkup.activity} scheduled for ${dateText}`;
     }
     return "";
   };
 
-  const renderName = () => {
-    if (isOperator) {
-      return linkup?.requester_name;
-    } else {
-      return operator.nickname;
-    }
-  };
+  const renderName = () =>
+    isOperator ? linkup?.requester_name : operator?.nickname;
 
   const renderUserData = () => {
     if (isOperator) {
@@ -147,58 +166,33 @@ const CustomChannelHeader = ({
     }
   };
 
-  const renderAvatar = () => {
-    if (isOperator) {
-      return linkup?.requester_avatar;
-    } else {
-      return linkup?.avatar;
-    }
-  };
-
   return (
     <Header>
+      {isMobile && (
+        <BackButton onClick={() => setCurrentChannel(null)}>
+          <ArrowBackIcon />
+        </BackButton>
+      )}
       {loading ? (
         <LoadingSpinner />
       ) : (
-        !loading && (
-          <ChannelInfo>
-            {operator && (
-              <>
-                {/* <StyledAvatar src={renderAvatar()} alt={renderName()} /> */}
-                <UserAvatar
-                  userData={renderUserData()}
-                  width="60px"
-                  height="60px"
-                />
-                <Box>
-                  <Nickname>{renderName()}</Nickname>
-                  <Box>{renderLinkupItemText()}</Box>
-                  {linkup?.request_status && (
-                    <Status
-                      statusColor={statusColors[linkupRequestStatus] || {}}
-                    >
-                      {linkupRequestStatus}
-                    </Status>
-                  )}
-                </Box>
-              </>
+        <ChannelInfoContainer>
+          <UserAvatar userData={renderUserData()} width="60px" height="60px" />
+          <InfoBox>
+            <Nickname>{renderName()}</Nickname>
+            <ActivityText>{renderLinkupItemText()}</ActivityText>
+            {linkup?.request_status && (
+              <Status statusColor={statusColors[linkupRequestStatus] || {}}>
+                {linkupRequestStatus}
+              </Status>
             )}
-          </ChannelInfo>
-        )
+          </InfoBox>
+        </ChannelInfoContainer>
       )}
-      {/* <IconButton className={classes.iconButton} onClick={onActionClick}>
-        <InfoIcon />
-      </IconButton> */}
       {isOperator && (
         <HorizontalMenu
-          showGoToItem={true}
-          showGoToRequest={true}
-          showEditItem={false}
-          showDeleteItem={false}
-          showCloseItem={false}
-          showCheckInLinkup={false}
-          showAcceptLinkupRequest={false}
-          showDeclineLinkupRequest={false}
+          showGoToItem
+          showGoToRequest
           linkupItem={linkup}
           menuAnchor={menuAnchor}
           setMenuAnchor={setMenuAnchor}

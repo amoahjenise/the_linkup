@@ -48,7 +48,7 @@ const EmptyFeedPlaceholder = () => {
         There are no linkups available at the moment.
       </Message>
       <Typography variant="body1">
-        Start by creating a link-up to connect with others.
+        Start by creating a linkup to connect with others.
       </Typography>
     </PlaceholderContainer>
   );

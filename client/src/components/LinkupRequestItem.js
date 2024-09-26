@@ -99,7 +99,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         payload: { id: post.id, status: "accepted" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request accepted.");
+      addSnackbar("Linkup request accepted.");
     } catch (error) {
       addSnackbar(error.message);
     }
@@ -113,7 +113,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         payload: { id: post.id, status: "declined" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request declined.");
+      addSnackbar("Linkup request declined.");
     } catch (error) {
       addSnackbar(error.message);
     }

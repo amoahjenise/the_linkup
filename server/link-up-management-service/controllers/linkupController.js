@@ -32,7 +32,7 @@ const searchLinkups = async (req, res) => {
   try {
     const { rows } = await pool.query(query, [
       `%${search_term}%`,
-      gender,
+      `{${gender}}`, // Pass gender as array
       userId,
     ]);
 
@@ -59,7 +59,7 @@ const createLinkup = async (req, res) => {
     linkup.location,
     linkup.activity,
     linkup.date,
-    linkup.gender_preference,
+    `{${linkup.gender_preference.join(",")}}`, // Convert gender_preference to an array format
     linkup.payment_option,
   ];
 
@@ -81,7 +81,7 @@ const createLinkup = async (req, res) => {
     } else {
       res.status(500).json({
         success: false,
-        message: "Failed to create link-up",
+        message: "Failed to create linkup",
         newLinkup: null,
       });
     }
@@ -97,7 +97,7 @@ const getLinkups = async (req, res) => {
   const query = readQueryFile(queryPath);
   const linkupsQueryValues = [
     userId,
-    gender,
+    `{${gender}}`, // Gender preference should be passed as an array
     offset,
     pageSize,
     latitude,
@@ -211,7 +211,7 @@ const updateLinkup = async (req, res) => {
     linkup.location,
     linkup.activity,
     linkup.date,
-    linkup.gender_preference,
+    `{${linkup.gender_preference.join(",")}}`, // Ensure gender_preference is passed as an array
     linkup.payment_option,
     linkupId,
   ];

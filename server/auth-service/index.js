@@ -19,6 +19,11 @@ const ALLOWED_ORIGINS = [
   "http://localhost:3000",
 ];
 
+function capitalizeFirstLetter(string) {
+  if (!string) return string; // Handle empty strings
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 // Create an Express Router instance
 const router = express.Router();
 
@@ -70,6 +75,7 @@ router.use(
 // Routes for authentication
 router.use("/", authRoutes);
 
+// Webhook handler
 router.post(
   "/api/webhooks",
   bodyParser.raw({ type: "application/json" }),
@@ -104,8 +110,6 @@ router.post(
         });
       }
 
-      console.log("svix headers are legit!");
-
       // Initiate Svix
       const wh = new Webhook(WEBHOOK_SECRET);
 
@@ -121,17 +125,16 @@ router.post(
       const eventType = evt.type;
 
       // Create formatted name as "First Name L."
-      // const formattedName = `${capitalizeFirstLetter(
-      //   first_name
-      // )} ${capitalizeFirstLetter(last_name.charAt(0))}.`;
+      const formattedName = `${capitalizeFirstLetter(
+        first_name
+      )} ${capitalizeFirstLetter(last_name)}`;
 
       if (eventType === "user.created") {
         const phoneNumber = attributes.phone_numbers[0].phone_number;
         const user = {
           id: id,
           phoneNumber: phoneNumber,
-          name: first_name,
-          // name: capitalizeFirstLetter(formattedName),
+          name: formattedName,
         };
 
         console.log("createUser data:", user);
@@ -140,12 +143,11 @@ router.post(
         const response = await createUser(user, client);
 
         // Call createSendbirdUser with transaction client
-        // const sendbirdUser = { id: response.id, name: formattedName };
         const sendbirdUser = {
           id: response.id,
-          name: first_name,
-          imageUrl: publicUrl,
+          name: formattedName,
         };
+
         const sendbirdResponse = await createSendbirdUser(sendbirdUser, client);
         console.log("User created with Sendbird API.", sendbirdResponse);
 

@@ -1,7 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
+import SearchHintBox from "./SearchHintBox"; // Import the hint box component
 
 // Styled components
 const Container = styled("div")(({ theme, colorMode }) => ({
@@ -9,7 +10,7 @@ const Container = styled("div")(({ theme, colorMode }) => ({
   padding: "4px 12px",
   borderRadius: "24px",
   borderWidth: "1px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "box-shadow 0.3s ease",
   "&:hover": {
     boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
@@ -50,33 +51,44 @@ const Icon = styled(BiSearch)({
 });
 
 const SearchInput = ({ handleInputChange }) => {
-  const inputRef = useRef(null); // Create a reference to the input element
-  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
+  const inputRef = useRef(null);
+  const { colorMode } = useColorMode();
+  const [isFocused, setIsFocused] = useState(false); // State to track input focus
 
   const handleClick = () => {
-    // Programmatically focus on the input element when clicked
     inputRef.current.focus();
   };
 
+  const handleFocus = () => {
+    setIsFocused(true); // Show hint box on focus
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false); // Hide hint box when focus is lost
+  };
+
   return (
-    <Container colorMode={colorMode}>
-      <InputContainer onClick={handleClick}>
-        <Input
-          ref={inputRef} // Attach the ref to the input element
-          type="search"
-          name="search"
-          placeholder="Search Linkups"
-          onChange={handleInputChange}
-        />
-        <IconContainer
-          style={{
-            background: "#0097A7",
-          }}
-        >
-          <Icon />
-        </IconContainer>
-      </InputContainer>
-    </Container>
+    <div style={{ position: "relative" }}>
+      {" "}
+      {/* Ensure relative positioning */}
+      <Container colorMode={colorMode}>
+        <InputContainer onClick={handleClick}>
+          <Input
+            ref={inputRef}
+            type="search"
+            name="search"
+            placeholder="Search Linkups"
+            onChange={handleInputChange}
+            onFocus={handleFocus} // Show hint box
+            onBlur={handleBlur} // Hide hint box
+          />
+          <IconContainer>
+            <Icon />
+          </IconContainer>
+        </InputContainer>
+      </Container>
+      {isFocused && <SearchHintBox />} {/* Conditionally render hint box */}
+    </div>
   );
 };
 

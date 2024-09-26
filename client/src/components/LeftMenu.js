@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Menu, MenuItem, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
@@ -9,36 +11,29 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HistoryIcon from "@mui/icons-material/History";
 import MessageIcon from "@mui/icons-material/Message";
 import SettingsIcon from "@mui/icons-material/Settings";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../assets/logo.png";
 import CustomUserButton from "./UserButton";
 import useSendbirdHandlers from "../handlers/useSendbirdHandlers";
 import { setUnreadMessagesCount } from "../redux/actions/messageActions";
 
-const drawerWidth = "20%";
+const footerHeight = "60px";
 
-const MainContainer = styled("div")(
-  ({ theme, isMobile, isOpen, colorMode }) => ({
-    flex: `0 0 ${drawerWidth}`,
-    padding: theme.spacing(4),
-    borderRight: "1px solid lightgrey",
-    position: isMobile ? "fixed" : "sticky",
-    bottom: isMobile && isOpen ? 0 : "auto",
-    left: isMobile ? (isOpen ? 0 : "-100%") : "auto",
-    width: isMobile ? "100%" : drawerWidth,
-    boxShadow: isMobile ? "0px -2px 4px rgba(0, 0, 0, 0.1)" : "none",
-    zIndex: isMobile ? 10000 : "auto",
-    backgroundColor: isMobile
-      ? colorMode === "dark"
-        ? "#1A202C"
-        : "white"
-      : "transparent",
-    height: isMobile ? (isOpen ? "100vh" : "auto") : "100%",
-    transition: "left 0.3s ease-in-out",
-  })
-);
+const MainContainer = styled("div")(({ theme, colorMode }) => ({
+  width: "25%",
+  height: "100%",
+  overflowY: "auto",
+  padding: theme.spacing(4),
+  borderRight: "1px solid lightgrey",
+  position: "sticky",
+  left: 0,
+  zIndex: 1000,
+  transition: "left 0.3s ease-in-out",
+  "@media (max-width: 1380px)": {
+    width: "12%", // Change to a narrow width
+    padding: theme.spacing(2), // Adjust padding if necessary
+  },
+}));
 
 const MenuList = styled("ul")({
   listStyleType: "none",
@@ -46,25 +41,80 @@ const MenuList = styled("ul")({
   margin: 0,
 });
 
-const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
-  marginBottom: theme.spacing(2),
-  padding: theme.spacing(2),
-  borderRadius: "100px",
-  backgroundColor: isActive
-    ? colorMode === "dark"
-      ? "rgba(18, 28, 38, 0.9)"
-      : "rgba(0, 0, 0, 0.1)"
-    : "transparent",
+const StyledHamburgerMenu = styled(Menu)(({ colorMode }) => ({
+  "& .MuiPaper-root": {
+    backgroundColor: colorMode === "dark" ? "#3A3A3A" : "#FFFFFF",
+    borderRadius: "12px",
+    boxShadow: "0px 4px 30px rgba(0, 0, 0, 0.25)",
+    margin: "0 auto",
+    overflow: "hidden",
+    width: "180px", // Set a fixed width
+    maxWidth: "90%", // Allow it to shrink on smaller screens
+  },
+  zIndex: 2100,
+}));
+
+const StyledHamburgerMenuItem = styled(MenuItem)(({ colorMode }) => ({
+  color: colorMode === "dark" ? "#FFFFFF" : "#333333",
+  fontSize: "16px",
+  padding: "12px 16px",
+  borderRadius: "10px",
+  margin: "4px 0",
+  transition: "background-color 0.3s, color 0.3s, transform 0.3s",
   display: "flex",
   alignItems: "center",
+  "&:hover": {
+    backgroundColor: colorMode === "dark" ? "#3C3C3C" : "#F5F5F5",
+    color: colorMode === "dark" ? "#FFFFFF" : "#000000",
+    transform: "scale(1.01)",
+    transition:
+      "background-color 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s",
+    boxShadow: `0 0 5px ${colorMode === "dark" ? "#FFFFFF" : "#000000"}`,
+  },
+  "&:active": {
+    backgroundColor: colorMode === "dark" ? "#5A5A5A" : "#E0E0E0",
+  },
+}));
+
+const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
+  display: "flex",
+  alignItems: "center",
+  flexGrow: 1,
+  minWidth: "0",
+  maxWidth: "100%",
+  marginBottom: theme.spacing(1),
+  padding: theme.spacing(2),
+  borderRadius: "8px",
+  backgroundColor: isActive
+    ? colorMode === "dark"
+      ? "rgba(18, 28, 38, 0.8)"
+      : "rgba(0, 0, 0, 0.07)"
+    : "transparent",
   border: isActive
-    ? `2px solid ${colorMode === "dark" ? "#333" : "#F1F1FA"}`
-    : "none",
+    ? `2px solid ${colorMode === "dark" ? "#333" : "#DDD"}`
+    : "1px solid transparent",
   "&:hover": {
     backgroundColor:
-      colorMode === "dark" ? "rgba(18, 28, 38, 0.7)" : "rgba(18, 28, 38, 0.04)",
-    borderColor: colorMode === "dark" ? "#333" : "#CCC",
+      colorMode === "dark" ? "rgba(18, 28, 38, 0.5)" : "rgba(0, 0, 0, 0.05)",
+    borderColor: colorMode === "dark" ? "#444" : "#CCC",
   },
+}));
+
+const FooterContainer = styled("div")(({ theme, colorMode }) => ({
+  position: "fixed",
+  bottom: 0,
+  width: "100%",
+  height: footerHeight,
+  display: "flex",
+  justifyContent: "space-around",
+  alignItems: "center",
+  boxShadow:
+    colorMode === "dark"
+      ? "0px -2px 4px rgba(255, 255, 255, 0.1)"
+      : "0px -2px 4px rgba(0, 0, 0, 0.1)",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.97)" : "rgba(255, 255, 255, 0.97)",
+  zIndex: 1000,
 }));
 
 const MenuItemLink = styled(Link)({
@@ -78,13 +128,28 @@ const MenuItemLink = styled(Link)({
 const IconWithSpacing = styled("div")({
   display: "flex",
   alignItems: "center",
-  marginRight: "16px", // Adjust the spacing as needed
 });
+
+const IconText = styled("span")(({ theme }) => ({
+  marginLeft: theme.spacing(2),
+  display: "inline", // Show text by default
+  "@media (max-width: 1380px)": {
+    display: "none", // Hide text on smaller screens
+  },
+}));
+
+const CustomUserButtonContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  marginTop: theme.spacing(2),
+}));
 
 const LogoContainer = styled("div")(({ theme }) => ({
   display: "flex",
+  alignItems: "center",
   marginBottom: theme.spacing(4),
-  [theme.breakpoints.down("md")]: {
+  "@media (max-width: 1380px)": {
+    justifyContent: "center", // Center logo in narrow view
     marginBottom: theme.spacing(2),
   },
 }));
@@ -95,68 +160,73 @@ const Logo = styled("img")(({ theme }) => ({
 
 const LogoText = styled("div")(({ theme }) => ({
   marginLeft: theme.spacing(1),
-  fontSize: "1.5rem", // Adjust font size as needed
+  fontSize: "1.5rem",
   fontWeight: "bold",
-  fontFamily: "'Poppins', sans-serif", // Use a stylish font (ensure the font is loaded)
-  letterSpacing: "0.5px", // Adjust letter spacing if needed
+  fontFamily: "'Poppins', sans-serif",
+  letterSpacing: "0.5px",
   display: "flex",
   alignItems: "center",
+  "@media (max-width: 1380px)": {
+    display: "none", // Hide text on smaller screens
+  },
 }));
 
-const MobileMenuButton = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "60px",
-  height: "60px",
-  backgroundColor: "#0097A7",
-  color: theme.palette.primary.contrastText,
-  borderRadius: "50%",
-  position: "fixed",
-  bottom: "20px",
-  right: "20px",
-  zIndex: 1100,
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
-}));
 const BadgeStyled = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-dot": {
-    backgroundColor: theme.palette.error.main, // Badge dot color
+    backgroundColor: theme.palette.error.main,
   },
   "& .MuiBadge-badge": {
     color: theme.palette.background.paper,
-    backgroundColor: theme.palette.error.main, // Badge background color
-    fontSize: "0.75rem", // Font size for the badge count
-    height: "20px", // Height of the badge
-    minWidth: "20px", // Minimum width of the badge
-    borderRadius: "50%", // Make the badge circular
-    padding: "0 6px", // Padding inside the badge
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: 0,
-    right: 0,
-    transform: "translate(50%, -50%)",
+    backgroundColor: theme.palette.error.main,
   },
 }));
 
+const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
+  <Link to={to} style={{ textDecoration: "none" }}>
+    <IconWithSpacing
+      style={{
+        backgroundColor: isActive
+          ? colorMode === "dark"
+            ? "rgba(255, 255, 255, 0.3)" // Lighter background for dark mode
+            : "rgba(255, 255, 255, 0.3)"
+          : "transparent",
+        border: isActive
+          ? `2px solid ${colorMode === "dark" ? "#FFFFFF" : "#000000"}` // High-contrast border
+          : "none",
+        borderRadius: "50%",
+        padding: "10px",
+        boxShadow:
+          isActive && colorMode === "dark" ? "0px 0px 10px #FFF" : "none", // Glow effect for dark mode
+        transition: "background-color 0.3s, box-shadow 0.3s",
+      }}
+    >
+      {badgeContent ? (
+        <BadgeStyled
+          badgeContent={badgeContent}
+          overlap="circular"
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          {icon}
+        </BadgeStyled>
+      ) : (
+        icon
+      )}
+    </IconWithSpacing>
+  </Link>
+);
+
 const LeftMenu = ({ isMobile }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+  const [menuAnchor, setMenuAnchor] = useState(null); // State for the menu
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
   const unreadNotificationsCount = useSelector(
     (state) => state.notifications.unreadCount
   );
+
   const unreadMessagesCount = useSelector(
     (state) => state.messages.unreadMessagesCount
   );
-
-  const handleUnreadMessageCountUpdate = (channel) => {
-    const unreadMessageCount = channel.unreadMessageCount;
-    dispatch(setUnreadMessagesCount(unreadMessageCount));
-  };
-
-  useSendbirdHandlers(handleUnreadMessageCountUpdate);
 
   const location = useLocation();
   const { colorMode } = useColorMode();
@@ -164,83 +234,163 @@ const LeftMenu = ({ isMobile }) => {
   const filterStyle =
     colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none";
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  const handleMenuOpen = (event) => {
+    setMenuAnchor(event.currentTarget);
   };
 
-  return isAuthenticated ? (
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  useSendbirdHandlers((channel) => {
+    const unreadMessageCount = channel.unreadMessageCount;
+    dispatch(setUnreadMessagesCount(unreadMessageCount));
+  });
+
+  if (!isAuthenticated) return null;
+
+  return (
     <>
-      <MainContainer isMobile={isMobile} isOpen={isOpen} colorMode={colorMode}>
-        {isMobile && (
-          <MobileMenuButton onClick={toggleMenu}>
-            {isOpen ? <CloseIcon /> : <MenuIcon />}
-          </MobileMenuButton>
-        )}
-        {(isOpen || !isMobile) && (
-          <>
-            <LogoContainer>
-              <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
-              <LogoText>The Linkup</LogoText>
-            </LogoContainer>
-            <MenuList>
-              <StyledMenuItemComponent
-                to="/home"
-                icon={<HomeIcon />}
-                text="Home"
-                location={location.pathname}
-                colorMode={colorMode}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItemComponent
-                to="/notifications"
-                icon={<NotificationsIcon />}
-                text="Notifications"
-                badgeContent={unreadNotificationsCount}
-                colorMode={colorMode}
-                location={location.pathname}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItemComponent
-                to="/profile/me"
-                icon={<AccountCircleIcon />}
-                text="Profile"
-                colorMode={colorMode}
-                location={location.pathname}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItemComponent
-                to="/history"
-                icon={<HistoryIcon />}
-                text="Linkups"
-                colorMode={colorMode}
-                location={location.pathname}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItemComponent
-                to="/messages"
-                icon={<MessageIcon />}
-                text="Messages"
-                badgeContent={unreadMessagesCount}
-                colorMode={colorMode}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItemComponent
-                to="/settings"
-                icon={<SettingsIcon />}
-                text="Settings"
-                colorMode={colorMode}
-                location={location.pathname}
-                toggleMenu={isMobile ? toggleMenu : null}
-              />
-              <StyledMenuItem>
-                <CustomUserButton />
-              </StyledMenuItem>
-            </MenuList>
-          </>
-        )}
-      </MainContainer>
+      {!isMobile && ( // Only render the left menu if not in mobile mode
+        <MainContainer colorMode={colorMode}>
+          <LogoContainer>
+            <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
+            <LogoText>The Linkup</LogoText>
+          </LogoContainer>
+          <MenuList>
+            <StyledMenuItemComponent
+              to="/home"
+              icon={<HomeIcon />}
+              text="Home"
+              location={location.pathname}
+              colorMode={colorMode}
+            />
+            <StyledMenuItemComponent
+              to="/notifications"
+              icon={<NotificationsIcon />}
+              text="Notifications"
+              badgeContent={unreadNotificationsCount}
+              colorMode={colorMode}
+              location={location.pathname}
+            />
+            <StyledMenuItemComponent
+              to="/profile/me"
+              icon={<AccountCircleIcon />}
+              text="Profile"
+              colorMode={colorMode}
+              location={location.pathname}
+            />
+            <StyledMenuItemComponent
+              to="/history"
+              icon={<HistoryIcon />}
+              text="Linkups"
+              colorMode={colorMode}
+              location={location.pathname}
+            />
+            <StyledMenuItemComponent
+              to="/messages"
+              icon={<MessageIcon />}
+              text="Messages"
+              badgeContent={unreadMessagesCount}
+              colorMode={colorMode}
+              location={location.pathname}
+            />
+            <StyledMenuItemComponent
+              to="/settings"
+              icon={<SettingsIcon />}
+              text="Settings"
+              colorMode={colorMode}
+              location={location.pathname}
+            />
+            <CustomUserButtonContainer>
+              <CustomUserButton />
+            </CustomUserButtonContainer>
+          </MenuList>
+        </MainContainer>
+      )}
+      {isMobile && ( // Render the footer only if in mobile mode
+        <FooterContainer colorMode={colorMode}>
+          <FooterMenuButton
+            to="/home"
+            icon={<HomeIcon />}
+            isActive={location.pathname === "/home"}
+          />
+          <FooterMenuButton
+            to="/notifications"
+            icon={
+              <Badge badgeContent={unreadNotificationsCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            }
+            isActive={location.pathname === "/notifications"}
+          />
+          <FooterMenuButton
+            to="/profile/me"
+            icon={<AccountCircleIcon />}
+            isActive={location.pathname === "/profile/me"}
+          />
+          <FooterMenuButton
+            to="/history"
+            icon={<HistoryIcon />}
+            isActive={location.pathname === "/history"}
+          />
+          <FooterMenuButton
+            to="/messages"
+            icon={
+              <Badge badgeContent={unreadMessagesCount} color="error">
+                <MessageIcon />
+              </Badge>
+            }
+            isActive={location.pathname === "/messages"}
+          />
+          <IconButton onClick={handleMenuOpen}>
+            <MenuIcon
+              style={{ color: colorMode === "dark" ? "white" : "black" }}
+            />
+          </IconButton>
+        </FooterContainer>
+      )}
+
+      <StyledHamburgerMenu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: "top", // Align the top of the menu with the anchor
+          horizontal: "center", // Center it horizontally
+        }}
+        transformOrigin={{
+          vertical: "bottom", // The bottom of the menu aligns just above the footer
+          horizontal: "center", // Center it horizontally
+        }}
+        colorMode={colorMode}
+      >
+        <StyledHamburgerMenuItem
+          component={Link}
+          to="/settings"
+          onClick={handleMenuClose}
+          colorMode={colorMode}
+        >
+          <IconWithSpacing>
+            <SettingsIcon
+              style={{
+                marginRight: "6px", // Adjust the spacing as needed
+              }}
+            />
+            <span>Settings</span>
+          </IconWithSpacing>
+        </StyledHamburgerMenuItem>
+        <StyledHamburgerMenuItem
+          onClick={() => {
+            handleMenuClose();
+          }}
+          colorMode={colorMode}
+        >
+          <CustomUserButton />
+        </StyledHamburgerMenuItem>
+      </StyledHamburgerMenu>
     </>
-  ) : null;
+  );
 };
 
 const StyledMenuItemComponent = ({
@@ -250,21 +400,17 @@ const StyledMenuItemComponent = ({
   badgeContent,
   location,
   colorMode,
-  toggleMenu,
 }) => {
   const isActive = location === to;
   return (
     <StyledMenuItem isActive={isActive} colorMode={colorMode}>
-      <MenuItemLink to={to} onClick={toggleMenu}>
+      <MenuItemLink to={to}>
         <IconWithSpacing>
           {badgeContent ? (
             <BadgeStyled
               badgeContent={badgeContent}
               overlap="circular"
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
               {icon}
             </BadgeStyled>
@@ -272,7 +418,7 @@ const StyledMenuItemComponent = ({
             icon
           )}
         </IconWithSpacing>
-        {text}
+        <IconText>{text}</IconText>
       </MenuItemLink>
     </StyledMenuItem>
   );

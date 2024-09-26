@@ -65,7 +65,7 @@ const HorizontalMenu = ({
         payload: { id: linkupItem.request_id, status: "accepted" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request accepted.");
+      addSnackbar("Linkup request accepted.");
     } catch (error) {
       addSnackbar(error.message);
     }
@@ -80,7 +80,7 @@ const HorizontalMenu = ({
         payload: { id: linkupItem.request_id, status: "declined" },
       });
       setShouldFetchLinkups(true);
-      addSnackbar("Link-up request declined.");
+      addSnackbar("Linkup request declined.");
     } catch (error) {
       addSnackbar(error.message);
     }
@@ -107,7 +107,7 @@ const HorizontalMenu = ({
     try {
       const response = await closeLinkup(linkupItem.id);
       const message = response.success
-        ? "Link-up closed successfully!"
+        ? "Linkup closed successfully!"
         : `Error closing the linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
@@ -125,7 +125,7 @@ const HorizontalMenu = ({
     try {
       const response = await deleteLinkup(linkupItem.id);
       const message = response.success
-        ? "Link-up deleted successfully!"
+        ? "Linkup deleted successfully!"
         : `Error deleting linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
       setShouldFetchLinkups(true);
@@ -161,6 +161,7 @@ const HorizontalMenu = ({
     <div>
       <MoreIcon onClick={handleMenuClick} />
       <Popover
+        style={{ zIndex: 5000 }}
         open={Boolean(menuAnchor)}
         anchorEl={menuAnchor}
         onClose={handleMenuClose}
@@ -177,8 +178,8 @@ const HorizontalMenu = ({
             color: "white",
             backgroundColor:
               colorMode === "dark"
-                ? "rgba(18, 78, 88, 0.97)"
-                : "rgba(8, 98, 110, 0.9)",
+                ? "rgba(18, 78, 88, 1)"
+                : "rgba(8, 98, 110, 1)",
             boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.3)",
           },
         }}

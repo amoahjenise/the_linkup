@@ -10,20 +10,19 @@ const handleError = (error) => {
   throw error;
 };
 
-export const searchLinkups = async (
-  searchTerm,
-  userId,
-  gender,
-  sqlOffset,
-  pageSize
-) => {
+// Convert gender array to string format for API requests
+const formatGender = (gender) => {
+  return Array.isArray(gender) ? `{${gender.join(",")}}` : gender;
+};
+
+export const searchLinkups = async (searchTerm, userId, gender) => {
   try {
     const response = await axios.get(
       `${BASE_URL}/api/linkup/linkups/search/${userId}`,
       {
         params: {
           search_term: searchTerm,
-          gender: gender,
+          gender: formatGender(gender), // Format gender for API
         },
       }
     );
@@ -46,7 +45,7 @@ export const getLinkups = async (
       `${BASE_URL}/api/linkup/linkups/${userId}`,
       {
         params: {
-          gender: gender,
+          gender: formatGender(gender), // Format gender for API
           offset: sqlOffset,
           pageSize: pageSize,
           latitude: latitude,

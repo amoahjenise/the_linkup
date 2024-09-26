@@ -13,6 +13,7 @@ import {
   sendInvitation,
 } from "../api/sendbirdAPI";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
+import { getLinkupStatus } from "../api/linkUpAPI";
 
 const SendRequestContainer = styled("div")({
   display: "flex",
@@ -25,12 +26,16 @@ const MainSection = styled("div")(({ theme }) => ({
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  padding: theme.spacing(2),
+  marginTop: theme.spacing(6),
+  [theme.breakpoints.down("md")]: {
+    marginTop: theme.spacing(10),
+  },
 }));
 
 const LinkUpInfo = styled("div")(({ theme }) => ({
   marginBottom: theme.spacing(2),
   fontSize: "20px",
+  textAlign: "center", // Center text
 }));
 
 const StyledTextField = styled(TextField)(({ theme, textColor }) => ({
@@ -77,12 +82,20 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const LocationDetails = styled("span")({
+const RequestBestPractices = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
+  flexDirection: "column", // Stack items vertically
   fontSize: "16px",
   justifyContent: "center",
-  alignItems: "center",
-});
+  alignItems: "flex-start", // Align text to the left
+  padding: theme.spacing(2),
+  border: `1px solid ${theme.palette.grey[300]}`, // Add a border
+  borderRadius: "8px", // Rounded corners'
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor:
+    colorMode === "dark" ? "black" : theme.palette.background.paper,
+  marginTop: theme.spacing(2),
+}));
 
 const SendRequest = ({ linkupId, linkups, colorMode }) => {
   const dispatch = useDispatch();
@@ -106,15 +119,36 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
     const aUsers = [requesterId, post.creator_id];
 
     try {
+      const response = await getLinkupStatus(post.id);
+      let displayMessage = "";
+
+      switch (response.linkupStatus) {
+        case "expired":
+          displayMessage = "This linkup has expired.";
+          break;
+        case "closed":
+          displayMessage =
+            "This linkup was closed and can no longer receive requests.";
+          break;
+        case "inactive":
+          displayMessage = "This linkup was deleted.";
+          break;
+        default:
+          break;
+      }
+
+      if (displayMessage) {
+        addSnackbar(displayMessage, { timeout: 7000 });
+        return;
+      }
+
       const existingRequest = await getRequestByLinkupIdAndSenderId(
         linkupId,
         requesterId
       );
 
-      console.log("existingRequest.linkupRequest", existingRequest);
-
       if (existingRequest.linkupRequest) {
-        addSnackbar("You have already sent a request for this link-up.");
+        addSnackbar("You have already sent a request for this linkup.");
         return;
       }
 
@@ -126,7 +160,6 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
       const channelUrl = channelResponse.channel_url;
 
       await sendInvitation(channelUrl, [requesterId], post.creator_id);
-
       const sendMessageResponse = await sendMessage(
         requesterId,
         channelUrl,
@@ -139,7 +172,7 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         post.creator_id,
         linkupId,
         message,
-        channelUrl,
+        channelUrl
       );
 
       if (sendMessageResponse.message_id) {
@@ -169,9 +202,21 @@ const SendRequest = ({ linkupId, linkups, colorMode }) => {
         <StyledAvatar alt={post.creator_name} src={post.avatar} />
         <LinkUpInfo>
           <div>{renderPostText()}</div>
-          <LocationDetails>
-            Location details will be provided if the request gets accepted.
-          </LocationDetails>
+          <RequestBestPractices colorMode={colorMode}>
+            <strong>To increase your chances of getting a response:</strong>
+            <div>
+              <strong>1. Personalize Your Message:</strong> Mention a specific
+              detail about the event.
+            </div>
+            <div>
+              <strong>2. Share Your Availability:</strong> Let them know when
+              you’re free to meet up.
+            </div>
+            <div>
+              <strong>3. Encourage Engagement:</strong> End with an open-ended
+              question to encourage a reply.
+            </div>
+          </RequestBestPractices>
         </LinkUpInfo>
         <StyledTextField
           label="Message"

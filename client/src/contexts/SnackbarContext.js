@@ -10,7 +10,7 @@ const SnackbarContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column-reverse", // Display new snackbars at the top
   alignItems: "center",
-  zIndex: 1300, // Ensure snackbar is above other content
+  zIndex: 4000, // Ensure snackbar is above other content
 }));
 
 const SnackbarItem = styled("div")(({ theme }) => ({
