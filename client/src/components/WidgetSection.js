@@ -30,16 +30,10 @@ const WidgetSection = ({
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  // Function to handle input change and trigger search with debounce
-  const handleInputChange = (event) => {
-    setLoading(true);
-    // Call debounceSearchLinkups function to prevent multiple API calls
-    debounceSearchLinkups(event.target.value);
-  };
-
   // Debounce searchLinkups function to prevent multiple API calls
   const debounceSearchLinkups = useCallback(
     debounce((value) => {
+      setLoading(true); // Moved loading state here for better control
       searchLinkups(value, userId, gender)
         .then((response) => {
           if (response.linkupList.length > 0)
@@ -50,8 +44,13 @@ const WidgetSection = ({
           setLoading(false);
         });
     }, 300),
-    [userId, gender, dispatch] // Dependencies adjusted for correct effect
+    [userId, gender, dispatch] // Dependencies for the debounced function
   );
+
+  // Function to handle input change and trigger search with debounce
+  const handleInputChange = (event) => {
+    debounceSearchLinkups(event.target.value); // Call the debounced function
+  };
 
   return (
     <WidgetSectionContainer>

@@ -42,7 +42,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
-      zIndex: 2000,
+      zIndex: 1000,
       overflowY: "auto",
     },
   },

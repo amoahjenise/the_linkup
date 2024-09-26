@@ -244,14 +244,25 @@ const HomePage = ({ isMobile }) => {
         ref={feedSectionRef}
         colorMode={colorMode}
       >
-        <FeedSection linkupList={linkupList} refreshLinkups={refreshLinkups} />
+        <FeedSection
+          linkupList={linkupList}
+          isLoading={isFetchingNextPage}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          onRefreshClick={refreshLinkups}
+        />
       </StyledDiv>
       <StyledDiv
         className={classes.widgetSection}
         colorMode={colorMode}
         isWidgetVisible={isWidgetVisible}
       >
-        <WidgetSection toggleWidget={toggleWidget} />
+        <WidgetSection
+          setIsWidgetVisible={setIsWidgetVisible}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          scrollToTopCallback={scrollToTop}
+          userId={userId}
+          gender={gender}
+        />
       </StyledDiv>
       {isMobile && (
         <MobileCreateButton onClick={toggleWidget}>
