@@ -71,14 +71,23 @@ const ResponsiveImage = styled("img")({
 const LeftColumn = styled("div")(({ theme }) => ({
   flex: 1,
   textAlign: "center",
-  padding: theme.spacing(2),
+  padding: theme.spacing(3), // Slightly increased padding for a more spacious feel
+  backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle, semi-transparent white
+  backdropFilter: "blur(10px)", // Adds a slight blur for a macOS-like frosted glass effect
+  borderRadius: "8px", // Rounded corners for a cleaner appearance
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
+  cursor: "default",
   [theme.breakpoints.up("md")]: {
     textAlign: "left",
-    paddingRight: theme.spacing(4),
+    paddingRight: theme.spacing(5), // Adjusted for more space on larger screens
   },
   [theme.breakpoints.down("sm")]: {
-    // Add margin or padding if needed for mobile
-    paddingTop: theme.spacing(4), // Additional spacing on top for better aesthetics
+    paddingTop: theme.spacing(10), // Additional spacing for mobile
+    paddingBottom: theme.spacing(3), // Added bottom padding for balance
+    backgroundColor: "transparent", // Remove background in mobile mode
+    backdropFilter: "none", // Disable blur on mobile
+    boxShadow: "none", // Remove shadow in mobile mode
   },
 }));
 
@@ -89,12 +98,8 @@ const LeftSubsectionContainer = styled("div")(({ theme }) => ({
 }));
 
 const LeftSubsection = styled("div")(({ theme }) => ({
-  backgroundColor: "rgb(0, 0, 0, 0.2)",
-  padding: theme.spacing(0, 1), // Additional spacing on top for better aesthetics
-  paddingBottom: theme.spacing(1), // Additional spacing on top for better aesthetics
-  [theme.breakpoints.down("sm")]: {
-    backgroundColor: "transparent", // Remove background in mobile mode
-  },
+  padding: theme.spacing(2), // Consistent padding all around
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
 }));
 
 const Footer = styled("footer")(({ theme }) => ({
@@ -194,15 +199,15 @@ const LandingPage = () => {
                 sx={{ marginTop: 2, color: "#FFFFFF" }}
               >
                 By signing up, you agree to the{" "}
-                <a href="/terms-of-service" style={{ color: "#ffe6ff" }}>
+                <a href="/terms-of-service" style={{ color: "#7bbda2" }}>
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="/privacy-policy" style={{ color: "#ffe6ff" }}>
+                <a href="/privacy-policy" style={{ color: "#7bbda2" }}>
                   Privacy Policy
                 </a>
                 , including{" "}
-                <a href="/cookie-use" style={{ color: "#ffe6ff" }}>
+                <a href="/cookie-use" style={{ color: "#7bbda2" }}>
                   Cookie Use
                 </a>
                 .
