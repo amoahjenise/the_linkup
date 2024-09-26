@@ -286,7 +286,6 @@ const UserProfilePage = ({ isMobile }) => {
           />
           <ProfileInfoBar
             userData={state.userData}
-            calculateAge={calculateAge}
             renderEditButton={() =>
               isLoggedUserProfile && (
                 <EditButton onClick={toggleEditModal} colorMode={colorMode}>

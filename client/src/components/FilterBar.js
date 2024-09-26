@@ -8,6 +8,7 @@ const FilterMain = styled("div")({
   flex: "1",
   top: 0,
   overflowY: "auto",
+  minWidth: 320,
 });
 
 const FilterContainer = styled("div")(({ theme }) => ({
@@ -18,12 +19,11 @@ const FilterContainer = styled("div")(({ theme }) => ({
   justifyContent: "center",
   top: 0,
   overflowY: "auto",
-  width: "350px",
   borderRadius: "10px", // Rounded corners
 }));
 
 const FormControlStyled = styled(FormControl)(({ theme }) => ({
-  minWidth: 120,
+  // minWidth: 200,
   marginBottom: theme.spacing(2), // Added spacing between the two selects
 }));
 
@@ -55,6 +55,19 @@ const FilterBar = ({
 
   const labelColor = colorMode === "dark" ? "#00CFFF" : undefined; // Use undefined to keep the default label color
 
+  const underlineStyles = {
+    "&:before": {
+      borderBottomColor: colorMode === "dark" ? "white" : "gray", // Default line
+    },
+    "&:hover:not(.Mui-disabled):before": {
+      borderBottomColor: colorMode === "dark" ? "white" : "gray", // On hover
+    },
+    "&:after": {
+      borderBottomColor:
+        colorMode === "dark" ? "white" : "theme.palette.primary.main", // After interaction
+    },
+  };
+
   return (
     <FilterMain data-testid="sidebarColumn">
       <FilterContainer>
@@ -67,6 +80,7 @@ const FilterBar = ({
             onChange={(event) => onStatusChange(event.target.value)}
             label="Status"
             style={{ color: textColor }}
+            sx={underlineStyles} // Apply the underline styles here
           >
             {statusOptions.map((status) => (
               <MenuItem key={status} value={status}>
@@ -83,6 +97,7 @@ const FilterBar = ({
             onChange={(event) => onDateFilterChange(event.target.value)}
             label="Date"
             style={{ color: textColor }}
+            sx={underlineStyles} // Apply the underline styles here
           >
             {dateOptions.map((dateOption) => (
               <MenuItem key={dateOption} value={dateOption}>

@@ -57,12 +57,7 @@ const EditButtonContainer = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ProfileInfoBar = ({
-  userData,
-  renderEditButton,
-  calculateAge,
-  colorMode,
-}) => {
+const ProfileInfoBar = ({ userData, renderEditButton, colorMode }) => {
   const textColor = colorMode === "dark" ? "white" : "#333333";
 
   return (
@@ -76,7 +71,7 @@ const ProfileInfoBar = ({
             variant="h6"
             sx={{ color: textColor, fontWeight: "bold" }}
           >
-            {userData?.name}, {calculateAge(userData?.date_of_birth)}
+            {userData?.name}
           </Typography>
           <Typography variant="body2" sx={{ color: textColor }}>
             {userData?.total_linkups} Created Linkups

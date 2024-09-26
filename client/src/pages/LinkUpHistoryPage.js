@@ -74,7 +74,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
 const WidgetButton = styled(ArrowIcon)(({ theme, colorMode }) => ({
   position: "fixed",
   height: "100%",
-  right: "20px",
+  right: "10px",
   color: colorMode === "dark" ? "light-blue" : theme.palette.primary,
 }));
 
@@ -86,7 +86,6 @@ const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
 const HistorySection = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  // alignItems: "center",
   width: "100%",
 }));
 

@@ -181,9 +181,25 @@ const BadgeStyled = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const FooterMenuButton = ({ to, icon, badgeContent }) => (
-  <Link to={to}>
-    <IconWithSpacing>
+const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
+  <Link to={to} style={{ textDecoration: "none" }}>
+    <IconWithSpacing
+      style={{
+        backgroundColor: isActive
+          ? colorMode === "dark"
+            ? "rgba(255, 255, 255, 0.3)" // Lighter background for dark mode
+            : "rgba(255, 255, 255, 0.3)"
+          : "transparent",
+        border: isActive
+          ? `2px solid ${colorMode === "dark" ? "#FFFFFF" : "#000000"}` // High-contrast border
+          : "none",
+        borderRadius: "50%",
+        padding: "10px",
+        boxShadow:
+          isActive && colorMode === "dark" ? "0px 0px 10px #FFF" : "none", // Glow effect for dark mode
+        transition: "background-color 0.3s, box-shadow 0.3s",
+      }}
+    >
       {badgeContent ? (
         <BadgeStyled
           badgeContent={badgeContent}
@@ -294,7 +310,11 @@ const LeftMenu = ({ isMobile }) => {
       )}
       {isMobile && ( // Render the footer only if in mobile mode
         <FooterContainer colorMode={colorMode}>
-          <FooterMenuButton to="/home" icon={<HomeIcon />} />
+          <FooterMenuButton
+            to="/home"
+            icon={<HomeIcon />}
+            isActive={location.pathname === "/home"}
+          />
           <FooterMenuButton
             to="/notifications"
             icon={
@@ -302,9 +322,18 @@ const LeftMenu = ({ isMobile }) => {
                 <NotificationsIcon />
               </Badge>
             }
+            isActive={location.pathname === "/notifications"}
           />
-          <FooterMenuButton to="/profile/me" icon={<AccountCircleIcon />} />
-          <FooterMenuButton to="/history" icon={<HistoryIcon />} />
+          <FooterMenuButton
+            to="/profile/me"
+            icon={<AccountCircleIcon />}
+            isActive={location.pathname === "/profile/me"}
+          />
+          <FooterMenuButton
+            to="/history"
+            icon={<HistoryIcon />}
+            isActive={location.pathname === "/history"}
+          />
           <FooterMenuButton
             to="/messages"
             icon={
@@ -312,6 +341,7 @@ const LeftMenu = ({ isMobile }) => {
                 <MessageIcon />
               </Badge>
             }
+            isActive={location.pathname === "/messages"}
           />
           <IconButton onClick={handleMenuOpen}>
             <MenuIcon
