@@ -3,32 +3,32 @@ import { styled } from "@mui/material/styles";
 import TopNavBar from "../components/TopNavBar";
 import SendbirdChat from "../components/SendbirdChat";
 
-const ConversationsPageContainer = styled("div")(({ theme }) => ({
-  // display: "flex",
-  // flexDirection: "column",
-  // alignItems: "center",
-  // width: "100%",
-  // height: "100%",
-}));
+const ConversationsPageContainer = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  width: "100%",
+  height: "100%",
+});
 
 const Container = styled("div")(({ theme }) => ({
-  // display: "flex",
-  // flexDirection: "column",
-  // height: "100%",
-  // width: "100%",
-  // overflowY: "hidden",
-  // padding: 0, // Ensure no padding that might cause spacing
-  // margin: 0, // Ensure no margin that might cause spacing
+  display: "flex",
+  flexDirection: "column",
+  height: "calc(100vh - 64px)", // Subtract the height of the TopNavBar (adjust if necessary)
+  width: "100%",
+  overflowY: "hidden",
+  padding: 0,
+  margin: 0,
 }));
 
 const ConversationsPage = () => {
   return (
-    // <ConversationsPageContainer>
-    //   <TopNavBar title="Messages" />
-    //   <Container>
+    <ConversationsPageContainer>
+      <TopNavBar title="Messages" />
+      <Container>
         <SendbirdChat />
-    //   </Container>
-    // </ConversationsPageContainer>
+      </Container>
+    </ConversationsPageContainer>
   );
 };
 

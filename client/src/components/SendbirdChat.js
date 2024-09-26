@@ -41,7 +41,6 @@ const MobileContainer = styled("div")(({ theme }) => ({
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
   width: "100%", // Full width for mobile
-  // borderRight: "1px solid lightgrey",
 }));
 
 const SendbirdChat = () => {

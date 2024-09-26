@@ -20,6 +20,8 @@ const Header = styled(Box)(({ theme }) => ({
   borderBottomWidth: "1px",
   borderBottom: "0.1px solid #lightgray",
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
+  top: 0,
+  position: "sticky",
 }));
 
 const BackButton = styled(IconButton)(({ theme }) => ({

@@ -161,6 +161,7 @@ const HorizontalMenu = ({
     <div>
       <MoreIcon onClick={handleMenuClick} />
       <Popover
+        style={{ zIndex: 5000 }}
         open={Boolean(menuAnchor)}
         anchorEl={menuAnchor}
         onClose={handleMenuClose}
