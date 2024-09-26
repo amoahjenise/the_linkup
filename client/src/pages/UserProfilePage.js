@@ -33,11 +33,14 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 // Styled components
-// Styled components
 const Container = styled(Box)(({ theme }) => ({
   overflowY: "auto", // Allow vertical scrolling only if content overflows
   height: "100vh", // Make container occupy full viewport height
   width: "100%", // Ensure it takes up full width
+  paddingBottom: "5px", // Add padding for footer
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 }));
 
 const Content = styled("div")({
@@ -205,7 +208,7 @@ const UserProfilePage = ({ isMobile }) => {
               ...prevState,
               userData: {
                 ...prevState.userData,
-                [key]: response?.data?.[key] || prevState.userData[key],
+                [key]: newValue, // Immediately update the state with new value
               },
             }));
           }
