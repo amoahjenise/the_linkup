@@ -129,13 +129,13 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
-// const OnlineIndicator = styled("div")(({ isOnline }) => ({
-//   width: "0.5rem",
-//   height: "0.5rem",
-//   borderRadius: "50%",
-//   backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
-//   marginLeft: "0.5rem", // Space between username and indicator
-// }));
+const OnlineIndicator = styled("div")(({ isOnline }) => ({
+  width: "0.5rem",
+  height: "0.5rem",
+  borderRadius: "50%",
+  backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
+  marginLeft: "0.5rem", // Space between username and indicator
+}));
 
 const PaymentOptionIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -390,7 +390,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             <div>
               <Name>
                 <UserName>{creator_name}</UserName>
-                {/* <OnlineIndicator isOnline={isOnline} /> */}
+                <OnlineIndicator isOnline={linkupItem.is_online} />
               </Name>
               <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>

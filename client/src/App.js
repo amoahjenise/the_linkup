@@ -29,10 +29,13 @@ import LeftMenu from "./components/LeftMenu";
 import ToggleColorMode from "./components/ToggleColorMode";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { authenticateUser } from "./api/authenticationAPI";
+import {
+  authenticateUser,
+  storeUserOnlineStatus,
+} from "./api/authenticationAPI";
 import { setCurrentUser } from "./redux/actions/userActions";
 import { login } from "./redux/actions/authActions";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useSession } from "@clerk/clerk-react";
 import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
@@ -134,6 +137,7 @@ const RoutesComponent = ({ isMobile, locationState }) => (
 
 const App = () => {
   const dispatch = useDispatch();
+  const { isSignedIn } = useSession();
   const userState = useSelector((state) => state.loggedUser);
   const locationState = useSelector((state) => state.location);
   const { isRegistering } = useSelector((state) => state.registration);
@@ -173,6 +177,34 @@ const App = () => {
   };
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
+
+  useEffect(() => {
+    const handleOnlineStatus = async () => {
+      if (isSignedIn && userState?.user?.id) {
+        // Store user as online in the database
+        await storeUserOnlineStatus(userState.user.id, true);
+      }
+    };
+
+    const handleCleanup = async () => {
+      if (isSignedIn && userState?.user?.id) {
+        // Store user as offline in the database
+        await storeUserOnlineStatus(userState.user.id, false);
+      }
+    };
+
+    // Handle online status
+    (async () => {
+      await handleOnlineStatus();
+    })();
+
+    // Cleanup function
+    return () => {
+      (async () => {
+        await handleCleanup();
+      })();
+    };
+  }, [isSignedIn, userState?.user?.id]);
 
   useEffect(() => {
     const fetchData = async () => {

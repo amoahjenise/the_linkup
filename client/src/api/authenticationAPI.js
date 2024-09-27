@@ -47,3 +47,16 @@ export const getUserByClerkId = async (clerkUserId) => {
     handleError(error, "fetching user");
   }
 };
+
+// New function to store user online status
+export const storeUserOnlineStatus = async (userId, isOnline) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/auth/store-user-online-status`,
+      { userId, isOnline }
+    );
+    return response.data;
+  } catch (error) {
+    handleError(error, "storing user online status");
+  }
+};

@@ -14,6 +14,7 @@ linkups_with_distance AS (
     users.latitude,
     users.longitude,
     users.avatar,
+    users.is_online,
     active_linkups.count AS total_active_linkups,
     (
       6371 * acos(

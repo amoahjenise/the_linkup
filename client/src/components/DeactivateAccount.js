@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import { Button, TextField } from "@mui/material";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { useNavigate } from "react-router-dom";
-import { useClerk, useSession } from "@clerk/clerk-react";
+import { useClerk } from "@clerk/clerk-react";
 import { deactivateUser } from "../api/usersAPI";
 
 // Styled components
