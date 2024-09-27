@@ -30,6 +30,30 @@ const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
   },
 }));
 
+// Styled TextField with border color handling
+const StyledTextField = styled(TextField)(({ theme, colorMode }) => ({
+  marginTop: theme.spacing(2),
+  width: "100%",
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // White border in dark mode, default grey in light mode
+    },
+    "&:hover fieldset": {
+      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // Maintain border color on hover
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // Maintain border color when focused
+    },
+  },
+  "& .MuiInputBase-input": {
+    color: colorMode === "dark" ? "#FFFFFF" : "#333333", // Input text color
+    // backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", // Background color for inputs
+  },
+  "& .MuiInputLabel-root": {
+    color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
+  },
+}));
+
 // DialogContent for the content inside the modal
 const DialogContent = styled("div")(({ theme }) => ({
   display: "flex",
@@ -40,17 +64,33 @@ const DialogContent = styled("div")(({ theme }) => ({
 // AvatarContainer for the avatar section
 const AvatarContainer = styled("div")(({ theme }) => ({
   marginBottom: theme.spacing(2),
+  cursor: "pointer",
 }));
 
 // BioTextField for the editable bio input
 const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
   marginTop: theme.spacing(2),
+  backgroundColor: colorMode === "dark" ? "transparent" : "white", // Input text color
+
   width: "100%",
   "& .MuiInputBase-input": {
     color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Input text color
   },
   "& .MuiInputLabel-root": {
     color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: colorMode === "dark" ? "#FFFFFF" : theme.palette.grey[400], // White border in dark mode, default grey in light mode
+    },
+    "&:hover fieldset": {
+      borderColor:
+        colorMode === "dark" ? "#FFFFFF" : theme.palette.primary.main, // Hover border color
+    },
+    "&.Mui-focused fieldset": {
+      borderColor:
+        colorMode === "dark" ? "#FFFFFF" : theme.palette.primary.main, // Focused border color
+    },
   },
 }));
 
@@ -134,41 +174,28 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             />
           </AvatarContainer>
 
-          <TextField
+          <StyledTextField
             label="Name"
             variant="outlined"
             value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
             InputProps={{
               readOnly: true,
-              style: {
-                color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  text color
-                backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", //  background color for inputs
-              },
             }}
-            InputLabelProps={{
-              style: { color: colorMode === "dark" ? "#B0B0B0" : "#333333" },
-            }}
+            onChange={(e) => setEditedName(e.target.value)}
             fullWidth
             margin="normal"
           />
 
-          <TextField
+          <StyledTextField
             label="Date of Birth"
             variant="outlined"
             value={formattedDOB}
             InputProps={{
               readOnly: true,
-              style: {
-                color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  text color
-                backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", //  background color for inputs
-              },
-            }}
-            InputLabelProps={{
-              style: { color: colorMode === "dark" ? "#B0B0B0" : "#333333" },
             }}
             fullWidth
             margin="normal"
+            // colorMode={colorMode}
           />
 
           <BioTextField
