@@ -15,7 +15,7 @@ const PageContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   minHeight: "100vh",
-  background: `url(${Banner}) no-repeat center center fixed`,
+  background: `url(${Banner}) no-repeat center center fixed`, // Use the background image
   backgroundSize: "cover",
   padding: "20px",
 });
@@ -24,49 +24,8 @@ const Logo = styled("img")({
   width: "30px",
   height: "30px",
   marginRight: "10px",
-  filter: "invert(1)", // White logo
+  filter: "invert(1)", // This will turn the logo white
 });
-
-// Shared button styles to avoid repetition
-const buttonStyles = {
-  textTransform: "none",
-  padding: "10px 20px",
-  borderRadius: "30px",
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-};
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  ...buttonStyles,
-  backgroundColor: "#FFFFFF",
-  color: "#00796B",
-  "&:hover": {
-    backgroundColor: "#FFEBEE",
-    transform: "scale(1.05)", // Lift effect on hover
-  },
-}));
-
-const OutlinedButton = styled(Button)(({ theme }) => ({
-  ...buttonStyles,
-  color: "#FFFFFF",
-  borderColor: "#FFFFFF",
-  "&:hover": {
-    borderColor: "#FFEBEE",
-    color: "#FFEBEE",
-    transform: "scale(1.05)", // Lift effect on hover
-  },
-}));
-
-const ResponsiveImage = styled("img")(({ theme }) => ({
-  maxHeight: "570px",
-  width: "auto",
-  maxWidth: "100%",
-  borderRadius: "8px",
-  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
-  transition: "transform 0.3s ease",
-  "&:hover": {
-    transform: "scale(1.08)",
-  },
-}));
 
 const ContentContainer = styled("main")(({ theme }) => ({
   display: "flex",
@@ -81,36 +40,74 @@ const ContentContainer = styled("main")(({ theme }) => ({
     justifyContent: "space-between",
   },
   [theme.breakpoints.down("sm")]: {
-    justifyContent: "center",
-    alignItems: "center",
-    height: "calc(100vh - 80px)",
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
+    height: "calc(100vh - 80px)", // Adjust height minus the footer
   },
 }));
 
-const Title = styled("h1")(({ theme }) => ({
-  fontSize: "2.5rem",
-  fontWeight: "bold",
-  color: "#FFFFFF",
-  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
-  [theme.breakpoints.up("sm")]: {
-    fontSize: "3rem",
-  },
+const RightColumn = styled("div")(({ theme }) => ({
+  flex: 1,
+  display: "none", // Hide by default (for mobile)
+  justifyContent: "center", // Align content to the right
+  alignItems: "center",
+  padding: theme.spacing(1), // Increased padding for a more spacious feel
+  transition: "background-color 0.3s ease", // Smooth transition for background changes
+
   [theme.breakpoints.up("md")]: {
-    fontSize: "4rem",
+    display: "flex", // Show on larger screens
+    marginTop: 0,
+  },
+
+  [theme.breakpoints.down("sm")]: {
+    display: "none", // Ensure it's hidden in mobile view
   },
 }));
 
-const Subtitle = styled(Typography)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  fontSize: "1.5rem",
-  fontWeight: "bold",
-  color: "#FFFFFF",
-  [theme.breakpoints.up("sm")]: {
-    fontSize: "1.3rem",
+const ResponsiveImage = styled("img")(({ theme }) => ({
+  maxHeight: "570px", // Limit the maximum height
+  width: "auto", // Maintain the aspect ratio
+  maxWidth: "100%", // Prevent overflow while allowing it to be responsive
+  borderRadius: "8px", // Softer corners
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)", // Subtle shadow for a clean look
+  transition: "transform 0.3s ease", // Smooth hover effect
+  "&:hover": {
+    transform: "scale(1.08)", // Slight zoom effect on hover for interaction
   },
+}));
+
+const LeftColumn = styled("div")(({ theme }) => ({
+  flex: 1,
+  textAlign: "center",
+  padding: theme.spacing(3), // Slightly increased padding for a more spacious feel
+  backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle, semi-transparent white
+  backdropFilter: "blur(10px)", // Adds a slight blur for a macOS-like frosted glass effect
+  borderRadius: "8px", // Rounded corners for a cleaner appearance
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
+  cursor: "default",
   [theme.breakpoints.up("md")]: {
-    fontSize: "1.6rem",
+    textAlign: "left",
+    paddingRight: theme.spacing(5), // Adjusted for more space on larger screens
   },
+  [theme.breakpoints.down("sm")]: {
+    paddingTop: theme.spacing(10), // Additional spacing for mobile
+    paddingBottom: theme.spacing(3), // Added bottom padding for balance
+    backgroundColor: "transparent", // Remove background in mobile mode
+    backdropFilter: "none", // Disable blur on mobile
+    boxShadow: "none", // Remove shadow in mobile mode
+  },
+}));
+
+const LeftSubsectionContainer = styled("div")(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    paddingTop: theme.spacing(15), // Additional spacing on top for better aesthetics
+  },
+}));
+
+const LeftSubsection = styled("div")(({ theme }) => ({
+  padding: theme.spacing(2), // Consistent padding all around
+  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
 }));
 
 const Footer = styled("footer")(({ theme }) => ({
@@ -119,8 +116,67 @@ const Footer = styled("footer")(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   borderTop: "1px solid #e0e0e0",
-  color: "#FFFFFF",
+  color: "#FFFFFF", // Light color for readability
   backgroundColor: "transparent",
+}));
+
+const Title = styled("h1")(({ theme }) => ({
+  fontSize: "2.5rem",
+  fontWeight: "bold",
+  color: "#FFFFFF", // Bright white to contrast with the background
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "3rem",
+  },
+  [theme.breakpoints.up("md")]: {
+    fontSize: "4rem",
+  },
+  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)", // Stronger shadow for better contrast
+}));
+
+const Subtitle = styled(Typography)(({ theme }) => ({
+  marginTop: theme.spacing(4),
+  fontSize: "1.5rem",
+  fontWeight: "bold",
+  color: "#FFFFFF", // Light pastel for a subtle contrast
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "1.3rem",
+  },
+  [theme.breakpoints.up("md")]: {
+    fontSize: "1.6rem",
+  },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: "none",
+  padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
+  backgroundColor: "#FFFFFF", // White button for contrast
+  color: "#00796B",
+  "&:hover": {
+    backgroundColor: "#FFEBEE",
+  },
+  borderRadius: "30px",
+  marginRight: theme.spacing(2),
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+}));
+
+const OutlinedButton = styled(Button)(({ theme }) => ({
+  textTransform: "none",
+  padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
+  color: "#FFFFFF",
+  borderColor: "#FFFFFF", // White border for subtle styling
+  borderRadius: "30px",
+  "&:hover": {
+    borderColor: "#FFEBEE",
+    color: "#FFEBEE",
+  },
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+}));
+
+const VideoContainer = styled("div")(({ theme }) => ({
+  width: "100%",
+  maxWidth: "600px",
+  overflow: "hidden",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
 }));
 
 const LandingPage = () => {
