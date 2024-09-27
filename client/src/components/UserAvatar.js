@@ -3,13 +3,19 @@ import { Avatar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-// Create a styled component for Avatar with applied styles
+// Create a styled component for Avatar with enhanced styles
 const ClickableAvatar = styled(Avatar)(({ theme }) => ({
   borderRadius: "50%",
   objectFit: "cover",
   marginRight: "1.25rem",
-  border: "1px solid #e1e8ed",
+  border: `2px solid ${theme.palette.common.white}`, // White border
+  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   cursor: "pointer",
+  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  "&:hover": {
+    transform: "scale(1.05)", // Slight zoom on hover
+    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)", // Enhanced shadow on hover
+  },
 }));
 
 const UserAvatar = ({ userData, width, height }) => {

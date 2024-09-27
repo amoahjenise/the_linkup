@@ -100,7 +100,7 @@ const FirstStep = ({ userData, setUserData }) => {
         setCustomInputValue(""); // Clear the custom input field
         setUserData((prevUserData) => ({
           ...prevUserData,
-          gender: value.toLowerCase(), // Set selected gender
+          gender: value, // Set selected gender
         }));
       }
     }
@@ -142,7 +142,7 @@ const FirstStep = ({ userData, setUserData }) => {
     } else if (customInputValue) {
       setUserData((prevUserData) => ({
         ...prevUserData,
-        gender: customInputValue.toLowerCase(), // Set valid custom gender
+        gender: customInputValue, // Set valid custom gender
       }));
     }
   };
