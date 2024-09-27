@@ -70,8 +70,8 @@ const FirstStep = ({ userData, setUserData }) => {
     // Set custom input value based on userData.gender
     if (
       userData.gender &&
-      userData.gender !== "male" &&
-      userData.gender !== "female"
+      userData.gender !== "Man" &&
+      userData.gender !== "Woman"
     ) {
       setShowCustomInput(true);
       setCustomInputValue(userData.gender);
@@ -168,8 +168,8 @@ const FirstStep = ({ userData, setUserData }) => {
         required
       >
         <option value="">--Select--</option>
-        <option value="male">Man</option>
-        <option value="female">Woman</option>
+        <option value="Man">Man</option>
+        <option value="Woman">Woman</option>
         <option value="custom">Beyond Binary</option>
       </Select>
 
