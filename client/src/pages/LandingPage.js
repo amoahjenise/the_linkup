@@ -5,17 +5,17 @@ import { Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useColorMode } from "@chakra-ui/react";
 import logoSrc from "../assets/logo.png";
-import LandingPageImage from "../assets/LandingPageImage.png";
-import Banner from "../assets/Banner3.jpg";
 import AppDarkMode from "../assets/AppDarkMode.png";
 import AppLightMode from "../assets/AppLightMode.png";
+import Banner from "../assets/Banner3.jpg";
+import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 
 // Styled Components
 const PageContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   minHeight: "100vh",
-  background: `url(${Banner}) no-repeat center center fixed`, // Use the background image
+  background: `url(${Banner}) no-repeat center center fixed`,
   backgroundSize: "cover",
   padding: "20px",
 });
@@ -24,48 +24,64 @@ const Logo = styled("img")({
   width: "30px",
   height: "30px",
   marginRight: "10px",
-  filter: "invert(1)", // This will turn the logo white
+  filter: "invert(1)", // White logo for dark backgrounds
 });
 
 const ContentContainer = styled("main")(({ theme }) => ({
   display: "flex",
   flex: 1,
-  padding: theme.spacing(4),
+  padding: theme.spacing(3),
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "column",
-  backgroundColor: "transparent",
   [theme.breakpoints.up("md")]: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   [theme.breakpoints.down("sm")]: {
-    justifyContent: "center", // Center horizontally
-    alignItems: "center", // Center vertically
-    height: "calc(100vh - 80px)", // Adjust height minus the footer
+    padding: theme.spacing(2),
+    flexDirection: "column", // Stack elements in a column
+    justifyContent: "center",
+    alignItems: "center",
+  },
+}));
+
+const LeftColumn = styled("div")(({ theme }) => ({
+  flex: 1,
+  textAlign: "center",
+  padding: theme.spacing(3),
+  backgroundColor: "rgba(255, 255, 255, 0.1)",
+  backdropFilter: "blur(10px)",
+  borderRadius: "8px",
+  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+  [theme.breakpoints.up("md")]: {
+    textAlign: "left",
+  },
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(2),
+    backgroundColor: "transparent",
+    backdropFilter: "none",
+    boxShadow: "none",
+    marginBottom: theme.spacing(3),
   },
 }));
 
 const RightColumn = styled("div")(({ theme }) => ({
   flex: 1,
-  display: "none", // Hide by default (for mobile)
-  justifyContent: "center", // Align content to the right
+  display: "none",
+  justifyContent: "center",
   alignItems: "center",
-  padding: theme.spacing(1), // Increased padding for a more spacious feel
-  transition: "background-color 0.3s ease", // Smooth transition for background changes
-
+  padding: theme.spacing(1),
   [theme.breakpoints.up("md")]: {
     display: "flex", // Show on larger screens
-    marginTop: 0,
   },
-
   [theme.breakpoints.down("sm")]: {
-    display: "none", // Ensure it's hidden in mobile view
+    display: "none", // Hide on smaller screens
   },
 }));
 
 const ResponsiveImage = styled("img")(({ theme }) => ({
-  maxHeight: "570px", // Limit the maximum height
+  maxHeight: "500px", // Limit the maximum height
   width: "auto", // Maintain the aspect ratio
   maxWidth: "100%", // Prevent overflow while allowing it to be responsive
   borderRadius: "8px", // Softer corners
@@ -76,68 +92,38 @@ const ResponsiveImage = styled("img")(({ theme }) => ({
   },
 }));
 
-const LeftColumn = styled("div")(({ theme }) => ({
-  flex: 1,
-  textAlign: "center",
-  padding: theme.spacing(3), // Slightly increased padding for a more spacious feel
-  backgroundColor: "rgba(255, 255, 255, 0.1)", // Subtle, semi-transparent white
-  backdropFilter: "blur(10px)", // Adds a slight blur for a macOS-like frosted glass effect
-  borderRadius: "8px", // Rounded corners for a cleaner appearance
-  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
-  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
-  cursor: "default",
-  [theme.breakpoints.up("md")]: {
-    textAlign: "left",
-    paddingRight: theme.spacing(5), // Adjusted for more space on larger screens
-  },
-  [theme.breakpoints.down("sm")]: {
-    paddingTop: theme.spacing(10), // Additional spacing for mobile
-    paddingBottom: theme.spacing(3), // Added bottom padding for balance
-    backgroundColor: "transparent", // Remove background in mobile mode
-    backdropFilter: "none", // Disable blur on mobile
-    boxShadow: "none", // Remove shadow in mobile mode
-  },
-}));
-
-const LeftSubsectionContainer = styled("div")(({ theme }) => ({
-  [theme.breakpoints.down("sm")]: {
-    paddingTop: theme.spacing(15), // Additional spacing on top for better aesthetics
-  },
-}));
-
-const LeftSubsection = styled("div")(({ theme }) => ({
-  padding: theme.spacing(2), // Consistent padding all around
-  transition: "background-color 0.3s ease", // Smooth transition effect for hover or state changes
-}));
-
 const Footer = styled("footer")(({ theme }) => ({
   display: "flex",
+  flexDirection: "column",
   padding: theme.spacing(2),
   justifyContent: "center",
   alignItems: "center",
   borderTop: "1px solid #e0e0e0",
-  color: "#FFFFFF", // Light color for readability
+  color: "#FFFFFF",
   backgroundColor: "transparent",
+  [theme.breakpoints.down("sm")]: {
+    paddingBottom: theme.spacing(3),
+    textAlign: "center",
+  },
 }));
 
 const Title = styled("h1")(({ theme }) => ({
-  fontSize: "2.5rem",
+  fontSize: "2rem",
   fontWeight: "bold",
-  color: "#FFFFFF", // Bright white to contrast with the background
+  color: "#FFFFFF",
   [theme.breakpoints.up("sm")]: {
-    fontSize: "3rem",
+    fontSize: "2.5rem",
   },
   [theme.breakpoints.up("md")]: {
-    fontSize: "4rem",
+    fontSize: "3rem",
   },
-  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)", // Stronger shadow for better contrast
+  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  fontSize: "1.5rem",
-  fontWeight: "bold",
-  color: "#FFFFFF", // Light pastel for a subtle contrast
+  marginTop: theme.spacing(3),
+  fontSize: "1.2rem",
+  color: "#FFFFFF",
   [theme.breakpoints.up("sm")]: {
     fontSize: "1.3rem",
   },
@@ -146,43 +132,46 @@ const Subtitle = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(SignUpButton)(({ theme }) => ({
   textTransform: "none",
-  padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
-  backgroundColor: "#FFFFFF", // White button for contrast
+  padding: theme.spacing(1, 3),
+  backgroundColor: "#FFFFFF",
   color: "#00796B",
   "&:hover": {
     backgroundColor: "#FFEBEE",
   },
   borderRadius: "30px",
-  marginRight: theme.spacing(2),
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  marginRight: theme.spacing(1),
+  marginTop: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width button for smaller screens
+    marginRight: 0, // Remove right margin for better mobile alignment
+  },
 }));
 
-const OutlinedButton = styled(Button)(({ theme }) => ({
+const OutlinedButton = styled(SignInButton)(({ theme }) => ({
   textTransform: "none",
-  padding: `${theme.spacing(1)} ${theme.spacing(4)}`,
+  padding: theme.spacing(1, 3),
   color: "#FFFFFF",
-  borderColor: "#FFFFFF", // White border for subtle styling
+  border: "2px solid #FFFFFF", // Set the border to create an outlined effect
   borderRadius: "30px",
+  backgroundColor: "transparent", // Transparent background for outlined look
+  transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effects
   "&:hover": {
     borderColor: "#FFEBEE",
     color: "#FFEBEE",
+    backgroundColor: "rgba(255, 255, 255, 0.1)", // Slight background color on hover
   },
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-}));
-
-const VideoContainer = styled("div")(({ theme }) => ({
-  width: "100%",
-  maxWidth: "600px",
-  overflow: "hidden",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  marginTop: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width button for smaller screens
+  },
 }));
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { colorMode } = useColorMode(); // Use Chakra UI's colorMode
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -195,48 +184,31 @@ const LandingPage = () => {
       <ContentContainer>
         <LeftColumn>
           <Title>The Linkup</Title>
-          <LeftSubsectionContainer>
-            <LeftSubsection>
-              <Subtitle>
-                Connect with new people and organize meetups around your
-                interests.
-              </Subtitle>
-              <Typography
-                variant="subtitle2"
-                component="small"
-                sx={{ marginTop: 2, color: "#FFFFFF" }}
-              >
-                By signing up, you agree to the{" "}
-                <a href="/terms-of-service" style={{ color: "#7bbda2" }}>
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="/privacy-policy" style={{ color: "#7bbda2" }}>
-                  Privacy Policy
-                </a>
-                , including{" "}
-                <a href="/cookie-use" style={{ color: "#7bbda2" }}>
-                  Cookie Use
-                </a>
-                .
-              </Typography>
-            </LeftSubsection>
-          </LeftSubsectionContainer>
+          <Subtitle>
+            Connect with new people and organize meetups around your interests.
+          </Subtitle>
+          <Typography
+            variant="subtitle2"
+            component="small"
+            sx={{ marginTop: 2, color: "#FFFFFF" }}
+          >
+            By signing up, you agree to the{" "}
+            <a href="/terms-of-service" style={{ color: "#7bbda2" }}>
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="/privacy-policy" style={{ color: "#7bbda2" }}>
+              Privacy Policy
+            </a>
+            , including{" "}
+            <a href="/cookie-use" style={{ color: "#7bbda2" }}>
+              Cookie Use
+            </a>
+            .
+          </Typography>
           <div style={{ marginTop: "20px" }}>
-            <StyledButton
-              variant="contained"
-              size="large"
-              onClick={() => navigate("/sign-up")}
-            >
-              Sign Up
-            </StyledButton>
-            <OutlinedButton
-              variant="outlined"
-              size="large"
-              onClick={() => navigate("/sign-in")}
-            >
-              Log In
-            </OutlinedButton>
+            <StyledButton variant="contained" size="large" />
+            <OutlinedButton variant="outlined" size="large" />
           </div>
         </LeftColumn>
 

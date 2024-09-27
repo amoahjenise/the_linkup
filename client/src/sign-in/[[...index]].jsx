@@ -20,8 +20,10 @@ export default function ClerkCustomSignIn() {
         <SignIn
           path="/sign-in"
           signUpUrl="/sign-up"
-          afterSignInUrl={"/home"}
-          afterSignUpUrl={"/registration"}
+          fallbackRedirectUrl={"/home"}
+          forceRedirectUrl={"/home"}
+          signUpForceRedirectUrl={"/registration"}
+          signUpFallbackRedirectUrl={"/registration"}
         />
       </Container>
     </Section>
