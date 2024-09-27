@@ -106,14 +106,18 @@ const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   width: "100%",
   height: footerHeight,
   display: "flex",
-  justifyContent: "space-around",
+  justifyContent: "space-between", // More space between buttons
   alignItems: "center",
+  padding: "0 20px", // Add padding for a more spacious look
   boxShadow:
     colorMode === "dark"
-      ? "0px -2px 4px rgba(255, 255, 255, 0.1)"
-      : "0px -2px 4px rgba(0, 0, 0, 0.1)",
+      ? "0px -4px 12px rgba(255, 255, 255, 0.1)" // Soft shadow for dark mode
+      : "0px -4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow for light mode
   backgroundColor:
-    colorMode === "dark" ? "rgba(0, 0, 0, 0.97)" : "rgba(255, 255, 255, 0.97)",
+    colorMode === "dark"
+      ? "rgba(10, 10, 10, 0.95)" // Slightly darker for contrast
+      : "rgba(255, 255, 255, 0.97)",
+  borderRadius: "20px 20px 0 0", // Rounded corners at the top
   zIndex: 1000,
 }));
 
@@ -187,16 +191,15 @@ const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
       style={{
         backgroundColor: isActive
           ? colorMode === "dark"
-            ? "rgba(255, 255, 255, 0.3)" // Lighter background for dark mode
-            : "rgba(255, 255, 255, 0.3)"
+            ? "rgba(255, 255, 255, 0.2)" // Slight contrast for active button
+            : "rgba(0, 0, 0, 0.05)"
           : "transparent",
-        border: isActive
-          ? `2px solid ${colorMode === "dark" ? "#FFFFFF" : "#000000"}` // High-contrast border
-          : "none",
-        borderRadius: "50%",
-        padding: "10px",
+        borderRadius: "50%", // Round buttons
+        padding: "10px", // Consistent padding for all buttons
         boxShadow:
-          isActive && colorMode === "dark" ? "0px 0px 10px #FFF" : "none", // Glow effect for dark mode
+          isActive && colorMode === "dark"
+            ? "0px 0px 12px rgba(255, 255, 255, 0.5)" // Soft glow on active
+            : "none",
         transition: "background-color 0.3s, box-shadow 0.3s",
       }}
     >

@@ -129,13 +129,13 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
-// const OnlineIndicator = styled("div")(({ isOnline }) => ({
-//   width: "0.5rem",
-//   height: "0.5rem",
-//   borderRadius: "50%",
-//   backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
-//   marginLeft: "0.5rem", // Space between username and indicator
-// }));
+const OnlineIndicator = styled("div")(({ isOnline }) => ({
+  width: "0.5rem",
+  height: "0.5rem",
+  borderRadius: "50%",
+  backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
+  marginLeft: "0.5rem", // Space between username and indicator
+}));
 
 const PaymentOptionIcon = styled("div")(({ theme }) => ({
   display: "flex",
@@ -148,7 +148,7 @@ const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
   display: "inline-block",
 }));
 
-const formatDate = (date) => moment(date).format("ddd, MMM DD - h:mm A z");
+const formatDate = (date) => moment(date).format("dddd MMM D, YYYY • h:mm A");
 
 const capitalizeLocation = (location) =>
   location
@@ -196,21 +196,27 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   // }, [creator_id]);
 
   useEffect(() => {
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-      const toRadians = (degrees) => (degrees * Math.PI) / 180;
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth's radius in kilometers
+      const dLat = degreesToRadians(lat2 - lat1);
+      const dLon = degreesToRadians(lon2 - lon1);
 
-      const R = 6371; // Radius of the Earth in kilometers
-      const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon1 - lon2);
       const a =
-        Math.sin(dLat) * Math.sin(dLat) +
-        Math.cos(toRadians(lat1)) *
-          Math.cos(toRadians(lat2)) *
-          Math.sin(dLon) *
-          Math.sin(dLon);
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degreesToRadians(lat1)) *
+          Math.cos(degreesToRadians(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    };
+
+      return R * c; // Distance in kilometers
+    }
+
+    // Helper function to convert degrees to radians
+    function degreesToRadians(degrees) {
+      return degrees * (Math.PI / 180);
+    }
 
     const fetchUserLocation = () => {
       if (navigator.geolocation) {
@@ -390,7 +396,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             <div>
               <Name>
                 <UserName>{creator_name}</UserName>
-                {/* <OnlineIndicator isOnline={isOnline} /> */}
+                <OnlineIndicator isOnline={linkupItem.is_online} />
               </Name>
               <PostInfo>
                 <span>{getTimeAgo(created_at)}</span>

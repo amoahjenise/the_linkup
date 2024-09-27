@@ -180,9 +180,53 @@ const getUserByClerkId = async (req, res) => {
   }
 };
 
+// Store user online status in PostgreSQL
+const storeUserOnlineStatus = async (req, res) => {
+  // Destructure userId and isOnline from the request body
+  const { userId, isOnline } = req.body;
+
+  // Check if userId and isOnline are provided
+  if (!userId || typeof isOnline !== "boolean") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid input: userId and isOnline are required.",
+    });
+  }
+
+  try {
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/storeUserOnlineStatus.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [isOnline, userId]; // Set the online status and user ID
+
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "User online status updated successfully!",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "No user found with the given ID or status unchanged.",
+      });
+    }
+  } catch (error) {
+    console.error("Error in storeUserOnlineStatus:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   createUser,
   createSendbirdUser,
+  storeUserOnlineStatus,
   storeSendbirdAccessToken,
   loginUser,
   getUserByClerkId,

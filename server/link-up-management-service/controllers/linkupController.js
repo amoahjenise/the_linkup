@@ -179,12 +179,13 @@ const deleteLinkup = async (req, res) => {
   const deleteLinkupQueryValues = [linkupId];
 
   try {
-    const { rowCount } = await pool.query(query, deleteLinkupQueryValues);
+    const { rows, rowCount } = await pool.query(query, deleteLinkupQueryValues);
+    const newLinkup = rows[0];
 
     if (rowCount > 0) {
       // Emit the event to all connected users
       if (socketIo) {
-        socketIo.emit("linkupDeleted", { id: linkupId.id, linkup: linkupId });
+        socketIo.emit("linkupDeleted", { id: linkupId.id, linkup: newLinkup });
       }
 
       res.json({

@@ -24,7 +24,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const NewLinkupButton = ({ onClick }) => {
   return (
     <StyledButton variant="contained" onClick={onClick}>
-      New Linkups
+      Update Feed
     </StyledButton>
   );
 };

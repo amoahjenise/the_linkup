@@ -7,7 +7,8 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-import { Close as CloseIcon, Add as AddIcon } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
@@ -16,61 +17,73 @@ const classes = {
   homePage: `${PREFIX}-homePage`,
   feedSection: `${PREFIX}-feedSection`,
   widgetSection: `${PREFIX}-widgetSection`,
-  fab: `${PREFIX}-fab`,
+  widgetButton: `${PREFIX}-widgetButton`,
+  widgetCloseButton: `${PREFIX}-widgetCloseButton`,
+  loadingContainer: `${PREFIX}-loadingContainer`,
+  slideIn: `${PREFIX}-slideIn`,
+  slideOut: `${PREFIX}-slideOut`,
 };
 
-const StyledDiv = styled("div")(({ theme, colorMode, isWidgetVisible }) => ({
+const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.homePage}`]: {
     display: "flex",
     width: "100%",
     position: "relative",
   },
   [`&.${classes.feedSection}`]: {
-    flex: 2,
+    flex: "2",
     overflowY: "auto",
-    borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
+    borderRightWidth: "1px",
+    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3", // Adjust border color based on mode
     [theme.breakpoints.down("sm")]: {
-      flex: 1,
+      flex: "1",
     },
   },
   [`&.${classes.widgetSection}`]: {
-    flex: 1,
+    flex: "1",
     overflowY: "auto",
-    display: "block",
-    [theme.breakpoints.down("md")]: {
+    overflowX: "hidden",
+    display: "block", // Make sure it's displayed by default
+
+    [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
-      left: 0,
+      right: 0,
       width: "100%",
       height: "100vh",
-      backgroundColor: colorMode === "dark" ? "rgba(0, 0, 0, 1)" : "white",
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
+      transform: "translateX(100%)",
+      transition: "transform 0.3s ease",
       zIndex: 2000,
-      transform: isWidgetVisible ? "translateX(0)" : "translateX(100%)",
-      opacity: isWidgetVisible ? 1 : 0,
-      transition: "transform 0.3s ease, opacity 0.3s ease",
       overflowY: "auto",
     },
   },
-}));
-
-const MobileCreateButton = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "60px",
-  height: "60px",
-  backgroundColor: "rgba(0, 151, 167, 0.7)",
-  "&:hover": {
-    backgroundColor: "rgba(0, 123, 134, 0.7)",
+  [`&.${classes.widgetButton}`]: {
+    position: "absolute",
+    top: "20px",
+    right: "20px",
+    zIndex: 1100,
   },
-  color: theme.palette.primary.contrastText,
-  borderRadius: "50%",
-  position: "fixed",
-  bottom: "80px",
-  right: "20px",
-  zIndex: 2100,
-  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
+  [`&.${classes.widgetCloseButton}`]: {
+    position: "absolute",
+    top: "10px",
+    left: "10px", // Position close button on the right side
+    zIndex: 1100,
+    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
+  },
+  [`&.${classes.slideIn}`]: {
+    transform: "translateX(0)",
+  },
+  [`&.${classes.slideOut}`]: {
+    transform: "translateX(100%)",
+  },
+  [`&.${classes.loadingContainer}`]: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+  },
 }));
 
 const PAGE_SIZE = 10;
@@ -92,73 +105,85 @@ const HomePage = ({ isMobile }) => {
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      0.5 -
+      Math.cos(dLat) / 2 +
+      (Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        (1 - Math.cos(dLon))) /
+        2;
+    return R * 2 * Math.asin(Math.sqrt(a));
+  };
+
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
       setIsFetchingNextPage(true);
       try {
-        if (!userId) return;
+        if (!userId || page < 1 || PAGE_SIZE < 1) return; // Validate userId and page values
 
-        const adjustedPage = page - 1;
-        const sqlOffset = adjustedPage * PAGE_SIZE;
+        const adjustedPage = page - 1; // Adjust page for zero-based indexing
+        const sqlOffset = adjustedPage * PAGE_SIZE; // This should be a valid number now
 
+        console.log(
+          "Fetching linkups - Page:",
+          page,
+          "Page Size:",
+          PAGE_SIZE,
+          "SQL Offset:",
+          sqlOffset
+        );
+
+        // Fetch linkups from the API
         const response = await getLinkups(
           userId,
           gender,
-          sqlOffset,
-          PAGE_SIZE,
+          0,
+          sqlOffset + PAGE_SIZE, // Adjust fetching logic
           latitude,
           longitude
         );
 
         if (response.success) {
+          // Filter only active linkups
           const activeLinkups = response.linkupList.filter(
             (linkup) => linkup.status === "active"
           );
 
-          const calculateDistance = (lat1, lon1, lat2, lon2) => {
-            const R = 6371; // Radius of the Earth in km
-            const dLat = (lat2 - lat1) * (Math.PI / 180);
-            const dLon = (lon2 - lon1) * (Math.PI / 180);
-            const a =
-              0.5 -
-              Math.cos(dLat) / 2 +
-              (Math.cos(lat1 * (Math.PI / 180)) *
-                Math.cos(lat2 * (Math.PI / 180)) *
-                (1 - Math.cos(dLon))) /
-                2;
-            return R * 2 * Math.asin(Math.sqrt(a));
-          };
-
+          // Calculate distance for each linkup and set isUserCreated
           const updatedLinkupList = activeLinkups.map((linkup) => ({
             ...linkup,
+            isUserCreated: linkup.creator_id === userId, // Check if the current user created the linkup
+            createdAtTimestamp: linkup.created_at, // Assign the created_at timestamp
             distance: calculateDistance(
               latitude,
               longitude,
               linkup.latitude,
               linkup.longitude
             ),
-            recency: Date.now() - new Date(linkup.created_at).getTime(),
           }));
 
+          // Sort the updated list by createdAtTimestamp, then by distance
           updatedLinkupList.sort((a, b) => {
-            if (a.recency !== b.recency) return a.recency - b.recency;
-            if (a.distance !== b.distance) return a.distance - b.distance;
-            return new Date(a.scheduled_at) - new Date(b.scheduled_at);
+            // Sort by createdAtTimestamp (newest first)
+            const createdAtComparison =
+              new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
+
+            if (createdAtComparison !== 0) return createdAtComparison; // If they are different, use this result
+
+            // If createdAt is the same, sort by distance
+            return a.distance - b.distance; // Ascending order by distance
           });
 
-          const userLinkups = updatedLinkupList.filter(
-            (linkup) => linkup.created_by === userId
-          );
-          const otherLinkups = updatedLinkupList.filter(
-            (linkup) => linkup.created_by !== userId
-          );
+          // Dispatch updated linkups to Redux store
+          dispatch(fetchLinkupsSuccess(updatedLinkupList));
 
-          const combinedLinkups = [...userLinkups, ...otherLinkups];
-
-          dispatch(fetchLinkupsSuccess(combinedLinkups));
-
+          // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
-          const newFetchedLinkupIds = combinedLinkups.map(
+          const newFetchedLinkupIds = updatedLinkupList.map(
             (linkup) => linkup.id
           );
           setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
@@ -168,6 +193,7 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
+        // Ensure fetching state is reset
         setIsFetchingNextPage(false);
       }
     },
@@ -175,14 +201,17 @@ const HomePage = ({ isMobile }) => {
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = 10;
+    const threshold = 10; // Set threshold for triggering new fetch
     if (
       feedSectionRef.current &&
       feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
         feedSectionRef.current.clientHeight + threshold
     ) {
       if (currentPage < totalPages && !isFetchingNextPage) {
-        fetchLinkupsAndPoll(currentPage + 1);
+        const newPageSize = PAGE_SIZE + (currentPage - 1) * PAGE_SIZE; // Increment the page size
+        fetchLinkupsAndPoll(currentPage + 1, newPageSize);
+      } else {
+        console.log("No more pages to fetch or currently fetching...");
       }
     }
   }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
@@ -204,7 +233,7 @@ const HomePage = ({ isMobile }) => {
 
   const fetchLinkupRequests = useCallback(async () => {
     try {
-      dispatch(showNewLinkupButton(false));
+      dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
       if (!userId) return;
       const response = await getLinkupRequests(userId);
       if (response.success) {
@@ -222,7 +251,7 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
-    dispatch(showNewLinkupButton(false));
+    dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
     fetchLinkupsAndPoll(1);
     scrollToTop();
   }, [dispatch, fetchLinkupsAndPoll]);
@@ -234,16 +263,12 @@ const HomePage = ({ isMobile }) => {
   };
 
   const toggleWidget = () => {
-    setIsWidgetVisible((prev) => !prev);
+    setIsWidgetVisible(!isWidgetVisible);
   };
 
   return (
     <StyledDiv className={classes.homePage} colorMode={colorMode}>
-      <StyledDiv
-        className={classes.feedSection}
-        ref={feedSectionRef}
-        colorMode={colorMode}
-      >
+      <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
         <FeedSection
           linkupList={linkupList}
           isLoading={isFetchingNextPage}
@@ -251,23 +276,47 @@ const HomePage = ({ isMobile }) => {
           onRefreshClick={refreshLinkups}
         />
       </StyledDiv>
-      <StyledDiv
-        className={classes.widgetSection}
-        colorMode={colorMode}
-        isWidgetVisible={isWidgetVisible}
-      >
-        <WidgetSection
-          setIsWidgetVisible={setIsWidgetVisible}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          scrollToTopCallback={scrollToTop}
-          userId={userId}
-          gender={gender}
-        />
-      </StyledDiv>
+      {!isMobile && (
+        <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
+          <WidgetSection
+            setShouldFetchLinkups={setShouldFetchLinkups}
+            scrollToTopCallback={scrollToTop}
+            onRefreshClick={refreshLinkups}
+            userId={userId}
+            gender={gender}
+          />
+        </StyledDiv>
+      )}
       {isMobile && (
-        <MobileCreateButton onClick={toggleWidget}>
-          {isWidgetVisible ? <CloseIcon /> : <AddIcon />}
-        </MobileCreateButton>
+        <>
+          <IconButton
+            className={classes.widgetButton}
+            onClick={toggleWidget}
+            color="primary"
+          >
+            <MenuIcon />
+          </IconButton>
+          <StyledDiv
+            className={`${classes.widgetSection} ${
+              isWidgetVisible ? classes.slideIn : classes.slideOut
+            }`}
+            colorMode={colorMode}
+          >
+            <IconButton
+              className={classes.widgetCloseButton}
+              onClick={toggleWidget}
+            >
+              <CloseIcon />
+            </IconButton>
+            <WidgetSection
+              setShouldFetchLinkups={setShouldFetchLinkups}
+              scrollToTopCallback={scrollToTop}
+              onRefreshClick={refreshLinkups}
+              userId={userId}
+              gender={gender}
+            />
+          </StyledDiv>
+        </>
       )}
     </StyledDiv>
   );
