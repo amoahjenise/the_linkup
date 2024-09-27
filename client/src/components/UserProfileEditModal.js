@@ -113,8 +113,12 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
     onSave(editedBio, updatedAvatar, editedName);
   };
 
-  // Format the date of birth
-  const formattedDOB = new Date(userData.date_of_birth).toLocaleDateString();
+  // Format the date of birth using Intl.DateTimeFormat
+  const formattedDOB = new Intl.DateTimeFormat("en-GB", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(userData.date_of_birth));
 
   return (
     <Modal open={isOpen} onClose={onClose}>
