@@ -87,7 +87,6 @@ const HomePage = ({ isMobile }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
-  const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
@@ -140,28 +139,46 @@ const HomePage = ({ isMobile }) => {
             recency: Date.now() - new Date(linkup.created_at).getTime(),
           }));
 
+          // Sort all linkups by recency first
           updatedLinkupList.sort((a, b) => {
             if (a.recency !== b.recency) return a.recency - b.recency;
             if (a.distance !== b.distance) return a.distance - b.distance;
             return new Date(a.scheduled_at) - new Date(b.scheduled_at);
           });
 
+          // Get the last created linkup for the connected user (if available)
           const userLinkups = updatedLinkupList.filter(
-            (linkup) => linkup.created_by === userId
-          );
-          const otherLinkups = updatedLinkupList.filter(
-            (linkup) => linkup.created_by !== userId
+            (linkup) => linkup.creator_id === userId
           );
 
-          const combinedLinkups = [...userLinkups, ...otherLinkups];
+          // If there are user linkups, prioritize the most recent one
+          const prioritizedLinkup =
+            userLinkups.length > 0 ? userLinkups[0] : null;
 
-          dispatch(fetchLinkupsSuccess(combinedLinkups));
+          // If there’s a prioritized linkup, move it to the top
+          const combinedLinkups = prioritizedLinkup
+            ? [
+                prioritizedLinkup,
+                ...updatedLinkupList.filter(
+                  (linkup) => linkup.id !== prioritizedLinkup.id
+                ),
+              ]
+            : updatedLinkupList;
+
+          // Identify unique linkups to add to state
+          const existingLinkupIds = new Set(
+            linkupList.map((linkup) => linkup.id)
+          );
+          const uniqueLinkups = combinedLinkups.filter(
+            (linkup) => !existingLinkupIds.has(linkup.id)
+          );
+
+          // Only dispatch if there are new unique linkups to add
+          if (uniqueLinkups.length > 0) {
+            dispatch(fetchLinkupsSuccess([...uniqueLinkups, ...linkupList]));
+          }
 
           setCurrentPage(page);
-          const newFetchedLinkupIds = combinedLinkups.map(
-            (linkup) => linkup.id
-          );
-          setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
         } else {
           console.error("Error fetching linkups:", response.message);
         }
@@ -171,7 +188,7 @@ const HomePage = ({ isMobile }) => {
         setIsFetchingNextPage(false);
       }
     },
-    [dispatch, fetchedLinkupIds, gender, latitude, longitude, userId]
+    [dispatch, gender, latitude, longitude, userId, linkupList]
   );
 
   const handleScroll = useCallback(() => {
