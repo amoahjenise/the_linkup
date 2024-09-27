@@ -51,7 +51,7 @@ export const SocketProvider = ({ children }) => {
 
     linkupManagementSocket.on("linkupDeleted", (data) => {
       if (data.linkup.creator_id === userId) return;
-      // dispatch(showUpdateFeedButton(true)); // Dispatch action to show the NewLinkupButton
+      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupExpired", (data) => {
