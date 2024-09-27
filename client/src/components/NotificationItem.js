@@ -95,8 +95,7 @@ const NotificationItem = ({ notification, onClick }) => {
             </>
           ) : notification.notification_type === "linkup_request_action" ? (
             <>
-              <span>{notification.receiver_name}</span>
-              <span> accepted your linkup request!</span>
+              <span>{notification.content}</span>
             </>
           ) : (
             <>
