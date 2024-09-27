@@ -233,8 +233,8 @@ const CreateLinkupWidget = ({
 
   // Gender options for MultiSelect
   const genderOptions = [
-    { key: "male", value: "Man" },
-    { key: "female", value: "Woman" },
+    { key: "man", value: "Man" },
+    { key: "woman", value: "Woman" },
     ...customGenderOptions.map((gender) => ({
       key: gender.toLowerCase(),
       value: gender,

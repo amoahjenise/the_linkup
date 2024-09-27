@@ -51,22 +51,30 @@ const RightColumn = styled("div")(({ theme }) => ({
   display: "none", // Hide by default (for mobile)
   justifyContent: "center", // Align content to the right
   alignItems: "center",
-  padding: theme.spacing(2),
-  marginTop: theme.spacing(4),
+  padding: theme.spacing(1), // Increased padding for a more spacious feel
+  transition: "background-color 0.3s ease", // Smooth transition for background changes
+
   [theme.breakpoints.up("md")]: {
     display: "flex", // Show on larger screens
     marginTop: 0,
   },
+
   [theme.breakpoints.down("sm")]: {
     display: "none", // Ensure it's hidden in mobile view
   },
 }));
 
-const ResponsiveImage = styled("img")({
-  maxHeight: "570px",
-  maxWidth: "auto", // Optional: limit max width if needed
-  borderRadius: "8px", // Optional: add some styling
-});
+const ResponsiveImage = styled("img")(({ theme }) => ({
+  maxHeight: "570px", // Limit the maximum height
+  width: "auto", // Maintain the aspect ratio
+  maxWidth: "100%", // Prevent overflow while allowing it to be responsive
+  borderRadius: "8px", // Softer corners
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)", // Subtle shadow for a clean look
+  transition: "transform 0.3s ease", // Smooth hover effect
+  "&:hover": {
+    transform: "scale(1.08)", // Slight zoom effect on hover for interaction
+  },
+}));
 
 const LeftColumn = styled("div")(({ theme }) => ({
   flex: 1,
