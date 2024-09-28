@@ -87,6 +87,7 @@ const HistorySection = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
+  overflowY: "auto",
 }));
 
 const FilterBarContainer = styled("div")(({ theme }) => ({
@@ -109,6 +110,7 @@ const TabBar = styled(Tabs)(({ theme }) => ({
   top: 65,
   zIndex: 1,
 }));
+
 const LinkUpHistoryPage = ({ isMobile }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -419,7 +421,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                       : `Received Requests (${receivedRequests.filteredList.length})`
                   }
                   style={{
-                    width: "33%",
                     color, // Apply the color directly to each Tab
                   }}
                 />

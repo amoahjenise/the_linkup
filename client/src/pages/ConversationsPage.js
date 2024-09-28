@@ -14,7 +14,7 @@ const ConversationsPageContainer = styled("div")({
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  height: "calc(100vh - 64px)", // Subtract the height of the TopNavBar (adjust if necessary)
+  height: "100vh", // Subtract the height of the TopNavBar (adjust if necessary)
   width: "100%",
   overflowY: "hidden",
   padding: 0,
@@ -24,7 +24,7 @@ const Container = styled("div")(({ theme }) => ({
 const ConversationsPage = () => {
   return (
     <ConversationsPageContainer>
-      <TopNavBar title="Messages" />
+      {/* <TopNavBar title="Messages" /> */}
       <Container>
         <SendbirdChat />
       </Container>

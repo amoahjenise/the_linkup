@@ -27,7 +27,6 @@ const MainContainer = styled("div")(({ theme, colorMode }) => ({
   borderRight: "1px solid lightgrey",
   position: "sticky",
   left: 0,
-  zIndex: 1000,
   transition: "left 0.3s ease-in-out",
   "@media (max-width: 1380px)": {
     width: "12%", // Change to a narrow width
