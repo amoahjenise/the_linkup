@@ -421,6 +421,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                       : `Received Requests (${receivedRequests.filteredList.length})`
                   }
                   style={{
+                    width: "34%",
                     color, // Apply the color directly to each Tab
                   }}
                 />
