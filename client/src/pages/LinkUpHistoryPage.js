@@ -41,7 +41,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       right: 0,
       width: "100%",
       height: "100vh",
-      backgroundColor: colorMode === "dark" ? "#1A202C" : "white",
+      backgroundColor: colorMode === "dark" ? "black" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
