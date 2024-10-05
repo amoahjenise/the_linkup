@@ -8,7 +8,7 @@ import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsAct
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
 import { IconButton } from "@mui/material";
-import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
@@ -34,7 +34,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     flex: "2",
     overflowY: "auto",
     borderRightWidth: "1px",
-    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3", // Adjust border color based on mode
+    borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
     [theme.breakpoints.down("sm")]: {
       flex: "1",
     },
@@ -42,16 +42,14 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.widgetSection}`]: {
     flex: "1",
     overflowY: "auto",
-    overflowX: "hidden",
-    display: "block", // Make sure it's displayed by default
-
+    display: "block",
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
       right: 0,
       width: "100%",
       height: "100vh",
-      backgroundColor: colorMode === "dark" ? "#1A202C" : "white", // Use Chakra's dark mode color
+      backgroundColor: colorMode === "dark" ? "#1A202C" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
@@ -60,17 +58,18 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     },
   },
   [`&.${classes.widgetButton}`]: {
-    position: "absolute",
-    top: "20px",
+    position: "fixed",
+    bottom: "20px",
     right: "20px",
     zIndex: 1100,
+    borderRadius: "50%",
+    backgroundColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
   },
   [`&.${classes.widgetCloseButton}`]: {
     position: "absolute",
     top: "10px",
-    left: "10px", // Position close button on the right side
+    left: "10px",
     zIndex: 1100,
-    color: colorMode === "dark" ? "white" : "black", // Adjust color based on mode
   },
   [`&.${classes.slideIn}`]: {
     transform: "translateX(0)",
@@ -276,48 +275,47 @@ const HomePage = ({ isMobile }) => {
           onRefreshClick={refreshLinkups}
         />
       </StyledDiv>
-      {!isMobile && (
-        <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
-          <WidgetSection
-            setShouldFetchLinkups={setShouldFetchLinkups}
-            scrollToTopCallback={scrollToTop}
-            onRefreshClick={refreshLinkups}
-            userId={userId}
-            gender={gender}
+      <StyledDiv
+        className={`${classes.widgetSection} ${
+          isWidgetVisible ? classes.slideIn : classes.slideOut
+        }`}
+        colorMode={colorMode}
+      >
+        <IconButton
+          className={classes.widgetCloseButton}
+          onClick={toggleWidget}
+        >
+          <CloseIcon
+            style={{ color: colorMode === "dark" ? "white" : "black" }}
           />
-        </StyledDiv>
-      )}
-      {isMobile && (
-        <>
-          <IconButton
-            className={classes.widgetButton}
-            onClick={toggleWidget}
-            color="primary"
-          >
-            <MenuIcon />
-          </IconButton>
-          <StyledDiv
-            className={`${classes.widgetSection} ${
-              isWidgetVisible ? classes.slideIn : classes.slideOut
-            }`}
-            colorMode={colorMode}
-          >
-            <IconButton
-              className={classes.widgetCloseButton}
-              onClick={toggleWidget}
-            >
-              <CloseIcon />
-            </IconButton>
-            <WidgetSection
-              setShouldFetchLinkups={setShouldFetchLinkups}
-              scrollToTopCallback={scrollToTop}
-              onRefreshClick={refreshLinkups}
-              userId={userId}
-              gender={gender}
-            />
-          </StyledDiv>
-        </>
-      )}
+        </IconButton>
+        <WidgetSection
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          scrollToTopCallback={scrollToTop}
+          onRefreshClick={refreshLinkups}
+          userId={userId}
+          gender={gender}
+        />
+      </StyledDiv>
+
+      {/* Floating Filter Icon Button */}
+      <IconButton
+        className={classes.widgetButton}
+        onClick={toggleWidget}
+        style={{
+          position: "fixed",
+          bottom: "100px",
+          right: "32px",
+          zIndex: 1000, // Ensure it's on top of other elements
+          color: "white",
+          backgroundColor: "#0097A7",
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // Circular shadow effect
+          borderRadius: "50%", // Make the button circular
+          padding: "12px", // Add padding for a circular look
+        }}
+      >
+        <AddIcon />
+      </IconButton>
     </StyledDiv>
   );
 };

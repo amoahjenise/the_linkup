@@ -106,7 +106,9 @@ const SettingsPage = () => {
       {/* SlidingSection is only shown on mobile */}
       <SlidingSection show={showSlidingSection} colorMode={colorMode}>
         <CloseButton onClick={closeSlidingSection}>
-          <CloseIcon />
+          <CloseIcon
+            style={{ color: colorMode === "dark" ? "white" : "black" }}
+          />
         </CloseButton>
         {activeSubSection === "deactivateAccount" && (
           <DeactivateAccount colorMode={colorMode} />

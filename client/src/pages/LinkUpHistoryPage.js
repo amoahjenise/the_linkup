@@ -17,7 +17,10 @@ import {
   Close as CloseIcon,
   ArrowBack as ArrowIcon,
 } from "@mui/icons-material";
+import FilterListIcon from "@mui/icons-material/FilterList"; // Import the filter icon
+
 import { IconButton } from "@mui/material";
+
 const PREFIX = "HistoryPage";
 const classes = {
   widgetSection: `${PREFIX}-widgetSection`,
@@ -71,22 +74,17 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
 }));
 
-const WidgetButton = styled(ArrowIcon)(({ theme, colorMode }) => ({
-  position: "fixed",
-  height: "100%",
-  right: "10px",
-  color: colorMode === "dark" ? "light-blue" : theme.palette.primary,
-}));
-
 const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
+  minHeight: "100vh", // Ensures the container spans the full height of the viewport
+  paddingBottom: "60px", // Adjust this value as needed to prevent overlap
 }));
 
 const HistorySection = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  width: "100%",
+  width: "auto",
   overflowY: "auto",
 }));
 
@@ -107,7 +105,7 @@ const TabBar = styled(Tabs)(({ theme }) => ({
   borderBottomWidth: "1px",
   borderBottomColor: "1px solid #D3D3D3",
   position: "sticky",
-  top: 65,
+  top: 55,
   zIndex: 1,
 }));
 
@@ -138,7 +136,11 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
-  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
+  const [isWidgetVisible, setIsWidgetVisible] = useState(false); // Track widget visibility
+
+  const handleWidgetToggle = () => {
+    setIsWidgetVisible((prevState) => !prevState); // Toggle widget visibility
+  };
 
   const myLinkupsFiltersInitialState = {
     activeStatus: "Active",
@@ -392,81 +394,24 @@ const LinkUpHistoryPage = ({ isMobile }) => {
 
   return (
     <LinkupHistoryPageContainer>
-      <HistorySection>
-        <TopBarContainer>
-          <TopNavBar title="Linkups" />
-        </TopBarContainer>
-        {isLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <TabBar
-              value={activeTab}
-              onChange={handleTabChange}
-              variant={isMobile ? "scrollable" : "standard"}
-              indicatorColor="primary"
-              style={{
-                width: "100%", // Ensure Tabs take full width
-                backgroundColor,
-              }}
+      {isWidgetVisible ? (
+        // When the widget is visible, show the FilterBar covering the entire screen
+        <FilterBarContainer>
+          <StyledDiv
+            className={`${classes.widgetSection} ${
+              isWidgetVisible ? classes.slideIn : classes.slideOut
+            }`}
+            colorMode={colorMode}
+          >
+            {/* Close button for the filter */}
+            <IconButton
+              className={classes.widgetCloseButton}
+              onClick={toggleWidget}
             >
-              {tabs.map((tab) => (
-                <Tab
-                  key={tab.id}
-                  label={
-                    tab.id === 0
-                      ? `My Linkups (${linkups.filteredList.length})`
-                      : tab.id === 1
-                      ? `Sent Requests (${sentRequests.filteredList.length})`
-                      : `Received Requests (${receivedRequests.filteredList.length})`
-                  }
-                  style={{
-                    width: "34%",
-                    color, // Apply the color directly to each Tab
-                  }}
-                />
-              ))}
-            </TabBar>
-
-            {activeTab === 0 && (
-              <div>
-                {linkups.filteredList.map((linkup) => (
-                  <LinkupHistoryItem
-                    key={linkup.id}
-                    linkup={linkup}
-                    setShouldFetchLinkups={setShouldFetchLinkups}
-                  />
-                ))}
-              </div>
-            )}
-            {activeTab === 1 && (
-              <div>
-                {sentRequests.filteredList.map((request) => (
-                  <LinkupRequestItem
-                    key={request.id}
-                    post={request}
-                    setShouldFetchLinkups={setShouldFetchLinkups}
-                  />
-                ))}
-              </div>
-            )}
-            {activeTab === 2 && (
-              <div>
-                {receivedRequests.filteredList.map((request) => (
-                  <LinkupRequestItem
-                    key={request.id}
-                    post={request}
-                    setShouldFetchLinkups={setShouldFetchLinkups}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </HistorySection>
-      <FilterBarContainer>
-        {!isMobile && (
-          <StyledDiv className={classes.widgetSection} colorMode={colorMode}>
+              <CloseIcon
+                style={{ color: colorMode === "dark" ? "white" : "black" }}
+              />
+            </IconButton>
             <FilterBar
               isMobile={isMobile}
               activeTab={activeTab}
@@ -519,83 +464,101 @@ const LinkUpHistoryPage = ({ isMobile }) => {
               }
             />
           </StyledDiv>
-        )}
-        {isMobile && (
-          <>
-            <IconButton
-              className={classes.widgetButton}
-              onClick={toggleWidget}
-              color="primary"
-            >
-              <WidgetButton colorMode={colorMode} />
-            </IconButton>
-            <StyledDiv
-              className={`${classes.widgetSection} ${
-                isWidgetVisible ? classes.slideIn : classes.slideOut
-              }`}
-              colorMode={colorMode}
-            >
-              <IconButton
-                className={classes.widgetCloseButton}
-                onClick={toggleWidget}
+        </FilterBarContainer>
+      ) : (
+        // Show HistorySection when the widget is hidden
+        <HistorySection style={{ overflowY: "auto" }}>
+          <TopBarContainer>
+            <TopNavBar title="Linkups" />
+          </TopBarContainer>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <TabBar
+                value={activeTab}
+                onChange={handleTabChange}
+                variant={isMobile ? "scrollable" : "standard"}
+                indicatorColor="primary"
+                style={{
+                  width: "100%", // Ensure Tabs take full width
+                  backgroundColor,
+                }}
               >
-                <CloseIcon />
-              </IconButton>
-              <FilterBar
-                isMobile={isMobile}
-                activeTab={activeTab}
-                activeStatus={
-                  activeTab === 0
-                    ? myLinkupsFilters.activeStatus
-                    : activeTab === 1
-                    ? sentRequestsFilters.activeStatus
-                    : receivedRequestsFilters.activeStatus
-                }
-                onStatusChange={(newStatus) => {
-                  if (activeTab === 0) {
-                    updateFilters({ activeStatus: newStatus }, true);
-                  } else if (activeTab === 1) {
-                    setSentRequestsFilters((prevFilters) => ({
-                      ...prevFilters,
-                      activeStatus: newStatus,
-                    }));
-                  } else {
-                    setReceivedRequestsFilters((prevFilters) => ({
-                      ...prevFilters,
-                      activeStatus: newStatus,
-                    }));
-                  }
-                }}
-                dateFilter={
-                  activeTab === 0
-                    ? myLinkupsFilters.dateFilter
-                    : activeTab === 1
-                    ? sentRequestsFilters.dateFilter
-                    : receivedRequestsFilters.dateFilter
-                }
-                onDateFilterChange={(newDateFilter) => {
-                  if (activeTab === 0) {
-                    updateFilters({ dateFilter: newDateFilter }, true);
-                  } else if (activeTab === 1) {
-                    setSentRequestsFilters((prevFilters) => ({
-                      ...prevFilters,
-                      dateFilter: newDateFilter,
-                    }));
-                  } else {
-                    setReceivedRequestsFilters((prevFilters) => ({
-                      ...prevFilters,
-                      dateFilter: newDateFilter,
-                    }));
-                  }
-                }}
-                statusOptions={
-                  activeTab === 0 ? statusOptions : requestsStatusOptions
-                }
-              />
-            </StyledDiv>
-          </>
-        )}
-      </FilterBarContainer>
+                {tabs.map((tab) => (
+                  <Tab
+                    key={tab.id}
+                    label={
+                      tab.id === 0
+                        ? `My Linkups (${linkups.filteredList.length})`
+                        : tab.id === 1
+                        ? `Sent Requests (${sentRequests.filteredList.length})`
+                        : `Received Requests (${receivedRequests.filteredList.length})`
+                    }
+                    style={{
+                      // width: "33%",
+                      color, // Apply the color directly to each Tab
+                    }}
+                  />
+                ))}
+              </TabBar>
+
+              {activeTab === 0 && (
+                <div>
+                  {linkups.filteredList.map((linkup) => (
+                    <LinkupHistoryItem
+                      key={linkup.id}
+                      linkup={linkup}
+                      setShouldFetchLinkups={setShouldFetchLinkups}
+                    />
+                  ))}
+                </div>
+              )}
+              {activeTab === 1 && (
+                <div>
+                  {sentRequests.filteredList.map((request) => (
+                    <LinkupRequestItem
+                      key={request.id}
+                      post={request}
+                      setShouldFetchLinkups={setShouldFetchLinkups}
+                    />
+                  ))}
+                </div>
+              )}
+              {activeTab === 2 && (
+                <div>
+                  {receivedRequests.filteredList.map((request) => (
+                    <LinkupRequestItem
+                      key={request.id}
+                      post={request}
+                      setShouldFetchLinkups={setShouldFetchLinkups}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+          {/* Floating Filter Icon Button */}
+          <IconButton
+            className={classes.widgetButton}
+            onClick={handleWidgetToggle}
+            style={{
+              position: "fixed",
+              bottom: "100px",
+              right: "32px",
+              zIndex: 1000, // Ensure it's on top of other elements
+              color: "white",
+              backgroundColor: "#0097A7",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // Circular shadow effect
+              borderRadius: "50%", // Make the button circular
+              padding: "12px", // Add padding for a circular look
+            }}
+          >
+            <FilterListIcon />
+          </IconButton>
+        </HistorySection>
+      )}
+
       {isEditing && (
         <EditLinkupModal
           open={isEditModalOpen}
