@@ -64,6 +64,10 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     zIndex: 1100,
     borderRadius: "50%",
     backgroundColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
+    display: "block",
+    [theme.breakpoints.down("sm")]: {
+      display: "none", // Hide on small screens
+    },
   },
   [`&.${classes.widgetCloseButton}`]: {
     position: "absolute",
@@ -262,8 +266,28 @@ const HomePage = ({ isMobile }) => {
   };
 
   const toggleWidget = () => {
-    setIsWidgetVisible(!isWidgetVisible);
+    if (window.innerWidth <= 600) {
+      setIsWidgetVisible(!isWidgetVisible); // Toggle only for mobile screens
+    }
   };
+
+  useEffect(() => {
+    // Ensure widget is always visible on desktop and only toggleable on mobile
+    const handleResize = () => {
+      if (window.innerWidth > 600) {
+        setIsWidgetVisible(true); // Always visible on desktop
+      } else {
+        setIsWidgetVisible(false); // Toggleable on mobile
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call initially to set the correct state on load
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <StyledDiv className={classes.homePage} colorMode={colorMode}>
@@ -281,14 +305,16 @@ const HomePage = ({ isMobile }) => {
         }`}
         colorMode={colorMode}
       >
-        <IconButton
-          className={classes.widgetCloseButton}
-          onClick={toggleWidget}
-        >
-          <CloseIcon
-            style={{ color: colorMode === "dark" ? "white" : "black" }}
-          />
-        </IconButton>
+        {window.innerWidth <= 600 && (
+          <IconButton
+            className={classes.widgetCloseButton}
+            onClick={toggleWidget}
+          >
+            <CloseIcon
+              style={{ color: colorMode === "dark" ? "white" : "black" }}
+            />
+          </IconButton>
+        )}
         <WidgetSection
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTop}
@@ -299,23 +325,25 @@ const HomePage = ({ isMobile }) => {
       </StyledDiv>
 
       {/* Floating Filter Icon Button */}
-      <IconButton
-        className={classes.widgetButton}
-        onClick={toggleWidget}
-        style={{
-          position: "fixed",
-          bottom: "100px",
-          right: "32px",
-          zIndex: 1000, // Ensure it's on top of other elements
-          color: "white",
-          backgroundColor: "#0097A7",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // Circular shadow effect
-          borderRadius: "50%", // Make the button circular
-          padding: "12px", // Add padding for a circular look
-        }}
-      >
-        <AddIcon />
-      </IconButton>
+      {window.innerWidth <= 600 && (
+        <IconButton
+          className={classes.widgetButton}
+          onClick={toggleWidget}
+          style={{
+            position: "fixed",
+            bottom: "100px",
+            right: "32px",
+            zIndex: 1000, // Ensure it's on top of other elements
+            color: "white",
+            backgroundColor: "#0097A7",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // Circular shadow effect
+            borderRadius: "50%", // Make the button circular
+            padding: "12px", // Add padding for a circular look
+          }}
+        >
+          <AddIcon />
+        </IconButton>
+      )}
     </StyledDiv>
   );
 };
