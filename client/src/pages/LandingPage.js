@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
-import { Typography, Button } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useColorMode } from "@chakra-ui/react";
 import logoSrc from "../assets/logo.png";
@@ -130,6 +130,7 @@ const Subtitle = styled(Typography)(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
     fontSize: "1.6rem",
   },
+  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
 }));
 
 const StyledButton = styled(SignUpButton)(({ theme }) => ({
@@ -190,7 +191,11 @@ const LandingPage = () => {
           <Typography
             variant="subtitle2"
             component="small"
-            sx={{ marginTop: 2, color: "#FFFFFF" }}
+            sx={{
+              marginTop: 2,
+              color: "#FFFFFF",
+              textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
+            }}
           >
             By signing up, you agree to the{" "}
             <a href="/terms-of-service" style={{ color: "white" }}>
