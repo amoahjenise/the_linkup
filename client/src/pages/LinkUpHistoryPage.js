@@ -74,10 +74,11 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
 const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
-  minHeight: "100vh",
+  minHeight: "110vh",
   paddingBottom: "60px",
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
+    minHeight: "100vh",
   },
 }));
 
@@ -396,7 +397,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
         <>
           {/* Left section with TabBar */}
           <HistorySection
-            style={{ width: isMobile ? "100%" : "70%", overflowY: "auto" }}
+          // style={{ width: isMobile ? "100%" : "70%", overflowY: "auto" }}
           >
             <TopBarContainer>
               <TopNavBar title="Linkups" />
@@ -411,7 +412,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   variant={isMobile ? "scrollable" : "standard"}
                   indicatorColor="primary"
                   style={{
-                    width: "100%", // Ensure Tabs take full width
+                    // width: "100%", // Ensure Tabs take full width
                     backgroundColor,
                   }}
                 >
