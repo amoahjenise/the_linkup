@@ -7,7 +7,7 @@ import { useColorMode } from "@chakra-ui/react";
 import logoSrc from "../assets/logo.png";
 import AppDarkMode from "../assets/AppDarkMode.png";
 import AppLightMode from "../assets/AppLightMode.png";
-import Banner from "../assets/Banner3.jpg";
+import Banner from "../assets/Banner.jpg";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 
 // Styled Components
@@ -193,15 +193,15 @@ const LandingPage = () => {
             sx={{ marginTop: 2, color: "#FFFFFF" }}
           >
             By signing up, you agree to the{" "}
-            <a href="/terms-of-service" style={{ color: "#7bbda2" }}>
+            <a href="/terms-of-service" style={{ color: "white" }}>
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="/privacy-policy" style={{ color: "#7bbda2" }}>
+            <a href="/privacy-policy" style={{ color: "white" }}>
               Privacy Policy
             </a>
             , including{" "}
-            <a href="/cookie-use" style={{ color: "#7bbda2" }}>
+            <a href="/cookie-use" style={{ color: "white" }}>
               Cookie Use
             </a>
             .
