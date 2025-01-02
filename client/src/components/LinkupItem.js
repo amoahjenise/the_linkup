@@ -31,16 +31,16 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   border: `1px solid ${
     colorMode === "light"
       ? "rgba(229, 235, 243, 1)" // Light border for light mode
-      : "rgba(229, 235, 243, 0.2)" // Subtle border for dark mode
+      : "rgba(255, 255, 255, 0.1)" // Subtle border for dark mode
   }`,
   padding: "1.5rem",
-  borderRadius: "1.5rem", // Large rounded corners for a soft feel
+  borderRadius: "1rem", // Slightly rounded corners for clean, balanced look
   width: "100%",
   background:
     colorMode === "light"
       ? "#ffffff" // Solid white background for light mode
       : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))", // Subtle gradient for dark mode
-  backdropFilter: "blur(10px)", // Glass-like background effect
+  backdropFilter: "blur(8px)", // Glass-like background effect
 
   // Box shadow for light mode
   boxShadow:
@@ -59,7 +59,7 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
     boxShadow:
       colorMode === "light"
         ? "0 12px 24px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.025)" // Hover shadow for light mode
-        : "0 12px 24px rgba(255, 255, 255, 0.1), 0 4px 6px rgba(80, 80, 0, 0.025)", // Hover shadow for dark mode
+        : "0 12px 24px rgba(255, 255, 255, 0.075), 0 4px 6px rgba(80, 80, 0, 0.025)", // Hover shadow for dark mode
   },
   cursor: "pointer",
 }));
