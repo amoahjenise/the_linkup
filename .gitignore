@@ -14,8 +14,6 @@ coverage/
 # Ignore logs
 *.log
 
-# Ignore the entire server directory
-server/
 
 # Allow client/build directory
 !client/build
