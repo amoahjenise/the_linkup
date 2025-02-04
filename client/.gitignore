@@ -1,0 +1,34 @@
+# Node Modules
+node_modules/
+client/node_modules/
+server/**/node_modules/
+
+# Environment Files
+.env
+client/.env
+server/**/.env
+
+# Coverage Reports
+coverage/
+
+# Logs
+*.log
+
+# Package Lock
+package-lock.json
+
+# Output build files from client
+!client/build
+
+# Ignore everything by default
+.*
+
+# Allow specific dotfiles
+!.gitignore
+!.editorconfig
+!.eslintignore
+!.eslintrc
+!.dockerignore
+!.npmignore
+!.npmrc
+!.prettierignore
