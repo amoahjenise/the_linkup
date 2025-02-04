@@ -1,21 +1,29 @@
 {
   "files": {
-    "main.css": "/static/css/main.60d3da3f.css",
-    "main.js": "/static/js/main.fea8cd7f.js",
+    "main.css": "/static/css/main.40cbf0e6.css",
+    "main.js": "/static/js/main.cf20f7db.js",
     "static/js/149.c8fd3733.chunk.js": "/static/js/149.c8fd3733.chunk.js",
     "static/js/767.fb75d722.chunk.js": "/static/js/767.fb75d722.chunk.js",
     "static/js/895.4d2ec066.chunk.js": "/static/js/895.4d2ec066.chunk.js",
     "static/js/921.182f0e31.chunk.js": "/static/js/921.182f0e31.chunk.js",
-    "static/media/logo.png": "/static/media/logo.6dc9f84f22759f067e7d.png",
+    "static/media/primeicons.svg": "/static/media/primeicons.6ed59f962963a4a73af2.svg",
+    "static/media/AppDarkMode.png": "/static/media/AppDarkMode.29887209c38811eadc06.png",
+    "static/media/Banner.jpg": "/static/media/Banner.ca99eb70e362d19f79d4.jpg",
+    "static/media/AppLightMode.png": "/static/media/AppLightMode.f1876e778be121972bd6.png",
+    "static/media/primeicons.eot": "/static/media/primeicons.ff0c4cd79b2ffca2de54.eot",
+    "static/media/primeicons.woff": "/static/media/primeicons.8931fda1930c3bd21e96.woff",
+    "static/media/primeicons.ttf": "/static/media/primeicons.a5c2a53d1ff7a9ff5933.ttf",
+    "static/media/primeicons.woff2": "/static/media/primeicons.024b32cc7bf399b1a847.woff2",
+    "static/media/logo.png": "/static/media/logo.b7f93556c34d27ac6dfe.png",
     "index.html": "/index.html",
-    "main.60d3da3f.css.map": "/static/css/main.60d3da3f.css.map",
-    "main.fea8cd7f.js.map": "/static/js/main.fea8cd7f.js.map",
+    "main.40cbf0e6.css.map": "/static/css/main.40cbf0e6.css.map",
+    "main.cf20f7db.js.map": "/static/js/main.cf20f7db.js.map",
     "149.c8fd3733.chunk.js.map": "/static/js/149.c8fd3733.chunk.js.map",
     "895.4d2ec066.chunk.js.map": "/static/js/895.4d2ec066.chunk.js.map",
     "921.182f0e31.chunk.js.map": "/static/js/921.182f0e31.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.60d3da3f.css",
-    "static/js/main.fea8cd7f.js"
+    "static/css/main.40cbf0e6.css",
+    "static/js/main.cf20f7db.js"
   ]
 }

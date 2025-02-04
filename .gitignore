@@ -1,27 +1,26 @@
-# Node Modules
+# Ignore all node_modules directories
 node_modules/
 client/node_modules/
 server/**/node_modules/
 
-
-# Environment Files
+# Ignore environment files
 .env
 client/.env
 server/**/.env
 
-# Coverage Reports
+# Ignore coverage reports
 coverage/
 
-# Logs
+# Ignore logs
 *.log
 
-# Package Lock
-package-lock.json
+# Ignore the entire server directory
+server/
 
-# Output build files from client
+# Allow client/build directory
 !client/build
 
-# Ignore everything by default
+# Ignore all dotfiles by default
 .*
 
 # Allow specific dotfiles
