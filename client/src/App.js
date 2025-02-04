@@ -256,57 +256,55 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <ToggleColorMode>
-        <SendbirdProvider
-          appId={REACT_APP_SENDBIRD_APP_ID}
-          userId={userState?.user?.id}
-          accessToken={userState?.user?.access_token}
-          theme={colorMode === "light" ? "light" : "dark"}
-          colorSet={myColorSet}
-          stringSet={myStringSet}
-          uikitOptions={{
-            groupChannel: {
-              enableTypingIndicator: true,
-              typingIndicatorTypes: new Set([
-                TypingIndicatorType.Bubble,
-                TypingIndicatorType.Text,
-              ]),
-            },
-          }}
-        >
-          <BrowserRouter>
-            <AppWrapper isAuthenticated={isAuthenticated}>
-              {isAuthenticated && !isRegistering && (
-                <LeftMenu isMobile={isMobile} />
-              )}
-              {publicPages.includes(window.location.pathname) ? (
-                <RoutesComponent
-                  isMobile={isMobile}
-                  locationState={locationState}
-                  userState={userState}
-                />
-              ) : (
-                <>
-                  <SignedIn>
-                    {authError ? (
-                      <ErrorPage />
-                    ) : (
-                      <RoutesComponent
-                        isMobile={isMobile}
-                        locationState={locationState}
-                        userState={userState}
-                      />
-                    )}
-                  </SignedIn>
-                  <SignedOut>
-                    <RedirectToSignIn />
-                  </SignedOut>
-                </>
-              )}
-            </AppWrapper>
-          </BrowserRouter>
-        </SendbirdProvider>
-      </ToggleColorMode>
+      <SendbirdProvider
+        appId={REACT_APP_SENDBIRD_APP_ID}
+        userId={userState?.user?.id}
+        accessToken={userState?.user?.access_token}
+        theme={colorMode === "light" ? "light" : "dark"}
+        colorSet={myColorSet}
+        stringSet={myStringSet}
+        uikitOptions={{
+          groupChannel: {
+            enableTypingIndicator: true,
+            typingIndicatorTypes: new Set([
+              TypingIndicatorType.Bubble,
+              TypingIndicatorType.Text,
+            ]),
+          },
+        }}
+      >
+        <BrowserRouter>
+          <AppWrapper isAuthenticated={isAuthenticated}>
+            {isAuthenticated && !isRegistering && (
+              <LeftMenu isMobile={isMobile} />
+            )}
+            {publicPages.includes(window.location.pathname) ? (
+              <RoutesComponent
+                isMobile={isMobile}
+                locationState={locationState}
+                userState={userState}
+              />
+            ) : (
+              <>
+                <SignedIn>
+                  {authError ? (
+                    <ErrorPage />
+                  ) : (
+                    <RoutesComponent
+                      isMobile={isMobile}
+                      locationState={locationState}
+                      userState={userState}
+                    />
+                  )}
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            )}
+          </AppWrapper>
+        </BrowserRouter>
+      </SendbirdProvider>
     </ThemeProvider>
   );
 };
