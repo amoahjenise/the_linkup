@@ -311,6 +311,42 @@ const updateUserName = async (req, res) => {
   }
 };
 
+const updateUserSocialMedia = async (req, res) => {
+  const { userId } = req.params;
+  const {
+    instagram_url = null,
+    facebook_url = null,
+    twitter_url = null,
+  } = req.body; // Default to null if not provided
+
+  try {
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/updateUserSocialMedia.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId, instagram_url, facebook_url, twitter_url];
+
+    const { rows, rowCount } = await pool.query(query, values);
+
+    if (rowCount > 0) {
+      res.json({
+        success: true,
+        message: "Social media links updated successfully!",
+        user: rows[0], // Returns updated user info
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "User not found or no changes were made.",
+      });
+    }
+  } catch (error) {
+    console.error("Failed to update social media links:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
 
@@ -352,6 +388,7 @@ module.exports = {
   updateUserBio,
   updateUserAvatar,
   updateSendbirdUser,
+  updateUserSocialMedia,
   updateUserName,
   setUserStatusActive,
 };
