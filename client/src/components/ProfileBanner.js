@@ -68,7 +68,7 @@ const ProfileBanner = ({ userData, userLocation, calculateAge, colorMode }) => (
         {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
         {userLocation}
       </UserInfoText>
-      <UserBioText variant="h4">{userData?.bio}</UserBioText>
+      <UserBioText variant="h5">{userData?.bio}</UserBioText>
     </TextContainer>
   </ProfileBannerContainer>
 );
