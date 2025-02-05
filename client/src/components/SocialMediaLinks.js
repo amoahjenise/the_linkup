@@ -8,7 +8,8 @@ import {
   Link,
   Switch,
 } from "@mui/material";
-import { Instagram, Facebook, Twitter } from "@mui/icons-material";
+import { FaXTwitter } from "react-icons/fa6"; // Import X (formerly Twitter) icon
+import { Instagram, Facebook } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 
 // Styled components
@@ -160,7 +161,7 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
 
         {/* Twitter */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Twitter sx={{ color: iconColor }} />
+          <FaXTwitter size={24} color={iconColor} />
           {previewMode || !isLoggedUserProfile ? (
             twitterUrl ? (
               <Link
@@ -172,12 +173,12 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
                 {twitterUrl}
               </Link>
             ) : (
-              <Typography color="gray">No Twitter link</Typography>
+              <Typography color="gray">No X link</Typography>
             )
           ) : (
             <StyledTextField
               fullWidth
-              label="Twitter URL"
+              label="X URL"
               value={twitterUrl}
               onChange={(e) => setTwitterUrl(e.target.value)}
               textColor={textColor}
