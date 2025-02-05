@@ -1,19 +1,20 @@
-import React from "react";
+// components/ProfileInfoBar.js
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
 import UserAvatar from "./UserAvatar";
+import LinkupsModal from "./LinkupsModal"; // Import the modal
 
-// Styled components
 const ProfileContentContainer = styled(Box)(({ theme, colorMode }) => ({
   top: 49,
-  position: "sticky", // Stick to the top
-  zIndex: 1, // Ensure it stays above the content
+  position: "sticky",
+  zIndex: 1,
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between", // Ensure even spacing
+  justifyContent: "space-between",
   borderTop: `1px solid ${theme.palette.divider}`,
   borderBottom: `1px solid ${
-    colorMode === "dark" ? "white" : `${theme.palette.divider}`
+    colorMode === "dark" ? "white" : theme.palette.divider
   }`,
   backgroundColor: colorMode === "dark" ? "#333333" : "white",
   width: "100%",
@@ -29,9 +30,8 @@ const ProfileContent = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   width: "100%",
   marginTop: theme.spacing(1),
-
   [theme.breakpoints.down("sm")]: {
-    justifyContent: "flex-start", // Align everything to the left on small screens
+    justifyContent: "flex-start",
     flexDirection: "row",
   },
 }));
@@ -46,40 +46,66 @@ const InnerHeaderContainer = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   textAlign: "left",
   [theme.breakpoints.down("sm")]: {
-    textAlign: "left", // Keep left-aligned on mobile
+    textAlign: "left",
   },
 }));
 
 const EditButtonContainer = styled(Box)(({ theme }) => ({
   marginLeft: "auto",
   [theme.breakpoints.down("sm")]: {
-    marginLeft: "auto", // Keep the button on the right side
+    marginLeft: "auto",
   },
 }));
 
 const ProfileInfoBar = ({ userData, renderEditButton, colorMode }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const textColor = colorMode === "dark" ? "white" : "#333333";
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <ProfileContentContainer colorMode={colorMode}>
-      <ProfileContent>
-        <AvatarContainer>
-          <UserAvatar userData={userData} width="100px" height="100px" />
-        </AvatarContainer>
-        <InnerHeaderContainer>
-          <Typography
-            variant="h6"
-            sx={{ color: textColor, fontWeight: "bold" }}
-          >
-            {userData?.name}
-          </Typography>
-          <Typography variant="body2" sx={{ color: textColor }}>
-            {userData?.total_linkups} Created Linkups
-          </Typography>
-        </InnerHeaderContainer>
-        <EditButtonContainer>{renderEditButton()}</EditButtonContainer>
-      </ProfileContent>
-    </ProfileContentContainer>
+    <>
+      <ProfileContentContainer colorMode={colorMode}>
+        <ProfileContent>
+          <AvatarContainer>
+            <UserAvatar userData={userData} width="100px" height="100px" />
+          </AvatarContainer>
+          <InnerHeaderContainer>
+            <Typography
+              variant="h6"
+              sx={{ color: textColor, fontWeight: "bold" }}
+            >
+              {userData?.name}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: textColor,
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+              onClick={handleOpenModal}
+            >
+              {userData?.total_linkups} Created Linkups
+            </Typography>
+          </InnerHeaderContainer>
+          <EditButtonContainer>{renderEditButton()}</EditButtonContainer>
+        </ProfileContent>
+      </ProfileContentContainer>
+
+      {/* Linkups Modal */}
+      <LinkupsModal
+        userId={userData?.id}
+        open={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 };
 

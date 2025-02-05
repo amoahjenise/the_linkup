@@ -57,7 +57,7 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
   );
   const [facebookUrl, setFacebookUrl] = useState(userData?.facebook_url || "");
   const [twitterUrl, setTwitterUrl] = useState(userData?.twitter_url || "");
-  const [previewMode, setPreviewMode] = useState(false); // Toggle preview mode
+  const [previewMode, setPreviewMode] = useState(true); // Toggle preview mode
 
   const handleSave = () => {
     onSave({
