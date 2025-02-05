@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import {
@@ -38,19 +38,32 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const AccountSettings = ({ colorMode }) => {
-  const [distanceRange, setDistanceRange] = useState([10, 50]); // Default range in km
-  const [ageRange, setAgeRange] = useState([25, 35]);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const { addSnackbar } = useSnackbar();
+const AccountSettings = () => {
   const dispatch = useDispatch();
+  const { addSnackbar } = useSnackbar();
+  const { settings } = useSelector((state) => state.loggedUser);
+
+  // Initialize state from Redux settings or default values
+  const [distanceRange, setDistanceRange] = useState([0, 500]);
+  const [ageRange, setAgeRange] = useState([18, 99]);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  useEffect(() => {
+    if (settings) {
+      setDistanceRange(settings.distanceRange || [0, 500]);
+      setAgeRange(settings.ageRange || [18, 99]);
+      setNotificationsEnabled(settings.notificationsEnabled ?? true);
+    }
+  }, [settings]);
 
   const handleSaveSettings = () => {
-    // Example action: save settings to the Redux store
+    const updatedSettings = { distanceRange, ageRange, notificationsEnabled };
+
     dispatch({
       type: "SAVE_SETTINGS",
-      payload: { distanceRange, ageRange, notificationsEnabled },
+      payload: updatedSettings,
     });
+
     addSnackbar("Settings saved successfully.");
   };
 
@@ -66,7 +79,7 @@ const AccountSettings = ({ colorMode }) => {
         value={distanceRange}
         onChange={(e, newValue) => setDistanceRange(newValue)}
         valueLabelDisplay="auto"
-        min={1}
+        min={0}
         max={100}
       />
 
