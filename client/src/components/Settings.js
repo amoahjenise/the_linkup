@@ -117,13 +117,22 @@ const Settings = ({
             </SubSectionItem>
           )}
           {activeSection === "data" && (
-            <SubSectionItem
-              variant="h6"
-              active={activeSubSection === "dataAndPermissions"}
-              onClick={() => onSubSectionClick("dataAndPermissions")}
-            >
-              Data and permissions
-            </SubSectionItem>
+            <>
+              <SubSectionItem
+                variant="h6"
+                active={activeSubSection === "dataAndPermissions"}
+                onClick={() => onSubSectionClick("dataAndPermissions")}
+              >
+                Data and permissions
+              </SubSectionItem>
+              <SubSectionItem
+                variant="h6"
+                active={activeSubSection === "dataDeletionInstructions"}
+                onClick={() => onSubSectionClick("dataDeletionInstructions")}
+              >
+                Data deletion instructions
+              </SubSectionItem>
+            </>
           )}
           {activeSection === "location" && (
             <SubSectionItem
