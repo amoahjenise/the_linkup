@@ -7,6 +7,7 @@ import LocationSharingSetting from "../components/LocationSharingSetting";
 import AccountSettings from "../components/AccountSettings"; // Import AccountSettings component
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import UserDataDeletionPage from "./UserDataDeletionPage";
 
 // Define styled components
 const SettingsPageContainer = styled("div")(({ theme }) => ({
@@ -98,6 +99,12 @@ const SettingsPage = () => {
             setActiveSubSection={setActiveSubSection}
           />
         )}
+        {activeSubSection === "dataDeletionInstructions" && (
+          <UserDataDeletionPage
+            activeSubSection={activeSubSection}
+            setActiveSubSection={setActiveSubSection}
+          />
+        )}
         {activeSubSection === "accountSettings" && (
           <AccountSettings colorMode={colorMode} />
         )}
@@ -115,6 +122,12 @@ const SettingsPage = () => {
         )}
         {activeSubSection === "locationSharing" && (
           <LocationSharingSetting
+            activeSubSection={activeSubSection}
+            setActiveSubSection={setActiveSubSection}
+          />
+        )}
+        {activeSubSection === "dataDeletionInstructions" && (
+          <UserDataDeletionPage
             activeSubSection={activeSubSection}
             setActiveSubSection={setActiveSubSection}
           />
