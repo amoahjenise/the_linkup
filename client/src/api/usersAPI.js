@@ -44,6 +44,28 @@ export const handleError = async (error, errorMessage) => {
   throw error;
 };
 
+export const updateUserSocialMedia = async (userId, socialMediaLinks) => {
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/api/user/update-user-social-media/${userId}`,
+      socialMediaLinks
+    );
+    return response.data; // Return the response data
+  } catch (error) {
+    try {
+      return await handleError(error, "Failed to update the user's social media links.");
+    } catch (error) {
+      // Handle other errors as needed
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "An error occurred.",
+        error: error.message,
+      };
+    }
+  }
+};
+
 export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${BASE_URL}/api/user/get-user-by-id`, {

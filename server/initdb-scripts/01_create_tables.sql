@@ -21,7 +21,10 @@ CREATE TABLE IF NOT EXISTS users (
     longitude NUMERIC,
     allow_location BOOLEAN DEFAULT FALSE,
     country VARCHAR(255),
-    instagram_access_token VARCHAR(255)
+    instagram_access_token VARCHAR(255),    
+    instagram_url TEXT,  
+    facebook_url TEXT,   
+    twitter_url TEXT    
 );
 
 -- Table: link_ups
