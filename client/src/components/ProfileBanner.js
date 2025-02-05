@@ -21,7 +21,7 @@ const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
 
   // Responsive layout for smaller screens
   [theme.breakpoints.down("sm")]: {
-    padding: theme.spacing(0, 3),
+    padding: theme.spacing(0, 2),
     height: "300px",
     gridTemplateColumns: "1fr",
   },
@@ -57,7 +57,7 @@ const UserBioText = styled(Typography)(({ theme }) => ({
 
   // Responsive font size for smaller screens
   [theme.breakpoints.down("sm")]: {
-    fontSize: "1.5rem",
+    fontSize: "1.25rem",
   },
 }));
 
