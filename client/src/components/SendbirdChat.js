@@ -6,7 +6,7 @@ import SBConversation from "@sendbird/uikit-react/GroupChannel";
 import SBChannelList from "@sendbird/uikit-react/GroupChannelList";
 import SBChannelSettings from "@sendbird/uikit-react/ChannelSettings";
 import sendbirdSelectors from "@sendbird/uikit-react/sendbirdSelectors";
-import useSendbirdStateContext from "@sendbird/uikit-react/useSendbirdStateContext";
+import { useSendbirdStateContext } from "@sendbird/uikit-react";
 import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
