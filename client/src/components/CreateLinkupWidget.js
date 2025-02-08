@@ -41,7 +41,7 @@ const Header = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   marginBottom: theme.spacing(2),
-  color: "#0097A7", // iOS blue for header icons and text
+  color: "#0097A7",
   fontWeight: "600",
   fontSize: "18px",
 }));

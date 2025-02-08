@@ -2,7 +2,9 @@ import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import SearchInput from "./SearchInputWidget";
 import WhatWouldYouLikeWidget from "./WhatWouldYouLikeWidget";
+import CategoryWidget from "./CategoryWidget";
 import CreateLinkupForm from "./CreateLinkupWidget";
+import AdWidget from "./AdWidget";
 import { styled } from "@mui/material/styles";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
@@ -47,6 +49,11 @@ const WidgetSection = ({
     [userId, gender, dispatch] // Dependencies for the debounced function
   );
 
+  const handleFilterChange = (selectedCategories) => {
+    console.log("Selected Categories:", selectedCategories);
+    // Apply filter logic to the feed based on selectedCategories
+  };
+
   // Function to handle input change and trigger search with debounce
   const handleInputChange = (event) => {
     debounceSearchLinkups(event.target.value); // Call the debounced function
@@ -72,6 +79,19 @@ const WidgetSection = ({
           scrollToTopCallback={scrollToTopCallback}
         />
       </Widget>
+
+      {/* <Widget>
+        <AdWidget
+          imageUrl="https://source.unsplash.com/400x300/?advertisement"
+          title="Join the Best Events!"
+          description="Discover new events happening near you."
+          link="https://your-advertiser-link.com"
+        />
+      </Widget> */}
+
+      {/* <Widget>        
+        <CategoryWidget onFilterChange={handleFilterChange} />
+      </Widget> */}
     </WidgetSectionContainer>
   );
 };

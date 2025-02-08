@@ -424,7 +424,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             )}
           </HorizontalMenuContainer>
         </UserInfo>
-
         <PostContent colorMode={colorMode}>
           <div>{formatDate(date)}</div>
           {renderLinkupItemText()}
