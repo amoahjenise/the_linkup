@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import GroupChannelHandler from "@sendbird/uikit-react/handlers/GroupChannelHandler";
-import useSendbirdStateContext from "@sendbird/uikit-react/useSendbirdStateContext";
+import { useSendbirdStateContext } from "@sendbird/uikit-react";
 import sendbirdSelectors from "@sendbird/uikit-react/sendbirdSelectors";
 
 const useSendbirdHandlers = (onUnreadMessageCountUpdate) => {
