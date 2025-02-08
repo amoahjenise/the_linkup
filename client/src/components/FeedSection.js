@@ -5,7 +5,7 @@ import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import LoadingSpinner from "./LoadingSpinner";
 import { styled } from "@mui/material/styles";
-import NewLinkupButton from "./NewLinkupButton"; // Your new component
+import NewLinkupButton from "./NewLinkupButton";
 
 const Root = styled("div")({
   position: "relative",
@@ -28,6 +28,22 @@ const FeedSection = ({
   const showNewLinkupButton = useSelector(
     (state) => state.linkups.showNewLinkupButton
   );
+  const { settings } = useSelector((state) => state.loggedUser);
+
+  // Default settings if none exist
+  const distanceRange = settings?.distanceRange || [0, 500];
+  const ageRange = settings?.ageRange || [18, 99];
+
+  // Function to filter linkups based on settings
+  const filteredLinkups = linkupList.filter((linkup) => {
+    const isWithinDistance =
+      linkup.distance >= distanceRange[0] &&
+      linkup.distance <= distanceRange[1];
+    const isWithinAgeRange =
+      linkup.creator_age >= ageRange[0] && linkup.creator_age <= ageRange[1];
+
+    return isWithinDistance && isWithinAgeRange;
+  });
 
   return (
     <Root>
@@ -38,10 +54,10 @@ const FeedSection = ({
         </LoadingContainer>
       ) : (
         <div>
-          {linkupList.length === 0 ? (
+          {filteredLinkups.length === 0 ? (
             <EmptyFeedPlaceholder />
           ) : (
-            linkupList.map((linkup) => (
+            filteredLinkups.map((linkup) => (
               <LinkupItem
                 key={linkup.id}
                 linkupItem={linkup}
