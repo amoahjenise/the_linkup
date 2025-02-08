@@ -12,7 +12,10 @@ const RootContainer = styled("div")(({ theme }) => ({
 export default function ClerkCustomSignUp() {
   return (
     <RootContainer>
-      <SignUp afterSignInUrl={"/home"} afterSignUpUrl={"/registration"} />
+      <SignUp
+        signUpForceRedirectUrl={"/registration"}
+        signUpFallbackRedirectUrl={"/registration"}
+      />
     </RootContainer>
   );
 }
