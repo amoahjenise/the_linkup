@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { AppBar, Toolbar, Typography, Tabs, Tab } from "@mui/material";
 import { useColorMode } from "@chakra-ui/react";
+import ToggleColorMode from "./ToggleColorMode";
 
 const CustomAppBar = styled(AppBar)(({ theme, colorMode }) => ({
   width: "100%",
@@ -29,6 +30,7 @@ const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
     <CustomAppBar elevation={0} colorMode={colorMode}>
       <Toolbar>
         <HeaderText variant="h6">{title}</HeaderText>
+        <ToggleColorMode />
       </Toolbar>
       {tabs && tabs.length > 0 && (
         <Tabs value={selectedTab} onChange={onChangeTab}>
