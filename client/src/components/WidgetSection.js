@@ -1,10 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import SearchInput from "./SearchInputWidget";
-import WhatWouldYouLikeWidget from "./WhatWouldYouLikeWidget";
-import CategoryWidget from "./CategoryWidget";
 import CreateLinkupForm from "./CreateLinkupWidget";
-import AdWidget from "./AdWidget";
 import { styled } from "@mui/material/styles";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
@@ -32,44 +29,36 @@ const WidgetSection = ({
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  // Debounce searchLinkups function to prevent multiple API calls
-  const debounceSearchLinkups = useCallback(
-    debounce((value) => {
-      setLoading(true); // Moved loading state here for better control
-      searchLinkups(value, userId, gender)
-        .then((response) => {
-          if (response.linkupList.length > 0)
-            dispatch(fetchLinkupsSuccess(response.linkupList));
-          setLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
+  // Persist debounced function using useRef to avoid recreation
+  const debounceSearchRef = useRef(
+    debounce(async (value) => {
+      setLoading(true);
+      try {
+        const response = await searchLinkups(value, userId, gender);
+        dispatch({
+          type: "FETCH_LINKUPS_SUCCESS",
+          payload: response.linkupList,
+          successMessage: "Linkups fetched successfully.",
         });
-    }, 300),
-    [userId, gender, dispatch] // Dependencies for the debounced function
+      } catch (error) {
+        console.error("Error fetching linkups:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, 300)
   );
 
-  const handleFilterChange = (selectedCategories) => {
-    console.log("Selected Categories:", selectedCategories);
-    // Apply filter logic to the feed based on selectedCategories
-  };
-
-  // Function to handle input change and trigger search with debounce
+  // Function to handle input change and trigger search
   const handleInputChange = (event) => {
-    debounceSearchLinkups(event.target.value); // Call the debounced function
+    debounceSearchRef.current(event.target.value);
   };
 
   return (
     <WidgetSectionContainer>
       {/* Search Input Component */}
       <Widget>
-        <SearchInput handleInputChange={handleInputChange} />
+        <SearchInput handleInputChange={handleInputChange} loading={loading} />
       </Widget>
-
-      {/* What would you like Component */}
-      {/* <Widget>
-        <WhatWouldYouLikeWidget onSubmitSuggestion={onSubmitSuggestion} />
-      </Widget> */}
 
       {/* Create Linkup Component */}
       <Widget>
@@ -79,19 +68,6 @@ const WidgetSection = ({
           scrollToTopCallback={scrollToTopCallback}
         />
       </Widget>
-
-      {/* <Widget>
-        <AdWidget
-          imageUrl="https://source.unsplash.com/400x300/?advertisement"
-          title="Join the Best Events!"
-          description="Discover new events happening near you."
-          link="https://your-advertiser-link.com"
-        />
-      </Widget> */}
-
-      {/* <Widget>        
-        <CategoryWidget onFilterChange={handleFilterChange} />
-      </Widget> */}
     </WidgetSectionContainer>
   );
 };
