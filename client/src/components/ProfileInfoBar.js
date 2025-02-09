@@ -79,7 +79,7 @@ const ProfileInfoBar = ({ userData, renderEditButton, colorMode }) => {
           </AvatarContainer>
           <InnerHeaderContainer>
             <Typography
-              variant="h6"
+              variant="h8"
               sx={{ color: textColor, fontWeight: "bold" }}
             >
               {userData?.name}
