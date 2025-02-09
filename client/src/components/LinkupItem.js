@@ -18,15 +18,16 @@ const compromise = nlp;
 
 // Styled Components
 const Container = styled("div")(({ theme }) => ({
-  padding: "0.75rem",
+  padding: "0.5rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
   height: "100%",
-  borderBottom: "1px solid rgba(130, 131, 129, 0.32)",
-  paddingTop: "24px",
-  paddingBottom: "24px",
+  // borderBottom: "1px solid rgba(130, 131, 129, 0.32)",
+  paddingTop: "12px",
+  paddingLeft: "16px",
+  paddingRight: "16px",
 }));
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
@@ -35,13 +36,12 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
       ? "rgba(229, 235, 243, 1)" // Light border for light mode
       : "rgba(255, 255, 255, 0.1)" // Subtle border for dark mode
   }`,
-  padding: "1.5rem",
-  borderRadius: "1rem", // Slightly rounded corners for clean, balanced look
+  padding: "1rem",
+  borderRadius: "0.75rem", // Slightly rounded corners for clean, balanced look
   width: "100%",
-  background:
-    colorMode === "light"
-      ? "#ffffff" // Solid white background for light mode
-      : "linear-gradient(135deg, rgba(130, 131, 129, 0.08), rgba(130, 131, 129, 0.12))", // Subtle gradient for dark mode
+  minHeight: "175px", // Ensures consistency
+  backgroundColor: colorMode === "dark" ? "#15202B" : "#FFFFFF",
+
   backdropFilter: "blur(8px)", // Glass-like background effect
 
   // Box shadow for light mode
@@ -71,7 +71,7 @@ const HorizontalMenuContainer = styled("div")(({ theme }) => ({
 }));
 
 const UserName = styled("div")(({ theme }) => ({
-  fontSize: "1rem",
+  fontSize: "0.85rem",
   fontWeight: "bold",
 }));
 
@@ -94,40 +94,47 @@ const PostActionsContainer = styled("div")(({ theme }) => ({
 const DistanceInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.9rem",
   color: "#718096",
   marginTop: "0.25rem",
   marginLeft: "4px",
+  lineHeight: "1rem",
+  fontSize: "0.8rem",
+  fontFamily:
+    '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', // Updated font
 }));
 
 const PostContent = styled("div")(({ theme, colorMode }) => ({
-  marginTop: "1rem",
-  lineHeight: "1rem",
+  marginTop: "0.5rem",
+  lineHeight: "1.25rem",
+  fontSize: "0.8rem",
+  fontFamily:
+    '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', // Updated font
+
   // Date/Time style
   "& div:first-of-type": {
-    fontWeight: "600", // semi bold
+    fontWeight: "450", // Semi-bold
     color: colorMode === "light" ? "#616871" : "#c3c4c4",
   },
+
   // Post Text style
   "& p": {
-    marginTop: "6px",
-    lineHeight: "1.5rem",
-    fontWeight: "500", // semi bold
-    color: colorMode === "light" ? "#282b2e" : "white",
+    fontWeight: "450", // Semi-bold
+    color: colorMode === "light" ? "#636977" : "white",
   },
+
   // Location style
   "& div:last-of-type": {
     marginTop: "5px",
-    fontWeight: "500", // semi bold
-    fontSize: "0.95rem", // smaller font
-    color: colorMode === "light" ? "#282b2e" : "white",
+    fontWeight: "450", // Semi-bold
+    fontSize: "0.8rem", // Smaller font
+    color: colorMode === "light" ? "#636977" : "white",
   },
 }));
 
 const PostInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.9rem",
+  fontSize: "0.8rem",
   color: "#718096",
 }));
 
@@ -172,7 +179,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const {
     id,
     creator_id,
-    creator_name,
+    name,
     activity,
     created_at,
     date,
@@ -183,19 +190,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   } = linkupItem;
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
-  // const [isOnline, setIsOnline] = useState(false); // State for online status
-
-  // useEffect(() => {
-  //   // Simulate online status
-  //   const fetchOnlineStatus = async () => {
-  //     // You can replace this with actual API call to fetch online status
-  //     const response = await fetch(`/api/users/${creator_id}/status`);
-  //     const data = await response.json();
-  //     setIsOnline(data.isOnline);
-  //   };
-
-  //   fetchOnlineStatus();
-  // }, [creator_id]);
 
   useEffect(() => {
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -215,7 +209,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
       return R * c; // Distance in kilometers
     }
 
-    // Helper function to convert degrees to radians
     function degreesToRadians(degrees) {
       return degrees * (Math.PI / 180);
     }
@@ -244,7 +237,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     fetchUserLocation();
   }, [latitude, longitude]);
 
-  // Function to render the appropriate icon based on the payment option
   const renderPaymentOptionIcon = () => {
     switch (linkupItem.payment_option) {
       case "split":
@@ -341,7 +333,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     return (
       <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
-          {creator_name}
+          {name}
         </Link>
         {" is trying to link up " + activityFormatted + "."}
       </p>
@@ -378,10 +370,10 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
 
   return (
     <div
-      style={{
-        paddingLeft: "24px",
-        paddingRight: "24px",
-      }}
+    // style={{
+    //   paddingLeft: "24px",
+    //   paddingRight: "24px",
+    // }}
     >
       <Container>
         <CardContainer
@@ -390,67 +382,89 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <UserInfo>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <UserAvatar
-                userData={{
-                  id: creator_id,
-                  name: creator_name,
-                  avatar: avatar,
-                }}
-                width="60px"
-                height="60px"
-              />
-              <div>
+          <div style={{ display: "flex", width: "100%" }}>
+            {/* Left Side */}
+            <div style={{ flex: 2, marginRight: "1rem" }}>
+              <UserInfo>
                 <Name>
-                  <UserName>{creator_name}</UserName>
+                  <UserName>{name}</UserName>
                   <OnlineIndicator isOnline={linkupItem.is_online} />
                 </Name>
-                <PostInfo>
-                  <span>{getTimeAgo(created_at)}</span>
-                </PostInfo>
+              </UserInfo>
+              <PostInfo>
+                <span>{getTimeAgo(created_at)}</span>
+              </PostInfo>
+              <PostContent colorMode={colorMode}>
+                <div>{formatDate(date)}</div>
+                {renderLinkupItemText()}
+                <div>{capitalizeLocation(location)}</div>
+              </PostContent>
+              <PostActionsContainer>
+                {loggedUser.user.id !== linkupItem.creator_id && (
+                  <div>
+                    <div>
+                      <PostActions
+                        paymentOption={linkupItem.payment_option}
+                        onRequestClick={handleRequestLinkup}
+                        disableRequest={disableRequest}
+                      />
+                    </div>
+                  </div>
+                )}
+                <span>{renderPaymentOptionIcon()}</span>
+              </PostActionsContainer>
+            </div>
+
+            {/* Right Side */}
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                justifyContent: "center",
+              }}
+            >
+              <HorizontalMenuContainer>
+                {loggedUser.user.id === linkupItem.creator_id ? (
+                  <HorizontalMenu
+                    showGoToItem={true}
+                    showEditItem={true}
+                    showDeleteItem={true}
+                    showCloseItem={true}
+                    showCheckInLinkup={false}
+                    showAcceptLinkupRequest={false}
+                    linkupItem={linkupItem}
+                    setShouldFetchLinkups={setShouldFetchLinkups}
+                    menuAnchor={menuAnchor}
+                    setMenuAnchor={setMenuAnchor}
+                  />
+                ) : (
+                  <DistanceInfo>
+                    {distance && <span>{`${distance} km away`}</span>}
+                  </DistanceInfo>
+                )}
+              </HorizontalMenuContainer>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                <UserAvatar
+                  userData={{
+                    id: creator_id,
+                    name: name,
+                    avatar: avatar,
+                  }}
+                  width="80px"
+                  height="80px"
+                />
               </div>
             </div>
-            <HorizontalMenuContainer>
-              {loggedUser.user.id === linkupItem.creator_id ? (
-                <HorizontalMenu
-                  showGoToItem={true}
-                  showEditItem={true}
-                  showDeleteItem={true}
-                  showCloseItem={true}
-                  showCheckInLinkup={false}
-                  showAcceptLinkupRequest={false}
-                  linkupItem={linkupItem}
-                  setShouldFetchLinkups={setShouldFetchLinkups}
-                  menuAnchor={menuAnchor}
-                  setMenuAnchor={setMenuAnchor}
-                />
-              ) : (
-                <DistanceInfo>
-                  {distance && <span>{`${distance} km away`}</span>}
-                </DistanceInfo>
-              )}
-            </HorizontalMenuContainer>
-          </UserInfo>
-          <PostContent colorMode={colorMode}>
-            <div>{formatDate(date)}</div>
-            {renderLinkupItemText()}
-            <div>{capitalizeLocation(location)}</div>
-          </PostContent>
-          <PostActionsContainer>
-            {loggedUser.user.id !== linkupItem.creator_id && (
-              <div>
-                <div>
-                  <PostActions
-                    paymentOption={linkupItem.payment_option}
-                    onRequestClick={handleRequestLinkup}
-                    disableRequest={disableRequest}
-                  />
-                </div>
-              </div>
-            )}
-            <span>{renderPaymentOptionIcon()}</span>
-          </PostActionsContainer>
+          </div>
         </CardContainer>
       </Container>
     </div>

@@ -36,6 +36,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#B71C1C",
   },
+  marginTop: theme.spacing(2),
 }));
 
 const AccountSettings = () => {
@@ -44,20 +45,24 @@ const AccountSettings = () => {
   const { settings } = useSelector((state) => state.loggedUser);
 
   // Initialize state from Redux settings or default values
-  const [distanceRange, setDistanceRange] = useState([0, 500]);
+  const [distanceRange, setDistanceRange] = useState(50);
   const [ageRange, setAgeRange] = useState([18, 99]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     if (settings) {
-      setDistanceRange(settings.distanceRange || [0, 500]);
+      setDistanceRange(settings.distanceRange ? settings.distanceRange[1] : 50);
       setAgeRange(settings.ageRange || [18, 99]);
       setNotificationsEnabled(settings.notificationsEnabled ?? true);
     }
   }, [settings]);
 
   const handleSaveSettings = () => {
-    const updatedSettings = { distanceRange, ageRange, notificationsEnabled };
+    const updatedSettings = {
+      distanceRange: [0, distanceRange],
+      ageRange,
+      notificationsEnabled,
+    };
 
     dispatch({
       type: "SAVE_SETTINGS",
@@ -72,8 +77,8 @@ const AccountSettings = () => {
       <SectionTitle>User Settings</SectionTitle>
 
       <Typography variant="h6" gutterBottom>
-        Distance Range ({distanceRange[0]} - {distanceRange[1]}{" "}
-        {distanceRange[1] > 100 ? "miles" : "km"})
+        Distance Range (0 - {distanceRange}{" "}
+        {distanceRange > 100 ? "miles" : "km"})
       </Typography>
       <Slider
         value={distanceRange}
@@ -94,7 +99,7 @@ const AccountSettings = () => {
         max={80}
       />
 
-      <FormControlLabel
+      {/* <FormControlLabel
         control={
           <Switch
             checked={notificationsEnabled}
@@ -103,7 +108,7 @@ const AccountSettings = () => {
           />
         }
         label="Enable Notifications"
-      />
+      /> */}
 
       <StyledButton variant="contained" onClick={handleSaveSettings}>
         Save Settings

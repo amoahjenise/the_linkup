@@ -11,6 +11,7 @@ WITH active_linkups AS (
 linkups_with_distance AS (
   SELECT
     link_ups.*,
+    users.name,
     users.avatar,
     users.is_online,
     users.latitude,

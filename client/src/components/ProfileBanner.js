@@ -9,7 +9,7 @@ const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
   gridTemplateColumns: "1fr 1fr",
   alignItems: "center",
   padding: theme.spacing(0, 6),
-  height: "360px",
+  height: "320px",
   background:
     colorMode === "light"
       ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 49%, transparent 85%), url(${banner})`
