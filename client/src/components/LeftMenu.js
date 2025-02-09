@@ -19,21 +19,34 @@ import { setUnreadMessagesCount } from "../redux/actions/messageActions";
 
 const footerHeight = "60px";
 
-const steamBackground = "#000000"; // Black
-const steamAccent = "#FFFFFF"; // White
-const steamHover = "#333333"; // Dark Gray
-const steamText = "#FFFFFF"; // White
+// Define colors for light and dark modes
+const lightModeColors = {
+  background: "#FFFFFF", // White
+  accent: "#00796B", // Teal
+  hover: "#F5F5F5", // Light Gray
+  text: "#000000", // Black
+};
+
+const darkModeColors = {
+  background: "#000000", // Black
+  accent: "#FFFFFF", // White
+  hover: "#333333", // Dark Gray
+  text: "#FFFFFF", // White
+};
 
 const MainContainer = styled("div")(({ theme, colorMode }) => ({
   width: "25%",
   height: "100%",
   overflowY: "auto",
   padding: theme.spacing(4),
-  borderRight: `1px solid ${steamHover}`,
+  borderRight: `1px solid ${colorMode === "dark" ? "white" : "lightgrey"}`,
   position: "sticky",
   left: 0,
   transition: "left 0.3s ease-in-out",
-  background: steamBackground,
+  background:
+    colorMode === "dark"
+      ? darkModeColors.background
+      : lightModeColors.background,
   "@media (max-width: 1380px)": {
     width: "12%",
     padding: theme.spacing(2),
@@ -48,7 +61,10 @@ const MenuList = styled("ul")({
 
 const StyledHamburgerMenu = styled(Menu)(({ colorMode }) => ({
   "& .MuiPaper-root": {
-    backgroundColor: steamBackground,
+    backgroundColor:
+      colorMode === "dark"
+        ? darkModeColors.background
+        : lightModeColors.background,
     borderRadius: "8px",
     boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.3)`,
     margin: "0 auto",
@@ -60,7 +76,7 @@ const StyledHamburgerMenu = styled(Menu)(({ colorMode }) => ({
 }));
 
 const StyledHamburgerMenuItem = styled(MenuItem)(({ colorMode }) => ({
-  color: steamText,
+  color: colorMode === "dark" ? darkModeColors.text : lightModeColors.text,
   fontSize: "14px",
   padding: "12px 16px",
   borderRadius: "4px",
@@ -69,8 +85,10 @@ const StyledHamburgerMenuItem = styled(MenuItem)(({ colorMode }) => ({
   display: "flex",
   alignItems: "center",
   "&:hover": {
-    backgroundColor: steamHover,
-    color: steamAccent,
+    backgroundColor:
+      colorMode === "dark" ? darkModeColors.hover : lightModeColors.hover,
+    color:
+      colorMode === "dark" ? darkModeColors.accent : lightModeColors.accent,
   },
 }));
 
@@ -89,12 +107,15 @@ const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
       : "rgba(0, 0, 0, 0.07)"
     : "transparent",
   border: isActive
-    ? `2px solid ${colorMode === "dark" ? "#333" : "#DDD"}`
+    ? `2px solid ${
+        colorMode === "dark" ? darkModeColors.hover : lightModeColors.hover
+      }`
     : "1px solid transparent",
   "&:hover": {
     backgroundColor:
       colorMode === "dark" ? "rgba(18, 28, 38, 0.5)" : "rgba(0, 0, 0, 0.05)",
-    borderColor: colorMode === "dark" ? "#444" : "#CCC",
+    borderColor:
+      colorMode === "dark" ? darkModeColors.hover : lightModeColors.hover,
   },
 }));
 
@@ -108,7 +129,10 @@ const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   alignItems: "center",
   padding: "0 20px",
   boxShadow: `0px -4px 12px rgba(0, 0, 0, 0.3)`,
-  backgroundColor: steamBackground,
+  backgroundColor:
+    colorMode === "dark"
+      ? darkModeColors.background
+      : lightModeColors.background,
   borderRadius: "8px 8px 0 0",
   zIndex: 1000,
 }));
@@ -126,11 +150,11 @@ const IconWithSpacing = styled("div")({
   alignItems: "center",
 });
 
-const IconText = styled("span")(({ theme }) => ({
+const IconText = styled("span")(({ theme, colorMode }) => ({
   marginLeft: theme.spacing(2),
   display: "inline",
   fontSize: "14px",
-  color: steamText,
+  color: colorMode === "dark" ? darkModeColors.text : lightModeColors.text,
   "@media (max-width: 1380px)": {
     display: "none",
   },
@@ -156,24 +180,29 @@ const Logo = styled("img")(({ theme }) => ({
   height: "50px",
 }));
 
-const LogoText = styled("div")(({ theme }) => ({
+const LogoText = styled("div")(({ theme, colorMode }) => ({
   marginLeft: theme.spacing(1),
   fontSize: "1.5rem",
   fontWeight: "bold",
   fontFamily: "'Roboto', sans-serif",
-  color: steamText,
+  color: colorMode === "dark" ? darkModeColors.text : lightModeColors.text,
   "@media (max-width: 1380px)": {
     display: "none",
   },
 }));
 
-const BadgeStyled = styled(Badge)(({ theme }) => ({
+const BadgeStyled = styled(Badge)(({ theme, colorMode }) => ({
   "& .MuiBadge-dot": {
-    backgroundColor: steamAccent,
+    backgroundColor:
+      colorMode === "dark" ? darkModeColors.accent : lightModeColors.accent,
   },
   "& .MuiBadge-badge": {
-    color: steamBackground,
-    backgroundColor: steamAccent,
+    color:
+      colorMode === "dark"
+        ? darkModeColors.background
+        : lightModeColors.background,
+    backgroundColor:
+      colorMode === "dark" ? darkModeColors.accent : lightModeColors.accent,
   },
 }));
 
@@ -181,7 +210,11 @@ const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
   <Link to={to} style={{ textDecoration: "none" }}>
     <IconWithSpacing
       style={{
-        backgroundColor: isActive ? steamHover : "transparent",
+        backgroundColor: isActive
+          ? colorMode === "dark"
+            ? darkModeColors.hover
+            : lightModeColors.hover
+          : "transparent",
         borderRadius: "8px",
         padding: "10px",
         transition: "background-color 0.3s",
@@ -192,6 +225,7 @@ const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
           badgeContent={badgeContent}
           overlap="circular"
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          colorMode={colorMode}
         >
           {icon}
         </BadgeStyled>
@@ -239,19 +273,37 @@ const LeftMenu = ({ isMobile }) => {
         <MainContainer colorMode={colorMode}>
           <LogoContainer>
             <Logo src={logo} alt="Logo" style={{ filter: filterStyle }} />
-            <LogoText>The Linkup</LogoText>
+            <LogoText colorMode={colorMode}>The Linkup</LogoText>
           </LogoContainer>
           <MenuList>
             <StyledMenuItemComponent
               to="/home"
-              icon={<HomeIcon style={{ color: steamText }} />}
+              icon={
+                <HomeIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Home"
               location={location.pathname}
               colorMode={colorMode}
             />
             <StyledMenuItemComponent
               to="/notifications"
-              icon={<NotificationsIcon style={{ color: steamText }} />}
+              icon={
+                <NotificationsIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Notifications"
               badgeContent={unreadNotificationsCount}
               colorMode={colorMode}
@@ -259,21 +311,48 @@ const LeftMenu = ({ isMobile }) => {
             />
             <StyledMenuItemComponent
               to="/profile/me"
-              icon={<AccountCircleIcon style={{ color: steamText }} />}
+              icon={
+                <AccountCircleIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Profile"
               colorMode={colorMode}
               location={location.pathname}
             />
             <StyledMenuItemComponent
               to="/history"
-              icon={<HistoryIcon style={{ color: steamText }} />}
+              icon={
+                <HistoryIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Linkups"
               colorMode={colorMode}
               location={location.pathname}
             />
             <StyledMenuItemComponent
               to="/messages"
-              icon={<MessageIcon style={{ color: steamText }} />}
+              icon={
+                <MessageIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Messages"
               badgeContent={unreadMessagesCount}
               colorMode={colorMode}
@@ -281,7 +360,16 @@ const LeftMenu = ({ isMobile }) => {
             />
             <StyledMenuItemComponent
               to="/settings"
-              icon={<SettingsIcon style={{ color: steamText }} />}
+              icon={
+                <SettingsIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
               text="Settings"
               colorMode={colorMode}
               location={location.pathname}
@@ -296,39 +384,92 @@ const LeftMenu = ({ isMobile }) => {
         <FooterContainer colorMode={colorMode}>
           <FooterMenuButton
             to="/home"
-            icon={<HomeIcon style={{ color: steamText }} />}
+            icon={
+              <HomeIcon
+                style={{
+                  color:
+                    colorMode === "dark"
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+              />
+            }
             isActive={location.pathname === "/home"}
+            colorMode={colorMode}
           />
           <FooterMenuButton
             to="/notifications"
             icon={
               <Badge badgeContent={unreadNotificationsCount} color="error">
-                <NotificationsIcon style={{ color: steamText }} />
+                <NotificationsIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
               </Badge>
             }
             isActive={location.pathname === "/notifications"}
+            colorMode={colorMode}
           />
           <FooterMenuButton
             to="/profile/me"
-            icon={<AccountCircleIcon style={{ color: steamText }} />}
+            icon={
+              <AccountCircleIcon
+                style={{
+                  color:
+                    colorMode === "dark"
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+              />
+            }
             isActive={location.pathname === "/profile/me"}
+            colorMode={colorMode}
           />
           <FooterMenuButton
             to="/history"
-            icon={<HistoryIcon style={{ color: steamText }} />}
+            icon={
+              <HistoryIcon
+                style={{
+                  color:
+                    colorMode === "dark"
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+              />
+            }
             isActive={location.pathname === "/history"}
+            colorMode={colorMode}
           />
           <FooterMenuButton
             to="/messages"
             icon={
               <Badge badgeContent={unreadMessagesCount} color="error">
-                <MessageIcon style={{ color: steamText }} />
+                <MessageIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
               </Badge>
             }
             isActive={location.pathname === "/messages"}
+            colorMode={colorMode}
           />
           <IconButton onClick={handleMenuOpen}>
-            <MenuIcon style={{ color: steamText }} />
+            <MenuIcon
+              style={{
+                color:
+                  colorMode === "dark"
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            />
           </IconButton>
         </FooterContainer>
       )}
@@ -354,7 +495,15 @@ const LeftMenu = ({ isMobile }) => {
           colorMode={colorMode}
         >
           <IconWithSpacing>
-            <SettingsIcon style={{ marginRight: "6px", color: steamText }} />
+            <SettingsIcon
+              style={{
+                marginRight: "6px",
+                color:
+                  colorMode === "dark"
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            />
             <span>Settings</span>
           </IconWithSpacing>
         </StyledHamburgerMenuItem>
@@ -389,6 +538,7 @@ const StyledMenuItemComponent = ({
               badgeContent={badgeContent}
               overlap="circular"
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              colorMode={colorMode}
             >
               {icon}
             </BadgeStyled>
@@ -396,7 +546,7 @@ const StyledMenuItemComponent = ({
             icon
           )}
         </IconWithSpacing>
-        <IconText>{text}</IconText>
+        <IconText colorMode={colorMode}>{text}</IconText>
       </MenuItemLink>
     </StyledMenuItem>
   );
