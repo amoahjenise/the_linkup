@@ -6,8 +6,6 @@ import { updateUnreadNotificationsCount } from "./redux/actions/notificationActi
 import { setUnreadMessagesCount } from "./redux/actions/messageActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { getUnreadMessagesCount } from "./api/sendbirdAPI";
-import ClerkCustomSignIn from "./sign-in/[[...index]]";
-import ClerkCustomSignUp from "./sign-up/[[...index]]";
 import {
   LandingPage,
   SignupPage,
@@ -26,7 +24,6 @@ import {
 } from "./pages";
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
-import ToggleColorMode from "./components/ToggleColorMode";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import {
@@ -69,8 +66,6 @@ const AppWrapper = styled("div", {
 const RoutesComponent = ({ isMobile, locationState }) => (
   <Routes>
     <Route path="/" exact element={<LandingPage />} />
-    <Route path="/sign-in/*" element={<ClerkCustomSignIn />} />
-    <Route path="/sign-up/*" element={<ClerkCustomSignUp />} />
     <Route path="/registration" element={<SignupPage />} />
     <Route path="/terms-of-service" element={<TermsOfServicePage />} />
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
