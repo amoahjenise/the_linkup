@@ -158,7 +158,7 @@ const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
   display: "inline-block",
 }));
 
-const formatDate = (date) => moment(date).format("dddd MMM D, YYYY • h:mm A");
+const formatDate = (date) => moment(date).format("ddd • MMM D, YYYY • h:mm A");
 
 const capitalizeLocation = (location) =>
   location
