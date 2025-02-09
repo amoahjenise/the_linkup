@@ -282,26 +282,6 @@ const CreateLinkupWidget = ({
               </Typography>
             }
             arrow
-            PopperProps={{
-              modifiers: [
-                {
-                  name: "zIndex",
-                  enabled: true,
-                  options: {
-                    zIndex: 2500, // Ensure it's above other elements
-                  },
-                },
-              ],
-              sx: {
-                "& .MuiTooltip-tooltip": {
-                  backgroundColor: colorMode === "dark" ? "#181717" : "#f0f0f0",
-                  color: colorMode === "dark" ? "#ffffff" : "#333333",
-                  border: "1px solid #b3b3b3",
-                },
-              },
-            }}
-            disableHoverListener
-            disableTouchListener={false}
           >
             <InfoIconStyled size="large">
               <InfoIcon />
