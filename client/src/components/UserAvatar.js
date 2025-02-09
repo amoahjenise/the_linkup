@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 const ClickableAvatar = styled(Avatar)(({ theme }) => ({
   borderRadius: "50%",
   objectFit: "cover",
-  marginRight: "1.25rem",
+  // marginRight: "1.25rem",
   border: `2px solid ${theme.palette.common.white}`, // White border
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   cursor: "pointer",

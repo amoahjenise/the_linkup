@@ -112,8 +112,9 @@ const PostContent = styled("div")(({ theme, colorMode }) => ({
 
   // Date/Time style
   "& div:first-of-type": {
-    fontWeight: "450", // Semi-bold
-    color: colorMode === "light" ? "#616871" : "#c3c4c4",
+    fontWeight: "350", // Semi-bold
+    color: colorMode === "light" ? "#616871" : "white",
+    marginBottom: "4px",
   },
 
   // Post Text style
