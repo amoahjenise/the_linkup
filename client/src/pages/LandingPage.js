@@ -135,37 +135,55 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 
 const StyledButton = styled(SignUpButton)(({ theme }) => ({
   textTransform: "none",
-  padding: theme.spacing(1, 3),
-  backgroundColor: "#FFFFFF",
-  color: "#00796B",
-  "&:hover": {
-    backgroundColor: "#FFEBEE",
-  },
+  padding: theme.spacing(1.5, 4),
+  fontSize: "1rem",
+  fontWeight: "bold",
+  background: "linear-gradient(45deg, #00796B, #004D40)",
+  color: "#FFFFFF",
   borderRadius: "30px",
-  marginRight: theme.spacing(1),
-  marginTop: theme.spacing(2),
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: "0 6px 8px rgba(0, 0, 0, 0.3)",
+    background: "linear-gradient(45deg, #004D40, #00796B)",
+  },
+  margin: theme.spacing(1, 0),
   [theme.breakpoints.down("sm")]: {
     width: "100%", // Full width button for smaller screens
-    marginRight: 0, // Remove right margin for better mobile alignment
   },
 }));
 
 const OutlinedButton = styled(SignInButton)(({ theme }) => ({
   textTransform: "none",
-  padding: theme.spacing(1, 3),
+  padding: theme.spacing(1.5, 4),
+  fontSize: "1rem",
+  fontWeight: "bold",
   color: "#FFFFFF",
-  border: "2px solid #FFFFFF", // Set the border to create an outlined effect
+  border: "2px solid #FFFFFF",
   borderRadius: "30px",
-  backgroundColor: "transparent", // Transparent background for outlined look
-  transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effects
+  background:
+    "linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(164, 122, 15, 0.75))", // Subtle gradient
+  transition:
+    "background-color 0.3s ease, color 0.3s ease, transform 0.3s ease",
   "&:hover": {
-    borderColor: "#FFEBEE",
+    backgroundColor: "linear-gradient(45deg, #004D40, #00796B)",
     color: "#FFEBEE",
-    backgroundColor: "rgba(255, 255, 255, 0.1)", // Slight background color on hover
+    transform: "translateY(-2px)",
   },
-  marginTop: theme.spacing(2),
+  margin: theme.spacing(1, 0),
   [theme.breakpoints.down("sm")]: {
     width: "100%", // Full width button for smaller screens
+  },
+}));
+
+const ButtonContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2), // Add space between buttons
+  marginTop: theme.spacing(3),
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width container for smaller screens
   },
 }));
 
@@ -211,10 +229,22 @@ const LandingPage = () => {
             </a>
             .
           </Typography>
-          <div style={{ marginTop: "20px" }}>
-            <StyledButton variant="contained" size="large" />
-            <OutlinedButton variant="outlined" size="large" />
-          </div>
+          <ButtonContainer>
+            <StyledButton
+              forceRedirectUrl="/registration" // Redirect to /registration after signing up
+              fallbackRedirectUrl="/registration"
+              mode="modal"
+            >
+              Sign Up
+            </StyledButton>
+            <OutlinedButton
+              forceRedirectUrl="/home" // Redirect to /home after signing in
+              fallbackRedirectUrl="/home"
+              mode="modal"
+            >
+              Sign In
+            </OutlinedButton>
+          </ButtonContainer>
         </LeftColumn>
 
         <RightColumn>
