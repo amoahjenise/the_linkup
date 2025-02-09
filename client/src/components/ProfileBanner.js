@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { Typography, Box } from "@mui/material";
-import banner from "../assets/Banner.jpg"; // Import the local banner image
+import banner from "../assets/Banner2.jpg"; // Import the local banner image
 
 // Styled ProfileBannerContainer with responsive design
 const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
@@ -12,7 +12,7 @@ const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
   height: "360px",
   background:
     colorMode === "light"
-      ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 49%, transparent 79%), url(${banner})`
+      ? `linear-gradient(to right, rgba(0, 0, 0, 0.95) 49%, transparent 85%), url(${banner})`
       : `linear-gradient(to right, rgba(0, 0, 0, 0.98) 48%, transparent 70%), url(${banner})`,
   backgroundSize: "cover",
   backgroundPosition: "center top",
