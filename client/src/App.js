@@ -127,6 +127,7 @@ const RoutesComponent = ({ isMobile, locationState }) => (
     />
     <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
     <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/Error" element={<ErrorPage />} />
   </Routes>
 );
 
