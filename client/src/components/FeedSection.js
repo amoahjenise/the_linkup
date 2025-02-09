@@ -9,6 +9,12 @@ import NewLinkupButton from "./NewLinkupButton";
 
 const Root = styled("div")({
   position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  borderRadius: "8px", // Subtle rounded corners for the whole feed
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow around the feed container
+  maxWidth: "100vw",
+  minHeight: "100vh",
 });
 
 const LoadingContainer = styled("div")({
