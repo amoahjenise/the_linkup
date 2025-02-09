@@ -50,6 +50,7 @@ const Content = styled("div")({
   display: "flex",
   flexDirection: "column",
   width: "100%",
+  overflowY: "auto", // Allow vertical scrolling only if content overflows
 });
 
 // const ImageSection = styled("div")({
@@ -220,7 +221,7 @@ const UserProfilePage = ({ isMobile }) => {
           ...prevState,
           userData: { ...prevState.userData, ...links },
         }));
-        addSnackbar("Social media links updated successfully!", "success");
+        addSnackbar("Saved", "success");
       } else {
         addSnackbar("Failed to update social media links.", "error");
       }

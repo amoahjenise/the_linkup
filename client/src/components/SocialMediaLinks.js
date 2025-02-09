@@ -41,9 +41,9 @@ const StyledTextField = styled(TextField)(({ textColor, isReadOnly }) => ({
 
 const StyledButton = styled(Button)({
   marginTop: 16,
-  backgroundColor: "#C13584",
+  background: "#0097A7",
   "&:hover": {
-    backgroundColor: "#C11884",
+    background: "#007b86",
   },
   display: "block", // Center the button
   marginLeft: "auto",
@@ -103,7 +103,7 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         {/* Instagram */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Instagram sx={{ color: iconColor }} />
+          <Instagram sx={{ color: "purple" }} />
           {previewMode || !isLoggedUserProfile ? (
             instagramUrl ? (
               <Link
@@ -132,7 +132,7 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
 
         {/* Facebook */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Facebook sx={{ color: iconColor }} />
+          <Facebook sx={{ color: "blue" }} />
           {previewMode || !isLoggedUserProfile ? (
             facebookUrl ? (
               <Link
@@ -192,7 +192,7 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
       {/* Save Button (only show if editable) */}
       {isLoggedUserProfile && !previewMode && (
         <StyledButton variant="contained" onClick={handleSave}>
-          Save Links
+          Save
         </StyledButton>
       )}
     </StyledBox>
