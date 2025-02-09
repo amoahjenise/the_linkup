@@ -152,7 +152,6 @@ const CustomChannelHeader = ({
     isOperator ? linkup?.requester_name : operator?.nickname;
 
   const renderUserData = () => {
-    if (!linkup) return;
     if (isOperator) {
       return {
         id: linkup?.requester_id,
