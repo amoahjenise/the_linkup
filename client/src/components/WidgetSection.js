@@ -6,6 +6,7 @@ import { styled } from "@mui/material/styles";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce"; // Import debounce function from lodash
+import CategoryWidget from "./CategoryWidget";
 
 const WidgetSectionContainer = styled("div")(({ theme }) => ({
   display: "flex",
@@ -35,11 +36,7 @@ const WidgetSection = ({
       setLoading(true);
       try {
         const response = await searchLinkups(value, userId, gender);
-        dispatch({
-          type: "FETCH_LINKUPS_SUCCESS",
-          payload: response.linkupList,
-          successMessage: "Linkups fetched successfully.",
-        });
+        dispatch(fetchLinkupsSuccess(response.linkupList));
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
@@ -51,6 +48,11 @@ const WidgetSection = ({
   // Function to handle input change and trigger search
   const handleInputChange = (event) => {
     debounceSearchRef.current(event.target.value);
+  };
+
+  const handleFilterChange = (selectedCategories) => {
+    console.log("Selected Categories:", selectedCategories);
+    // Apply filter logic to the feed based on selectedCategories
   };
 
   return (
@@ -68,6 +70,10 @@ const WidgetSection = ({
           scrollToTopCallback={scrollToTopCallback}
         />
       </Widget>
+
+      {/* <Widget>
+        <CategoryWidget onFilterChange={handleFilterChange} />
+      </Widget> */}
     </WidgetSectionContainer>
   );
 };

@@ -8,6 +8,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 import nlp from "compromise";
 import UserAvatar from "./UserAvatar";
+import { darken } from "@mui/system";
 
 const compromise = nlp;
 
@@ -65,7 +66,7 @@ const Status = styled(Typography)(({ theme, statusColor }) => ({
   border: `1px solid ${theme.palette.divider}`, // Border for a sharper outline
   transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transitions
   "&:hover": {
-    backgroundColor: theme.palette.action.hover, // Light hover effect for interaction feedback
+    backgroundColor: darken(statusColor.background, 0.1), // Slightly darker on hover
     color: statusColor.hoverColor || statusColor.color, // Optional hover color
   },
   width: "50%",
@@ -151,6 +152,7 @@ const CustomChannelHeader = ({
     isOperator ? linkup?.requester_name : operator?.nickname;
 
   const renderUserData = () => {
+    if (!linkup) return;
     if (isOperator) {
       return {
         id: linkup?.requester_id,

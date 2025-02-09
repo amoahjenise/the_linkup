@@ -41,7 +41,18 @@ const FeedSection = ({
   const ageRange = settings?.ageRange || [18, 99];
 
   // Function to filter linkups based on settings
-  const filteredLinkups = linkupList || []; // If no settings exist, return the full list
+  const filteredLinkups = settings
+    ? linkupList.filter((linkup) => {
+        const isWithinDistance =
+          linkup.distance >= distanceRange[0] &&
+          linkup.distance <= distanceRange[1];
+        const isWithinAgeRange =
+          linkup.creator_age >= ageRange[0] &&
+          linkup.creator_age <= ageRange[1];
+
+        return isWithinDistance && isWithinAgeRange;
+      })
+    : linkupList; // If no settings exist, return the full list
 
   return (
     <Root>
