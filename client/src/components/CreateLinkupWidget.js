@@ -241,6 +241,8 @@ const CreateLinkupWidget = ({
     })),
   ];
 
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
   return (
     <WidgetContainer colorMode={colorMode}>
       <style>
@@ -281,7 +283,26 @@ const CreateLinkupWidget = ({
                 trusted individuals.
               </Typography>
             }
+            open={tooltipOpen}
+            onMouseEnter={() => setTooltipOpen(true)}
+            onMouseLeave={() => setTooltipOpen(false)}
+            onTouchStart={() => setTooltipOpen(true)} // Open on touch
+            onClick={() => setTooltipOpen((prev) => !prev)} // Toggle on click
             arrow
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: colorMode === "dark" ? "#181717" : "#f0f0f0",
+                  color: colorMode === "dark" ? "#ffffff" : "#333333",
+                  border: "1px solid #b3b3b3",
+                },
+              },
+              popper: {
+                sx: {
+                  zIndex: 20000,
+                },
+              },
+            }}
           >
             <InfoIconStyled size="large">
               <InfoIcon />
