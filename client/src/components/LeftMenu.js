@@ -193,16 +193,14 @@ const LogoText = styled("div")(({ theme, colorMode }) => ({
 
 const BadgeStyled = styled(Badge)(({ theme, colorMode }) => ({
   "& .MuiBadge-dot": {
-    backgroundColor:
-      colorMode === "dark" ? darkModeColors.accent : lightModeColors.accent,
+    backgroundColor: theme.palette.error.main,
   },
   "& .MuiBadge-badge": {
     color:
       colorMode === "dark"
         ? darkModeColors.background
         : lightModeColors.background,
-    backgroundColor:
-      colorMode === "dark" ? darkModeColors.accent : lightModeColors.accent,
+    backgroundColor: theme.palette.error.main,
   },
 }));
 
