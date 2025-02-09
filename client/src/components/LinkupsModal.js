@@ -11,13 +11,14 @@ const ModalContainer = styled(Box)(({ theme, colorMode }) => ({
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "90%",
-  maxWidth: "600px",
+  maxWidth: "500px",
   maxHeight: "80vh",
-  overflowY: "auto",
-  backgroundColor: colorMode === "light" ? "#ffffff" : "#333333",
+  overflow: "hidden",
+  backgroundColor: colorMode === "light" ? "#ffffff" : "#222222",
   borderRadius: "12px",
-  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
-  padding: theme.spacing(3),
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+  display: "flex",
+  flexDirection: "column",
   transition: "all 0.3s ease-in-out",
 
   [theme.breakpoints.down("sm")]: {
@@ -31,21 +32,32 @@ const ModalContainer = styled(Box)(({ theme, colorMode }) => ({
   },
 }));
 
+const Header = styled(Box)(({ theme, colorMode }) => ({
+  position: "sticky",
+  top: 0,
+  backgroundColor: colorMode === "light" ? "#ffffff" : "#222222",
+  zIndex: 10,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: theme.spacing(1.5),
+  borderBottom: `1px solid ${colorMode === "light" ? "#ddd" : "#444"}`,
+}));
+
 const CloseButton = styled(IconButton)({
-  position: "absolute",
-  top: 12,
-  right: 12,
-  backgroundColor: "rgba(0,0,0,0.1)",
-  "&:hover": {
-    backgroundColor: "rgba(0,0,0,0.2)",
-  },
+  color: "inherit",
+});
+
+const Content = styled(Box)({
+  flex: 1,
+  overflowY: "auto",
+  padding: "8px 12px", // Reduced padding for tighter layout
 });
 
 const LinkupsModal = ({ userId, open, onClose }) => {
   const { colorMode } = useColorMode();
   const [linkups, setLinkups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const modalRef = useRef(null);
   const startY = useRef(0);
 
   useEffect(() => {
@@ -82,35 +94,40 @@ const LinkupsModal = ({ userId, open, onClose }) => {
   return (
     <Modal open={open} onClose={onClose}>
       <ModalContainer
-        ref={modalRef}
         colorMode={colorMode}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
       >
-        <CloseButton onClick={onClose}>
-          <CloseIcon />
-        </CloseButton>
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{ color: colorMode === "light" ? "#333333" : "white" }}
-        >
-          Created Linkups
-        </Typography>
-        {isLoading ? (
-          <Typography>Loading...</Typography>
-        ) : linkups.length > 0 ? (
-          linkups.map((linkup) => (
-            <LinkupItem
-              key={linkup.id}
-              linkupItem={linkup}
-              setShouldFetchLinkups={() => {}}
-              disableRequest={true}
-            />
-          ))
-        ) : (
-          <Typography>No linkups found.</Typography>
-        )}
+        <Header colorMode={colorMode}>
+          <Typography variant="h6" sx={{ fontSize: "1rem" }}>
+            Created Linkups
+          </Typography>
+          <CloseButton onClick={onClose}>
+            <CloseIcon />
+          </CloseButton>
+        </Header>
+        <Content>
+          {isLoading ? (
+            <Typography>Loading...</Typography>
+          ) : linkups.length > 0 ? (
+            linkups.map((linkup, index) => (
+              <Box
+                key={linkup.id}
+                sx={{
+                  marginBottom: index !== linkups.length - 1 ? "6px" : "0px",
+                }}
+              >
+                <LinkupItem
+                  linkupItem={linkup}
+                  setShouldFetchLinkups={() => {}}
+                  disableRequest={true}
+                />
+              </Box>
+            ))
+          ) : (
+            <Typography>No linkups found.</Typography>
+          )}
+        </Content>
       </ModalContainer>
     </Modal>
   );
