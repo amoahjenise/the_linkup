@@ -38,6 +38,7 @@ const ProfileContent = styled(Box)(({ theme }) => ({
 
 const AvatarContainer = styled(Box)(({ theme }) => ({
   position: "relative",
+  marginRight: "1.25rem",
 }));
 
 const InnerHeaderContainer = styled(Box)(({ theme }) => ({

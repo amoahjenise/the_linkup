@@ -7,7 +7,7 @@ import { useColorMode } from "@chakra-ui/react";
 import logoSrc from "../assets/logo.png";
 import AppDarkMode from "../assets/AppDarkMode.png";
 import AppLightMode from "../assets/AppLightMode.png";
-import Banner from "../assets/Banner.jpg";
+import Wallpaper from "../assets/LandingPageImage.jpg";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 
 // Styled Components
@@ -15,7 +15,7 @@ const PageContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   minHeight: "100vh",
-  background: `url(${Banner}) no-repeat center center fixed`,
+  background: `url(${Wallpaper}) no-repeat center center fixed`,
   backgroundSize: "cover",
   padding: "20px",
 });
@@ -122,15 +122,15 @@ const Title = styled("h1")(({ theme }) => ({
 
 const Subtitle = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(3),
-  fontSize: "1.2rem",
-  color: "#FFFFFF",
+  fontSize: "1.3rem",
+  fontWeight: "600px",
   [theme.breakpoints.up("sm")]: {
     fontSize: "1.3rem",
   },
   [theme.breakpoints.up("md")]: {
     fontSize: "1.6rem",
   },
-  textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
+  textShadow: "2px 2px 10px rgba(0, 0, 0, 0.9)", // Stronger text shadow for better contrast
 }));
 
 const StyledButton = styled(SignUpButton)(({ theme }) => ({
@@ -138,15 +138,15 @@ const StyledButton = styled(SignUpButton)(({ theme }) => ({
   padding: theme.spacing(1.5, 4),
   fontSize: "1rem",
   fontWeight: "bold",
-  background: "linear-gradient(45deg, #00796B, #004D40)",
+  border: "2px solid rgb(255, 255, 255)", // Border to match button text
+  background: "linear-gradient(45deg,rgb(51, 51, 51, 0.7), #5C6BC0)", // Sleek charcoal and slate blue gradient
   color: "#FFFFFF",
   borderRadius: "30px",
   boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease", // Shorter transition for a subtler effect
   "&:hover": {
     transform: "translateY(-2px)",
-    boxShadow: "0 6px 8px rgba(0, 0, 0, 0.3)",
-    background: "linear-gradient(45deg, #004D40, #00796B)",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)", // Subtle shadow change
   },
   margin: theme.spacing(1, 0),
   [theme.breakpoints.down("sm")]: {
@@ -159,16 +159,15 @@ const OutlinedButton = styled(SignInButton)(({ theme }) => ({
   padding: theme.spacing(1.5, 4),
   fontSize: "1rem",
   fontWeight: "bold",
-  color: "#FFFFFF",
-  border: "2px solid #FFFFFF",
+  border: "2px solid rgb(255, 255, 255)", // Border to match button text
   borderRadius: "30px",
   background:
-    "linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(164, 122, 15, 0.75))", // Subtle gradient
+    "linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(63, 81, 181, 0.75))", // Subtle gradient with blue tones
   transition:
     "background-color 0.3s ease, color 0.3s ease, transform 0.3s ease",
   "&:hover": {
-    backgroundColor: "linear-gradient(45deg, #004D40, #00796B)",
-    color: "#FFEBEE",
+    backgroundColor: "linear-gradient(45deg, #4CAF50, #2196F3)", // Match the primary button gradient on hover
+    color: "#FFFFFF", // Change text to white on hover for contrast
     transform: "translateY(-2px)",
   },
   margin: theme.spacing(1, 0),
@@ -213,6 +212,7 @@ const LandingPage = () => {
               marginTop: 2,
               color: "#FFFFFF",
               textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
+              fontSize: "16px",
             }}
           >
             By signing up, you agree to the{" "}
