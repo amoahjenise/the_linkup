@@ -24,7 +24,9 @@ const Container = styled("div")(({ theme }) => ({
   justifyContent: "center",
   width: "100%",
   height: "100%",
-  borderBottom: "1px solid #D3D3D3",
+  borderBottom: "1px solid rgba(130, 131, 129, 0.32)",
+  paddingTop: "24px",
+  paddingBottom: "24px",
 }));
 
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
@@ -375,76 +377,83 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   };
 
   return (
-    <Container>
-      <CardContainer
-        isHovered={isHovered}
-        colorMode={colorMode}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <UserInfo>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <UserAvatar
-              userData={{
-                id: creator_id,
-                name: creator_name,
-                avatar: avatar,
-              }}
-              width="60px"
-              height="60px"
-            />
-            <div>
-              <Name>
-                <UserName>{creator_name}</UserName>
-                <OnlineIndicator isOnline={linkupItem.is_online} />
-              </Name>
-              <PostInfo>
-                <span>{getTimeAgo(created_at)}</span>
-              </PostInfo>
-            </div>
-          </div>
-          <HorizontalMenuContainer>
-            {loggedUser.user.id === linkupItem.creator_id ? (
-              <HorizontalMenu
-                showGoToItem={true}
-                showEditItem={true}
-                showDeleteItem={true}
-                showCloseItem={true}
-                showCheckInLinkup={false}
-                showAcceptLinkupRequest={false}
-                linkupItem={linkupItem}
-                setShouldFetchLinkups={setShouldFetchLinkups}
-                menuAnchor={menuAnchor}
-                setMenuAnchor={setMenuAnchor}
+    <div
+      style={{
+        paddingLeft: "24px",
+        paddingRight: "24px",
+      }}
+    >
+      <Container>
+        <CardContainer
+          isHovered={isHovered}
+          colorMode={colorMode}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <UserInfo>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <UserAvatar
+                userData={{
+                  id: creator_id,
+                  name: creator_name,
+                  avatar: avatar,
+                }}
+                width="60px"
+                height="60px"
               />
-            ) : (
-              <DistanceInfo>
-                {distance && <span>{`${distance} km away`}</span>}
-              </DistanceInfo>
-            )}
-          </HorizontalMenuContainer>
-        </UserInfo>
-        <PostContent colorMode={colorMode}>
-          <div>{formatDate(date)}</div>
-          {renderLinkupItemText()}
-          <div>{capitalizeLocation(location)}</div>
-        </PostContent>
-        <PostActionsContainer>
-          {loggedUser.user.id !== linkupItem.creator_id && (
-            <div>
               <div>
-                <PostActions
-                  paymentOption={linkupItem.payment_option}
-                  onRequestClick={handleRequestLinkup}
-                  disableRequest={disableRequest}
-                />
+                <Name>
+                  <UserName>{creator_name}</UserName>
+                  <OnlineIndicator isOnline={linkupItem.is_online} />
+                </Name>
+                <PostInfo>
+                  <span>{getTimeAgo(created_at)}</span>
+                </PostInfo>
               </div>
             </div>
-          )}
-          <span>{renderPaymentOptionIcon()}</span>
-        </PostActionsContainer>
-      </CardContainer>
-    </Container>
+            <HorizontalMenuContainer>
+              {loggedUser.user.id === linkupItem.creator_id ? (
+                <HorizontalMenu
+                  showGoToItem={true}
+                  showEditItem={true}
+                  showDeleteItem={true}
+                  showCloseItem={true}
+                  showCheckInLinkup={false}
+                  showAcceptLinkupRequest={false}
+                  linkupItem={linkupItem}
+                  setShouldFetchLinkups={setShouldFetchLinkups}
+                  menuAnchor={menuAnchor}
+                  setMenuAnchor={setMenuAnchor}
+                />
+              ) : (
+                <DistanceInfo>
+                  {distance && <span>{`${distance} km away`}</span>}
+                </DistanceInfo>
+              )}
+            </HorizontalMenuContainer>
+          </UserInfo>
+          <PostContent colorMode={colorMode}>
+            <div>{formatDate(date)}</div>
+            {renderLinkupItemText()}
+            <div>{capitalizeLocation(location)}</div>
+          </PostContent>
+          <PostActionsContainer>
+            {loggedUser.user.id !== linkupItem.creator_id && (
+              <div>
+                <div>
+                  <PostActions
+                    paymentOption={linkupItem.payment_option}
+                    onRequestClick={handleRequestLinkup}
+                    disableRequest={disableRequest}
+                  />
+                </div>
+              </div>
+            )}
+            <span>{renderPaymentOptionIcon()}</span>
+          </PostActionsContainer>
+        </CardContainer>
+      </Container>
+    </div>
   );
 };
 
