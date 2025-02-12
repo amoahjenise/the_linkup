@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import {
   Box,
   TextField,
-  Button,
   Typography,
   styled,
   Link,
   Switch,
 } from "@mui/material";
-import { FaXTwitter } from "react-icons/fa6"; // Import X (formerly Twitter) icon
+import { FaXTwitter } from "react-icons/fa6";
 import { Instagram, Facebook } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 
@@ -36,47 +35,65 @@ const StyledTextField = styled(TextField)(({ textColor, isReadOnly }) => ({
     "&:hover fieldset": {
       borderColor: textColor,
     },
+    "&.Mui-focused fieldset": {
+      borderColor: textColor, // Ensure focused state matches the text color
+    },
   },
 }));
 
-const StyledButton = styled(Button)({
-  marginTop: 16,
-  background: "#0097A7",
-  "&:hover": {
-    background: "#007b86",
-  },
-  display: "block", // Center the button
-  marginLeft: "auto",
-  marginRight: "auto",
-});
+const SocialMediaField = ({
+  icon,
+  label,
+  url,
+  setUrl,
+  isEditable,
+  textColor,
+}) => (
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    {icon}
+    {isEditable ? (
+      <StyledTextField
+        fullWidth
+        label={label}
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        InputProps={{ readOnly: !isEditable }}
+        textColor={textColor} // Pass textColor to StyledTextField
+      />
+    ) : url ? (
+      <Link
+        href={url.startsWith("http") ? url : `https://${url}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        color="inherit"
+      >
+        {url}
+      </Link>
+    ) : (
+      <Typography color="gray">No {label} link</Typography>
+    )}
+  </Box>
+);
 
 const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
   const { colorMode } = useColorMode();
-  const [instagramUrl, setInstagramUrl] = useState(
-    userData?.instagram_url || ""
-  );
-  const [facebookUrl, setFacebookUrl] = useState(userData?.facebook_url || "");
-  const [twitterUrl, setTwitterUrl] = useState(userData?.twitter_url || "");
-  const [previewMode, setPreviewMode] = useState(true); // Toggle preview mode
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: userData?.instagram_url || "",
+    facebook: userData?.facebook_url || "",
+    twitter: userData?.twitter_url || "",
+  });
+  const [isEditable, setIsEditable] = useState(false);
 
   const handleSave = () => {
     onSave({
-      instagram_url: instagramUrl,
-      facebook_url: facebookUrl,
-      twitter_url: twitterUrl,
+      instagram_url: socialLinks.instagram,
+      facebook_url: socialLinks.facebook,
+      twitter_url: socialLinks.twitter,
     });
-  };
-
-  const formatUrl = (url) => {
-    if (!url) return null; // Return null if there's no URL
-    return url.startsWith("http://") || url.startsWith("https://")
-      ? url
-      : `https://${url}`;
   };
 
   // Define colors for light and dark modes
   const textColor = colorMode === "light" ? "black" : "white";
-  const iconColor = colorMode === "light" ? "black" : "white";
 
   return (
     <StyledBox>
@@ -86,115 +103,57 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
         </StyledTypography>
         {isLoggedUserProfile && (
           <Box display="flex" alignItems="center">
-            <Typography
-              variant="body2"
-              sx={{ color: textColor, marginRight: 1 }}
-            >
-              {previewMode ? "Edit" : "Preview"}
+            <Typography variant="body2" sx={{ marginRight: 1 }}>
+              {isEditable ? "Save" : "Edit"}
             </Typography>
             <Switch
-              checked={previewMode}
-              onChange={() => setPreviewMode(!previewMode)}
+              checked={isEditable}
+              onChange={() => {
+                if (isEditable) handleSave();
+                setIsEditable(!isEditable);
+              }}
             />
           </Box>
         )}
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {/* Instagram */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Instagram sx={{ color: "purple" }} />
-          {previewMode || !isLoggedUserProfile ? (
-            instagramUrl ? (
-              <Link
-                href={formatUrl(instagramUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-              >
-                {instagramUrl}
-              </Link>
-            ) : (
-              <Typography color="gray">No Instagram link</Typography>
-            )
-          ) : (
-            <StyledTextField
-              fullWidth
-              label="Instagram URL"
-              value={instagramUrl}
-              onChange={(e) => setInstagramUrl(e.target.value)}
-              textColor={textColor}
-              isReadOnly={!isLoggedUserProfile}
-              InputProps={{ readOnly: !isLoggedUserProfile }}
+        <SocialMediaField
+          icon={<Instagram sx={{ color: "purple" }} />}
+          label="Instagram"
+          url={socialLinks.instagram}
+          setUrl={(value) =>
+            setSocialLinks((prev) => ({ ...prev, instagram: value }))
+          }
+          isEditable={isEditable && isLoggedUserProfile}
+          textColor={textColor} // Pass textColor to SocialMediaField
+        />
+        <SocialMediaField
+          icon={<Facebook sx={{ color: "blue" }} />}
+          label="Facebook"
+          url={socialLinks.facebook}
+          setUrl={(value) =>
+            setSocialLinks((prev) => ({ ...prev, facebook: value }))
+          }
+          isEditable={isEditable && isLoggedUserProfile}
+          textColor={textColor} // Pass textColor to SocialMediaField
+        />
+        <SocialMediaField
+          icon={
+            <FaXTwitter
+              size={24}
+              color={colorMode === "light" ? "black" : "white"}
             />
-          )}
-        </Box>
-
-        {/* Facebook */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Facebook sx={{ color: "blue" }} />
-          {previewMode || !isLoggedUserProfile ? (
-            facebookUrl ? (
-              <Link
-                href={formatUrl(facebookUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-              >
-                {facebookUrl}
-              </Link>
-            ) : (
-              <Typography color="gray">No Facebook link</Typography>
-            )
-          ) : (
-            <StyledTextField
-              fullWidth
-              label="Facebook URL"
-              value={facebookUrl}
-              onChange={(e) => setFacebookUrl(e.target.value)}
-              textColor={textColor}
-              isReadOnly={!isLoggedUserProfile}
-              InputProps={{ readOnly: !isLoggedUserProfile }}
-            />
-          )}
-        </Box>
-
-        {/* Twitter */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <FaXTwitter size={24} color={iconColor} />
-          {previewMode || !isLoggedUserProfile ? (
-            twitterUrl ? (
-              <Link
-                href={formatUrl(twitterUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-              >
-                {twitterUrl}
-              </Link>
-            ) : (
-              <Typography color="gray">No X link</Typography>
-            )
-          ) : (
-            <StyledTextField
-              fullWidth
-              label="X URL"
-              value={twitterUrl}
-              onChange={(e) => setTwitterUrl(e.target.value)}
-              textColor={textColor}
-              isReadOnly={!isLoggedUserProfile}
-              InputProps={{ readOnly: !isLoggedUserProfile }}
-            />
-          )}
-        </Box>
+          }
+          label="X (Twitter)"
+          url={socialLinks.twitter}
+          setUrl={(value) =>
+            setSocialLinks((prev) => ({ ...prev, twitter: value }))
+          }
+          isEditable={isEditable && isLoggedUserProfile}
+          textColor={textColor} // Pass textColor to SocialMediaField
+        />
       </Box>
-
-      {/* Save Button (only show if editable) */}
-      {isLoggedUserProfile && !previewMode && (
-        <StyledButton variant="contained" onClick={handleSave}>
-          Save
-        </StyledButton>
-      )}
     </StyledBox>
   );
 };
