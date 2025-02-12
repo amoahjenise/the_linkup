@@ -12,6 +12,7 @@ import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 import LoadingSpinner from "../components/LoadingSpinner";
+import useLocationUpdate from "../hooks/useLocationUpdate";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -109,6 +110,9 @@ const HomePage = ({ isMobile }) => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
+
+  // Call the useLocationUpdate hook in your component
+  useLocationUpdate();
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the Earth in km

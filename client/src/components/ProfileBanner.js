@@ -24,7 +24,7 @@ const ProfileBannerContainer = styled(Box)(({ theme, colorMode }) => ({
   // Responsive layout for smaller screens
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(0, 2),
-    height: "300px",
+    height: "250px",
     gridTemplateColumns: "1fr",
   },
 }));
