@@ -437,7 +437,13 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                   <DistanceInfo>
                     <span>
                       {distanceInKm ? (
-                        `${distanceInKm} km away`
+                        distanceInKm < 0.5 ? (
+                          "< 500m away"
+                        ) : distanceInKm < 1 ? (
+                          "< 1 km away"
+                        ) : (
+                          `${distanceInKm} km away`
+                        )
                       ) : (
                         <CircularProgress size={24} />
                       )}
