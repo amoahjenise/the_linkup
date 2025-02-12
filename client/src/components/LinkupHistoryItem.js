@@ -8,7 +8,7 @@ import {
   CancelOutlined,
 } from "@mui/icons-material";
 import moment from "moment";
-import HorizontalMenu from "./HorizontalMenu";
+import MoreMenu from "./MoreMenu";
 import nlp from "compromise";
 const compromise = nlp;
 
@@ -166,7 +166,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
           height="40px"
         />
         {status === "active" && (
-          <HorizontalMenu
+          <MoreMenu
             showGoToItem={false}
             showEditItem={true}
             showDeleteItem={true}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Popover, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -16,11 +16,11 @@ import {
 } from "../api/linkupRequestAPI";
 
 // Styled components
-const MoreIcon = styled(MoreHorizIcon)(({ theme }) => ({
+const MoreIcon = styled(MoreVertIcon)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-const HorizontalMenu = ({
+const MoreMenu = ({
   showGoToItem,
   showGoToRequest,
   showEditItem,
@@ -281,4 +281,4 @@ const HorizontalMenu = ({
   );
 };
 
-export default HorizontalMenu;
+export default MoreMenu;

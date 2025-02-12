@@ -2,12 +2,13 @@ import React, { useCallback, useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import { Box, Typography, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import HorizontalMenu from "./HorizontalMenu";
+import MoreMenu from "./MoreMenu";
 import moment from "moment";
 import LoadingSpinner from "./LoadingSpinner";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 import nlp from "compromise";
 import UserAvatar from "./UserAvatar";
+import { useNavigate } from "react-router-dom";
 
 const compromise = nlp;
 
@@ -54,6 +55,7 @@ const ActivityText = styled(Typography)(({ theme }) => ({
 const Status = styled(Typography)(({ theme, statusColor }) => ({
   display: "inline-block",
   textAlign: "center",
+  marginTop: "8px",
   padding: theme.spacing(0.5, 1),
   borderRadius: "12px", // Rounded corners for a pill-shaped button
   fontWeight: 600, // Slightly bolder text for emphasis
@@ -65,6 +67,11 @@ const Status = styled(Typography)(({ theme, statusColor }) => ({
   border: `1px solid ${theme.palette.divider}`, // Border for a sharper outline
   transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transitions
   width: "50%",
+  cursor: "pointer",
+  "&:hover": {
+    transform: "scale(1.05)", // Slight zoom on hover
+    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)", // Enhanced shadow on hover
+  },
 }));
 
 const statusColors = {
@@ -85,6 +92,7 @@ const CustomChannelHeader = ({
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
+  const navigate = useNavigate();
 
   const operator = channel?.members?.find(
     (member) => member.role === "operator"
@@ -168,6 +176,10 @@ const CustomChannelHeader = ({
     }
   };
 
+  const handleLinkupStatusClick = () => {
+    navigate("/history/requests-received");
+  };
+
   return (
     <Header>
       {isMobile && (
@@ -184,7 +196,10 @@ const CustomChannelHeader = ({
             <Nickname>{renderName()}</Nickname>
             <ActivityText>{renderLinkupItemText()}</ActivityText>
             {linkup?.request_status && (
-              <Status statusColor={statusColors[linkupRequestStatus] || {}}>
+              <Status
+                onClick={handleLinkupStatusClick}
+                statusColor={statusColors[linkupRequestStatus] || {}}
+              >
                 {linkupRequestStatus}
               </Status>
             )}
@@ -192,7 +207,7 @@ const CustomChannelHeader = ({
         </ChannelInfoContainer>
       )}
       {isOperator && (
-        <HorizontalMenu
+        <MoreMenu
           showGoToItem
           showGoToRequest
           linkupItem={linkup}
