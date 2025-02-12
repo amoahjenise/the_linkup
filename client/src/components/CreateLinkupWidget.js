@@ -30,7 +30,7 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   transition: "box-shadow 0.3s ease, transform 0.3s ease",
   "&:hover": {
     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
-    transform: "translateY(-2px)",
+    // transform: "translateY(-2px)",
   },
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
@@ -376,7 +376,7 @@ const CreateLinkupWidget = ({
           <Dropdown
             value={paymentOption}
             options={[
-              { label: "", value: "" },
+              { label: "No Payment Option", value: "" }, // More intuitive default option
               { label: "Split The Bill", value: "split" },
               { label: "I Will Pay", value: "iWillPay" },
               { label: "Please Pay", value: "pleasePay" },
@@ -386,18 +386,17 @@ const CreateLinkupWidget = ({
             className="w-full md:w-14rem"
             style={{
               width: "100%",
-              border: `1px solid ${
-                colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
-              }`,
+              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
               backgroundColor:
                 colorMode === "dark"
                   ? "rgba(130, 131, 129, 0.1)"
                   : "rgba(130, 131, 129, 0.03)",
-              color: paymentOption.length
+              color: paymentOption
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
                 : "grey",
+              opacity: paymentOption ? 1 : 0.7, // Slightly faded when empty
             }}
           />
         </CustomDropdown>

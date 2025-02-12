@@ -332,7 +332,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
               aria-label="Who's Paying?"
               value={paymentOption}
               options={[
-                { label: "", value: "" },
+                { label: "No Payment Option", value: "" },
                 { label: "Split The Bill", value: "split" },
                 { label: "I Will Pay", value: "iWillPay" },
                 { label: "Please Pay", value: "pleasePay" },
