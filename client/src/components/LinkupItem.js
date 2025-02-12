@@ -13,6 +13,7 @@ import nlp from "compromise";
 import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
 import EmojiTooltip from "./EmojiTooltip";
 import { Tooltip } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 const compromise = nlp;
 
@@ -101,6 +102,9 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   fontSize: "0.8rem",
   fontFamily:
     '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', // Updated font
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.75rem", // Adjust font size for mobile
+  },
 }));
 
 const PostContent = styled("div")(({ theme, colorMode }) => ({
@@ -166,16 +170,10 @@ const capitalizeLocation = (location) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-const capitalizeFirstLetter = (string) => {
-  if (!string) return "";
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
 const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const { colorMode } = useColorMode(); // Use useColorMode hook
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-  const [distance, setDistance] = useState(null);
   const loggedUser = useSelector((state) => state.loggedUser);
   const {
     id,
@@ -192,51 +190,46 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const { addSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth's radius in kilometers
-      const dLat = degreesToRadians(lat2 - lat1);
-      const dLon = degreesToRadians(lon2 - lon1);
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
 
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(degreesToRadians(lat1)) *
-          Math.cos(degreesToRadians(lat2)) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(degreesToRadians(lat1)) *
+        Math.cos(degreesToRadians(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
 
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-      return R * c; // Distance in kilometers
-    }
+    return R * c; // Distance in kilometers
+  };
 
-    function degreesToRadians(degrees) {
-      return degrees * (Math.PI / 180);
-    }
+  const degreesToRadians = (degrees) => degrees * (Math.PI / 180);
+  // Ensure the logged user has valid latitude/longitude values
+  const useDistance = (latitude, longitude) => {
+    const [distance, setDistance] = useState(null);
 
-    const fetchUserLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLat = position.coords.latitude;
-            const userLon = position.coords.longitude;
-            const dist = calculateDistance(
-              userLat,
-              userLon,
-              latitude,
-              longitude
-            );
-            setDistance(dist.toFixed(0)); // Set distance with 2 decimal places
-          },
-          (error) => {
-            console.error("Error fetching user's location:", error);
-          }
-        );
+    useEffect(() => {
+      if (loggedUser?.user?.latitude && loggedUser?.user?.longitude) {
+        const userLat = loggedUser.user.latitude;
+        const userLon = loggedUser.user.longitude;
+
+        if (latitude && longitude) {
+          const dist = calculateDistance(userLat, userLon, latitude, longitude);
+          setDistance(dist.toFixed(0)); // Set distance with 0 decimal places
+        } else {
+          setDistance(null); // Handle cases where distance can't be calculated
+        }
       }
-    };
+    }, [latitude, longitude]);
 
-    fetchUserLocation();
-  }, [latitude, longitude]);
+    return distance;
+  };
+
+  const distanceInKm = useDistance(latitude, longitude); // Use the distance hook
 
   const renderPaymentOptionIcon = () => {
     switch (linkupItem.payment_option) {
@@ -442,7 +435,13 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                   />
                 ) : (
                   <DistanceInfo>
-                    {distance && <span>{`${distance} km away`}</span>}
+                    <span>
+                      {distanceInKm ? (
+                        `${distanceInKm} km away`
+                      ) : (
+                        <CircularProgress size={24} />
+                      )}
+                    </span>
                   </DistanceInfo>
                 )}
               </HorizontalMenuContainer>
