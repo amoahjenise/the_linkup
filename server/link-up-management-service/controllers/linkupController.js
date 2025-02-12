@@ -221,6 +221,16 @@ const updateLinkup = async (req, res) => {
     const { rows } = await pool.query(query, updateLinkupQueryValues);
 
     if (rows.length > 0) {
+      const updatedLinkup = rows[0];
+
+      // Emit the event to all connected users
+      if (socketIo) {
+        socketIo.emit("linkupUpdated", {
+          id: updatedLinkup.id,
+          linkup: updatedLinkup,
+        });
+      }
+
       res.json({
         success: true,
         message: "Linkup updated successfully",
