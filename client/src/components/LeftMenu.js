@@ -439,7 +439,11 @@ const LeftMenu = ({ isMobile }) => {
                 }}
               />
             }
-            isActive={location.pathname === "/history"}
+            isActive={
+              location.pathname === "/history" ||
+              location.pathname === "/history/requests-sent" ||
+              location.pathname === "/history/requests-received"
+            }
             colorMode={colorMode}
           />
           <FooterMenuButton
@@ -526,7 +530,12 @@ const StyledMenuItemComponent = ({
   location,
   colorMode,
 }) => {
-  const isActive = location === to;
+  const isActive =
+    location === to ||
+    (to === "/history" &&
+      (location === "/history" ||
+        location === "/history/requests-sent" ||
+        location === "/history/requests-received"));
   return (
     <StyledMenuItem isActive={isActive} colorMode={colorMode}>
       <MenuItemLink to={to}>

@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import moment from "moment";
 import UserAvatar from "./UserAvatar";
-import HorizontalMenu from "./HorizontalMenu";
+import MoreMenu from "./MoreMenu";
 import PostActions from "./PostActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkUpAPI";
@@ -67,7 +67,7 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   cursor: "pointer",
 }));
 
-const HorizontalMenuContainer = styled("div")(({ theme }) => ({
+const MoreMenuContainer = styled("div")(({ theme }) => ({
   marginLeft: "auto",
 }));
 
@@ -419,9 +419,9 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 justifyContent: "center",
               }}
             >
-              <HorizontalMenuContainer>
+              <MoreMenuContainer>
                 {loggedUser.user.id === linkupItem.creator_id ? (
-                  <HorizontalMenu
+                  <MoreMenu
                     showGoToItem={true}
                     showEditItem={true}
                     showDeleteItem={true}
@@ -444,7 +444,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                     </span>
                   </DistanceInfo>
                 )}
-              </HorizontalMenuContainer>
+              </MoreMenuContainer>
               <div
                 style={{
                   display: "flex",
