@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { fetchLocation } from "../redux/reducers/locationSlice";
 import { postLocation } from "../api/locationAPI";
