@@ -118,6 +118,7 @@ const LinkupsModal = ({ userId, open, onClose }) => {
                 }}
               >
                 <LinkupItem
+                  key={linkup.id}
                   linkupItem={linkup}
                   setShouldFetchLinkups={() => {}}
                   disableRequest={true}

@@ -180,7 +180,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   const {
     id,
     creator_id,
-    name,
+    creator_name,
     activity,
     created_at,
     date,
@@ -334,7 +334,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     return (
       <p>
         <Link to={`/profile/${creator_id}`} className={UserName}>
-          {name}
+          {creator_name}
         </Link>
         {" is trying to link up " + activityFormatted + "."}
       </p>
@@ -388,7 +388,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             <div style={{ flex: 2, marginRight: "1rem" }}>
               <UserInfo>
                 <Name>
-                  <UserName>{name}</UserName>
+                  <UserName>{creator_name}</UserName>
                   <OnlineIndicator isOnline={linkupItem.is_online} />
                 </Name>
               </UserInfo>
@@ -457,7 +457,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 <UserAvatar
                   userData={{
                     id: creator_id,
-                    name: name,
+                    name: creator_name,
                     avatar: avatar,
                   }}
                   width="80px"
