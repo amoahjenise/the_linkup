@@ -210,7 +210,7 @@ const UserProfilePage = ({ isMobile }) => {
 
       if (!hasChanges) {
         // If no changes, show a snackbar and return early
-        addSnackbar("No changes detected.", "info");
+        // addSnackbar("No changes detected.", "info");
         return;
       }
 
