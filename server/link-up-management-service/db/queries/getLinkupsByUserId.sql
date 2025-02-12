@@ -1,4 +1,12 @@
-SELECT link_ups.*, users.avatar
+SELECT 
+    link_ups.*, 
+    users.avatar,
+    users.name,
+    users.avatar,
+    users.is_online,
+    users.latitude,
+    users.longitude,
+    users.date_of_birth
 FROM link_ups
 INNER JOIN users ON link_ups.creator_id = users.id
 WHERE link_ups.creator_id = $1
