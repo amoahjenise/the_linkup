@@ -5,9 +5,9 @@ import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useColorMode } from "@chakra-ui/react";
 import logoSrc from "../assets/logo.png";
-import AppDarkMode from "../assets/AppDarkMode.png";
-import AppLightMode from "../assets/AppLightMode.png";
-import Wallpaper from "../assets/LandingPageImage.jpg";
+import AppDarkMode from "../assets/LandingPagePreview.png";
+import AppLightMode from "../assets/LandingPagePreview.png";
+import Wallpaper from "../assets/Image1.jpg";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 
 // Styled Components
@@ -81,7 +81,7 @@ const RightColumn = styled("div")(({ theme }) => ({
 }));
 
 const ResponsiveImage = styled("img")(({ theme }) => ({
-  maxHeight: "500px", // Limit the maximum height
+  maxHeight: "275px", // Limit the maximum height
   width: "auto", // Maintain the aspect ratio
   maxWidth: "100%", // Prevent overflow while allowing it to be responsive
   borderRadius: "8px", // Softer corners
