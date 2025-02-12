@@ -76,17 +76,7 @@ const RoutesComponent = ({ isMobile, locationState }) => (
     />
     <Route
       path="/home"
-      element={
-        locationState.allow_location &&
-        locationState.city &&
-        locationState.country ? (
-          <HomePage isMobile={isMobile} />
-        ) : locationState ? (
-          <Geolocation />
-        ) : (
-          <></>
-        )
-      }
+      element={<HomePage isMobile={isMobile} />}
       // element={
       //   locationState.allow_location &&
       //   locationState.city &&

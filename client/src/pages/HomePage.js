@@ -11,6 +11,7 @@ import { IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -105,6 +106,7 @@ const HomePage = ({ isMobile }) => {
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
 
@@ -198,6 +200,7 @@ const HomePage = ({ isMobile }) => {
       } finally {
         // Ensure fetching state is reset
         setIsFetchingNextPage(false);
+        setIsLoading(false); // Set loading to false after fetching
       }
     },
     [dispatch, fetchedLinkupIds, gender, latitude, longitude, userId]
@@ -220,18 +223,30 @@ const HomePage = ({ isMobile }) => {
   }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
 
   useEffect(() => {
-    if (shouldFetchLinkups) {
+    if (loggedUser.user.id) {
+      setShouldFetchLinkups(true);
+    }
+  }, [loggedUser]);
+
+  useEffect(() => {
+    if (userId && shouldFetchLinkups) {
       fetchLinkupsAndPoll(1);
       setShouldFetchLinkups(false);
     }
-  }, [fetchLinkupsAndPoll, shouldFetchLinkups]);
+  }, [fetchLinkupsAndPoll, shouldFetchLinkups, userId]);
 
   useEffect(() => {
     const scrollContainer = feedSectionRef.current;
-    scrollContainer.addEventListener("scroll", handleScroll);
-    return () => {
-      scrollContainer.removeEventListener("scroll", handleScroll);
-    };
+
+    // Check if the scroll container exists before adding the event listener
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+
+      // Clean up the event listener when the component unmounts
+      return () => {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      };
+    }
   }, [handleScroll]);
 
   const fetchLinkupRequests = useCallback(async () => {
@@ -289,15 +304,21 @@ const HomePage = ({ isMobile }) => {
     };
   }, []);
 
+  if (isLoading) {
+    return <LoadingSpinner />; // Show loading state until userId is available
+  }
+
   return (
     <StyledDiv className={classes.homePage} colorMode={colorMode}>
       <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
-        <FeedSection
-          linkupList={linkupList}
-          isLoading={isFetchingNextPage}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          onRefreshClick={refreshLinkups}
-        />
+        {userId && (
+          <FeedSection
+            linkupList={linkupList}
+            isLoading={isFetchingNextPage}
+            setShouldFetchLinkups={setShouldFetchLinkups}
+            onRefreshClick={refreshLinkups}
+          />
+        )}
       </StyledDiv>
       <StyledDiv
         className={`${classes.widgetSection} ${

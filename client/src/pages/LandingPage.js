@@ -110,7 +110,7 @@ const Footer = styled("footer")(({ theme }) => ({
 const Title = styled("h1")(({ theme }) => ({
   fontSize: "2rem",
   fontWeight: "bold",
-  color: "#FFFFFF",
+  color: "white",
   [theme.breakpoints.up("sm")]: {
     fontSize: "2.5rem",
   },
@@ -121,6 +121,7 @@ const Title = styled("h1")(({ theme }) => ({
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
+  color: "white",
   marginTop: theme.spacing(3),
   fontSize: "1.3rem",
   fontWeight: "600px",
@@ -161,6 +162,7 @@ const OutlinedButton = styled(SignInButton)(({ theme }) => ({
   fontWeight: "bold",
   border: "2px solid rgb(255, 255, 255)", // Border to match button text
   borderRadius: "30px",
+  color: "#FFFFFF",
   background:
     "linear-gradient(45deg, rgba(255, 255, 255, 0.5), rgba(63, 81, 181, 0.75))", // Subtle gradient with blue tones
   transition:
