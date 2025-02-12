@@ -16,6 +16,7 @@ export const SocketProvider = ({ children }) => {
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
+  const userGender = loggedUser?.user?.gender;
 
   const BASE_URL = process.env.REACT_APP_BACKEND_URL;
   const LINKUP_MANAGEMENT_SOCKET_NAMESPACE =
@@ -45,12 +46,26 @@ export const SocketProvider = ({ children }) => {
     requestNotificationPermission(); // Request notification permission on mount
 
     linkupManagementSocket.on("linkupCreated", (data) => {
+      // Check if the linkup creator is the current user and if the user's gender is not in the gender preference
+      if (
+        data.linkup.creator_id === userId ||
+        !data.linkup.gender_preference.includes(userGender)
+      )
+        return; // Don't show the button if the gender is not matched
+      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
+    });
+
+    linkupManagementSocket.on("linkupUpdated", (data) => {
       if (data.linkup.creator_id === userId) return;
       dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupDeleted", (data) => {
-      if (data.linkup.creator_id === userId) return;
+      if (
+        data.linkup.creator_id === userId ||
+        !data.linkup.gender_preference.includes(userGender)
+      )
+        return; // Don't show the button if the gender is not matched
       dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
@@ -88,6 +103,7 @@ export const SocketProvider = ({ children }) => {
     addSnackbar,
     dispatch,
     userId,
+    userGender,
     linkupManagementSocket,
     linkupRequestSocket,
   ]);
