@@ -37,7 +37,6 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
-import Geolocation from "./components/Geolocation";
 
 const publicPages = [
   "/",
@@ -63,7 +62,7 @@ const AppWrapper = styled("div", {
   }),
 }));
 
-const RoutesComponent = ({ isMobile, locationState }) => (
+const RoutesComponent = ({ isMobile }) => (
   <Routes>
     <Route path="/" exact element={<LandingPage />} />
     <Route path="/registration" element={<SignupPage />} />
@@ -74,31 +73,7 @@ const RoutesComponent = ({ isMobile, locationState }) => (
       path="/data-deletion-instructions"
       element={<UserDataDeletionPage />}
     />
-    <Route
-      path="/home"
-      element={
-        locationState.allow_location &&
-        locationState.city &&
-        locationState.country ? (
-          <HomePage isMobile={isMobile} />
-        ) : locationState ? (
-          <Geolocation />
-        ) : (
-          <></>
-        )
-      }
-      // element={
-      //   locationState.allow_location &&
-      //   locationState.city &&
-      //   locationState.country ? (
-      //     <HomePage isMobile={isMobile} />
-      //   ) : locationState ? (
-      //     <Geolocation />
-      //   ) : (
-      //     <></>
-      //   )
-      // }
-    />
+    <Route path="/home" element={<HomePage isMobile={isMobile} />} />
     <Route path="/notifications" element={<NotificationsPage />} />
     <Route
       path="/profile/:id"
@@ -135,7 +110,6 @@ const App = () => {
   const dispatch = useDispatch();
   const { isSignedIn } = useSession();
   const userState = useSelector((state) => state.loggedUser);
-  const locationState = useSelector((state) => state.location);
   const { isRegistering } = useSelector((state) => state.registration);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isSigningOut } = useSelector((state) => state.logout);
@@ -275,11 +249,7 @@ const App = () => {
               <LeftMenu isMobile={isMobile} />
             )}
             {publicPages.includes(window.location.pathname) ? (
-              <RoutesComponent
-                isMobile={isMobile}
-                locationState={locationState}
-                userState={userState}
-              />
+              <RoutesComponent isMobile={isMobile} userState={userState} />
             ) : (
               <>
                 <SignedIn>
@@ -288,7 +258,6 @@ const App = () => {
                   ) : (
                     <RoutesComponent
                       isMobile={isMobile}
-                      locationState={locationState}
                       userState={userState}
                     />
                   )}

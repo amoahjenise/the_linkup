@@ -26,13 +26,14 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
   borderRadius: "24px",
   borderWidth: "1px",
-  transition: "box-shadow 0.3s ease",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+  transition: "box-shadow 0.3s ease, transform 0.3s ease",
+  "&:hover": {
+    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+    // transform: "translateY(-2px)",
+  },
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
-  color: theme.palette.text.primary,
-  "&:hover": {
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-  },
   backgroundColor: colorMode === "dark" ? "rgba(200, 200, 200, 0.1)" : "white",
 }));
 
@@ -375,7 +376,7 @@ const CreateLinkupWidget = ({
           <Dropdown
             value={paymentOption}
             options={[
-              { label: "", value: "" },
+              { label: "No Payment Option", value: "" }, // More intuitive default option
               { label: "Split The Bill", value: "split" },
               { label: "I Will Pay", value: "iWillPay" },
               { label: "Please Pay", value: "pleasePay" },
@@ -385,18 +386,17 @@ const CreateLinkupWidget = ({
             className="w-full md:w-14rem"
             style={{
               width: "100%",
-              border: `1px solid ${
-                colorMode === "dark" ? "#4a4a4a" : "#ddd" // Hardcoded a light color if no theme is available
-              }`,
+              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
               backgroundColor:
                 colorMode === "dark"
                   ? "rgba(130, 131, 129, 0.1)"
                   : "rgba(130, 131, 129, 0.03)",
-              color: genderPreference.length
+              color: paymentOption
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
                 : "grey",
+              opacity: paymentOption ? 1 : 0.7, // Slightly faded when empty
             }}
           />
         </CustomDropdown>

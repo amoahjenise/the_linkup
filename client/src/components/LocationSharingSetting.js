@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { FormControlLabel, Switch } from "@mui/material";
 import { updateLocationSharing } from "../redux/reducers/locationSlice";
-import useLocationUpdate from "../utils/useLocationUpdate";
+import useLocationUpdate from "../hooks/useLocationUpdate";
 
 // Styled Components
 const Section = styled("div")(({ theme }) => ({
