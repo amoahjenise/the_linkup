@@ -4,22 +4,22 @@ import { useColorMode } from "@chakra-ui/react";
 
 // Sample categories (you can replace this with your own data)
 const categories = [
-  { id: 1, name: "Sports", color: "#FF6B6B" },
-  { id: 2, name: "Music", color: "#4ECDC4" },
-  { id: 3, name: "Food", color: "#FFD166" },
-  { id: 4, name: "Tech", color: "#6B5B95" },
-  { id: 5, name: "Travel", color: "#45B7D5" },
-  { id: 6, name: "Art", color: "#D4A5A5" },
-  { id: 7, name: "Fitness", color: "#FF8C42" },
-  { id: 8, name: "Gaming", color: "#7E57C2" },
-  { id: 9, name: "Networking", color: "#2E86AB" },
-  { id: 10, name: "Outdoor Adventures", color: "#00897B" },
-  { id: 11, name: "Parties & Nightlife", color: "#D81159" },
-  { id: 12, name: "Events", color: "#FF9F1C" },
-  { id: 13, name: "Movies", color: "#FF6F61" },
-  { id: 14, name: "Wellness & Meditation", color: "#A2C5AC" },
-  { id: 15, name: "Business & Entrepreneurship", color: "#FFB400" },
-  { id: 16, name: "Photography", color: "#00B8D4" },
+  { id: 1, name: "Sports", color: "#0097A7" },
+  { id: 2, name: "Music", color: "#0097A7" },
+  { id: 3, name: "Food", color: "#0097A7" },
+  { id: 4, name: "Tech", color: "#0097A7" },
+  { id: 5, name: "Travel", color: "#0097A7" },
+  { id: 6, name: "Art", color: "#0097A7" },
+  { id: 7, name: "Fitness", color: "#0097A7" },
+  { id: 8, name: "Gaming", color: "#0097A7" },
+  { id: 9, name: "Networking", color: "#0097A7" },
+  { id: 10, name: "Outdoor Adventures", color: "#0097A7" },
+  { id: 11, name: "Parties & Nightlife", color: "#0097A7" },
+  { id: 12, name: "Events", color: "#0097A7" },
+  { id: 13, name: "Movies", color: "#0097A7" },
+  { id: 14, name: "Wellness & Meditation", color: "#0097A7" },
+  { id: 15, name: "Business & Entrepreneurship", color: "#0097A7" },
+  { id: 16, name: "Photography", color: "#0097A7" },
 ];
 
 const CategoryWidget = ({ onFilterChange }) => {
