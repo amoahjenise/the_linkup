@@ -36,8 +36,8 @@ const MobileContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "calc(100vh - 60px)", // Adjust height to account for footer
-  paddingBottom: "60px", // Add padding to avoid overlap with footer
+  height: "100%", // Adjust height to account for footer
+  // paddingBottom: "60px", // Add padding to avoid overlap with footer
 }));
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({

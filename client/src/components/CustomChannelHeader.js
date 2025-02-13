@@ -23,6 +23,7 @@ const Header = styled(Box)(({ theme }) => ({
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
   top: 0,
   position: "sticky",
+  overflowY: "hidden",
 }));
 
 const BackButton = styled(IconButton)(({ theme }) => ({
