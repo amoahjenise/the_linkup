@@ -15,6 +15,10 @@ import {
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useColorMode } from "@chakra-ui/react";
+import {
+  getUserSettings,
+  saveUserSettings,
+} from "../redux/actions/userSettingsActions";
 
 // Styled Components
 const Container = styled(Card)(({ theme }) => ({
@@ -46,25 +50,27 @@ const StyledButton = styled(Button)(({ colorMode }) => ({
 const UserSettings = () => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
-  const { settings, user } = useSelector((state) => state.loggedUser);
-  const [distanceRange, setDistanceRange] = useState(50);
-  const [ageRange, setAgeRange] = useState([18, 99]);
+  const { user } = useSelector((state) => state.loggedUser); // Get logged in user
+  const { userSettings } = useSelector((state) => state.userSettings); // Get settings from Redux
+
+  // States for current user settings (to update them)
+  const [distanceRange, setDistanceRange] = useState(
+    userSettings?.distanceRange ? userSettings.distanceRange[1] : 50
+  );
+  const [ageRange, setAgeRange] = useState(userSettings?.ageRange || [18, 99]);
+
   const { colorMode } = useColorMode();
 
-  useEffect(() => {
-    if (settings) {
-      setDistanceRange(settings.distanceRange ? settings.distanceRange[1] : 50);
-      setAgeRange(settings.ageRange || [18, 99]);
-    }
-  }, [settings]);
-
+  // Handle saving settings to Redux
   const handleSaveSettings = () => {
     const updatedSettings = {
       distanceRange: [0, distanceRange],
       ageRange,
     };
 
-    dispatch({ type: "SAVE_SETTINGS", payload: updatedSettings });
+    // Save to Redux
+    dispatch(saveUserSettings(updatedSettings));
+
     addSnackbar("Settings saved successfully.", "success");
   };
 
@@ -125,14 +131,14 @@ const UserSettings = () => {
 
         {/* Distance Range */}
         <Typography color={colorMode === "light" ? "black" : "white"}>
-          Distance Range: {distanceRange} {distanceRange > 100 ? "miles" : "km"}
+          {`Distance Range: ${distanceRange} km`}
         </Typography>
         <Slider
           value={distanceRange}
           onChange={(e, newValue) => setDistanceRange(newValue)}
           valueLabelDisplay="auto"
           min={0}
-          max={100}
+          max={1000}
           sx={{ mb: 2, color: colorMode === "light" ? "#1976d2" : "#90caf9" }}
         />
 
