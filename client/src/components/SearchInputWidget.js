@@ -7,10 +7,9 @@ import SearchHintBox from "./SearchHintBox"; // Import the hint box component
 // Styled components
 const Container = styled("div")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: "4px 12px",
+  padding: "2px 5px",
   borderRadius: "24px",
   borderWidth: "1px",
-  // boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "box-shadow 0.3s ease",
   "&:hover": {
     boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
@@ -26,10 +25,9 @@ const InputContainer = styled("div")({
 });
 
 const Input = styled("input")({
-  background: "transparent",
   height: "36px",
   width: "100%",
-  padding: "0 16px",
+  padding: "0 8px",
   borderRadius: "24px",
   border: "none",
   fontWeight: "semi-bold",
@@ -81,6 +79,7 @@ const SearchInput = ({ handleInputChange }) => {
             onChange={handleInputChange}
             onFocus={handleFocus} // Show hint box
             onBlur={handleBlur} // Hide hint box
+            autoComplete="off"
           />
           <IconContainer>
             <Icon />
