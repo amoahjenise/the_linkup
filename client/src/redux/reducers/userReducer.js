@@ -8,12 +8,10 @@ import {
   FETCH_USER_DATA_FAILURE,
   SET_CURRENT_USER,
   UPDATE_CURRENT_USER,
-  SAVE_SETTINGS,
 } from "../actions/actionTypes";
 
 const initialState = {
   user: {},
-  settings: {}, // Ensure settings are stored here
   error: null,
   successMessage: "",
   loading: false,
@@ -74,11 +72,6 @@ const userReducer = (state = initialState, action) => {
           ...state.user,
           ...action.payload,
         },
-      };
-    case SAVE_SETTINGS: // New case to update settings
-      return {
-        ...state,
-        settings: action.payload, // Store the new settings
       };
     default:
       return state;

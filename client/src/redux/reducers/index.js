@@ -10,11 +10,13 @@ import userSentRequestsReducer from "./userSentRequestsReducer";
 import messageReducer from "./messageReducer";
 import logoutReducer from "./logoutReducer";
 import locationReducer from "./locationSlice";
+import userSettingsReducer from "./userSettingsReducer";
 
 const appReducer = combineReducers({
   auth: authReducer,
   logout: logoutReducer,
   registration: registrationReducer,
+  userSettings: userSettingsReducer,
   loggedUser: userReducer,
   linkups: linkupReducer,
   editingLinkup: editingLinkupReducer,
@@ -27,11 +29,9 @@ const appReducer = combineReducers({
 
 const rootReducer = (state, action) => {
   if (action.type === "LOGOUT") {
-    // Preserve the auth state and reset the rest
-    // const { auth } = state;
-    // state = { auth };
-    // Reset the state to initial values for all reducers
-    state = undefined;
+    // Preserve the userSettings state and reset other parts of the state
+    const { userSettings } = state;
+    state = { userSettings }; // Keep userSettings while resetting the rest
   }
 
   return appReducer(state, action);
