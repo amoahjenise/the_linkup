@@ -3,8 +3,7 @@ import { styled } from "@mui/material/styles";
 import DeactivateAccount from "../components/DeactivateAccount";
 import Settings from "../components/Settings";
 import { useColorMode } from "@chakra-ui/react";
-import LocationSharingSetting from "../components/LocationSharingSetting";
-import AccountSettings from "../components/AccountSettings"; // Import AccountSettings component
+import AccountSettings from "../components/UserSettings"; // Import AccountSettings component
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import UserDataDeletionPage from "./UserDataDeletionPage";
@@ -34,6 +33,8 @@ const RightSection = styled("div")(({ theme, colorMode }) => ({
   [theme.breakpoints.down("md")]: {
     display: "none",
   },
+  maxHeight: "100vh", // Ensures it fits the viewport height
+  overflowY: "auto", // Enables vertical scrolling
 }));
 
 const SlidingSection = styled("div")(({ theme, show, colorMode }) => ({
@@ -93,12 +94,7 @@ const SettingsPage = () => {
         {activeSubSection === "deactivateAccount" && (
           <DeactivateAccount colorMode={colorMode} />
         )}
-        {activeSubSection === "locationSharing" && (
-          <LocationSharingSetting
-            activeSubSection={activeSubSection}
-            setActiveSubSection={setActiveSubSection}
-          />
-        )}
+
         {activeSubSection === "dataDeletionInstructions" && (
           <UserDataDeletionPage
             activeSubSection={activeSubSection}
@@ -119,12 +115,6 @@ const SettingsPage = () => {
         </CloseButton>
         {activeSubSection === "deactivateAccount" && (
           <DeactivateAccount colorMode={colorMode} />
-        )}
-        {activeSubSection === "locationSharing" && (
-          <LocationSharingSetting
-            activeSubSection={activeSubSection}
-            setActiveSubSection={setActiveSubSection}
-          />
         )}
         {activeSubSection === "dataDeletionInstructions" && (
           <UserDataDeletionPage
