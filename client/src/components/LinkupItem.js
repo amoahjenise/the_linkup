@@ -17,125 +17,127 @@ import { CircularProgress } from "@mui/material";
 
 const compromise = nlp;
 
-// Styled Components
+// Container wrapper
 const Container = styled("div")(({ theme }) => ({
-  padding: "0.5rem",
+  padding: "0.75rem 1rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
   height: "100%",
-  // borderBottom: "1px solid rgba(130, 131, 129, 0.32)",
-  paddingTop: "12px",
-  paddingLeft: "16px",
-  paddingRight: "16px",
+  backgroundColor: "transparent",
 }));
 
+// Card-like container with refined hover effects
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   border: `1px solid ${
     colorMode === "light"
-      ? "rgba(229, 235, 243, 1)" // Light border for light mode
-      : "rgba(255, 255, 255, 0.1)" // Subtle border for dark mode
+      ? "rgba(229, 235, 243, 1)"
+      : "rgba(255, 255, 255, 0.1)"
   }`,
   padding: "1rem",
-  borderRadius: "0.75rem", // Slightly rounded corners for clean, balanced look
+  borderRadius: "1rem",
   width: "100%",
-  minHeight: "175px", // Ensures consistency
-  backgroundColor: colorMode === "dark" ? "#15202B" : "#FFFFFF",
-
-  backdropFilter: "blur(8px)", // Glass-like background effect
-
-  // Box shadow for light mode
+  minHeight: "175px",
+  backgroundColor: colorMode === "dark" ? "#1C1E21" : "#FFFFFF",
+  backdropFilter: "blur(12px)",
   boxShadow:
     colorMode === "light"
       ? isHovered
-        ? "0 12px 24px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)" // More defined shadow on hover
-        : "0 4px 8px rgba(0, 0, 0, 0.05)" // Subtle shadow when not hovered
+        ? "0 4px 12px rgba(0, 0, 0, 0.15)"
+        : "0 2px 6px rgba(0, 0, 0, 0.05)"
       : isHovered
-      ? "0 12px 24px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2)" // Stronger shadow on hover for dark mode
-      : "none", // No shadow by default in dark mode
-
+      ? "0 4px 12px rgba(0, 0, 0, 0.3)"
+      : "none",
   transition: "transform 0.2s ease, box-shadow 0.2s ease",
 
   "&:hover": {
-    transform: "translateY(-2px)", // Subtle hover effect
+    transform: "translateY(-3px)",
     boxShadow:
       colorMode === "light"
-        ? "0 12px 24px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.025)" // Hover shadow for light mode
-        : "0 12px 24px rgba(255, 255, 255, 0.075), 0 4px 6px rgba(80, 80, 0, 0.025)", // Hover shadow for dark mode
+        ? "0 6px 18px rgba(0, 0, 0, 0.1)"
+        : "0 6px 18px rgba(255, 255, 255, 0.15)",
   },
   cursor: "pointer",
 }));
 
-const MoreMenuContainer = styled("div")(({ theme }) => ({
+// Menu container for additional options
+const MoreMenuContainer = styled("div")({
   marginLeft: "auto",
-}));
+});
 
-const UserName = styled("div")(({ theme }) => ({
-  fontSize: "0.85rem",
-  fontWeight: "bold",
-}));
+// Username styling with a modern touch
+const UserName = styled("div")({
+  fontSize: "0.9rem",
+  fontWeight: "600",
+  color: "inherit",
+});
 
-const Name = styled("div")(({ theme }) => ({
+// User name and online status container
+const Name = styled("div")({
   display: "flex",
   alignItems: "center",
-}));
+  gap: "0.5rem",
+});
 
-const UserInfo = styled("div")(({ theme }) => ({
+// User info container
+const UserInfo = styled("div")({
   display: "flex",
   alignItems: "center",
-}));
+  gap: "0.5rem",
+});
 
-const PostActionsContainer = styled("div")(({ theme }) => ({
+// Post action buttons container
+const PostActionsContainer = styled("div")({
   display: "flex",
   alignItems: "center",
   marginTop: "0.5rem",
-}));
+});
 
+// Distance and meta information
 const DistanceInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   color: "#718096",
   marginTop: "0.25rem",
   marginLeft: "4px",
-  lineHeight: "1rem",
   fontSize: "0.8rem",
   fontFamily:
-    '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', // Updated font
+    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   [theme.breakpoints.down("sm")]: {
-    fontSize: "0.75rem", // Adjust font size for mobile
+    fontSize: "0.75rem",
   },
 }));
 
-const PostContent = styled("div")(({ theme, colorMode }) => ({
+// Post content section
+const PostContent = styled("div")(({ colorMode }) => ({
   marginTop: "0.5rem",
-  lineHeight: "1.25rem",
-  fontSize: "0.8rem",
+  lineHeight: "1.4rem",
+  fontSize: "0.9rem",
   fontFamily:
-    '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', // Updated font
+    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  color: colorMode === "light" ? "#333" : "#E4E6EB",
 
-  // Date/Time style
   "& div:first-of-type": {
-    fontWeight: "350", // Semi-bold
-    color: colorMode === "light" ? "#616871" : "white",
+    fontWeight: "400",
+    color: colorMode === "light" ? "#606770" : "#B0B3B8",
     marginBottom: "4px",
   },
 
-  // Post Text style
   "& p": {
-    fontWeight: "450", // Semi-bold
-    color: colorMode === "light" ? "#636977" : "white",
+    fontWeight: "500",
+    color: colorMode === "light" ? "#242526" : "#E4E6EB",
   },
 
-  // Location style
   "& div:last-of-type": {
     marginTop: "5px",
-    fontWeight: "450", // Semi-bold
-    fontSize: "0.8rem", // Smaller font
-    color: colorMode === "light" ? "#636977" : "white",
+    fontWeight: "500",
+    fontSize: "0.85rem",
+    color: colorMode === "light" ? "#242526" : "#E4E6EB",
   },
 }));
 
+// Post metadata (timestamp, location, etc.)
 const PostInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -143,24 +145,26 @@ const PostInfo = styled("div")(({ theme }) => ({
   color: "#718096",
 }));
 
+// Online status indicator
 const OnlineIndicator = styled("div")(({ isOnline }) => ({
   width: "0.5rem",
   height: "0.5rem",
   borderRadius: "50%",
-  backgroundColor: isOnline ? "green" : "gray", // Green if online, gray if offline
-  marginLeft: "0.5rem", // Space between username and indicator
+  backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
+  marginLeft: "0.5rem",
 }));
 
-const PaymentOptionIcon = styled("div")(({ theme }) => ({
+// Payment option icon container
+const PaymentOptionIcon = styled("div")({
   display: "flex",
   justifyContent: "space-between",
   width: "50%",
   height: "50%",
-}));
+});
 
-const PaymentOptionIconContainer = styled("div")(({ theme }) => ({
+const PaymentOptionIconContainer = styled("div")({
   display: "inline-block",
-}));
+});
 
 const formatDate = (date) => moment(date).format("ddd • MMM D, YYYY • h:mm A");
 
