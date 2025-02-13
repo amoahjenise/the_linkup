@@ -178,7 +178,9 @@ const CustomChannelHeader = ({
   };
 
   const handleLinkupStatusClick = () => {
-    navigate("/history/requests-received");
+    isOperator
+      ? navigate("/history/requests-received")
+      : navigate("/history/requests-sent");
   };
 
   return (
