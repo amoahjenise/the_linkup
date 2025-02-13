@@ -20,7 +20,6 @@ const Root = styled("div")({
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow around the feed container
   maxWidth: "100vw",
   minHeight: "100vh",
-  // padding: "16px", // Adding padding for better layout
 });
 
 const LoadingContainer = styled("div")({
@@ -40,9 +39,10 @@ const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   position: "fixed",
+  bottom: "3%", // Adjusted position to place the button above the first linkup item
   left: "47%",
   transform: "translateX(-50%)",
-  zIndex: 2000,
+  zIndex: 3000,
   padding: "5px 10px",
   fontSize: "12px",
   borderRadius: "20px",
@@ -50,20 +50,30 @@ const StyledButton = styled(Button)(({ theme }) => ({
     "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
   color: "#fff",
   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease, background 0.3s ease",
+  transition: "transform 0.3s ease, background 0.3s ease", // Add transition for smooth animation
   "&:hover": {
-    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))",
-    transform: "translateX(-50%) translateY(-5px)",
-  },
-
-  // Default bottom value for larger screens (above mobile)
-  bottom: "3%",
-
-  // Adjust position for mobile view
-  [theme.breakpoints.down("sm")]: {
-    bottom: "70px", // Adjust this value based on your footer height
+    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))", // Adjust hover effect
+    transform: "translateX(-50%) translateY(-5px)", // Slide up effect
   },
 }));
+
+const calculateAge = (dob) => {
+  const birthDate = new Date(dob);
+  const currentDate = new Date();
+  const age = currentDate.getFullYear() - birthDate.getFullYear();
+  const month = currentDate.getMonth();
+  const day = currentDate.getDate();
+
+  // Adjust the age if the birthday hasn't occurred yet this year
+  if (
+    month < birthDate.getMonth() ||
+    (month === birthDate.getMonth() && day < birthDate.getDate())
+  ) {
+    return age - 1;
+  }
+
+  return age;
+};
 
 const FeedSection = ({
   linkupList,
@@ -88,10 +98,37 @@ const FeedSection = ({
   const ageRange = userSettings?.ageRange || [18, 99];
   const genderRange = userSettings?.genderRange || [];
 
-  // Sync filteredLinkups with Redux state
+  // Apply filtering logic based on user settings
   useEffect(() => {
-    setFilteredLinkups(linkupList);
-  }, [linkupList]);
+    const filterLinkups = () => {
+      return linkupList.filter((linkup) => {
+        // Distance filter
+        const distance = linkup.distance || 0;
+        if (distance < distanceRange[0] || distance > distanceRange[1]) {
+          return false;
+        }
+
+        // Age filter
+        const age = calculateAge(linkup.date_of_birth) || 0;
+        if (age < ageRange[0] || age > ageRange[1]) {
+          return false;
+        }
+
+        // Gender filter (if any selected)
+        if (
+          genderRange.length > 0 &&
+          !genderRange.includes(linkup.creator_gender)
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    };
+
+    const filtered = filterLinkups();
+    setFilteredLinkups(filtered);
+  }, [linkupList, userSettings]); // Re-run filter when linkupList or userSettings change
 
   const scrollToTop = () => {
     if (feedRef.current) {
@@ -113,18 +150,16 @@ const FeedSection = ({
 
   // Add scroll event listener when the component mounts
   useEffect(() => {
-    const currentFeedRef = feedRef.current; // Capture the current value of feedRef
-
-    if (currentFeedRef) {
-      currentFeedRef.addEventListener("scroll", handleScroll);
+    if (feedRef.current) {
+      feedRef.current.addEventListener("scroll", handleScroll);
     }
 
     return () => {
-      if (currentFeedRef) {
-        currentFeedRef.removeEventListener("scroll", handleScroll);
+      if (feedRef.current) {
+        feedRef.current.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [feedRef]); // Dependency on feedRef to ensure it's properly handled
+  }, []);
 
   // Persist debounced function using useRef to avoid recreation
   const debounceSearchRef = useRef(
@@ -155,39 +190,6 @@ const FeedSection = ({
     debounceSearchRef.current(event.target.value);
   };
 
-  // Function to filter linkups based on user settings
-  const filterLinkups = (linkups) => {
-    return linkups.filter((linkup) => {
-      // Filter by distance
-      const distance = linkup.distance || 0;
-      if (distance < distanceRange[0] || distance > distanceRange[1]) {
-        return false;
-      }
-
-      // Filter by age range
-      const linkupAge = linkup.creator_age || 0;
-      if (linkupAge < ageRange[0] || linkupAge > ageRange[1]) {
-        return false;
-      }
-
-      // Filter by gender range
-      if (
-        genderRange.length > 0 &&
-        !genderRange.includes(linkup.creator_gender)
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-  };
-
-  // Sync filteredLinkups with Redux state and apply filtering
-  useEffect(() => {
-    const updatedLinkups = filterLinkups(linkupList);
-    setFilteredLinkups(updatedLinkups);
-  }, [linkupList, userSettings]); // Re-filter whenever linkupList or userSettings change
-
   return (
     <Root>
       <TopNavBar title="Home" />
@@ -195,11 +197,14 @@ const FeedSection = ({
       <SearchInputContainer>
         <SearchInput handleInputChange={handleInputChange} loading={loading} />
       </SearchInputContainer>
-      {isLoading || loading ? (
+      {/* Show LoadingSpinner when filtering or fetching data */}
+      {(isLoading || loading) && (
         <LoadingContainer>
           <LoadingSpinner />
         </LoadingContainer>
-      ) : (
+      )}
+      {/* Render filtered linkups or empty state */}
+      {!isLoading && !loading && (
         <div>
           {filteredLinkups.length === 0 ? (
             <EmptyFeedPlaceholder />
@@ -218,7 +223,7 @@ const FeedSection = ({
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
-              Back to top
+              Tap to scroll to top
             </StyledButton>
           )}
         </div>
