@@ -20,7 +20,7 @@ const Root = styled("div")({
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow around the feed container
   maxWidth: "100vw",
   minHeight: "100vh",
-  padding: "16px", // Adding padding for better layout
+  // padding: "16px", // Adding padding for better layout
 });
 
 const LoadingContainer = styled("div")({
