@@ -52,7 +52,7 @@ const TermsOfServicePage = () => {
       <Section>
         <Subtitle variant="h6">2. Eligibility</Subtitle>
         <Text variant="body1">
-          You must be at least 13 years old to use our Service. By using the
+          You must be at least 18 years old to use our Service. By using the
           Service, you represent and warrant that you meet the age requirement
           and have the legal capacity to enter into a binding contract.
         </Text>
@@ -126,7 +126,7 @@ const TermsOfServicePage = () => {
           The Service and its original content, features, and functionality are
           and will remain the exclusive property of The Linkup and its
           licensors. The Service is protected by copyright, trademark, and other
-          laws of both the United States and foreign countries.
+          laws of both Canada and foreign countries.
         </Text>
       </Section>
 
