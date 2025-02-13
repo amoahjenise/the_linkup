@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import LinkupItem from "./LinkupItem";
 import TopNavBar from "./TopNavBar";
@@ -10,6 +10,7 @@ import SearchInput from "./SearchInputWidget";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce";
+import Button from "@mui/material/Button";
 
 const Root = styled("div")({
   position: "relative",
@@ -37,6 +38,26 @@ const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
   zIndex: theme.zIndex.appBar,
 }));
 
+const StyledButton = styled(Button)(({ theme }) => ({
+  position: "fixed",
+  bottom: "3%", // Adjusted position to place the button above the first linkup item
+  left: "47%",
+  transform: "translateX(-50%)",
+  zIndex: 3000,
+  padding: "5px 10px",
+  fontSize: "12px",
+  borderRadius: "20px",
+  background:
+    "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
+  color: "#fff",
+  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  transition: "transform 0.3s ease, background 0.3s ease", // Add transition for smooth animation
+  "&:hover": {
+    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))", // Adjust hover effect
+    transform: "translateX(-50%) translateY(-5px)", // Slide up effect
+  },
+}));
+
 const FeedSection = ({
   linkupList,
   isLoading,
@@ -44,6 +65,7 @@ const FeedSection = ({
   onRefreshClick,
   userId,
   gender,
+  feedRef,
 }) => {
   const dispatch = useDispatch();
   const userSentRequests = useSelector((state) => state.userSentRequests);
@@ -53,9 +75,48 @@ const FeedSection = ({
   const { userSettings } = useSelector((state) => state.userSettings);
   const [loading, setLoading] = useState(false);
   const [filteredLinkups, setFilteredLinkups] = useState(linkupList); // Initial filtered list based on linkupList
+  const [showScrollToTopButton, setShowScrollToTopButton] = useState(false); // State to control button visibility
 
   const distanceRange = userSettings?.distanceRange || [0, 1000];
   const ageRange = userSettings?.ageRange || [18, 99];
+
+  // Sync filteredLinkups with Redux state
+  useEffect(() => {
+    setFilteredLinkups(linkupList);
+  }, [linkupList]);
+
+  const scrollToTop = () => {
+    if (feedRef.current) {
+      feedRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Handle scroll position to toggle the scroll-to-top button
+  const handleScroll = () => {
+    if (feedRef.current) {
+      const scrollPosition = feedRef.current.scrollTop;
+      // Show button when scrolled down more than 200px
+      setShowScrollToTopButton(scrollPosition > 200);
+    }
+  };
+
+  // Add scroll event listener when the component mounts
+  useEffect(() => {
+    const currentFeedRef = feedRef.current; // Capture the current value of feedRef
+
+    if (currentFeedRef) {
+      currentFeedRef.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (currentFeedRef) {
+        currentFeedRef.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [feedRef]); // Dependency on feedRef to ensure it's properly handled
 
   // Persist debounced function using useRef to avoid recreation
   const debounceSearchRef = useRef(
@@ -89,7 +150,7 @@ const FeedSection = ({
   return (
     <Root>
       <TopNavBar title="Home" />
-      {isLoading ? (
+      {isLoading || loading ? (
         <LoadingContainer>
           <LoadingSpinner />
         </LoadingContainer>
@@ -117,6 +178,11 @@ const FeedSection = ({
             ))
           )}
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
+          {showScrollToTopButton && (
+            <StyledButton variant="contained" onClick={scrollToTop}>
+              Tap to scroll to top
+            </StyledButton>
+          )}
         </div>
       )}
     </Root>
