@@ -39,7 +39,6 @@ const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   position: "fixed",
-  bottom: "3%", // Adjusted position to place the button above the first linkup item
   left: "47%",
   transform: "translateX(-50%)",
   zIndex: 3000,
@@ -50,10 +49,18 @@ const StyledButton = styled(Button)(({ theme }) => ({
     "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
   color: "#fff",
   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease, background 0.3s ease", // Add transition for smooth animation
+  transition: "transform 0.3s ease, background 0.3s ease",
   "&:hover": {
-    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))", // Adjust hover effect
-    transform: "translateX(-50%) translateY(-5px)", // Slide up effect
+    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))",
+    transform: "translateX(-50%) translateY(-5px)",
+  },
+
+  // Default bottom value for larger screens (above mobile)
+  bottom: "3%",
+
+  // Adjust position for mobile view
+  [theme.breakpoints.down("sm")]: {
+    bottom: "70px", // Adjust this value based on your footer height
   },
 }));
 
@@ -223,7 +230,7 @@ const FeedSection = ({
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
-              Tap to scroll to top
+              back to top
             </StyledButton>
           )}
         </div>
