@@ -7,7 +7,6 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-import { Box } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
