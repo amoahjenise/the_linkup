@@ -8,7 +8,7 @@ WITH active_linkups AS (
     AND link_ups.hidden <> true
     AND link_ups.status = 'active'
 )
-SELECT link_ups.*, users.avatar, users.is_online, users.latitude, users.longitude,
+SELECT link_ups.*, users.avatar, users.gender AS creator_gender, users.is_online, users.latitude, users.longitude,
     users.date_of_birth, active_linkups.count AS total_active_linkups
 FROM link_ups
 INNER JOIN users ON link_ups.creator_id = users.id

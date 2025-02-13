@@ -3,6 +3,7 @@ SELECT
     users.avatar,
     users.name,
     users.avatar,
+    users.gender AS creator_gender,
     users.is_online,
     users.latitude,
     users.longitude,

@@ -15,10 +15,9 @@ import {
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useColorMode } from "@chakra-ui/react";
-import {
-  getUserSettings,
-  saveUserSettings,
-} from "../redux/actions/userSettingsActions";
+import { MultiSelect } from "primereact/multiselect";
+import { saveUserSettings } from "../redux/actions/userSettingsActions";
+import { customGenderOptions } from "../utils/customGenderOptions";
 
 // Styled Components
 const Container = styled(Card)(({ theme }) => ({
@@ -52,20 +51,34 @@ const UserSettings = () => {
   const { addSnackbar } = useSnackbar();
   const { user } = useSelector((state) => state.loggedUser); // Get logged in user
   const { userSettings } = useSelector((state) => state.userSettings); // Get settings from Redux
+  const [formErrors, setFormErrors] = useState({});
 
   // States for current user settings (to update them)
   const [distanceRange, setDistanceRange] = useState(
     userSettings?.distanceRange ? userSettings.distanceRange[1] : 50
   );
   const [ageRange, setAgeRange] = useState(userSettings?.ageRange || [18, 99]);
+  const [genderRange, setGenderPreference] = useState(
+    userSettings?.genderRange || []
+  );
 
   const { colorMode } = useColorMode();
+
+  const genderOptions = [
+    { key: "man", value: "Man" },
+    { key: "woman", value: "Woman" },
+    ...customGenderOptions.map((gender) => ({
+      key: gender.toLowerCase(),
+      value: gender,
+    })),
+  ];
 
   // Handle saving settings to Redux
   const handleSaveSettings = () => {
     const updatedSettings = {
       distanceRange: [0, distanceRange],
       ageRange,
+      genderRange, // Save selected gender preferences
     };
 
     // Save to Redux
@@ -153,6 +166,47 @@ const UserSettings = () => {
           min={18}
           max={80}
           sx={{ mb: 2, color: colorMode === "light" ? "#1976d2" : "#90caf9" }}
+        />
+
+        {/* Gender Preference */}
+        <SectionTitle colorMode={colorMode} variant="h6">
+          Gender Preference
+        </SectionTitle>
+        <MultiSelect
+          value={genderRange}
+          options={genderOptions}
+          onChange={(e) => setGenderPreference(e.value)}
+          optionLabel="value"
+          placeholder="Display linkups from selected genders"
+          className={`p-multiselect ${formErrors.genderRange ? "error" : ""}`}
+          style={{
+            width: "100%",
+            maxWidth: "400px",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
+            backgroundColor:
+              colorMode === "dark"
+                ? "rgba(130, 131, 129, 0.1)"
+                : "rgba(130, 131, 129, 0.03)",
+            color: genderRange.length
+              ? colorMode === "dark"
+                ? "white"
+                : "black"
+              : "grey",
+          }}
+          itemTemplate={(option) => (
+            <div
+              style={{
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {option.value}
+            </div>
+          )}
         />
 
         {/* Save Button */}
