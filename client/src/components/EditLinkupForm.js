@@ -141,8 +141,8 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
 
   // Gender options for MultiSelect
   const genderOptions = [
-    { key: "man", value: "Men" },
-    { key: "woman", value: "Women" },
+    { key: "man", value: "Man" },
+    { key: "woman", value: "Woman" },
     ...customGenderOptions.map((gender) => ({
       key: gender.toLowerCase(),
       value: gender,
