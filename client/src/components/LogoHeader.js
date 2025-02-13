@@ -11,7 +11,7 @@ const MainContainer = styled("div")(({ theme }) => ({
 }));
 
 const LogoContainer = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(4),
+  marginRight: theme.spacing(1),
   [theme.breakpoints.down("md")]: {
     marginBottom: theme.spacing(0),
   },
@@ -28,11 +28,14 @@ const Title = styled(Typography)(({ theme }) => ({
 const LogoHeader = () => {
   return (
     <MainContainer>
-      {/* Uncomment this to include the logo */}
       <LogoContainer>
-        <LogoImage src={logo} alt="Logo" />
+        <LogoImage
+          src={logo}
+          alt="Logo"
+          style={{ filter: "invert(0.879) grayscale(70%)" }}
+        />
       </LogoContainer>
-      <Title variant="h4" component="h1">
+      <Title variant="h4" component="h1" color="white">
         The Linkup
       </Title>
     </MainContainer>

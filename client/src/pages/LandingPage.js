@@ -9,6 +9,7 @@ import AppDarkMode from "../assets/LandingPagePreview.png";
 import AppLightMode from "../assets/LandingPagePreview.png";
 import Wallpaper from "../assets/Image1.jpg";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
+import LogoHeader from "../components/LogoHeader";
 
 // Styled Components
 const PageContainer = styled("div")({
@@ -203,7 +204,8 @@ const LandingPage = () => {
     <PageContainer>
       <ContentContainer>
         <LeftColumn>
-          <Title>The Linkup</Title>
+          {/* <Title>The Linkup</Title> */}
+          <LogoHeader />
           <Subtitle>
             Connect with new people and organize meetups around your interests.
           </Subtitle>
