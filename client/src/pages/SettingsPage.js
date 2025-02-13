@@ -3,10 +3,11 @@ import { styled } from "@mui/material/styles";
 import DeactivateAccount from "../components/DeactivateAccount";
 import Settings from "../components/Settings";
 import { useColorMode } from "@chakra-ui/react";
-import AccountSettings from "../components/UserSettings"; // Import AccountSettings component
+import UserSettings from "../components/UserSettings"; // Import UserSettings component
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import UserDataDeletionPage from "./UserDataDeletionPage";
+import DataAndPermissionsPage from "./DataAndPermissionsPage";
 
 // Define styled components
 const SettingsPageContainer = styled("div")(({ theme }) => ({
@@ -64,7 +65,7 @@ const CloseButton = styled(IconButton)(({ theme }) => ({
 
 const SettingsPage = () => {
   const { colorMode } = useColorMode();
-  const [activeSubSection, setActiveSubSection] = useState("accountSettings");
+  const [activeSubSection, setActiveSubSection] = useState("userSettings");
   const [showSlidingSection, setShowSlidingSection] = useState(false);
 
   const handleSubSectionClick = (subSection) => {
@@ -96,13 +97,11 @@ const SettingsPage = () => {
         )}
 
         {activeSubSection === "dataDeletionInstructions" && (
-          <UserDataDeletionPage
-            activeSubSection={activeSubSection}
-            setActiveSubSection={setActiveSubSection}
-          />
+          <UserDataDeletionPage />
         )}
-        {activeSubSection === "accountSettings" && (
-          <AccountSettings colorMode={colorMode} />
+        {activeSubSection === "userSettings" && <UserSettings />}
+        {activeSubSection === "dataAndPermissions" && (
+          <DataAndPermissionsPage />
         )}
       </RightSection>
 
@@ -116,15 +115,14 @@ const SettingsPage = () => {
         {activeSubSection === "deactivateAccount" && (
           <DeactivateAccount colorMode={colorMode} />
         )}
+
+        {activeSubSection === "dataAndPermissions" && (
+          <DataAndPermissionsPage />
+        )}
         {activeSubSection === "dataDeletionInstructions" && (
-          <UserDataDeletionPage
-            activeSubSection={activeSubSection}
-            setActiveSubSection={setActiveSubSection}
-          />
+          <UserDataDeletionPage />
         )}
-        {activeSubSection === "accountSettings" && (
-          <AccountSettings colorMode={colorMode} />
-        )}
+        {activeSubSection === "userSettings" && <UserSettings />}
       </SlidingSection>
     </SettingsPageContainer>
   );
