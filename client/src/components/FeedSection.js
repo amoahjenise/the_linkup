@@ -86,6 +86,7 @@ const FeedSection = ({
 
   const distanceRange = userSettings?.distanceRange || [0, 1000];
   const ageRange = userSettings?.ageRange || [18, 99];
+  const genderRange = userSettings?.genderRange || [];
 
   // Sync filteredLinkups with Redux state
   useEffect(() => {
@@ -153,6 +154,39 @@ const FeedSection = ({
   const handleInputChange = (event) => {
     debounceSearchRef.current(event.target.value);
   };
+
+  // Function to filter linkups based on user settings
+  const filterLinkups = (linkups) => {
+    return linkups.filter((linkup) => {
+      // Filter by distance
+      const distance = linkup.distance || 0;
+      if (distance < distanceRange[0] || distance > distanceRange[1]) {
+        return false;
+      }
+
+      // Filter by age range
+      const linkupAge = linkup.creator_age || 0;
+      if (linkupAge < ageRange[0] || linkupAge > ageRange[1]) {
+        return false;
+      }
+
+      // Filter by gender range
+      if (
+        genderRange.length > 0 &&
+        !genderRange.includes(linkup.creator_gender)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  // Sync filteredLinkups with Redux state and apply filtering
+  useEffect(() => {
+    const updatedLinkups = filterLinkups(linkupList);
+    setFilteredLinkups(updatedLinkups);
+  }, [linkupList, userSettings]); // Re-filter whenever linkupList or userSettings change
 
   return (
     <Root>

@@ -13,6 +13,7 @@ linkups_with_distance AS (
     link_ups.*,
     users.name,
     users.avatar,
+    users.gender AS creator_gender,
     users.is_online,
     users.latitude,
     users.longitude,
