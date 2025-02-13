@@ -81,12 +81,6 @@ const Settings = ({
           >
             Data
           </SectionItem>
-          <SectionItem
-            active={activeSection === "location"}
-            onClick={() => handleSectionClick("location")}
-          >
-            Location Sharing
-          </SectionItem>
         </Sections>
         <Content>
           {activeSection === "account" && (
@@ -96,7 +90,7 @@ const Settings = ({
                 active={activeSubSection === "accountSettings"}
                 onClick={() => onSubSectionClick("accountSettings")}
               >
-                Account settings
+                User settings
               </SubSectionItem>
               <SubSectionItem
                 variant="h6"
@@ -133,15 +127,6 @@ const Settings = ({
                 Data deletion instructions
               </SubSectionItem>
             </>
-          )}
-          {activeSection === "location" && (
-            <SubSectionItem
-              variant="h6"
-              active={activeSubSection === "locationSharing"}
-              onClick={() => onSubSectionClick("locationSharing")}
-            >
-              Control location sharing
-            </SubSectionItem>
           )}
         </Content>
       </Root>
