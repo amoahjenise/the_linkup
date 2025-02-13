@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import SaveIcon from "@mui/icons-material/Save";
 import { useColorMode } from "@chakra-ui/react";
 
 // Styled Components

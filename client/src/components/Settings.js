@@ -87,8 +87,8 @@ const Settings = ({
             <>
               <SubSectionItem
                 variant="h6"
-                active={activeSubSection === "accountSettings"}
-                onClick={() => onSubSectionClick("accountSettings")}
+                active={activeSubSection === "userSettings"}
+                onClick={() => onSubSectionClick("userSettings")}
               >
                 User settings
               </SubSectionItem>
