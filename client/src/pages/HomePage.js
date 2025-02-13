@@ -322,6 +322,8 @@ const HomePage = ({ isMobile }) => {
             isLoading={isFetchingNextPage}
             setShouldFetchLinkups={setShouldFetchLinkups}
             onRefreshClick={refreshLinkups}
+            userId={userId}
+            gender={gender}
           />
         )}
       </StyledDiv>
@@ -345,8 +347,6 @@ const HomePage = ({ isMobile }) => {
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTop}
           onRefreshClick={refreshLinkups}
-          userId={userId}
-          gender={gender}
         />
       </StyledDiv>
 
