@@ -324,6 +324,7 @@ const HomePage = ({ isMobile }) => {
             onRefreshClick={refreshLinkups}
             userId={userId}
             gender={gender}
+            feedRef={feedSectionRef}
           />
         )}
       </StyledDiv>
