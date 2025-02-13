@@ -42,7 +42,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   position: "fixed",
   left: "47%",
   transform: "translateX(-50%)",
-  zIndex: 3000,
+  zIndex: 2000,
   padding: "5px 10px",
   fontSize: "12px",
   borderRadius: "20px",
@@ -218,7 +218,7 @@ const FeedSection = ({
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
-              Tap to scroll to top
+              Back to top
             </StyledButton>
           )}
         </div>
