@@ -157,19 +157,16 @@ const FeedSection = ({
   return (
     <Root>
       <TopNavBar title="Home" />
+      {/* Search Input Component */}
+      <SearchInputContainer>
+        <SearchInput handleInputChange={handleInputChange} loading={loading} />
+      </SearchInputContainer>
       {isLoading || loading ? (
         <LoadingContainer>
           <LoadingSpinner />
         </LoadingContainer>
       ) : (
         <div>
-          {/* Search Input Component */}
-          <SearchInputContainer>
-            <SearchInput
-              handleInputChange={handleInputChange}
-              loading={loading}
-            />
-          </SearchInputContainer>
           {filteredLinkups.length === 0 ? (
             <EmptyFeedPlaceholder />
           ) : (
