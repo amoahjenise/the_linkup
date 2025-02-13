@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import { BiSearch } from "react-icons/bi";
+import { MdClose } from "react-icons/md";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
-import SearchHintBox from "./SearchHintBox"; // Import the hint box component
+import SearchHintBox from "./SearchHintBox";
 
-// Styled components
 const Container = styled("div")(({ theme, colorMode }) => ({
   width: "100%",
   padding: "2px 5px",
@@ -41,34 +41,40 @@ const IconContainer = styled("div")({
   padding: "8px",
   background: "#0097A7",
   borderRadius: "50%",
-});
-
-const Icon = styled(BiSearch)({
-  color: "#fff",
-  fontSize: "18px",
+  cursor: "pointer",
 });
 
 const SearchInput = ({ handleInputChange }) => {
   const inputRef = useRef(null);
   const { colorMode } = useColorMode();
-  const [isFocused, setIsFocused] = useState(false); // State to track input focus
+  const [searchValue, setSearchValue] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleClick = () => {
     inputRef.current.focus();
   };
 
   const handleFocus = () => {
-    setIsFocused(true); // Show hint box on focus
+    setIsFocused(true);
   };
 
   const handleBlur = () => {
-    setIsFocused(false); // Hide hint box when focus is lost
+    setIsFocused(false);
+  };
+
+  const handleChange = (event) => {
+    setSearchValue(event.target.value);
+    handleInputChange(event);
+  };
+
+  const handleClear = () => {
+    setSearchValue("");
+    handleInputChange({ target: { value: "" } });
+    inputRef.current.focus();
   };
 
   return (
     <div style={{ position: "relative" }}>
-      {" "}
-      {/* Ensure relative positioning */}
       <Container colorMode={colorMode}>
         <InputContainer onClick={handleClick}>
           <Input
@@ -76,17 +82,18 @@ const SearchInput = ({ handleInputChange }) => {
             type="search"
             name="search"
             placeholder="Search Linkups"
-            onChange={handleInputChange}
-            onFocus={handleFocus} // Show hint box
-            onBlur={handleBlur} // Hide hint box
+            value={searchValue}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             autoComplete="off"
           />
           <IconContainer>
-            <Icon />
+            <BiSearch color="#fff" fontSize="18px" />
           </IconContainer>
         </InputContainer>
       </Container>
-      {isFocused && <SearchHintBox />} {/* Conditionally render hint box */}
+      {isFocused && <SearchHintBox />}
     </div>
   );
 };
