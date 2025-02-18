@@ -11,8 +11,8 @@ const WidgetSectionContainer = styled("div")(({ theme }) => ({
 }));
 
 const Widget = styled("div")(({ theme }) => ({
-  width: "95%",
   marginBottom: theme.spacing(2), // Spacing between widgets
+  minWidth: "300px",
 }));
 
 const WidgetSection = ({
