@@ -33,19 +33,27 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     position: "relative",
   },
   [`&.${classes.feedSection}`]: {
-    flex: "2",
+    flex: "2.5",
     overflowY: "auto",
     borderRightWidth: "1px",
     borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
+    [theme.breakpoints.down("md")]: {
+      flex: "2", // Reduce feed width slightly on medium screens
+    },
     [theme.breakpoints.down("sm")]: {
-      flex: "1",
+      flex: "1", // Full width on smaller screens
     },
   },
   [`&.${classes.widgetSection}`]: {
-    flex: "1",
+    flex: "1.5",
     overflowY: "auto",
     display: "block",
+    transition: "width 0.3s ease",
+    [theme.breakpoints.down("md")]: {
+      flex: "2", // Reduce widget section width at medium screens
+    },
     [theme.breakpoints.down("sm")]: {
+      flex: "2", // Reduce widget section width at medium screens
       position: "fixed",
       top: 0,
       right: 0,
@@ -65,7 +73,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     right: "20px",
     zIndex: 1100,
     borderRadius: "50%",
-    backgroundColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
+    backgroundColor: theme.palette.mode === "dark" ? "#2D3748" : "#D3D3D3",
     display: "block",
     [theme.breakpoints.down("sm")]: {
       display: "none", // Hide on small screens
