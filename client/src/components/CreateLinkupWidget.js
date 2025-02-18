@@ -24,6 +24,7 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   flexDirection: "column",
   justifyContent: "center",
   padding: theme.spacing(2),
+  maxWidth: "310px",
   borderRadius: "24px",
   borderWidth: "1px",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
