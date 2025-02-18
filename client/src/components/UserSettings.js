@@ -65,8 +65,8 @@ const UserSettings = () => {
   const { colorMode } = useColorMode();
 
   const genderOptions = [
-    { key: "man", value: "Man" },
-    { key: "woman", value: "Woman" },
+    { key: "men", value: "Men" },
+    { key: "women", value: "Women" },
     ...customGenderOptions.map((gender) => ({
       key: gender.toLowerCase(),
       value: gender,

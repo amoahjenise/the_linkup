@@ -24,6 +24,7 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   flexDirection: "column",
   justifyContent: "center",
   padding: theme.spacing(2),
+  maxWidth: "310px",
   borderRadius: "24px",
   borderWidth: "1px",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
@@ -234,8 +235,8 @@ const CreateLinkupWidget = ({
 
   // Gender options for MultiSelect
   const genderOptions = [
-    { key: "man", value: "Man" },
-    { key: "woman", value: "Woman" },
+    { key: "men", value: "Men" },
+    { key: "women", value: "Women" },
     ...customGenderOptions.map((gender) => ({
       key: gender.toLowerCase(),
       value: gender,
