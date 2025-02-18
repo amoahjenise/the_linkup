@@ -168,8 +168,8 @@ const FirstStep = ({ userData, setUserData }) => {
         required
       >
         <option value="">--Select--</option>
-        <option value="Men">Men</option>
-        <option value="Women">Women</option>
+        <option value="Men">Man</option>
+        <option value="Women">Woman</option>
         <option value="custom">Beyond Binary</option>
       </Select>
 
