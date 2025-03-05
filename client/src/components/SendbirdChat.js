@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import SBConversation from "@sendbird/uikit-react/GroupChannel";
@@ -11,6 +11,9 @@ import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
+
+// Actions
+import { setIsInConversation } from "../redux/actions/conversationActions";
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({
@@ -37,7 +40,6 @@ const MobileContainer = styled("div")(({ theme }) => ({
   flexDirection: "column",
   width: "100%",
   height: "100%", // Adjust height to account for footer
-  // paddingBottom: "60px", // Add padding to avoid overlap with footer
 }));
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
@@ -51,6 +53,9 @@ const SendbirdChat = () => {
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
 
   const globalStore = useSendbirdStateContext();
+
+  // Add dispatch hook
+  const dispatch = useDispatch();
 
   // Move the selector call to a separate function
   const getGroupChannel = useCallback(() => {
@@ -69,7 +74,12 @@ const SendbirdChat = () => {
 
   useEffect(() => {
     const fetchChannelData = async () => {
-      if (!currentChannel?._url) return;
+      if (!currentChannel?._url) {
+        dispatch(setIsInConversation(false));
+        return;
+      }
+
+      dispatch(setIsInConversation(true));
 
       try {
         const linkupResponse = await getLinkupByConversation(
@@ -100,7 +110,15 @@ const SendbirdChat = () => {
     };
 
     fetchChannelData();
-  }, [currentChannel, getGroupChannel, userId, isOperator]);
+
+    // Cleanup: Reset state when the component unmounts or when `currentChannel` changes
+    return () => {
+      // Dispatch actions to reset the state when leaving the conversation
+      if (!currentChannel) {
+        dispatch(setIsInConversation(false));
+      }
+    };
+  }, [currentChannel, getGroupChannel, userId, isOperator, dispatch]);
 
   const renderConversation = () => (
     <>

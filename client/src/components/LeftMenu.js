@@ -244,6 +244,9 @@ const LeftMenu = ({ isMobile }) => {
   const unreadMessagesCount = useSelector(
     (state) => state.messages.unreadMessagesCount
   );
+  const isInConversation = useSelector(
+    (state) => state.conversation.isInConversation
+  );
   const location = useLocation();
   const { colorMode } = useColorMode();
 
@@ -378,28 +381,95 @@ const LeftMenu = ({ isMobile }) => {
           </MenuList>
         </MainContainer>
       )}
-      {isMobile && (
-        <FooterContainer colorMode={colorMode}>
-          <FooterMenuButton
-            to="/home"
-            icon={
-              <HomeIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
+      {isMobile && isInConversation
+        ? !isInConversation
+        : true && ( // Only render mobile menu when the state allows
+            <FooterContainer colorMode={colorMode}>
+              <FooterMenuButton
+                to="/home"
+                icon={
+                  <HomeIcon
+                    style={{
+                      color:
+                        colorMode === "dark"
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  />
+                }
+                isActive={location.pathname === "/home"}
+                colorMode={colorMode}
               />
-            }
-            isActive={location.pathname === "/home"}
-            colorMode={colorMode}
-          />
-          <FooterMenuButton
-            to="/notifications"
-            icon={
-              <Badge badgeContent={unreadNotificationsCount} color="error">
-                <NotificationsIcon
+              <FooterMenuButton
+                to="/notifications"
+                icon={
+                  <Badge badgeContent={unreadNotificationsCount} color="error">
+                    <NotificationsIcon
+                      style={{
+                        color:
+                          colorMode === "dark"
+                            ? darkModeColors.text
+                            : lightModeColors.text,
+                      }}
+                    />
+                  </Badge>
+                }
+                isActive={location.pathname === "/notifications"}
+                colorMode={colorMode}
+              />
+              <FooterMenuButton
+                to="/profile/me"
+                icon={
+                  <AccountCircleIcon
+                    style={{
+                      color:
+                        colorMode === "dark"
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  />
+                }
+                isActive={location.pathname === "/profile/me"}
+                colorMode={colorMode}
+              />
+              <FooterMenuButton
+                to="/history"
+                icon={
+                  <HistoryIcon
+                    style={{
+                      color:
+                        colorMode === "dark"
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  />
+                }
+                isActive={
+                  location.pathname === "/history" ||
+                  location.pathname === "/history/requests-sent" ||
+                  location.pathname === "/history/requests-received"
+                }
+                colorMode={colorMode}
+              />
+              <FooterMenuButton
+                to="/messages"
+                icon={
+                  <Badge badgeContent={unreadMessagesCount} color="error">
+                    <MessageIcon
+                      style={{
+                        color:
+                          colorMode === "dark"
+                            ? darkModeColors.text
+                            : lightModeColors.text,
+                      }}
+                    />
+                  </Badge>
+                }
+                isActive={location.pathname === "/messages"}
+                colorMode={colorMode}
+              />
+              <IconButton onClick={handleMenuOpen}>
+                <MenuIcon
                   style={{
                     color:
                       colorMode === "dark"
@@ -407,74 +477,9 @@ const LeftMenu = ({ isMobile }) => {
                         : lightModeColors.text,
                   }}
                 />
-              </Badge>
-            }
-            isActive={location.pathname === "/notifications"}
-            colorMode={colorMode}
-          />
-          <FooterMenuButton
-            to="/profile/me"
-            icon={
-              <AccountCircleIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
-              />
-            }
-            isActive={location.pathname === "/profile/me"}
-            colorMode={colorMode}
-          />
-          <FooterMenuButton
-            to="/history"
-            icon={
-              <HistoryIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
-              />
-            }
-            isActive={
-              location.pathname === "/history" ||
-              location.pathname === "/history/requests-sent" ||
-              location.pathname === "/history/requests-received"
-            }
-            colorMode={colorMode}
-          />
-          <FooterMenuButton
-            to="/messages"
-            icon={
-              <Badge badgeContent={unreadMessagesCount} color="error">
-                <MessageIcon
-                  style={{
-                    color:
-                      colorMode === "dark"
-                        ? darkModeColors.text
-                        : lightModeColors.text,
-                  }}
-                />
-              </Badge>
-            }
-            isActive={location.pathname === "/messages"}
-            colorMode={colorMode}
-          />
-          <IconButton onClick={handleMenuOpen}>
-            <MenuIcon
-              style={{
-                color:
-                  colorMode === "dark"
-                    ? darkModeColors.text
-                    : lightModeColors.text,
-              }}
-            />
-          </IconButton>
-        </FooterContainer>
-      )}
+              </IconButton>
+            </FooterContainer>
+          )}
 
       <StyledHamburgerMenu
         anchorEl={menuAnchor}

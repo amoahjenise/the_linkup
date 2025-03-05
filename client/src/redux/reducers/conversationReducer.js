@@ -1,5 +1,3 @@
-// conversationReducer.js
-
 import {
   NEW_MESSAGE,
   SET_CONVERSATIONS,
@@ -9,9 +7,11 @@ import {
   INCREMENT_UNREAD_COUNT,
   DECREMENT_UNREAD_COUNT,
   RESET_UNREAD_COUNT,
+  SET_IS_IN_CONVERSATION,
 } from "../actions/actionTypes";
 
 const initialState = {
+  isInConversation: false,
   conversations: [],
   selectedConversation: null,
   messages: [],
@@ -28,33 +28,40 @@ const conversationReducer = (state = initialState, action) => {
           action.updatedConversation.conversation_id
       );
 
-      // Create a copy of the updated conversation
-      const updatedConversation = {
-        ...state.conversations[conversationIndex],
-        last_message: action.updatedConversation.last_message,
-        last_message_timestamp:
-          action.updatedConversation.last_message_timestamp,
-        unread_count: action.updatedConversation.unread_count,
-      };
+      if (conversationIndex !== -1) {
+        // Create a copy of the updated conversation
+        const updatedConversation = {
+          ...state.conversations[conversationIndex],
+          last_message: action.updatedConversation.last_message,
+          last_message_timestamp:
+            action.updatedConversation.last_message_timestamp,
+          unread_count: action.updatedConversation.unread_count,
+        };
 
-      // Create a copy of the conversations array with the updated conversation
-      const updatedConversations = [...state.conversations];
-      updatedConversations[conversationIndex] = updatedConversation;
+        // Create a copy of the conversations array with the updated conversation
+        const updatedConversations = [...state.conversations];
+        updatedConversations[conversationIndex] = updatedConversation;
 
-      return {
-        ...state,
-        conversations: updatedConversations,
-      };
+        return {
+          ...state,
+          conversations: updatedConversations,
+        };
+      }
+
+      return state;
+
     case SET_CONVERSATIONS:
       return {
         ...state,
         conversations: action.conversations,
       };
+
     case SET_SELECTED_CONVERSATION:
       return {
         ...state,
         selectedConversation: action.conversation,
       };
+
     case SET_MESSAGES:
       return {
         ...state,
@@ -62,6 +69,7 @@ const conversationReducer = (state = initialState, action) => {
         messages: action.messages,
         linkupId: action.linkupId,
       };
+
     case NEW_MESSAGE:
       // Update the messages array in the selected conversation
       const updatedMessages = [
@@ -81,6 +89,7 @@ const conversationReducer = (state = initialState, action) => {
         ...state,
         messages: updatedMessages,
       };
+
     case INCREMENT_UNREAD_COUNT:
       // Find the index of the conversation to update
       const conversationIndexToIncrement = state.conversations.findIndex(
@@ -159,6 +168,9 @@ const conversationReducer = (state = initialState, action) => {
       }
 
       return state;
+
+    case SET_IS_IN_CONVERSATION:
+      return { ...state, isInConversation: action.payload };
 
     default:
       return state;

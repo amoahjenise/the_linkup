@@ -8,6 +8,7 @@ import {
   INCREMENT_UNREAD_COUNT,
   DECREMENT_UNREAD_COUNT,
   RESET_UNREAD_COUNT,
+  SET_IS_IN_CONVERSATION,
 } from "./actionTypes";
 
 // Action to update the selected conversation with new message content and timestamp
@@ -54,4 +55,9 @@ export const decrementUnreadCount = (conversationId) => ({
 export const resetUnreadCount = (conversationId) => ({
   type: RESET_UNREAD_COUNT,
   conversationId,
+});
+
+export const setIsInConversation = (isInConversation) => ({
+  type: SET_IS_IN_CONVERSATION,
+  payload: isInConversation,
 });
