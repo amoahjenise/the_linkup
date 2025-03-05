@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import NotificationItem from "./NotificationItem";
-import LoadingSpinner from "./LoadingSpinner"; // Import the LoadingSpinner component
+import LoadingSpinner from "./LoadingSpinner";
 import { updateUnreadNotificationsCount } from "../redux/actions/notificationActions";
 import {
   markNotificationAsRead,
@@ -10,7 +10,6 @@ import {
 } from "../api/notificationAPI";
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
-import { Typography } from "@mui/material";
 import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
 
 // Define styled components
@@ -19,20 +18,28 @@ const MainContainer = styled("div")(({ theme }) => ({
   flexDirection: "column",
   overflowY: "hidden",
   width: "100%",
+  height: "100vh",
 }));
 
-const NotificationsList = styled("ul")({
+const NotificationsList = styled("ul")(({ theme }) => ({
   overflowY: "auto",
   listStyle: "none",
-  padding: 0,
   margin: 0,
-});
+  flexGrow: 1,
+  padding: theme.spacing(2),
+}));
 
 const NoNotificationsContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100%",
   padding: theme.spacing(4),
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[3],
+  boxShadow: theme.shadows[1],
 }));
+
+const MemoizedNotificationItem = memo(NotificationItem);
 
 const Notifications = () => {
   const dispatch = useDispatch();
@@ -72,8 +79,8 @@ const Notifications = () => {
 
   const handleNotificationClick = async (notification) => {
     try {
-      if (notification.is_read === false) {
-        markNotificationAsRead(notification.id);
+      if (!notification.is_read) {
+        await markNotificationAsRead(notification.id);
         dispatch(updateUnreadNotificationsCount(unreadNotificationsCount - 1));
       }
 
@@ -94,18 +101,20 @@ const Notifications = () => {
       <TopNavBar title="Notifications" />
       {isLoading ? (
         <LoadingSpinner marginTop="350px" />
-      ) : notifications.length === 0 ? ( // Check if notifications array is empty
+      ) : notifications.length === 0 ? (
         <NoNotificationsContainer>
           <EmptyNotificationsPlaceholder />
         </NoNotificationsContainer>
       ) : (
         <NotificationsList>
           {notifications.map((notification) => (
-            <NotificationItem
-              key={notification.id}
-              notification={notification}
-              onClick={() => handleNotificationClick(notification)}
-            />
+            <div style={{ marginTop: 4 }}>
+              <MemoizedNotificationItem
+                key={notification.id}
+                notification={notification}
+                onClick={() => handleNotificationClick(notification)}
+              />
+            </div>
           ))}
         </NotificationsList>
       )}
