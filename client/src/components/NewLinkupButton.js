@@ -1,31 +1,46 @@
 import React from "react";
-import Button from "@mui/material/Button";
-import { styled } from "@mui/material/styles";
+import { Button, styled, Tooltip } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  position: "fixed",
-  top: "9.5%", // Adjusted position to place the button above the first linkup item
-  left: "47%",
+const FloatingButton = styled(Button)(({ theme }) => ({
+  position: "fixed", // Use fixed positioning to keep the button in place
+  top: "11%", // Adjust this value to place the button at the desired vertical position
+  left: "50%",
   transform: "translateX(-50%)",
   zIndex: 3000,
-  padding: "5px 10px",
-  fontSize: "12px",
-  borderRadius: "20px",
-  background: "linear-gradient(120deg, #00796B, rgba(150, 190, 220, 1))", // Using 'background' for gradient
+  minWidth: "auto",
+  width: "56px",
+  height: "56px",
+  borderRadius: "50%",
+  background:
+    "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
   color: "#fff",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease, background 0.3s ease", // Add transition for smooth animation
+  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+  transition: "all 0.3s ease",
   "&:hover": {
-    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))", // Adjust hover effect
-    transform: "translateX(-50%) translateY(-5px)", // Slide up effect
+    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))",
+    transform: "translateX(-50%) translateY(-5px)",
+  },
+  "&:active": {
+    transform: "translateX(-50%) translateY(0)",
+  },
+  "&:focus": {
+    outline: "none",
+    boxShadow: "0 0 0 3px rgba(0, 123, 107, 0.5)",
   },
 }));
 
 const NewLinkupButton = ({ onClick }) => {
   return (
-    <StyledButton variant="contained" onClick={onClick}>
-      Update Feed
-    </StyledButton>
+    <Tooltip title="Update Feed" arrow placement="bottom">
+      <FloatingButton
+        variant="contained"
+        onClick={onClick}
+        aria-label="Update Feed"
+      >
+        <RefreshIcon />
+      </FloatingButton>
+    </Tooltip>
   );
 };
 

@@ -8,8 +8,6 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import { Tooltip, IconButton, Button, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useColorMode } from "@chakra-ui/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { MultiSelect } from "primereact/multiselect";
 import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
 import { PrimeReactContext } from "primereact/api";
@@ -45,19 +43,27 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   backgroundColor: colorMode === "dark" ? "rgba(200, 200, 200, 0.1)" : "white",
 }));
 
-const Header = styled("div")(({ theme }) => ({
+const Header = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   marginBottom: theme.spacing(2),
-  color: "#0097A7",
-  fontWeight: "600",
-  fontSize: "18px",
-}));
-
-const Icon = styled(FontAwesomeIcon)(({ theme }) => ({
-  marginRight: theme.spacing(1),
-  color: "#0097A7",
+  fontWeight: "700",
+  fontSize: "20px",
+  letterSpacing: "0.5px",
+  textTransform: "capitalize",
+  color: colorMode === "dark" ? "#00E5FF" : "#007B86",
+  background:
+    colorMode === "dark"
+      ? "linear-gradient(90deg, #00E5FF, #0097A7)"
+      : "linear-gradient(90deg, #007B86, #0097A7)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  textShadow:
+    colorMode === "dark"
+      ? "0px 2px 10px rgba(0, 229, 255, 0.4)"
+      : "0px 1px 4px rgba(0, 123, 134, 0.2)",
+  cursor: "default",
 }));
 
 const Form = styled("form")(({ theme }) => ({
@@ -261,8 +267,7 @@ const CreateLinkupWidget = ({
                     }`}
       </style>
       <Header>
-        <Icon icon={faPlusCircle} />
-        <span>Create a Linkup</span>
+        <span>Linkup</span>
       </Header>
       <Form onSubmit={handleCreateLinkUp}>
         <InputField

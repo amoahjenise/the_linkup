@@ -39,7 +39,7 @@ const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   position: "fixed",
-  left: "47%",
+  left: "50%",
   transform: "translateX(-50%)",
   zIndex: 2000,
   padding: "5px 10px",
@@ -56,7 +56,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 
   // Default bottom value for larger screens (above mobile)
-  bottom: "3%",
+  bottom: "10%",
 
   // Adjust position for mobile view
   [theme.breakpoints.down("sm")]: {
@@ -228,6 +228,7 @@ const FeedSection = ({
             ))
           )}
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
+
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
               Top
