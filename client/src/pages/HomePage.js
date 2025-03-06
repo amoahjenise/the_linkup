@@ -352,9 +352,9 @@ const HomePage = ({ isMobile }) => {
           </IconButton>
         )}
         <WidgetSection
+          setIsWidgetVisible={setIsWidgetVisible}
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTop}
-          onRefreshClick={refreshLinkups}
         />
       </StyledDiv>
 

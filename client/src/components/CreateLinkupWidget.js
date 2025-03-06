@@ -149,7 +149,7 @@ const ErrorText = styled("p")(({ theme }) => ({
 }));
 
 const CreateLinkupWidget = ({
-  setIsWidgetVisible = () => {}, // Default function to do nothing
+  setIsWidgetVisible,
   setShouldFetchLinkups,
   scrollToTopCallback,
 }) => {
