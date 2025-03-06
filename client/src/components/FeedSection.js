@@ -230,7 +230,7 @@ const FeedSection = ({
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
-              back to top
+              Top
             </StyledButton>
           )}
         </div>
