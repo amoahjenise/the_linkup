@@ -21,21 +21,22 @@ const CustomUserButton = () => {
   const handleSignOut = async () => {
     if (isSignedIn) {
       setLoading(true);
+
       try {
-        await signOut();
-
-        dispatch(logout());
-        dispatch(loggingOut());
-
-        navigate("/");
-        addSnackbar("Signed out successfully.", "success");
+        setTimeout(async () => {
+          dispatch(logout());
+          dispatch(loggingOut());
+          await signOut({ redirectUrl: "/" }); // Redirects to the root page after sign-out
+        }, 500);
       } catch (error) {
         console.error("Error signing out:", error);
+        // Show error message to the user
         addSnackbar(
           "An error occurred while signing out. Please try again.",
           "error"
         );
       } finally {
+        // Ensure that loading state is set back to false after sign-out is complete or if an error occurs
         setLoading(false);
       }
     }
@@ -57,7 +58,7 @@ const CustomUserButton = () => {
         fontSize: "16px",
         boxShadow:
           theme.palette.mode === "dark"
-            ? "0px 4px 10px rgba(255, 255, 255, 0.1)"
+            ? "0px 4px 10px rgba(232, 213, 213, 0.1)"
             : "0px 4px 10px rgba(0, 0, 0, 0.1)",
         backgroundColor: theme.palette.mode === "dark" ? "#FF5252" : "#D32F2F",
         "&:hover": {
