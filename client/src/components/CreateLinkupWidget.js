@@ -25,13 +25,20 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   justifyContent: "center",
   padding: theme.spacing(2),
   maxWidth: "310px",
-  borderRadius: "24px",
-  borderWidth: "1px",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-  transition: "box-shadow 0.3s ease, transform 0.3s ease",
+  borderRadius: "16px",
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`,
+  boxShadow:
+    colorMode === "dark"
+      ? "0 4px 12px rgba(255, 255, 255, 0.08)"
+      : "0 4px 12px rgba(0, 0, 0, 0.1)",
+  transition: "box-shadow 0.3s ease",
   "&:hover": {
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
-    // transform: "translateY(-2px)",
+    boxShadow:
+      colorMode === "dark"
+        ? "0 8px 24px rgba(255, 255, 255, 0.15)"
+        : "0 8px 24px rgba(0, 0, 0, 0.15)",
   },
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
@@ -354,6 +361,7 @@ const CreateLinkupWidget = ({
                   ? "white"
                   : "black"
                 : "grey",
+              opacity: genderPreference.length > 1 ? 1 : 0.85, // Slightly faded when empty
             }}
             // Add a dropdown style for scrolling if needed
             itemTemplate={(option) => (
@@ -397,7 +405,7 @@ const CreateLinkupWidget = ({
                   ? "white"
                   : "black"
                 : "grey",
-              opacity: paymentOption ? 1 : 0.7, // Slightly faded when empty
+              opacity: paymentOption ? 1 : 0.85, // Slightly faded when empty
             }}
           />
         </CustomDropdown>
