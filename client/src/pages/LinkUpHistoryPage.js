@@ -15,7 +15,6 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { useColorMode } from "@chakra-ui/react";
 import { Close as CloseIcon } from "@mui/icons-material";
 import FilterListIcon from "@mui/icons-material/FilterList"; // Import the filter icon
-
 import { IconButton } from "@mui/material";
 
 const PREFIX = "HistoryPage";
@@ -436,7 +435,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
 
                 {/* Linkup items based on active tab */}
                 {activeTab === 0 && (
-                  <div>
+                  <div style={{ padding: 12 }}>
                     {linkups.filteredList.map((linkup) => (
                       <LinkupHistoryItem
                         key={linkup.id}
@@ -447,7 +446,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   </div>
                 )}
                 {activeTab === 1 && (
-                  <div>
+                  <div style={{ padding: 12 }}>
                     {sentRequests.filteredList.map((request) => (
                       <LinkupRequestItem
                         key={request.id}
@@ -458,7 +457,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   </div>
                 )}
                 {activeTab === 2 && (
-                  <div>
+                  <div style={{ padding: 12 }}>
                     {receivedRequests.filteredList.map((request) => (
                       <LinkupRequestItem
                         key={request.id}

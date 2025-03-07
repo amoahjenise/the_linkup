@@ -9,14 +9,28 @@ import {
 } from "@mui/icons-material";
 import moment from "moment";
 import MoreMenu from "./MoreMenu";
+import { useColorMode } from "@chakra-ui/react";
 import nlp from "compromise";
 const compromise = nlp;
 
 // Styled components
-const LinkupHistoryItemWrapper = styled("div")(({ theme }) => ({
+const LinkupHistoryItemWrapper = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(2),
-  marginBottom: theme.spacing(1),
-  borderBottom: "1px solid #D3D3D3",
+  borderRadius: "8px", // Soft rounded corners for a modern look
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  transition: "box-shadow 0.2s ease, transform 0.2s ease", // Smoother and faster transition
+  backgroundColor: colorMode === "dark" ? "rgb(16, 16, 16)" : "white",
+  "&:hover": {
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.15)", // Slightly stronger shadow on hover
+    transform: "translateY(-2px)", // Small upward lift for interactivity
+  },
+  "&:active": {
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Slightly reduce shadow on click
+    transform: "translateY(0)", // Reset transform on click
+  },
+  "& + &": {
+    marginTop: theme.spacing(2), // Add spacing between list items
+  },
 }));
 
 const ItemHeader = styled("div")(({ theme }) => ({
@@ -29,39 +43,61 @@ const ItemHeader = styled("div")(({ theme }) => ({
 const LinkupDetails = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  marginRight: theme.spacing(4),
+  justifyContent: "space-between",
+}));
+
+const ActivityText = styled(Typography)(({ theme, colorMode }) => ({
+  fontSize: "1rem",
+  fontWeight: 500,
+  color: colorMode === "dark" ? "white" : theme.palette.text.primary,
+  marginBottom: theme.spacing(0.5),
 }));
 
 const StyledChip = styled(Chip)(({ theme, status }) => {
   let backgroundColor;
+  let color;
   switch (status) {
     case "active":
-      backgroundColor = "#f1c40f"; // Yellow
+      backgroundColor = "rgba(241, 196, 15, 0.1)"; // Yellow with transparency
+      color = "#f1c40f";
       break;
     case "closed":
-      backgroundColor = "#F0F7F8"; // Lightblue-gray
+      backgroundColor = "rgba(240, 247, 248, 0.1)"; // Lightblue-gray with transparency
+      color = "#99DFD6";
       break;
     case "completed":
-      backgroundColor = "rgb(115, 255, 174, 0.9)"; // Green
+      backgroundColor = "rgba(115, 255, 174, 0.1)"; // Green with transparency
+      color = "#73ffae";
       break;
     case "expired":
-      backgroundColor = "pink"; // Pink
+      backgroundColor = "rgba(255, 182, 193, 0.1)"; // Pink with transparency
+      color = "#ffb6c1";
       break;
     default:
-      backgroundColor = "#FFFFFF";
+      backgroundColor = theme.palette.background.default;
+      color = theme.palette.text.secondary;
       break;
   }
   return {
-    width: "140px",
-    marginLeft: "auto",
+    width: "120px",
     backgroundColor: backgroundColor,
-    color: theme.palette.text.secondary,
+    color: color,
+    border: `1px solid ${color}`,
+    borderRadius: "20px",
+    fontWeight: 500,
+    fontSize: "0.875rem",
   };
 });
 
+const DetailsText = styled(Typography)(({ theme, colorMode }) => ({
+  fontSize: "0.875rem",
+  color: colorMode === "dark" ? "gray" : theme.palette.text.secondary,
+  marginBottom: theme.spacing(0.5),
+}));
+
 const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   const [menuAnchor, setMenuAnchor] = useState(null);
-
+  const { colorMode } = useColorMode();
   const {
     creator_id,
     creator_name,
@@ -97,13 +133,18 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   const renderStatusIcon = () => {
     switch (status) {
       case "active":
-        return <QueryBuilderOutlined />;
+        return (
+          <QueryBuilderOutlined
+            fontSize="small"
+            color="rgba(241, 196, 15, 0.1)"
+          />
+        );
       case "closed":
-        return <CheckCircleOutlined />;
+        return <CheckCircleOutlined fontSize="small" color="#99DFD6" />;
       case "completed":
-        return <CheckCircleOutlined />;
+        return <CheckCircleOutlined fontSize="small" color="#73ffae" />;
       case "expired":
-        return <CancelOutlined />;
+        return <CancelOutlined fontSize="small" color="#ffb6c1" />;
       default:
         return null;
     }
@@ -154,7 +195,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   };
 
   return (
-    <LinkupHistoryItemWrapper>
+    <LinkupHistoryItemWrapper colorMode={colorMode}>
       <ItemHeader>
         <UserAvatar
           userData={{
@@ -181,24 +222,25 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
         )}
       </ItemHeader>
       <LinkupDetails>
-        <div>
-          <p>{renderLinkupItemText()}</p>
-        </div>
+        <ActivityText colorMode={colorMode}>
+          {renderLinkupItemText()}
+        </ActivityText>
         <StyledChip
           label={getStatusLabel()}
           icon={renderStatusIcon()}
-          variant="outlined"
           status={status} // Pass the status for conditional styling
         />
       </LinkupDetails>
-      <Typography variant="subtitle2" component="details">
-        <Typography variant="subtitle2" component="span" display="block">
-          Location: {formattedLocation}
+      <DetailsText colorMode={colorMode}>
+        <Typography variant="subtitle2" component="details">
+          <Typography variant="subtitle2" component="span" display="block">
+            Location: {formattedLocation}
+          </Typography>
+          <Typography variant="subtitle2" component="span" display="block">
+            {getPaymentOptionText()}
+          </Typography>
         </Typography>
-        <Typography variant="subtitle2" component="span" display="block">
-          {getPaymentOptionText()}
-        </Typography>
-      </Typography>
+      </DetailsText>
     </LinkupHistoryItemWrapper>
   );
 };
