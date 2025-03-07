@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Import default styles
+import "../DatePicker.css"; // Import default styles
 import { createLinkup } from "../api/linkUpAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
@@ -15,6 +15,7 @@ import { PrimeReactContext } from "primereact/api";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Dropdown } from "primereact/dropdown";
+import LoadingSpinner from "./LoadingSpinner";
 
 // Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
@@ -275,20 +276,40 @@ const CreateLinkupWidget = ({
   const { changeTheme } = useContext(PrimeReactContext);
   const [currentTheme, setCurrentTheme] = useState(""); // Initialize as an empty string
   const [formErrors, setFormErrors] = useState({}); // Track form errors
+  const [isLoading, setIsLoading] = useState(false); // Initialize as false (boolean)
 
   useEffect(() => {
-    const themeLink = document.getElementById("theme-link");
-    const initialTheme = themeLink.getAttribute("href").includes("dark")
-      ? "bootstrap4-dark-blue"
-      : "bootstrap4-light-blue";
-    setCurrentTheme(initialTheme);
+    const applyTheme = async () => {
+      setIsLoading(true); // Set loading state to true
+      try {
+        const themeLink = document.getElementById("theme-link");
+        const initialTheme = themeLink.getAttribute("href").includes("dark")
+          ? "bootstrap4-dark-blue"
+          : "bootstrap4-light-blue";
+        setCurrentTheme(initialTheme);
 
-    const newTheme =
-      colorMode === "dark" ? "bootstrap4-dark-blue" : "bootstrap4-light-blue";
+        const newTheme =
+          colorMode === "dark"
+            ? "bootstrap4-dark-blue"
+            : "bootstrap4-light-blue";
 
-    changeTheme(initialTheme, newTheme, "theme-link", () => {
-      setCurrentTheme(newTheme);
-    });
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Change the theme and wait for it to complete
+        await new Promise((resolve) => {
+          changeTheme(initialTheme, newTheme, "theme-link", () => {
+            setCurrentTheme(newTheme);
+            resolve();
+          });
+        });
+      } catch (error) {
+        console.error("Error applying theme:", error);
+      } finally {
+        setIsLoading(false); // Reset loading state regardless of success or failure
+      }
+    };
+
+    applyTheme(); // Call the async function
   }, [colorMode, changeTheme]);
 
   const maxTime = new Date();
@@ -370,7 +391,9 @@ const CreateLinkupWidget = ({
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  return (
+  return isLoading ? (
+    <LoadingSpinner />
+  ) : (
     <WidgetContainer colorMode={colorMode}>
       <style>
         {` 
