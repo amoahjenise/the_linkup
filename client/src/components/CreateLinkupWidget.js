@@ -135,33 +135,45 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1, 4),
 }));
 
-const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
+const CustomDropdown = styled("div")(({ theme, colorMode, hasError }) => ({
   width: "100%",
   marginBottom: theme.spacing(2),
   borderRadius: "8px", // Slightly rounded corners
   border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+    hasError
+      ? theme.palette.error.main // Red border for error state
+      : colorMode === "dark"
+      ? "#4a4a4a"
+      : theme.palette.divider
   }`, // Border color
   backgroundColor:
     colorMode === "dark"
       ? "rgba(130, 131, 129, 0.1)" // Dark mode background
       : "rgba(130, 131, 129, 0.03)", // Light mode background
   transition: "all 0.3s ease", // Smooth transitions for all properties
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
+  boxShadow: hasError
+    ? `0 0 0 3px ${theme.palette.error.light}` // Red shadow for error state
+    : "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
 
   // Focus state
   "&:focus-within": {
-    borderColor: theme.palette.primary.main, // Highlight border on focus
-    boxShadow: `0 0 0 3px ${
-      colorMode === "dark"
-        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
-        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
-    }`,
+    borderColor: hasError
+      ? theme.palette.error.main // Red border for error state
+      : theme.palette.primary.main, // Highlight border on focus
+    boxShadow: hasError
+      ? `0 0 0 3px ${theme.palette.error.light}` // Red shadow for error state
+      : `0 0 0 3px ${
+          colorMode === "dark"
+            ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
+            : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+        }`,
   },
 
   // Hover state
   "&:hover": {
-    borderColor: theme.palette.primary.main, // Highlight border on hover
+    borderColor: hasError
+      ? theme.palette.error.main // Red border for error state
+      : theme.palette.primary.main, // Highlight border on hover
   },
 
   // Disabled state
@@ -245,7 +257,7 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
 const ErrorText = styled("p")(({ theme }) => ({
   color: theme.palette.error.main,
   fontSize: "12px",
-  margin: "8px 0 0",
+  margin: "8px 0 4px 8px", // Consistent margin with standard input errors
 }));
 
 const CreateLinkupWidget = ({
@@ -472,6 +484,10 @@ const CreateLinkupWidget = ({
               </div>
             )}
           />
+          {/* Display error message if no gender is selected */}
+          {formErrors.genderPreference && (
+            <ErrorText>{formErrors.genderPreference}</ErrorText>
+          )}
         </CustomDropdown>
         <CustomDropdown colorMode={colorMode}>
           <Dropdown
