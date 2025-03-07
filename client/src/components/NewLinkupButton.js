@@ -13,7 +13,7 @@ const FloatingButton = styled(Button)(({ theme }) => ({
   height: "56px",
   borderRadius: "50%",
   background:
-    "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
+    "linear-gradient(120deg, rgba(0, 121, 107, 0.25), rgba(150, 190, 220, 0.25))",
   color: "#fff",
   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
   transition: "all 0.3s ease",

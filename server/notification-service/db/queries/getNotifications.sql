@@ -12,6 +12,8 @@ SELECT
     u.avatar AS requester_avatar,
     u_receiver.name AS receiver_name,
     u_receiver.avatar AS receiver_avatar,
+    u.is_online AS requester_is_online,
+    u_receiver.is_online AS receiver_is_online,
     lur.message AS message
 FROM notifications n
 JOIN users u ON n.requester_id = u.id

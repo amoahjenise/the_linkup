@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Modal, Typography, IconButton, styled } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
-import LinkupItem from "./LinkupItem";
 import { getUserLinkups } from "../api/linkUpAPI";
+import CreatedLinkupItem from "./CreatedLinkupItem";
 
 const ModalContainer = styled(Box)(({ theme, colorMode }) => ({
   position: "absolute",
@@ -58,6 +58,7 @@ const LinkupsModal = ({ userId, open, onClose }) => {
   const { colorMode } = useColorMode();
   const [linkups, setLinkups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const startY = useRef(0);
 
   useEffect(() => {
@@ -117,10 +118,10 @@ const LinkupsModal = ({ userId, open, onClose }) => {
                   marginBottom: index !== linkups.length - 1 ? "6px" : "0px",
                 }}
               >
-                <LinkupItem
+                <CreatedLinkupItem
                   key={linkup.id}
                   linkupItem={linkup}
-                  setShouldFetchLinkups={() => {}}
+                  setShouldFetchLinkups={setShouldFetchLinkups}
                   disableRequest={true}
                 />
               </Box>

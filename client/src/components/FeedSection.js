@@ -17,9 +17,9 @@ const Root = styled("div")({
   display: "flex",
   flexDirection: "column",
   borderRadius: "8px", // Subtle rounded corners for the whole feed
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow around the feed container
   maxWidth: "100vw",
   minHeight: "100vh",
+  marginBottom: 15,
 });
 
 const LoadingContainer = styled("div")({
@@ -46,7 +46,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontSize: "12px",
   borderRadius: "20px",
   background:
-    "linear-gradient(120deg, rgba(0, 121, 107, 0.4), rgba(150, 190, 220, 0.4))",
+    "linear-gradient(120deg, rgba(0, 121, 107, 0.25), rgba(150, 190, 220, 0.25))",
   color: "#fff",
   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
   transition: "transform 0.3s ease, background 0.3s ease",
@@ -109,6 +109,11 @@ const FeedSection = ({
   useEffect(() => {
     const filterLinkups = () => {
       return linkupList.filter((linkup) => {
+        // Skip filtering if the linkup belongs to the logged-in user
+        if (linkup.creator_id === userId) {
+          return true;
+        }
+
         // Distance filter
         const distance = linkup.distance || 0;
         if (distance < distanceRange[0] || distance > distanceRange[1]) {
@@ -231,7 +236,7 @@ const FeedSection = ({
 
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
-              Top
+              Scroll to Top
             </StyledButton>
           )}
         </div>

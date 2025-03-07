@@ -8,6 +8,7 @@ import {
   showNotification,
 } from "../utils/notificationUtils";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
+import { calculateDistance, calculateAge } from "../utils/utils"; // Utility functions for distance and age
 
 const SocketContext = createContext();
 
@@ -17,6 +18,7 @@ export const SocketProvider = ({ children }) => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
   const userGender = loggedUser?.user?.gender;
+  const userSettings = useSelector((state) => state.userSettings.userSettings); // Get user settings from Redux store
 
   const BASE_URL = process.env.REACT_APP_BACKEND_URL;
   const LINKUP_MANAGEMENT_SOCKET_NAMESPACE =
@@ -43,29 +45,72 @@ export const SocketProvider = ({ children }) => {
   );
 
   useEffect(() => {
+    // Function to check if a linkup matches the user's settings
+    const isLinkupWithinUserSettings = (linkup) => {
+      if (!userSettings || !loggedUser) return false;
+
+      // Distance filter
+      const distance = calculateDistance(
+        loggedUser.user.latitude,
+        loggedUser.user.longitude,
+        linkup.latitude,
+        linkup.longitude
+      );
+      if (
+        distance < userSettings.distanceRange[0] ||
+        distance > userSettings.distanceRange[1]
+      ) {
+        return false;
+      }
+
+      // Age filter
+      const age = calculateAge(linkup.date_of_birth) || 0;
+      if (age < userSettings.ageRange[0] || age > userSettings.ageRange[1]) {
+        return false;
+      }
+
+      // Gender filter (if any selected)
+      if (
+        userSettings.genderRange.length > 0 &&
+        !userSettings.genderRange.includes(linkup.creator_gender)
+      ) {
+        return false;
+      }
+
+      return true;
+    };
+
     requestNotificationPermission(); // Request notification permission on mount
 
     linkupManagementSocket.on("linkupCreated", (data) => {
-      // Check if the linkup creator is the current user and if the user's gender is not in the gender preference
+      // Check if the linkup matches the user's settings
       if (
-        data.linkup.creator_id === userId ||
-        !data.linkup.gender_preference.includes(userGender)
-      )
-        return; // Don't show the button if the gender is not matched
+        data.linkup.creator_id === userId || // Skip if the user created the linkup
+        !data.linkup.gender_preference.includes(userGender) || // Skip if gender preference doesn't match
+        !isLinkupWithinUserSettings(data.linkup) // Skip if linkup doesn't match user settings
+      ) {
+        return;
+      }
+
       dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupUpdated", (data) => {
-      if (data.linkup.creator_id === userId) return;
+      if (data.linkup.creator_id === userId) return; // Skip if the user updated the linkup
+      if (!isLinkupWithinUserSettings(data.linkup)) return; // Skip if linkup doesn't match user settings
+
       dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupManagementSocket.on("linkupDeleted", (data) => {
       if (
-        data.linkup.creator_id === userId ||
-        !data.linkup.gender_preference.includes(userGender)
-      )
-        return; // Don't show the button if the gender is not matched
+        data.linkup.creator_id === userId || // Skip if the user deleted the linkup
+        !data.linkup.gender_preference.includes(userGender) || // Skip if gender preference doesn't match
+        !isLinkupWithinUserSettings(data.linkup) // Skip if linkup doesn't match user settings
+      ) {
+        return;
+      }
+
       dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
@@ -104,6 +149,7 @@ export const SocketProvider = ({ children }) => {
     dispatch,
     userId,
     userGender,
+    userSettings,
     linkupManagementSocket,
     linkupRequestSocket,
   ]);

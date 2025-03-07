@@ -102,9 +102,7 @@ const DeclineButton = styled(Button)(({ theme }) => ({
 const ButtonGroup = styled("div")(({ theme }) => ({
   display: "flex",
   marginTop: theme.spacing(1),
-  "& > *": {
-    marginRight: theme.spacing(1),
-  },
+  gap: theme.spacing(1), // Add consistent spacing between buttons
 }));
 
 const RequestText = styled(Typography)(({ theme, colorMode }) => ({
