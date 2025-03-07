@@ -94,20 +94,30 @@ const NotificationTime = styled(Typography)(({ theme, colorMode }) => ({
 const NotificationItem = ({ notification, onClick }) => {
   const { colorMode } = useColorMode();
 
-  const getTimeAgo = () => {
+  const getTimeAgo = (createdAt) => {
     const now = moment();
-    const created = moment(notification.created_at);
+    const created = moment(createdAt);
     const duration = moment.duration(now.diff(created));
+
+    const years = duration.years();
+    const months = duration.months();
     const days = duration.days();
     const hours = duration.hours();
     const minutes = duration.minutes();
+    const seconds = duration.seconds();
 
-    if (days > 0) {
-      return `${days}d ago`;
+    if (years > 0) {
+      return `${years} year${years !== 1 ? "s" : ""} ago`;
+    } else if (months > 0) {
+      return `${months} month${months !== 1 ? "s" : ""} ago`;
+    } else if (days > 0) {
+      return `${days} day${days !== 1 ? "s" : ""} ago`;
     } else if (hours > 0) {
-      return `${hours}h ago`;
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
     } else if (minutes > 0) {
-      return `${minutes}m ago`;
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    } else if (seconds > 0) {
+      return `${seconds} second${seconds !== 1 ? "s" : ""} ago`;
     } else {
       return "Just now";
     }
@@ -194,7 +204,7 @@ const NotificationItem = ({ notification, onClick }) => {
           </NotificationMessage>
         )}
         <NotificationTime colorMode={colorMode}>
-          {getTimeAgo()}
+          {getTimeAgo(notification.created_at)}
         </NotificationTime>
       </NotificationContent>
     </NotificationItemWrapper>
