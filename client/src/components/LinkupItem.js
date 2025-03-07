@@ -109,31 +109,31 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   },
 }));
 
-// Post content section
 const PostContent = styled("div")(({ colorMode }) => ({
   marginTop: "0.5rem",
-  lineHeight: "1.4rem",
-  fontSize: "0.9rem",
+  lineHeight: "1.5rem",
+  fontSize: "0.935rem",
   fontFamily:
     'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  color: colorMode === "light" ? "#333" : "#E4E6EB",
+  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB", // Better contrast
 
   "& div:first-of-type": {
-    fontWeight: "400",
-    color: colorMode === "light" ? "#606770" : "#B0B3B8",
-    marginBottom: "4px",
+    fontWeight: "500",
+    color: colorMode === "light" ? "#242526" : "#DADDE1", // Slightly bolder for emphasis
+    marginBottom: "6px",
   },
 
   "& p": {
-    fontWeight: "500",
-    color: colorMode === "light" ? "#242526" : "#E4E6EB",
+    fontWeight: "400",
+    color: colorMode === "light" ? "#3D3D3D" : "#C9CCD1",
+    letterSpacing: "0.2px",
   },
 
   "& div:last-of-type": {
-    marginTop: "5px",
+    marginTop: "6px",
     fontWeight: "500",
-    fontSize: "0.85rem",
-    color: colorMode === "light" ? "#242526" : "#E4E6EB",
+    fontSize: "0.9rem",
+    color: colorMode === "light" ? "#606770" : "#A8ABB1", // Softer but clear
   },
 }));
 
@@ -166,7 +166,7 @@ const PaymentOptionIconContainer = styled("div")({
   display: "inline-block",
 });
 
-const formatDate = (date) => moment(date).format("ddd • MMM D, YYYY • h:mm A");
+const formatDate = (date) => moment(date).format("dddd, MMM D YYYY • h:mm A");
 
 const capitalizeLocation = (location) =>
   location
@@ -321,19 +321,23 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     let activityFormatted = "";
 
     if (activity) {
-      if (isVerbEndingWithIng) {
-        activityFormatted = `for ${activity}`;
-      } else {
-        activityFormatted = `${startsWithVerb ? "to" : "for"}  ${activity}`;
-      }
+      activityFormatted = isVerbEndingWithIng
+        ? `for ${activity}`
+        : `${startsWithVerb ? "to" : "for"} ${activity}`;
     }
 
     return (
       <p>
-        <Link to={`/profile/${creator_id}`} className={UserName}>
+        <Link
+          style={{ fontWeight: 500 }}
+          to={`/profile/${creator_id}`}
+          className={UserName}
+        >
           {creator_name}
-        </Link>
-        {" is trying to link up " + activityFormatted + "."}
+        </Link>{" "}
+        is trying to link up{" "}
+        <span style={{ fontWeight: 500 }}>{activityFormatted}</span> on{" "}
+        <span style={{ fontWeight: 500 }}>{formatDate(date)}</span>.
       </p>
     );
   };
@@ -393,7 +397,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                 <span>{getTimeAgo(created_at)}</span>
               </PostInfo>
               <PostContent colorMode={colorMode}>
-                <div>{formatDate(date)}</div>
+                {/* <div>{formatDate(date)}</div> */}
                 {renderLinkupItemText()}
                 <div>{capitalizeLocation(location)}</div>
               </PostContent>
