@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Box, Typography, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -89,7 +90,9 @@ const CustomChannelHeader = ({
   loading,
   isMobile,
   setCurrentChannel,
+  setIsInConversation,
 }) => {
+  const dispatch = useDispatch();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
@@ -186,7 +189,12 @@ const CustomChannelHeader = ({
   return (
     <Header>
       {isMobile && (
-        <BackButton onClick={() => setCurrentChannel(null)}>
+        <BackButton
+          onClick={() => {
+            setCurrentChannel(null);
+            dispatch(setIsInConversation(false));
+          }}
+        >
           <ArrowBackIcon />
         </BackButton>
       )}

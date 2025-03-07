@@ -382,7 +382,7 @@ const LeftMenu = ({ isMobile }) => {
         </MainContainer>
       )}
       {isMobile &&
-        (isInConversation ? !isInConversation : true) && ( // Only render mobile menu when the state allows
+        !isInConversation && ( // Only render mobile menu when the state allows
           <FooterContainer colorMode={colorMode}>
             <FooterMenuButton
               to="/home"
