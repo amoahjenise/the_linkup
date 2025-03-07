@@ -13,8 +13,8 @@ const NotificationItemWrapper = styled("div")(
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
       : colorMode === "dark"
-      ? "rgba(8, 8, 8, 1)"
-      : "rgba(0, 0, 0, 0.01)",
+      ? "rgb(16, 16, 16)"
+      : "rgba(0, 0, 0, 0.015)",
     borderRadius: "12px",
     boxShadow:
       colorMode === "dark"
@@ -27,7 +27,9 @@ const NotificationItemWrapper = styled("div")(
       borderRadius: "8px",
       backgroundColor: isUnread
         ? "rgba(144, 200, 215, 0.2)"
-        : "rgba(200, 200, 200, 0.1)",
+        : colorMode === "dark"
+        ? "rgba(200, 200, 200, 0.1)"
+        : "rgba(210, 210, 210, 0.2)",
     },
     "&:last-child": {
       marginBottom: "0", // Remove margin for the last item
