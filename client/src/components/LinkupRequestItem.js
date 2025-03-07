@@ -10,62 +10,92 @@ import { Chip, Button, Typography } from "@mui/material";
 import {
   CheckCircleOutlined,
   CloseOutlined,
+  CancelOutlined,
   QueryBuilderOutlined,
 } from "@mui/icons-material";
 import moment from "moment";
 import { useSnackbar } from "../contexts/SnackbarContext";
+import { useColorMode } from "@chakra-ui/react";
 import nlp from "compromise";
 
 const compromise = nlp;
 
-const LinkupRequestItemContainer = styled("div")(({ theme }) => ({
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(1),
-  borderBottom: "1px solid #D3D3D3",
+const LinkupRequestItemContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  padding: theme.spacing(2),
+  borderRadius: "8px", // Soft rounded corners for a modern look
+  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  transition: "box-shadow 0.2s ease, transform 0.2s ease", // Smoother and faster transition
+  backgroundColor: colorMode === "dark" ? "rgb(16, 16, 16)" : "white",
+  "&:hover": {
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.15)", // Slightly stronger shadow on hover
+    transform: "translateY(-2px)", // Small upward lift for interactivity
+  },
+  "&:active": {
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Slightly reduce shadow on click
+    transform: "translateY(0)", // Reset transform on click
+  },
+  "& + &": {
+    marginTop: theme.spacing(2), // Add spacing between list items
+  },
 }));
 
-const StatusChip = styled(Chip)(({ theme, status }) => ({
-  width: "110px",
-  marginRight: "auto",
-  backgroundColor:
-    status === "pending"
-      ? "#f1c40f"
-      : status === "accepted"
-      ? "rgb(115, 255, 174, 0.9)"
-      : "pink",
-  color: theme.palette.text.secondary,
-}));
+const StatusChip = styled(Chip)(({ theme, status }) => {
+  let backgroundColor;
+  let color;
+  switch (status) {
+    case "pending":
+      backgroundColor = "rgba(241, 196, 15, 0.1)"; // Yellow with transparency
+      color = "#f1c40f";
+      break;
+    case "accepted":
+      backgroundColor = "rgba(115, 255, 174, 0.1)"; // Green with transparency
+      color = "#73ffae";
+      break;
+    default:
+      backgroundColor = "rgba(255, 182, 193, 0.1)"; // Pink with transparency
+      color = "#ffb6c1";
+      break;
+  }
+  return {
+    width: "110px",
+    marginRight: "auto",
+    backgroundColor: backgroundColor,
+    color: color,
+    border: `1px solid ${color}`,
+    borderRadius: "20px", // Rounded corners for a modern look
+    fontWeight: 500,
+    fontSize: "0.875rem",
+  };
+});
 
 const AcceptButton = styled(Button)(({ theme }) => ({
   backgroundColor: "transparent",
   color: "#00BFFF",
-  borderColor: "#00BFFF",
-  borderWidth: "1px",
-  border: "0.1px solid #ccc",
-  marginRight: theme.spacing(2),
+  border: `1px solid #00BFFF`,
+  borderRadius: "20px", // Rounded corners
+  padding: theme.spacing(1, 2),
   cursor: "pointer",
-  transition: "background-color 0.3s ease",
+  transition: "background-color 0.2s ease, color 0.2s ease",
   "&:hover": {
     color: "#00BFFF",
-    backgroundColor: "rgb(0, 191, 255, 0.1)",
+    backgroundColor: "rgba(0, 191, 255, 0.1)", // Light blue background on hover
   },
 }));
 
 const DeclineButton = styled(Button)(({ theme }) => ({
   backgroundColor: "transparent",
   color: "#FF0000",
-  borderColor: "#FF0000",
-  borderWidth: "1px",
-  border: "0.1px solid #ccc",
-  marginRight: theme.spacing(2),
+  border: `1px solid #FF0000`,
+  borderRadius: "20px", // Rounded corners
+  padding: theme.spacing(1, 2),
   cursor: "pointer",
-  transition: "background-color 0.3s ease",
+  transition: "background-color 0.2s ease, color 0.2s ease",
   "&:hover": {
     color: "#FF0000",
-    backgroundColor: "rgb(255, 0, 67, 0.2)",
+    backgroundColor: "rgba(255, 0, 67, 0.1)", // Light red background on hover
   },
 }));
 
@@ -77,11 +107,19 @@ const ButtonGroup = styled("div")(({ theme }) => ({
   },
 }));
 
-const RequestText = styled("p")(({ theme }) => ({
+const RequestText = styled(Typography)(({ theme, colorMode }) => ({
   margin: 0,
   marginBottom: theme.spacing(1),
   marginTop: theme.spacing(1),
   marginRight: theme.spacing(1),
+  fontSize: "1rem",
+  fontWeight: 500,
+}));
+
+const DetailsText = styled(Typography)(({ theme, colorMode }) => ({
+  fontSize: "0.875rem",
+  color: colorMode === "dark" ? "gray" : theme.palette.text.secondary,
+  marginBottom: theme.spacing(0.5),
 }));
 
 const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
@@ -90,6 +128,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const userId = loggedUser?.user?.id || "";
   const [isMyLinkup, setIsMyLinkup] = useState(userId === post.creator_id);
   const { addSnackbar } = useSnackbar();
+  const { colorMode } = useColorMode();
 
   const handleAcceptClick = async () => {
     try {
@@ -122,13 +161,20 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   const renderStatusIcon = () => {
     switch (post.status) {
       case "pending":
-        return <QueryBuilderOutlined />;
+        return (
+          <QueryBuilderOutlined
+            fontSize="small"
+            color="rgba(241, 196, 15, 0.1)"
+          />
+        );
       case "accepted":
-        return <CheckCircleOutlined />;
+        return <CheckCircleOutlined fontSize="small" color="#99DFD6" />;
       case "declined":
-        return <CloseOutlined />;
+        return <CloseOutlined fontSize="small" color="#99DFD6" />;
       case "expired":
-        return <CloseOutlined />;
+        return (
+          <CancelOutlined CancelOutlined fontSize="small" color="#ffb6c1" />
+        );
       default:
         return null;
     }
@@ -199,7 +245,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
   }, [post.creator_id, userId]);
 
   return (
-    <LinkupRequestItemContainer>
+    <LinkupRequestItemContainer colorMode={colorMode}>
       <div>
         <UserAvatar
           userData={{
@@ -211,18 +257,19 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
           height="40px"
         />
         <div>
-          <RequestText>{renderLinkupItemText()}</RequestText>
-          {/* {isMyLinkup ||
-            (post.status === "accepted" && ( */}
-          <Typography variant="subtitle2" component="details">
-            <Typography variant="subtitle2" component="span" display="block">
-              Location: {post.location}
+          <RequestText colorMode={colorMode}>
+            {renderLinkupItemText()}
+          </RequestText>
+          <DetailsText colorMode={colorMode}>
+            <Typography variant="subtitle2" component="details">
+              <Typography variant="subtitle2" component="span" display="block">
+                Location: {post.location}
+              </Typography>
+              <Typography variant="subtitle2" component="span" display="block">
+                {getPaymentOptionText()}
+              </Typography>
             </Typography>
-            <Typography variant="subtitle2" component="span" display="block">
-              {getPaymentOptionText()}
-            </Typography>
-          </Typography>
-          {/* ))} */}
+          </DetailsText>
         </div>
       </div>
       <div>
