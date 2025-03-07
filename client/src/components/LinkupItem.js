@@ -390,7 +390,12 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               <UserInfo>
                 <Name>
                   <UserName>{creator_name}</UserName>
-                  <OnlineIndicator isOnline={linkupItem.is_online} />
+                  <Tooltip
+                    title={linkupItem.is_online ? "Online" : "Offline"}
+                    arrow
+                  >
+                    <OnlineIndicator isOnline={linkupItem.is_online} />
+                  </Tooltip>
                 </Name>
               </UserInfo>
               <PostInfo>

@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import default styles
 import { createLinkup } from "../api/linkUpAPI";
 import { updateLinkupList } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
@@ -73,22 +74,55 @@ const Form = styled("form")(({ theme }) => ({
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
+  width: "100%",
+  padding: theme.spacing(1), // Match padding with InputField
+  fontFamily: "Arial, sans-serif", // Consistent font family
+  fontWeight: 400, // Consistent font weight
+  paddingLeft: theme.spacing(2), // Align text within inputs
   marginBottom: theme.spacing(2),
-  padding: theme.spacing(1),
-  paddingLeft: theme.spacing(1.5), // Align text within inputs
-  color: colorMode === "dark" ? "white" : "black",
+  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Text color
   backgroundColor:
     colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)"
-      : "rgba(130, 131, 129, 0.03)",
-  borderRadius: theme.shape.borderRadius,
+      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
+      : "rgba(130, 131, 129, 0.03)", // Light mode background
+  borderRadius: "8px", // Slightly rounded corners
   border: `1px solid ${
     colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`,
+  }`, // Border color
+  outline: "none", // Remove default outline
+  transition: "all 0.3s ease", // Smooth transitions for all properties
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
+
+  // Focus state
   "&:focus": {
-    borderColor: theme.palette.primary.main,
+    borderColor: theme.palette.primary.main, // Highlight border on focus
+    boxShadow: `0 0 0 3px ${
+      colorMode === "dark"
+        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
+        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+    }`,
   },
-  width: "100%",
+
+  // Placeholder styling
+  "&::placeholder": {
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
+    opacity: 1, // Ensure placeholder is fully visible
+  },
+
+  // Hover state
+  "&:hover": {
+    borderColor: theme.palette.primary.main, // Highlight border on hover
+  },
+
+  // Disabled state
+  "&:disabled": {
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
+        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
+    cursor: "not-allowed", // Change cursor for disabled state
+  },
 }));
 
 const CreateLinkUpButton = styled(Button)(({ theme }) => ({
@@ -101,29 +135,95 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1, 4),
 }));
 
-const CustomDropdown = styled("div")(({ theme }) => ({
+const CustomDropdown = styled("div")(({ theme, colorMode }) => ({
+  width: "100%",
   marginBottom: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: "8px", // Slightly rounded corners
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`, // Border color
+  backgroundColor:
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
+      : "rgba(130, 131, 129, 0.03)", // Light mode background
+  transition: "all 0.3s ease", // Smooth transitions for all properties
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
+
+  // Focus state
+  "&:focus-within": {
+    borderColor: theme.palette.primary.main, // Highlight border on focus
+    boxShadow: `0 0 0 3px ${
+      colorMode === "dark"
+        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
+        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+    }`,
+  },
+
+  // Hover state
+  "&:hover": {
+    borderColor: theme.palette.primary.main, // Highlight border on hover
+  },
+
+  // Disabled state
+  "&:disabled": {
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
+        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
+    cursor: "not-allowed", // Change cursor for disabled state
+  },
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: theme.spacing(1),
+  padding: theme.spacing(1), // Slightly larger padding for better spacing
   fontFamily: "Arial, sans-serif", // Consistent font family
   fontWeight: 400, // Consistent font weight
-  paddingLeft: theme.spacing(1.5), // Align text within inputs
+  paddingLeft: theme.spacing(2), // Align text within inputs
   marginBottom: theme.spacing(2),
-  color: colorMode === "dark" ? "white" : "black", // Text color
+  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Text color
   backgroundColor:
     colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)"
-      : "rgba(130, 131, 129, 0.03)",
-  borderRadius: theme.shape.borderRadius,
+      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
+      : "rgba(130, 131, 129, 0.03)", // Light mode background
+  borderRadius: "8px", // Slightly rounded corners
   border: `1px solid ${
     colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`,
+  }`, // Border color
+  outline: "none", // Remove default outline
+  transition: "all 0.3s ease", // Smooth transitions for all properties
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
+
+  // Focus state
   "&:focus": {
-    borderColor: theme.palette.primary.main,
+    borderColor: theme.palette.primary.main, // Highlight border on focus
+    boxShadow: `0 0 0 3px ${
+      colorMode === "dark"
+        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
+        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+    }`,
+  },
+
+  // Placeholder styling
+  "&::placeholder": {
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
+    opacity: 1, // Ensure placeholder is fully visible
+  },
+
+  // Hover state
+  "&:hover": {
+    borderColor: theme.palette.primary.main, // Highlight border on hover
+  },
+
+  // Disabled state
+  "&:disabled": {
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
+        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
+    cursor: "not-allowed", // Change cursor for disabled state
   },
 }));
 
@@ -149,7 +249,7 @@ const ErrorText = styled("p")(({ theme }) => ({
 }));
 
 const CreateLinkupWidget = ({
-  setIsWidgetVisible,
+  toggleWidget,
   setShouldFetchLinkups,
   scrollToTopCallback,
 }) => {
@@ -235,7 +335,7 @@ const CreateLinkupWidget = ({
         setSelectedDate(null);
         setGenderPreference([]);
         setPaymentOption("");
-        setIsWidgetVisible(false);
+        toggleWidget();
         setShouldFetchLinkups(true);
         scrollToTopCallback();
       } else {
@@ -339,7 +439,7 @@ const CreateLinkupWidget = ({
           colorMode={colorMode} // Pass colorMode to styled component
         />
         {/* MultiSelect for gender preference */}
-        <CustomDropdown>
+        <CustomDropdown colorMode={colorMode}>
           <MultiSelect
             id="gender-preference"
             value={genderPreference}
@@ -351,24 +451,15 @@ const CreateLinkupWidget = ({
               formErrors.genderPreference ? "error" : ""
             }`}
             style={{
-              width: "100%", // Ensure full width
-              maxWidth: "400px", // Set a max width to prevent overflow
-              overflow: "hidden", // Prevent overflow
-              whiteSpace: "nowrap", // Prevent wrapping
-              textOverflow: "ellipsis", // Add ellipsis for overflow text
-              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
-              backgroundColor:
-                colorMode === "dark"
-                  ? "rgba(130, 131, 129, 0.1)"
-                  : "rgba(130, 131, 129, 0.03)",
+              width: "100%",
+              border: "none", // Remove default border
+              backgroundColor: "transparent", // Transparent background
               color: genderPreference.length
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
                 : "grey",
-              opacity: genderPreference.length > 1 ? 1 : 0.85, // Slightly faded when empty
             }}
-            // Add a dropdown style for scrolling if needed
             itemTemplate={(option) => (
               <div
                 style={{
@@ -381,41 +472,31 @@ const CreateLinkupWidget = ({
               </div>
             )}
           />
-          {/* Display error message if no gender is selected */}
-          {formErrors.genderPreference && (
-            <ErrorText>{formErrors.genderPreference}</ErrorText>
-          )}
         </CustomDropdown>
-        <CustomDropdown>
+        <CustomDropdown colorMode={colorMode}>
           <Dropdown
             value={paymentOption}
             options={[
-              { label: "No Payment Option", value: "" }, // More intuitive default option
+              { label: "No Payment Option", value: "" },
               { label: "Split The Bill", value: "split" },
               { label: "I Will Pay", value: "iWillPay" },
               { label: "Please Pay", value: "pleasePay" },
             ]}
             onChange={(e) => setPaymentOption(e.value)}
             placeholder="Who's Paying?"
-            className="w-full md:w-14rem"
             style={{
               width: "100%",
-              border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#ddd"}`,
-              backgroundColor:
-                colorMode === "dark"
-                  ? "rgba(130, 131, 129, 0.1)"
-                  : "rgba(130, 131, 129, 0.03)",
+              border: "none", // Remove default border
+              backgroundColor: "transparent", // Transparent background
               color: paymentOption
                 ? colorMode === "dark"
                   ? "white"
                   : "black"
                 : "grey",
-              opacity: paymentOption ? 1 : 0.85, // Slightly faded when empty
             }}
           />
         </CustomDropdown>
 
-        {/* <CenterElement> */}
         <CreateLinkUpButton
           type="submit"
           aria-label="create-linkup"
@@ -423,7 +504,6 @@ const CreateLinkupWidget = ({
         >
           POST
         </CreateLinkUpButton>
-        {/* </CenterElement>{" "} */}
       </Form>
     </WidgetContainer>
   );

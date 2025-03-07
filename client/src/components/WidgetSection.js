@@ -16,7 +16,7 @@ const Widget = styled("div")(({ theme }) => ({
 }));
 
 const WidgetSection = ({
-  setIsWidgetVisible,
+  toggleWidget,
   setShouldFetchLinkups,
   scrollToTopCallback,
 }) => {
@@ -30,7 +30,7 @@ const WidgetSection = ({
       {/* Create Linkup Component */}
       <Widget>
         <CreateLinkupForm
-          setIsWidgetVisible={setIsWidgetVisible}
+          toggleWidget={toggleWidget}
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTopCallback}
         />
