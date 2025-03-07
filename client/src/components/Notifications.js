@@ -108,7 +108,7 @@ const Notifications = () => {
       ) : (
         <NotificationsList>
           {notifications.map((notification) => (
-            <div style={{ marginTop: 8 }}>
+            <div style={{ marginBottom: 8 }}>
               <MemoizedNotificationItem
                 key={notification.id}
                 notification={notification}

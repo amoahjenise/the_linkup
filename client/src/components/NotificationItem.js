@@ -10,26 +10,25 @@ const NotificationItemWrapper = styled("div")(
     alignItems: "center",
     padding: "12px 16px",
     cursor: "pointer",
-    backgroundColor: isUnread ? "rgba(173, 216, 230, 0.1)" : "transparent",
-    borderRadius: "0px",
+    backgroundColor: isUnread
+      ? "rgba(173, 216, 230, 0.15)"
+      : colorMode === "dark"
+      ? " rgba(8, 8, 8, 1)"
+      : "rgba(0, 0, 0, 0.01)",
+
+    borderRadius: "12px",
     boxShadow:
       colorMode === "dark"
-        ? "0 2px 6px rgba(255, 255, 255, 0.1)" // Light glow for dark mode
-        : "0 1px 3px rgba(0, 0, 0, 0.1)", // Standard shadow for light mode
-    border: `1px solid ${
-      colorMode === "dark" ? "#B0B0B0" : theme.palette.divider
-    }`, // Border for separation (light gray in dark mode)
+        ? "0 2px 8px rgb(255, 255, 255, 0.08)" // Subtle shadow for dark mode
+        : "0 2px 8px rgba(0, 0, 0, 0.05)", // Subtle shadow for light mode
     transition: "background-color 0.2s ease, box-shadow 0.2s ease",
     height: "100px", // Fixed height for 3 lines of text
     overflow: "hidden", // Ensure text doesn't overflow
     "&:hover": {
+      borderRadius: "8px",
       backgroundColor: isUnread
         ? "rgba(144, 200, 215, 0.2)"
         : "rgba(200, 200, 200, 0.1)",
-      boxShadow:
-        colorMode === "dark"
-          ? "0 4px 12px rgba(255, 255, 255, 0.15)" // More visible in dark mode
-          : "0 2px 6px rgba(0, 0, 0, 0.15)", // Normal hover shadow
     },
     "&:last-child": {
       marginBottom: "0", // Remove margin for the last item
@@ -41,6 +40,7 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
   width: theme.spacing(6),
   height: theme.spacing(6),
   marginRight: theme.spacing(2),
+  border: `2px solid ${theme.palette.primary.main}`, // Add a border for a polished look
 }));
 
 const NotificationContent = styled("div")(({ theme }) => ({
@@ -67,6 +67,7 @@ const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
       : "#B0B0B0", // Explicit light gray color for dark mode
   marginTop: theme.spacing(0.5),
 }));
+
 const NotificationTime = styled(Typography)(({ theme, colorMode }) => ({
   fontSize: "0.75rem",
   marginTop: theme.spacing(0.5),
