@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Typography, Tooltip } from "@mui/material";
 import moment from "moment";
 import { useColorMode } from "@chakra-ui/react";
 
@@ -13,13 +13,12 @@ const NotificationItemWrapper = styled("div")(
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
       : colorMode === "dark"
-      ? " rgba(8, 8, 8, 1)"
+      ? "rgba(8, 8, 8, 1)"
       : "rgba(0, 0, 0, 0.01)",
-
     borderRadius: "12px",
     boxShadow:
       colorMode === "dark"
-        ? "0 2px 8px rgb(255, 255, 255, 0.08)" // Subtle shadow for dark mode
+        ? "0 2px 8px rgba(255, 255, 255, 0.08)" // Subtle shadow for dark mode
         : "0 2px 8px rgba(0, 0, 0, 0.05)", // Subtle shadow for light mode
     transition: "background-color 0.2s ease, box-shadow 0.2s ease",
     height: "100px", // Fixed height for 3 lines of text
@@ -41,6 +40,19 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
   height: theme.spacing(6),
   marginRight: theme.spacing(2),
   border: `2px solid ${theme.palette.primary.main}`, // Add a border for a polished look
+  position: "relative", // Required for positioning the online indicator
+}));
+
+const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
+  position: "relative",
+  bottom: "-20px", // Position at the bottom-right corner
+  right: "-45px",
+  width: "12px", // Slightly larger for better visibility
+  height: "12px",
+  borderRadius: "50%", // Circular shape
+  backgroundColor: isOnline ? "#4CAF50" : "#B0B0B0", // Green for online, gray for offline
+  border: `2px solid ${colorMode === "dark" ? "black" : "white"}`, // Border to stand out
+  zIndex: 1,
 }));
 
 const NotificationContent = styled("div")(({ theme }) => ({
@@ -99,6 +111,19 @@ const NotificationItem = ({ notification, onClick }) => {
     }
   };
 
+  const getIsUserOnline = () => {
+    switch (notification.notification_type) {
+      case "linkup_request":
+        return notification.requester_is_online;
+      case "linkup_request_action":
+        return notification.receiver_is_online;
+      case "new_message":
+        return notification.requester_is_online;
+      default:
+        return "";
+    }
+  };
+
   const getDisplayName = () => {
     switch (notification.notification_type) {
       case "linkup_request":
@@ -131,7 +156,13 @@ const NotificationItem = ({ notification, onClick }) => {
       onClick={onClick}
       colorMode={colorMode}
     >
-      <NotificationAvatar alt={getDisplayName()} src={getDisplayAvatar()} />
+      <Tooltip title={getIsUserOnline() ? "Online" : "Offline"} arrow>
+        <OnlineIndicator isOnline={getIsUserOnline()} colorMode={colorMode} />
+      </Tooltip>
+      <NotificationAvatar
+        alt={getDisplayName()}
+        src={getDisplayAvatar()}
+      ></NotificationAvatar>
       <NotificationContent>
         <NotificationTitle colorMode={colorMode}>
           {notification.notification_type === "linkup_request" ? (
