@@ -134,6 +134,7 @@ const SendbirdChat = () => {
             isOperator={isOperator}
             isMobile={isMobile}
             setCurrentChannel={setCurrentChannel}
+            setIsInConversation={setIsInConversation}
           />
         )}
       />
