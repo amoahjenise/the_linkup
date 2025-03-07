@@ -352,7 +352,7 @@ const HomePage = ({ isMobile }) => {
           </IconButton>
         )}
         <WidgetSection
-          setIsWidgetVisible={setIsWidgetVisible}
+          toggleWidget={toggleWidget}
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTop}
         />
