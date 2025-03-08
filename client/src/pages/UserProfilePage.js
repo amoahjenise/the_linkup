@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-// import ImageGrid from "../components/ImageGrid";
-
 import {
   getUserById,
   updateUserBio,
@@ -22,11 +20,6 @@ import timezone from "dayjs/plugin/timezone";
 import { useClerk } from "@clerk/clerk-react";
 import { Box, Button } from "@mui/material";
 import { useColorMode } from "@chakra-ui/react";
-// import {
-//   // getUserMedia,
-//   postInstagramAccessToken,
-//   getAccessToken,
-// } from "../api/instagramAPI";
 import ProfileBanner from "../components/ProfileBanner";
 import ProfileInfoBar from "../components/ProfileInfoBar";
 import SocialMediaLinks from "../components/SocialMediaLinks";
@@ -52,13 +45,6 @@ const Content = styled("div")({
   width: "100%",
   overflowY: "auto", // Allow vertical scrolling only if content overflows
 });
-
-// const ImageSection = styled("div")({
-//   display: "flex",
-//   flexDirection: "column",
-//   alignItems: "center",
-//   marginTop: "1px", // Minimize margin to avoid extra scroll space
-// });
 
 const EditButton = styled(Button)(({ theme, colorMode }) => ({
   color: colorMode === "light" ? "black" : "white",
@@ -96,34 +82,6 @@ const UserProfilePage = ({ isMobile }) => {
   const isLoggedUserProfile =
     userIdParam === "me" || userIdParam === loggedUser.user.id;
 
-  // useEffect(() => {
-  //   const fetchInstagramMedia = async (code) => {
-  //     try {
-  //       const accessToken = await getAccessToken(code);
-  //       await postInstagramAccessToken(userId, accessToken);
-  //       const instagramMediaResponse = await getUserMedia(accessToken);
-
-  //       if (instagramMediaResponse.success) {
-  //         const instagramImageUrls = instagramMediaResponse.data.data.map(
-  //           (imageObj) => imageObj.media_url
-  //         );
-  //         setState((prevState) => ({
-  //           ...prevState,
-  //           profileImages: instagramImageUrls,
-  //         }));
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching Instagram media:", error);
-  //     }
-  //   };
-
-  //   const code = new URLSearchParams(window.location.search).get("code");
-  //   if (code) {
-  //     fetchInstagramMedia(code);
-  //     window.history.replaceState({}, document.title, window.location.pathname);
-  //   }
-  // }, [userId]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -135,26 +93,10 @@ const UserProfilePage = ({ isMobile }) => {
         }
 
         const userData = userDataResponse?.data?.user || {};
-        //   const { instagram_access_token } = userData;
-
-        //   let profileImages = [];
-        //   if (instagram_access_token) {
-        //     const instagramMediaResponse = await getUserMedia(
-        //       instagram_access_token
-        //     );
-        //     if (instagramMediaResponse.success) {
-        //       profileImages = instagramMediaResponse.data.data.map(
-        //         (imageObj) => imageObj.media_url
-        //       );
-        //     }
-        //   }
-
         setState((prevState) => ({
           ...prevState,
           userData,
-          // profileImages,
           isLoading: false,
-          // isInstagramTokenUpdated: !!instagram_access_token,
         }));
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -173,48 +115,17 @@ const UserProfilePage = ({ isMobile }) => {
       });
   }, [dispatch, navigate, userId]);
 
-  // useEffect(() => {
-  //   if (state.isInstagramTokenUpdated) {
-  //     const fetchInstagramMedia = async () => {
-  //       try {
-  //         const { instagram_access_token } = state.userData;
-  //         const instagramMediaResponse = await getUserMedia(
-  //           instagram_access_token
-  //         );
-  //         if (instagramMediaResponse.success) {
-  //           const profileImages = instagramMediaResponse.data.data.map(
-  //             (imageObj) => imageObj.media_url
-  //           );
-  //           setState((prevState) => ({ ...prevState, profileImages }));
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching Instagram media:", error);
-  //       }
-  //     };
-
-  //     fetchInstagramMedia();
-  //     setState((prevState) => ({
-  //       ...prevState,
-  //       isInstagramTokenUpdated: false,
-  //     }));
-  //   }
-  // }, [state.isInstagramTokenUpdated, state.userData]);
-
   const handleSaveSocialMediaLinks = async (links) => {
     try {
-      // Check if there are any changes
       const hasChanges =
         links.instagram_url !== state.userData?.instagram_url ||
         links.facebook_url !== state.userData?.facebook_url ||
         links.twitter_url !== state.userData?.twitter_url;
 
       if (!hasChanges) {
-        // If no changes, show a snackbar and return early
-        // addSnackbar("No changes detected.", "info");
         return;
       }
 
-      // If there are changes, send the request to the backend
       const response = await updateUserSocialMedia(userId, links);
       if (response.success) {
         setState((prevState) => ({
@@ -286,6 +197,7 @@ const UserProfilePage = ({ isMobile }) => {
     console.log("After toggle:", !state.isEditModalOpen); // Debugging line
   };
 
+  // Function to calculate user's age
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 0;
 
@@ -294,7 +206,6 @@ const UserProfilePage = ({ isMobile }) => {
 
     let age = today.diff(birthDate, "year");
 
-    // Check if the current date is before the birthday in the current year
     if (today.isBefore(birthDate.add(age, "year"))) {
       age -= 1;
     }
@@ -337,13 +248,6 @@ const UserProfilePage = ({ isMobile }) => {
               isMobile={isMobile}
               isLoggedUserProfile={isLoggedUserProfile}
             />
-            {/* <ImageSection>
-              <ImageGrid
-                images={state.profileImages}
-                isMobile={isMobile}
-                isLoggedUserProfile={isLoggedUserProfile}
-              />
-            </ImageSection> */}
           </Content>
         </>
       )}
