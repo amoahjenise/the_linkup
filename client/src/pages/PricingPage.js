@@ -208,8 +208,11 @@ const PricingPage = () => {
 
           {/* Footer */}
           <Footer>
-            <Typography variant="body2" color="textSecondary">
-              *Cancel anytime. 30-day money-back guarantee.
+            <Typography
+              variant="body2"
+              color={colorMode === "dark" ? "lightgray" : "textSecondary"}
+            >
+              * You can cancel your subscription at any time.{" "}
             </Typography>
           </Footer>
         </PricingContainer>
