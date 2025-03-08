@@ -5,7 +5,6 @@ import {
   Typography,
   Card,
   CardContent,
-  Button,
   useMediaQuery,
 } from "@mui/material";
 import LogoHeader from "../components/LogoHeader";
@@ -144,13 +143,16 @@ const LandingPage = () => {
     <Box
       sx={{
         padding: "40px",
-        background: "linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         color: "white",
+        background: isSmallScreen
+          ? `url(${Wallpaper2}) no-repeat center center fixed` // Apply wallpaper on mobile
+          : "linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))", // Default background for large screens
+        backgroundSize: "cover",
       }}
     >
       <LogoHeader />
