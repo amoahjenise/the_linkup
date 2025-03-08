@@ -11,6 +11,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HistoryIcon from "@mui/icons-material/History";
 import MessageIcon from "@mui/icons-material/Message";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DiamondIcon from "@mui/icons-material/Diamond"; // New icon for Pro Plan
 import { useColorMode } from "@chakra-ui/react";
 import logo from "../assets/logo.png";
 import CustomUserButton from "./UserButton";
@@ -375,6 +376,23 @@ const LeftMenu = ({ isMobile }) => {
               colorMode={colorMode}
               location={location.pathname}
             />
+            {/* New Pro Plan Menu Item */}
+            <StyledMenuItemComponent
+              to="/pricing"
+              icon={
+                <DiamondIcon
+                  style={{
+                    color:
+                      colorMode === "dark"
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                />
+              }
+              text="Go Pro"
+              colorMode={colorMode}
+              location={location.pathname}
+            />
             <CustomUserButtonContainer>
               <CustomUserButton />
             </CustomUserButtonContainer>
@@ -511,6 +529,26 @@ const LeftMenu = ({ isMobile }) => {
               }}
             />
             <span>Settings</span>
+          </IconWithSpacing>
+        </StyledHamburgerMenuItem>
+        {/* Add Pro Plan to Mobile Menu */}
+        <StyledHamburgerMenuItem
+          component={Link}
+          to="/pricing"
+          onClick={handleMenuClose}
+          colorMode={colorMode}
+        >
+          <IconWithSpacing>
+            <DiamondIcon
+              style={{
+                marginRight: "6px",
+                color:
+                  colorMode === "dark"
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            />
+            <span>Go Pro</span>
           </IconWithSpacing>
         </StyledHamburgerMenuItem>
         <StyledHamburgerMenuItem
