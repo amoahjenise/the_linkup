@@ -1,5 +1,13 @@
 import React, { memo } from "react";
-import { Box, Grid, Typography, Card, CardContent } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
 import LogoHeader from "../components/LogoHeader";
 import WidgetTemplate from "../components/WidgetTemplate";
 import { styled } from "@mui/material/styles";
@@ -7,6 +15,7 @@ import Wallpaper from "../assets/Image5.jpg";
 import Wallpaper2 from "../assets/Image2.jpg";
 import { useTheme } from "@mui/material/styles";
 
+// Footer component styled
 const Footer = styled("footer")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -29,6 +38,7 @@ const Logo = styled("img")({
   filter: "invert(1)", // White logo for dark backgrounds
 });
 
+// Widgets for desktop view
 const SignUpWidget = memo(() => (
   <Card
     sx={{
@@ -102,8 +112,10 @@ const TermsAndServiceWidget = memo(() => (
   </Card>
 ));
 
+// Main LandingPage component
 const LandingPage = () => {
-  const theme = useTheme(); // Make sure theme is initialized using useTheme
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
 
   return (
     <Box
@@ -119,60 +131,123 @@ const LandingPage = () => {
       }}
     >
       <LogoHeader />
-      <Grid
-        container
-        spacing={2}
-        justifyContent="center"
-        sx={{
-          maxWidth: "1200px",
-          paddingTop: "40px",
-          paddingBottom: "40px",
-          [theme.breakpoints.down("md")]: {
-            flexDirection: "column", // Stack columns on medium screens
-            alignItems: "center", // Center the content for small screens
-          },
-        }}
-      >
-        {/* WidgetTemplate - Left Side */}
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          md={3}
-          sx={{
-            cursor: "pointer",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.02)",
-            },
-            marginBottom: "20px", // Ensure there's spacing on smaller screens
-          }}
-        >
-          <WidgetTemplate
-            image={Wallpaper}
-            title="Connect With New People and Organize Meetups"
-            subtitle="Around your interests"
-          />
-        </Grid>
 
-        {/* Right Side - Stacked Widgets */}
+      {/* Small screen layout */}
+      {isSmallScreen ? (
         <Grid
-          item
-          xs={12}
-          sm={6}
-          md={3} // Updated to 3 for better balance on larger screens
+          container
+          spacing={2}
+          justifyContent="center"
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2, // Increase gap between widgets
-            alignItems: "center", // Center widgets on small screens
-            justifyContent: "flex-start", // Ensure widgets are aligned to the top
+            maxWidth: "1200px",
+            paddingTop: "40px",
+            paddingBottom: "40px",
           }}
         >
-          <TermsAndServiceWidget />
-          <SignUpWidget />
+          {/* Mobile View: Sign In/Sign Up and Terms */}
+          <Grid
+            item
+            xs={12}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2, // Increase gap between items
+              alignItems: "center", // Center items on small screens
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{ width: "200px", backgroundColor: "#1976d2" }}
+            >
+              Sign In
+            </Button>
+            <Button variant="outlined" sx={{ width: "200px" }}>
+              Sign Up
+            </Button>
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              <a href="/terms-of-service" style={{ color: "white" }}>
+                Terms of Service
+              </a>{" "}
+              |{" "}
+              <a href="/privacy-policy" style={{ color: "white" }}>
+                Privacy Policy
+              </a>
+            </Typography>
+            <Typography variant="body2" sx={{ color: "gray" }}>
+              <a href="/cookie-use" style={{ color: "white" }}>
+                Cookie Use
+              </a>
+              .
+            </Typography>
+
+            {/* Add the description text here */}
+            <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
+              Connect with new people and organize meetups around your
+              interests.
+            </Typography>
+          </Grid>
         </Grid>
-      </Grid>
+      ) : (
+        // Large screen layout
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          sx={{
+            maxWidth: "1200px",
+            paddingTop: "40px",
+            paddingBottom: "40px",
+            [theme.breakpoints.down("sm")]: {
+              flexDirection: "column", // Stack columns on small screens
+              alignItems: "center", // Center the content for small screens
+            },
+            [theme.breakpoints.between(900, 1220)]: {
+              flexDirection: "row", // Keep them side by side on medium screens
+              gap: "120px", // Add gap between the columns
+            },
+          }}
+        >
+          {/* WidgetTemplate - Left Side */}
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={3}
+            sx={{
+              cursor: "pointer",
+              transition: "transform 0.3s ease",
+              "&:hover": {
+                transform: "scale(1.02)",
+              },
+              marginBottom: "20px", // Ensure there's spacing on smaller screens
+            }}
+          >
+            <WidgetTemplate
+              image={Wallpaper}
+              title="Connect With New People and Organize Meetups"
+              subtitle="Around your interests"
+            />
+          </Grid>
+
+          {/* Right Side - Stacked Widgets */}
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={3} // Updated to 3 for better balance on larger screens
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2, // Increase gap between widgets
+              alignItems: "center", // Center widgets on small screens
+              justifyContent: "flex-start", // Ensure widgets are aligned to the top
+            }}
+          >
+            <TermsAndServiceWidget />
+            <SignUpWidget />
+          </Grid>
+        </Grid>
+      )}
 
       <Footer>
         <Typography variant="body2">
