@@ -14,6 +14,36 @@ import { styled } from "@mui/material/styles";
 import Wallpaper from "../assets/Image5.jpg";
 import Wallpaper2 from "../assets/Image2.jpg";
 import { useTheme } from "@mui/material/styles";
+import { SignInButton, SignUpButton } from "@clerk/clerk-react";
+
+// Custom styled SignInButton and SignUpButton
+const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 151, 167, 0.8)",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "rgba(0, 151, 167, 1)",
+  },
+  padding: "6px 20px", // Added padding to match the button style
+  borderRadius: "4px", // Slight border radius for a cleaner look
+  textTransform: "none", // Prevents text from being uppercased
+  fontWeight: 600, // Bold text
+  letterSpacing: "0.5px", // Adjusts spacing between letters
+  fontSize: "14px", // Standard font size for the button text
+}));
+
+const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 151, 167, 0.9)",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "rgba(0, 151, 167, 1)",
+  },
+  padding: "6px 20px", // Added padding to match the button style
+  borderRadius: "4px", // Slight border radius for a cleaner look
+  textTransform: "none", // Prevents text from being uppercased
+  fontWeight: 600, // Bold text
+  letterSpacing: "0.5px", // Adjusts spacing between letters
+  fontSize: "14px", // Standard font size for the button text
+}));
 
 // Footer component styled
 const Footer = styled("footer")(({ theme }) => ({
@@ -30,13 +60,6 @@ const Footer = styled("footer")(({ theme }) => ({
     textAlign: "center",
   },
 }));
-
-const Logo = styled("img")({
-  width: "30px",
-  height: "30px",
-  marginRight: "10px",
-  filter: "invert(1)", // White logo for dark backgrounds
-});
 
 // Widgets for desktop view
 const SignUpWidget = memo(() => (
@@ -155,15 +178,32 @@ const LandingPage = () => {
               alignItems: "center", // Center items on small screens
             }}
           >
-            <Button
+            {/* Custom Sign Up Button */}
+            <CustomSignUpButton
+              sx={{
+                width: "200px",
+              }}
               variant="contained"
-              sx={{ width: "200px", backgroundColor: "#1976d2" }}
+              forceRedirectUrl="/registration"
+              fallbackRedirectUrl="/registration"
+              mode="modal"
             >
-              Sign In
-            </Button>
-            <Button variant="outlined" sx={{ width: "200px" }}>
-              Sign Up
-            </Button>
+              SIGN UP
+            </CustomSignUpButton>
+            {/* Custom Sign In Button */}
+            <CustomSignInButton
+              sx={{
+                width: "200px",
+                marginBottom: "16px", // Space between buttons
+              }}
+              variant="contained"
+              forceRedirectUrl="/home"
+              fallbackRedirectUrl="/home"
+              mode="modal"
+            >
+              SIGN IN
+            </CustomSignInButton>
+
             <Typography variant="body1" sx={{ mt: 2 }}>
               <a href="/terms-of-service" style={{ color: "white" }}>
                 Terms of Service

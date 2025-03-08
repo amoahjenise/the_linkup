@@ -1,6 +1,36 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
+import { styled } from "@mui/material/styles";
+
+// Custom styled SignInButton and SignUpButton
+const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 151, 167, 0.8)",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "rgba(0, 151, 167, 1)",
+  },
+  padding: "6px 20px", // Added padding to match the button style
+  borderRadius: "4px", // Slight border radius for a cleaner look
+  textTransform: "none", // Prevents text from being uppercased
+  fontWeight: 600, // Bold text
+  letterSpacing: "0.5px", // Adjusts spacing between letters
+  fontSize: "14px", // Standard font size for the button text
+}));
+
+const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
+  backgroundColor: "rgba(0, 151, 167, 0.9)",
+  color: "white",
+  "&:hover": {
+    backgroundColor: "rgba(0, 151, 167, 1)",
+  },
+  padding: "6px 20px", // Added padding to match the button style
+  borderRadius: "4px", // Slight border radius for a cleaner look
+  textTransform: "none", // Prevents text from being uppercased
+  fontWeight: 600, // Bold text
+  letterSpacing: "0.5px", // Adjusts spacing between letters
+  fontSize: "14px", // Standard font size for the button text
+}));
 
 // WidgetTemplate Component
 const WidgetTemplate = ({ image, title, subtitle }) => {
@@ -77,38 +107,30 @@ const WidgetTemplate = ({ image, title, subtitle }) => {
           }}
         >
           {/* Sign Up Button */}
-          <Button
+          <CustomSignUpButton
             sx={{
-              backgroundColor: "rgba(0, 151, 167, 0.8)",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "rgba(0, 151, 167, 1)",
-              },
+              width: "100%", // Make button take full width
             }}
             variant="contained"
             forceRedirectUrl="/registration" // Redirect to /registration after signing up
             fallbackRedirectUrl="/registration"
             mode="modal"
           >
-            Sign Up
-          </Button>
+            SIGN UP
+          </CustomSignUpButton>
 
           {/* Sign In Button */}
-          <Button
+          <CustomSignInButton
             sx={{
-              backgroundColor: "rgba(0, 151, 167, 0.8)",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "rgba(0, 151, 167, 1)",
-              },
+              width: "100%", // Make button take full width
             }}
             variant="contained"
             forceRedirectUrl="/home" // Redirect to /home after signing in
             fallbackRedirectUrl="/home"
             mode="modal"
           >
-            Sign In
-          </Button>
+            SIGN IN
+          </CustomSignInButton>
         </Box>
       </Box>
     </Box>
