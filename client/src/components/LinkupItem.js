@@ -319,16 +319,28 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   };
 
   const renderLinkupItemText = () => {
+    // Parse the activity using NLP
     const doc = compromise(activity);
-    const startsWithVerb = doc.verbs().length > 0;
-    const isVerbEndingWithIng = activity.endsWith("ing");
 
+    // Detect verbs and nouns
+    const verbs = doc.verbs();
+    const nouns = doc.nouns();
+
+    // Check if any of the nouns are plural
+    const isPlural = nouns.some((noun) => noun.tag() === "Plural");
+
+    // Default activity formatted string
     let activityFormatted = "";
 
-    if (activity) {
-      activityFormatted = isVerbEndingWithIng
-        ? `for ${activity}`
-        : `${startsWithVerb ? "to" : "for"} ${activity}`;
+    // If it's a gerund (e.g., "Hiking", "Running"), treat it as a noun phrase
+    const isGerund = activity.match(/\w+ing$/);
+
+    if (isGerund) {
+      activityFormatted = `for ${activity}`;
+    } else {
+      // If it's plural or contains more nouns, use "for" (e.g., "hikes", "soccer games")
+      const isNounHeavy = nouns.length >= verbs.length || isPlural;
+      activityFormatted = isNounHeavy ? `for ${activity}` : `to ${activity}`;
     }
 
     return (
