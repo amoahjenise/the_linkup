@@ -124,7 +124,6 @@ const PostContent = styled("div")(({ colorMode }) => ({
 
   "& p": {
     fontWeight: "400", // Normal weight for paragraphs
-    color: colorMode === "light" ? "#3D3D3D" : "#C9CCD1", // Softer contrast for text
     letterSpacing: "0.5px", // Subtle letter-spacing for readability
     marginBottom: "12px", // Adequate spacing between paragraphs
   },
@@ -133,7 +132,7 @@ const PostContent = styled("div")(({ colorMode }) => ({
     marginTop: "12px", // Increased margin for clean separation
     fontWeight: "500", // Medium weight for metadata (timestamp, etc.)
     fontSize: "0.95rem", // Slightly smaller for metadata
-    color: colorMode === "light" ? "#606770" : "#A8ABB1", // Softer colors for metadata
+    color: colorMode === "light" ? "#606770" : "#D1D4D9", // Softer colors for metadata
   },
 }));
 
