@@ -118,7 +118,7 @@ const TermsAndServiceWidget = memo(() => (
       <Typography variant="body1" sx={{ mt: 2, color: "white" }}>
         <a href="/terms-of-service" style={{ color: "white" }}>
           Terms of Service
-        </a>{" "}
+        </a>
         ,{" "}
         <a href="/privacy-policy" style={{ color: "white" }}>
           Privacy Policy
