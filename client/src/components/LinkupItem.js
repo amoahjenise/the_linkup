@@ -110,30 +110,30 @@ const DistanceInfo = styled("div")(({ theme }) => ({
 }));
 
 const PostContent = styled("div")(({ colorMode }) => ({
-  marginTop: "0.5rem",
-  lineHeight: "1.5rem",
-  fontSize: "0.935rem",
-  fontFamily:
-    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB", // Better contrast
+  marginTop: "1rem", // Spacious margin for better separation
+  lineHeight: "1.75rem", // Improved line height for easy readability
+  fontSize: "1rem", // Balanced font size for content
+  fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif', // Clean, modern font
+  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB", // High contrast for legibility
 
   "& div:first-of-type": {
-    fontWeight: "500",
-    color: colorMode === "light" ? "#242526" : "#DADDE1", // Slightly bolder for emphasis
-    marginBottom: "6px",
+    fontWeight: "600", // Emphasis for the first div (title/heading)
+    color: colorMode === "light" ? "#242526" : "#DADDE1", // Subtle emphasis in dark mode
+    marginBottom: "10px", // Increased bottom margin for proper spacing
   },
 
   "& p": {
-    fontWeight: "400",
-    color: colorMode === "light" ? "#3D3D3D" : "#C9CCD1",
-    letterSpacing: "0.2px",
+    fontWeight: "400", // Normal weight for paragraphs
+    color: colorMode === "light" ? "#3D3D3D" : "#C9CCD1", // Softer contrast for text
+    letterSpacing: "0.5px", // Subtle letter-spacing for readability
+    marginBottom: "12px", // Adequate spacing between paragraphs
   },
 
   "& div:last-of-type": {
-    marginTop: "6px",
-    fontWeight: "500",
-    fontSize: "0.9rem",
-    color: colorMode === "light" ? "#606770" : "#A8ABB1", // Softer but clear
+    marginTop: "12px", // Increased margin for clean separation
+    fontWeight: "500", // Medium weight for metadata (timestamp, etc.)
+    fontSize: "0.95rem", // Slightly smaller for metadata
+    color: colorMode === "light" ? "#606770" : "#A8ABB1", // Softer colors for metadata
   },
 }));
 
@@ -141,8 +141,13 @@ const PostContent = styled("div")(({ colorMode }) => ({
 const PostInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.8rem",
-  color: "#718096",
+  fontSize: "0.85rem", // Balanced font size for metadata
+  color: "#718096", // Light, soft color for metadata text
+  gap: "12px", // Increased gap for better spacing between metadata items
+  marginTop: "4px", // Spacing from the post content
+  fontWeight: "400", // Normal font weight for metadata
+  letterSpacing: "0.25px", // Subtle letter-spacing for clarity
+  textTransform: "capitalize", // Optionally add a more polished look
 }));
 
 // Online status indicator
