@@ -37,6 +37,7 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
+import PricingPage from "./pages/PricingPage";
 
 const publicPages = [
   "/",
@@ -103,6 +104,7 @@ const RoutesComponent = ({ isMobile }) => (
     <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
     <Route path="/settings" element={<SettingsPage />} />
     <Route path="/Error" element={<ErrorPage />} />
+    <Route path="/pricing" element={<PricingPage />} />
   </Routes>
 );
 
