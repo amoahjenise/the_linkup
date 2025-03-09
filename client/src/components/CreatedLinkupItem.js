@@ -12,114 +12,100 @@ import { Tooltip } from "@mui/material";
 
 const compromise = nlp;
 
+// OUTER CONTAINER
 const Container = styled("div")({
-  padding: "0.75rem 1rem",
   display: "flex",
-  alignItems: "center",
+  width: "100%",
   justifyContent: "center",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "transparent",
+  padding: "0.25rem 0.5rem", // tighter spacing
 });
 
+// MAIN CARD
 const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
-  border: `1px solid ${
-    colorMode === "light"
-      ? "rgba(229, 235, 243, 1)"
-      : "rgba(255, 255, 255, 0.1)"
-  }`,
-  padding: "1rem",
-  borderRadius: "1rem",
+  display: "flex",
+  flexDirection: "column",
   width: "100%",
-  minHeight: "175px",
-  backgroundColor: colorMode === "dark" ? "#19262e" : "#FFFFFF",
-  backdropFilter: "blur(12px)",
-  boxShadow:
+  maxWidth: "600px",
+  padding: "1rem",
+  backgroundColor: colorMode === "dark" ? "#1A1D21" : "#FFFFFF",
+  borderRadius: "12px",
+  border:
     colorMode === "light"
-      ? isHovered
-        ? "0 4px 12px rgba(0, 0, 0, 0.15)"
-        : "0 2px 6px rgba(0, 0, 0, 0.05)"
-      : isHovered
-      ? "0 4px 12px rgba(0, 0, 0, 0.3)"
-      : "none",
-  transition: "transform 0.2s ease, box-shadow 0.2s ease",
-  "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow:
-      colorMode === "light"
-        ? "0 6px 18px rgba(0, 0, 0, 0.1)"
-        : "0 6px 18px rgba(255, 255, 255, 0.15)",
-  },
+      ? "1px solid rgba(229, 235, 243, 0.8)"
+      : "1px solid rgba(255, 255, 255, 0.08)",
+  boxShadow: isHovered
+    ? colorMode === "light"
+      ? "0px 4px 12px rgba(0, 0, 0, 0.12)"
+      : "0px 4px 16px rgba(0, 0, 0, 0.5)"
+    : colorMode === "light"
+    ? "0px 1px 4px rgba(0, 0, 0, 0.05)"
+    : "0px 1px 4px rgba(0, 0, 0, 0.2)",
+  transition: "all 0.2s ease",
   cursor: "pointer",
-}));
-
-const UserName = styled("div")({
-  fontSize: "0.9rem",
-  fontWeight: "600",
-  color: "inherit",
-});
-
-const Name = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-});
-
-const UserInfo = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-});
-
-const PostActionsContainer = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  marginTop: "0.5rem",
-});
-
-const PostContent = styled("div")(({ colorMode }) => ({
-  marginTop: "0.5rem",
-  lineHeight: "1.5rem",
-  fontSize: "0.935rem",
-  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB",
-  "& div:first-of-type": {
-    fontWeight: "500",
-    color: colorMode === "light" ? "#242526" : "#DADDE1",
-    marginBottom: "6px",
-  },
-  "& p": {
-    fontWeight: "400",
-    color: colorMode === "light" ? "#3D3D3D" : "#C9CCD1",
-    letterSpacing: "0.2px",
-  },
-  "& div:last-of-type": {
-    marginTop: "6px",
-    fontWeight: "500",
-    fontSize: "0.9rem",
-    color: colorMode === "light" ? "#606770" : "#A8ABB1",
+  "&:hover": {
+    transform: "translateY(-2px)",
   },
 }));
 
-const PostInfo = styled("div")({
+// USER INFO
+const UserInfoRow = styled("div")({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.8rem",
-  color: "#718096",
+  justifyContent: "space-between",
+  width: "100%",
 });
 
+// USER NAME
+const UserName = styled("span")(({ theme }) => ({
+  fontWeight: 600,
+  fontSize: "0.95rem",
+}));
+
+// ONLINE INDICATOR
 const OnlineIndicator = styled("div")(({ isOnline }) => ({
-  width: "0.5rem",
-  height: "0.5rem",
+  width: "10px",
+  height: "10px",
   borderRadius: "50%",
   backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
   marginLeft: "0.5rem",
 }));
 
+// TIMESTAMP
+const PostInfo = styled("div")(({ theme, colorMode }) => ({
+  fontSize: "0.75rem",
+  color: colorMode === "dark" ? "white" : theme.palette.text.secondary,
+}));
+
+// MAIN CONTENT TEXT
+const PostContent = styled("div")(({ colorMode }) => ({
+  marginTop: "0.75rem",
+  fontSize: "0.92rem",
+  color: colorMode === "dark" ? "#DADDE1" : "#1C1E21",
+  lineHeight: "1.5",
+  "& p": {
+    margin: 0,
+    fontWeight: 400,
+  },
+  "& span": {
+    fontWeight: 500,
+  },
+}));
+
+// LOCATION TEXT
+const LocationText = styled("div")(({ colorMode }) => ({
+  marginTop: "0.5rem",
+  fontSize: "0.85rem",
+  color: colorMode === "dark" ? "#A8ABB1" : "#606770",
+}));
+
+// PAYMENT ICON CONTAINER
 const PaymentOptionIcon = styled("div")({
   display: "flex",
-  justifyContent: "space-between",
-  width: "50%",
-  height: "50%",
+  alignItems: "center",
+  marginTop: "0.75rem",
+  "& svg": {
+    fontSize: "1.25rem",
+  },
 });
 
 const formatDate = (date) => moment(date).format("dddd, MMM D YYYY • h:mm A");
@@ -134,6 +120,7 @@ const CreatedLinkupItem = ({ linkupItem }) => {
   const { colorMode } = useColorMode();
   const [isHovered, setIsHovered] = useState(false);
   const loggedUser = useSelector((state) => state.loggedUser);
+
   const {
     id,
     creator_id,
@@ -149,27 +136,19 @@ const CreatedLinkupItem = ({ linkupItem }) => {
     switch (linkupItem.payment_option) {
       case "split":
         return (
-          <Tooltip title="Lets split the bill!">
-            <span
-              role="img"
-              aria-label="split the bill"
-              style={{ fontSize: "30px" }}
-            >
-              <PaymentOptionIcon>
-                <IoReceipt />
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>
+          <Tooltip title="Let's split the bill!">
+            <PaymentOptionIcon>
+              <IoReceipt />
+              <IoReceipt />
+            </PaymentOptionIcon>
           </Tooltip>
         );
       case "iWillPay":
         return (
           <Tooltip title="I'll pay!">
-            <span role="img" aria-label="i'll pay" style={{ fontSize: "30px" }}>
-              <PaymentOptionIcon>
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>
+            <PaymentOptionIcon>
+              <IoReceipt />
+            </PaymentOptionIcon>
           </Tooltip>
         );
       case "pleasePay":
@@ -196,15 +175,13 @@ const CreatedLinkupItem = ({ linkupItem }) => {
     return (
       <p>
         <Link
-          style={{ fontWeight: 500 }}
           to={`/profile/${creator_id}`}
-          className={UserName}
+          style={{ fontWeight: 500, textDecoration: "none", color: "inherit" }}
         >
           {creator_name}
         </Link>{" "}
-        is trying to link up{" "}
-        <span style={{ fontWeight: 500 }}>{activityFormatted}</span> on{" "}
-        <span style={{ fontWeight: 500 }}>{formatDate(date)}</span>.
+        is trying to link up <span>{activityFormatted}</span> on{" "}
+        <span>{formatDate(date)}</span>.
       </p>
     );
   };
@@ -240,46 +217,30 @@ const CreatedLinkupItem = ({ linkupItem }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div style={{ display: "flex", width: "100%" }}>
-          <div style={{ flex: 2, marginRight: "1rem" }}>
-            <UserInfo>
-              <Name>
-                <UserName>{creator_name}</UserName>
-                <Tooltip
-                  title={linkupItem.is_online ? "Online" : "Offline"}
-                  arrow
-                >
-                  <OnlineIndicator isOnline={linkupItem.is_online} />
-                </Tooltip>
-              </Name>
-            </UserInfo>
-            <PostInfo>
-              <span>{getTimeAgo(created_at)}</span>
-            </PostInfo>
-            <PostContent colorMode={colorMode}>
-              {renderLinkupItemText()}
-              <div>{capitalizeLocation(location)}</div>
-            </PostContent>
-            <PostActionsContainer>
-              <span>{renderPaymentOptionIcon()}</span>
-            </PostActionsContainer>
+        <UserInfoRow>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <UserName>{creator_name}</UserName>
+            <Tooltip title={linkupItem.is_online ? "Online" : "Offline"} arrow>
+              <OnlineIndicator isOnline={linkupItem.is_online} />
+            </Tooltip>
           </div>
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              justifyContent: "center",
-            }}
-          >
-            <UserAvatar
-              userData={{ id: creator_id, name: creator_name, avatar: avatar }}
-              width="80px"
-              height="80px"
-            />
-          </div>
-        </div>
+          <UserAvatar
+            userData={{ id: creator_id, name: creator_name, avatar: avatar }}
+            width="50px"
+            height="50px"
+          />
+        </UserInfoRow>
+        <PostInfo colorMode={colorMode}>{getTimeAgo(created_at)}</PostInfo>
+
+        <PostContent colorMode={colorMode}>
+          {renderLinkupItemText()}
+        </PostContent>
+
+        <LocationText colorMode={colorMode}>
+          {capitalizeLocation(location)}
+        </LocationText>
+
+        {renderPaymentOptionIcon()}
       </CardContainer>
     </Container>
   );
