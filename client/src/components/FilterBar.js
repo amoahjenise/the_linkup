@@ -42,7 +42,7 @@ const FilterBar = ({
 }) => {
   const { colorMode } = useColorMode();
 
-  let statusOptions = ["All", "Active", "Closed", "Completed", "Expired"];
+  let statusOptions = ["All", "Active", "Closed", "Expired"];
 
   if (activeTab === 1 || activeTab === 2) {
     // Modify status options for the "Requests Sent" and "Requests Received" tabs
