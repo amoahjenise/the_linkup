@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import UserProfile from "../components/UserProfile";
 import { styled } from "@mui/material/styles";
+import { Box } from "@mui/material";
 import {
   getUserById,
   updateUserBio,
@@ -10,23 +12,11 @@ import {
   updateSendbirdUser,
   updateUserName,
 } from "../api/usersAPI";
-import LoadingSpinner from "../components/LoadingSpinner";
-import TopNavBar from "../components/TopNavBar";
-import UserProfileEditModal from "../components/UserProfileEditModal";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 import { useClerk } from "@clerk/clerk-react";
-import { Box, Button } from "@mui/material";
 import { useColorMode } from "@chakra-ui/react";
-import ProfileBanner from "../components/ProfileBanner";
-import ProfileInfoBar from "../components/ProfileInfoBar";
-import SocialMediaLinks from "../components/SocialMediaLinks";
-
-// Extend Day.js with plugins
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import TopNavBar from "../components/TopNavBar";
 
 // Styled components
 const Container = styled(Box)(({ theme }) => ({
@@ -39,27 +29,6 @@ const Container = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Content = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  overflowY: "auto", // Allow vertical scrolling only if content overflows
-});
-
-const EditButton = styled(Button)(({ theme, colorMode }) => ({
-  color: colorMode === "light" ? "black" : "white",
-  borderRadius: "20px",
-  padding: theme.spacing(1, 3),
-  textTransform: "none",
-  border: `1px solid ${
-    colorMode === "light" ? "white" : theme.palette.divider
-  }`,
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-  "&:hover": {
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-  },
-}));
-
 const UserProfilePage = ({ isMobile }) => {
   const { id: userIdParam } = useParams();
   const [state, setState] = useState({
@@ -67,6 +36,7 @@ const UserProfilePage = ({ isMobile }) => {
     profileImages: [],
     isLoading: true,
     isEditModalOpen: false,
+    isSocialMediaModalOpen: false, // Add state for SocialMediaLinks modal
     isInstagramTokenUpdated: false,
   });
 
@@ -105,14 +75,6 @@ const UserProfilePage = ({ isMobile }) => {
     };
 
     fetchData();
-    return () =>
-      setState({
-        userData: null,
-        profileImages: [],
-        isLoading: true,
-        isEditModalOpen: false,
-        isInstagramTokenUpdated: false,
-      });
   }, [dispatch, navigate, userId]);
 
   const handleSaveSocialMediaLinks = async (links) => {
@@ -189,12 +151,26 @@ const UserProfilePage = ({ isMobile }) => {
   };
 
   const toggleEditModal = () => {
-    console.log("Before toggle:", state.isEditModalOpen); // Debugging line
     setState((prevState) => ({
       ...prevState,
       isEditModalOpen: !prevState.isEditModalOpen,
     }));
-    console.log("After toggle:", !state.isEditModalOpen); // Debugging line
+  };
+
+  // Toggle Social Media Modal
+  const toggleSocialMediaModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isSocialMediaModalOpen: !prevState.isSocialMediaModalOpen,
+    }));
+  };
+
+  // Toggle Linkups Modal
+  const toggleLinkupsModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      isLinkupsModalOpen: !prevState.isLinkupsModalOpen,
+    }));
   };
 
   // Function to calculate user's age
@@ -216,49 +192,26 @@ const UserProfilePage = ({ isMobile }) => {
   return (
     <Container>
       <TopNavBar title="Profile" />
-      {state.isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          <ProfileBanner
-            userData={state.userData}
-            userLocation={
-              locationState.city && locationState.country
-                ? `${locationState.city}, ${locationState.country}`
-                : "Unknown Location"
-            }
-            calculateAge={calculateAge}
-            colorMode={colorMode}
-          />
-          <ProfileInfoBar
-            userData={state.userData}
-            renderEditButton={() =>
-              isLoggedUserProfile && (
-                <EditButton onClick={toggleEditModal} colorMode={colorMode}>
-                  Edit Profile
-                </EditButton>
-              )
-            }
-            colorMode={colorMode}
-          />
-          <Content>
-            <SocialMediaLinks
-              userData={state.userData}
-              onSave={handleSaveSocialMediaLinks}
-              isMobile={isMobile}
-              isLoggedUserProfile={isLoggedUserProfile}
-            />
-          </Content>
-        </>
-      )}
-      {state.isEditModalOpen && (
-        <UserProfileEditModal
-          isOpen={state.isEditModalOpen}
-          userData={state.userData}
-          onClose={toggleEditModal}
-          onSave={handleSaveChanges}
-        />
-      )}
+      <UserProfile
+        isMobile={isMobile}
+        userData={state.userData}
+        calculateAge={calculateAge}
+        userLocation={
+          locationState.city && locationState.country
+            ? `${locationState.city}, ${locationState.country}`
+            : "Unknown Location"
+        }
+        toggleEditModal={toggleEditModal}
+        handleSaveSocialMediaLinks={handleSaveSocialMediaLinks}
+        isLoggedUserProfile={isLoggedUserProfile}
+        isEditModalOpen={state.isEditModalOpen}
+        handleSaveChanges={handleSaveChanges}
+        isSocialMediaModalOpen={state.isSocialMediaModalOpen}
+        toggleSocialMediaModal={toggleSocialMediaModal}
+        isLinkupsModalOpen={state.isLinkupsModalOpen} // Pass Linkups modal state
+        toggleLinkupsModal={toggleLinkupsModal} // Pass Linkups modal toggle function
+        addSnackbar={addSnackbar}
+      />
     </Container>
   );
 };

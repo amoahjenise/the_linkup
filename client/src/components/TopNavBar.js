@@ -30,7 +30,7 @@ const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
     <CustomAppBar elevation={0} colorMode={colorMode}>
       <Toolbar>
         <HeaderText variant="h6">{title}</HeaderText>
-        <ToggleColorMode />
+        {/* <ToggleColorMode /> */}
       </Toolbar>
       {tabs && tabs.length > 0 && (
         <Tabs value={selectedTab} onChange={onChangeTab}>
