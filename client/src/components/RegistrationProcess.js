@@ -25,13 +25,21 @@ const Root = styled("div")(({ theme }) => ({
 }));
 
 const Title = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(8),
-  fontSize: "24px",
+  fontFamily: '"Roboto", "Helvetica Neue", Arial, sans-serif', // Modern sans-serif font
+  fontSize: "40px", // Larger title size for emphasis
+  fontWeight: "bold", // Bold for prominence, like Netflix
+  lineHeight: "1.2", // Tight line height for a clean look
+  textTransform: "capitalize", // Capitalize first letter for a polished look
+  marginBottom: theme.spacing(4), // Added margin between title and subtitle
 }));
 
 const SubTitle = styled("p")(({ theme }) => ({
-  fontSize: "18px",
-  marginBottom: theme.spacing(2),
+  fontFamily: '"Roboto", "Helvetica Neue", Arial, sans-serif', // Consistent font family
+  fontSize: "18px", // Smaller subtitle size
+  fontWeight: "400", // Lighter weight for subtitles
+  lineHeight: "1.6", // A bit more line height for readability
+  marginTop: theme.spacing(2), // Space between title and subtitle
+  textTransform: "none", // Capitalize first letter for a polished look
 }));
 
 const ButtonContainer = styled("div")(({ theme }) => ({
@@ -43,24 +51,46 @@ const ButtonContainer = styled("div")(({ theme }) => ({
 
 const BackButton = styled(Button)(({ theme, colorMode }) => ({
   width: "50%",
-  border: "1px solid #ccc",
   color: colorMode === "dark" ? "#fff" : "#000",
-  marginRight: theme.spacing(2),
+  backgroundColor: colorMode === "dark" ? "#424242" : "#f0f0f0", // A neutral background for better aesthetics
+  borderRadius: "12px", // Rounded corners for a softer look
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for the button
+  textTransform: "none", // Disable uppercase transformation for a more natural text
+  padding: "12px 24px", // Consistent padding
+  transition: "all 0.3s ease", // Smooth transition for hover effect
   "&:hover": {
-    backgroundColor: colorMode === "dark" ? "#1976d2" : "#434EA5",
+    backgroundColor: colorMode === "dark" ? "#616161" : "#e0e0e0", // Lighter shade on hover
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)", // Slightly more prominent shadow on hover
   },
+  "&:focus": {
+    outline: "none", // Remove default focus outline for cleaner appearance
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)", // Focus effect with subtle glow
+  },
+  marginRight: theme.spacing(2),
 }));
 
 const ContinueButton = styled(Button)(({ theme, colorMode }) => ({
   width: "50%",
-  border: "1px solid #ccc",
   color: colorMode === "dark" ? "#fff" : "#000",
+  backgroundColor: "#009688", // Linkup teal color
+  borderRadius: "12px", // Rounded corners for a modern feel
+  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Soft shadow for depth
+  textTransform: "none", // Keep text natural
+  padding: "12px 24px", // Maintain consistent padding
+  transition: "all 0.3s ease", // Smooth transition for hover effect
   "&:hover": {
-    backgroundColor: colorMode === "dark" ? "#1976d2" : "#434EA5",
+    backgroundColor: "#00796b", // Darker teal shade on hover
+    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)", // Slightly more prominent shadow on hover
   },
   "&.Mui-disabled": {
-    color: colorMode === "dark" ? "#fff" : "#000",
+    backgroundColor: colorMode === "dark" ? "#616161" : "#BDBDBD", // Disabled state color
+    color: "#9E9E9E", // Disabled text color
   },
+  "&:focus": {
+    outline: "none", // Remove focus outline
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)", // Focus effect with subtle glow
+  },
+  marginLeft: theme.spacing(2),
 }));
 
 const RegistrationProcess = () => {
@@ -69,7 +99,6 @@ const RegistrationProcess = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useUser();
-  console.log("User from Clerk:", user);
   const clerk = useClerk();
   const registrationData = useSelector((state) => state.registration);
   const [userData, setUserData] = useState({
@@ -99,7 +128,6 @@ const RegistrationProcess = () => {
             dispatch(setIsRegistering(true));
           }
         } catch (error) {
-          // alert(`An unknown error occurred. Please try again later.`);
           console.log(`Error fetching user data: ${error.message}`);
         }
       }
@@ -157,7 +185,7 @@ const RegistrationProcess = () => {
   ];
 
   const pageSubTitles = [
-    "This is how you’ll appear on The Linkup. You won't be able to change this later.",
+    "Your age will be displayed, and your gender will be used for linkup filtering. This can't be changed later.",
     "Let's add your first picture to display on your profile.",
     "",
   ];
@@ -175,7 +203,7 @@ const RegistrationProcess = () => {
 
   return (
     <Root>
-      <MultiStepProgressBar colorMode={colorMode} />
+      <MultiStepProgressBar />
       <div>
         <Title>
           <h1>
