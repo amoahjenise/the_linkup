@@ -162,7 +162,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
     dateFilter: "All",
   });
 
-  const statusOptions = ["Active", "Closed", "Completed", "Expired", "All"];
+  const statusOptions = ["Active", "Closed", "Expired", "All"];
   const requestsStatusOptions = [
     "All",
     "Pending",

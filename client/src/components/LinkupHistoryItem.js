@@ -58,8 +58,8 @@ const StyledChip = styled(Chip)(({ theme, status }) => {
   let color;
   switch (status) {
     case "active":
-      backgroundColor = "rgba(241, 196, 15, 0.1)"; // Yellow with transparency
-      color = "#f1c40f";
+      backgroundColor = "rgba(15, 241, 90, 0.1)"; // Green with transparency
+      color = "#73faae";
       break;
     case "closed":
       backgroundColor = "rgba(240, 247, 248, 0.1)"; // Lightblue-gray with transparency
@@ -136,7 +136,7 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
         return (
           <QueryBuilderOutlined
             fontSize="small"
-            color="rgba(241, 196, 15, 0.1)"
+            color="rgba(15, 241, 90, 0.1)"
           />
         );
       case "closed":
