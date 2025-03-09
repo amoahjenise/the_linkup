@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { Typography } from "@mui/material";
 import logo from "../assets/logo.png";
+import { useColorMode } from "@chakra-ui/react";
 
 // Styled components
 const MainContainer = styled("div")(({ theme }) => ({
@@ -26,16 +27,24 @@ const Title = styled(Typography)(({ theme }) => ({
 }));
 
 const LogoHeader = () => {
+  const { colorMode } = useColorMode();
+
   return (
     <MainContainer>
       <LogoContainer>
         <LogoImage
           src={logo}
           alt="Logo"
-          style={{ filter: "invert(0.879) grayscale(70%)" }}
+          style={{
+            filter: colorMode === "dark" ? "invert(1)" : "none", // Invert only in dark mode
+          }}
         />
       </LogoContainer>
-      <Title variant="h4" component="h1" color="white">
+      <Title
+        variant="h4"
+        component="h1"
+        color={colorMode === "dark" ? "white" : "black"}
+      >
         The Linkup
       </Title>
     </MainContainer>
