@@ -1,47 +1,63 @@
 import React, { useRef, useState } from "react";
-import { BiSearch } from "react-icons/bi";
-import { MdClose } from "react-icons/md";
+import { BiSearch, BiX } from "react-icons/bi";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
 import SearchHintBox from "./SearchHintBox";
 
+// Container now includes a proper border and adjusts colors based on the color mode.
 const Container = styled("div")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: "2px 5px",
+  padding: "4px 8px",
   borderRadius: "24px",
-  borderWidth: "1px",
-  transition: "box-shadow 0.3s ease",
+  border: `1px solid ${
+    colorMode === "dark" ? "rgba(255,255,255,0.2)" : "#ccc"
+  }`,
+  transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+  backgroundColor: colorMode === "dark" ? "rgb(18, 18, 18)" : "#fff",
   "&:hover": {
     boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
+    borderColor: colorMode === "dark" ? "rgba(255,255,255,0.4)" : "#999",
   },
-  backgroundColor: colorMode === "dark" ? "rgba(200, 200, 200, 0.1)" : "white",
 }));
 
+// InputContainer is now positioned relative so we can absolutely position the icon.
 const InputContainer = styled("div")({
+  position: "relative",
   display: "flex",
-  flexDirection: "row",
   alignItems: "center",
-  justifyContent: "space-between",
 });
 
+// The Input takes the full available width and adds right padding to prevent text
+// from going underneath the icon.
 const Input = styled("input")({
+  flex: 1,
   height: "36px",
-  width: "100%",
-  padding: "0 8px",
+  padding: "0 16px",
+  paddingRight: "48px", // extra space for the icon
   borderRadius: "24px",
   border: "none",
-  fontWeight: "semi-bold",
+  fontWeight: 600,
   outline: "none",
 });
 
+// The IconContainer is absolutely positioned to the right.
+// A hover effect is added for better UX.
 const IconContainer = styled("div")({
+  position: "absolute",
+  right: "8px",
+  top: "50%",
+  transform: "translateY(-50%)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "8px",
   background: "#0097A7",
   borderRadius: "50%",
+  padding: "8px",
   cursor: "pointer",
+  transition: "background 0.3s ease",
+  "&:hover": {
+    background: "#007C91",
+  },
 });
 
 const SearchInput = ({ handleInputChange }) => {
@@ -67,7 +83,9 @@ const SearchInput = ({ handleInputChange }) => {
     handleInputChange(event);
   };
 
-  const handleClear = () => {
+  // Clears the input and focuses the field.
+  const handleClear = (e) => {
+    e.stopPropagation();
     setSearchValue("");
     handleInputChange({ target: { value: "" } });
     inputRef.current.focus();
@@ -88,8 +106,12 @@ const SearchInput = ({ handleInputChange }) => {
             onBlur={handleBlur}
             autoComplete="off"
           />
-          <IconContainer>
-            <BiSearch color="#fff" fontSize="18px" />
+          <IconContainer onClick={searchValue ? handleClear : handleClick}>
+            {searchValue ? (
+              <BiX color="#fff" fontSize="18px" />
+            ) : (
+              <BiSearch color="#fff" fontSize="18px" />
+            )}
           </IconContainer>
         </InputContainer>
       </Container>
