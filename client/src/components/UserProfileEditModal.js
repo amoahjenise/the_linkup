@@ -47,7 +47,6 @@ const StyledTextField = styled(TextField)(({ theme, colorMode }) => ({
   },
   "& .MuiInputBase-input": {
     color: colorMode === "dark" ? "#FFFFFF" : "#333333", // Input text color
-    // backgroundColor: colorMode === "dark" ? "#424242" : "#F2F2F2", // Background color for inputs
   },
   "& .MuiInputLabel-root": {
     color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
@@ -71,7 +70,6 @@ const AvatarContainer = styled("div")(({ theme }) => ({
 const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
   marginTop: theme.spacing(2),
   backgroundColor: colorMode === "dark" ? "transparent" : "white", // Input text color
-
   width: "100%",
   "& .MuiInputBase-input": {
     color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Input text color
@@ -135,13 +133,13 @@ const MAX_BIO_LENGTH = 160;
 const MIN_CHARS_REMAINING_TO_DISPLAY = 10;
 
 const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
-  const [editedBio, setEditedBio] = useState(userData.bio || "");
-  const [updatedAvatar, setUpdatedAvatar] = useState(userData.avatar || null);
-  const [editedName, setEditedName] = useState(userData.name || "");
   const { colorMode } = useColorMode();
+  const [editedBio, setEditedBio] = useState(userData?.bio || "");
+  const [updatedAvatar, setUpdatedAvatar] = useState(userData?.avatar || null);
+  const [editedName, setEditedName] = useState(userData?.name || "");
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && userData) {
       // Reset the state with userData values when the modal is opened
       setEditedBio(userData.bio || "");
       setUpdatedAvatar(userData.avatar || null);
@@ -154,11 +152,17 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
   };
 
   // Format the date of birth using Intl.DateTimeFormat
-  const formattedDOB = new Intl.DateTimeFormat("en-GB", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(userData.date_of_birth));
+  const formattedDOB = userData?.date_of_birth
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date(userData.date_of_birth))
+    : "";
+
+  if (!userData) {
+    return null; // Don't render the modal if userData is null
+  }
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -195,7 +199,6 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             }}
             fullWidth
             margin="normal"
-            // colorMode={colorMode}
           />
 
           <BioTextField

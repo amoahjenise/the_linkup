@@ -6,12 +6,33 @@ import {
   styled,
   Link,
   Switch,
+  Modal,
+  Paper,
 } from "@mui/material";
 import { FaXTwitter } from "react-icons/fa6";
 import { Instagram, Facebook } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 
 // Styled components
+const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
+  borderRadius: 12,
+  position: "absolute",
+  width: "100%",
+  maxWidth: 400,
+  boxShadow: theme.shadows[5],
+  padding: theme.spacing(3),
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Dark mode text color
+  backgroundColor: colorMode === "dark" ? "#181818" : "#F2F2F2", // Dark/light mode background color
+  [theme.breakpoints.down("sm")]: {
+    width: "90%",
+    maxWidth: "90%",
+    padding: theme.spacing(2),
+  },
+}));
+
 const StyledBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
@@ -75,7 +96,13 @@ const SocialMediaField = ({
   </Box>
 );
 
-const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
+const SocialMediaLinks = ({
+  userData,
+  onSave,
+  isLoggedUserProfile,
+  open,
+  onClose,
+}) => {
   const { colorMode } = useColorMode();
   const [socialLinks, setSocialLinks] = useState({
     instagram: userData?.instagram_url || "",
@@ -96,65 +123,73 @@ const SocialMediaLinks = ({ userData, onSave, isLoggedUserProfile }) => {
   const textColor = colorMode === "light" ? "black" : "white";
 
   return (
-    <StyledBox>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <StyledTypography variant="h6" gutterBottom textColor={textColor}>
-          Social Media Links
-        </StyledTypography>
-        {isLoggedUserProfile && (
-          <Box display="flex" alignItems="center">
-            <Typography variant="body2" sx={{ marginRight: 1 }}>
-              {isEditable ? "Save" : "Edit"}
-            </Typography>
-            <Switch
-              checked={isEditable}
-              onChange={() => {
-                if (isEditable) handleSave();
-                setIsEditable(!isEditable);
-              }}
+    <Modal open={open} onClose={onClose}>
+      <StyledPaper colorMode={colorMode}>
+        <StyledBox>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StyledTypography variant="h6" gutterBottom textColor={textColor}>
+              Social Media Links
+            </StyledTypography>
+            {isLoggedUserProfile && (
+              <Box display="flex" alignItems="center">
+                <Typography variant="body2" sx={{ marginRight: 1 }}>
+                  {isEditable ? "Save" : "Edit"}
+                </Typography>
+                <Switch
+                  checked={isEditable}
+                  onChange={() => {
+                    if (isEditable) handleSave();
+                    setIsEditable(!isEditable);
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <SocialMediaField
+              icon={<Instagram sx={{ color: "purple" }} />}
+              label="Instagram"
+              url={socialLinks.instagram}
+              setUrl={(value) =>
+                setSocialLinks((prev) => ({ ...prev, instagram: value }))
+              }
+              isEditable={isEditable && isLoggedUserProfile}
+              textColor={textColor} // Pass textColor to SocialMediaField
+            />
+            <SocialMediaField
+              icon={<Facebook sx={{ color: "blue" }} />}
+              label="Facebook"
+              url={socialLinks.facebook}
+              setUrl={(value) =>
+                setSocialLinks((prev) => ({ ...prev, facebook: value }))
+              }
+              isEditable={isEditable && isLoggedUserProfile}
+              textColor={textColor} // Pass textColor to SocialMediaField
+            />
+            <SocialMediaField
+              icon={
+                <FaXTwitter
+                  size={24}
+                  color={colorMode === "light" ? "black" : "white"}
+                />
+              }
+              label="X (Twitter)"
+              url={socialLinks.twitter}
+              setUrl={(value) =>
+                setSocialLinks((prev) => ({ ...prev, twitter: value }))
+              }
+              isEditable={isEditable && isLoggedUserProfile}
+              textColor={textColor} // Pass textColor to SocialMediaField
             />
           </Box>
-        )}
-      </Box>
-
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <SocialMediaField
-          icon={<Instagram sx={{ color: "purple" }} />}
-          label="Instagram"
-          url={socialLinks.instagram}
-          setUrl={(value) =>
-            setSocialLinks((prev) => ({ ...prev, instagram: value }))
-          }
-          isEditable={isEditable && isLoggedUserProfile}
-          textColor={textColor} // Pass textColor to SocialMediaField
-        />
-        <SocialMediaField
-          icon={<Facebook sx={{ color: "blue" }} />}
-          label="Facebook"
-          url={socialLinks.facebook}
-          setUrl={(value) =>
-            setSocialLinks((prev) => ({ ...prev, facebook: value }))
-          }
-          isEditable={isEditable && isLoggedUserProfile}
-          textColor={textColor} // Pass textColor to SocialMediaField
-        />
-        <SocialMediaField
-          icon={
-            <FaXTwitter
-              size={24}
-              color={colorMode === "light" ? "black" : "white"}
-            />
-          }
-          label="X (Twitter)"
-          url={socialLinks.twitter}
-          setUrl={(value) =>
-            setSocialLinks((prev) => ({ ...prev, twitter: value }))
-          }
-          isEditable={isEditable && isLoggedUserProfile}
-          textColor={textColor} // Pass textColor to SocialMediaField
-        />
-      </Box>
-    </StyledBox>
+        </StyledBox>
+      </StyledPaper>
+    </Modal>
   );
 };
 
