@@ -85,7 +85,7 @@ const SignUpWidget = memo(() => (
   >
     <CardContent sx={{ textAlign: "center", color: "white" }}>
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
-        Join The Linkup Platform
+        Explore fun activities with The Linkup Platform
       </Typography>
     </CardContent>
   </Card>
@@ -96,7 +96,7 @@ const TermsAndServiceWidget = memo(() => (
     sx={{
       cursor: "default",
       position: "relative",
-      background: `linear-gradient(45deg, rgba(211, 254, 255, 0.85), rgba(30, 73, 79, 0.75))`,
+      background: `linear-gradient(45deg, rgba(211, 254, 255, 0.75), rgba(30, 73, 79, 0.75))`,
       backdropFilter: "blur(10px)",
       borderRadius: "20px",
       padding: "20px",

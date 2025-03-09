@@ -66,9 +66,9 @@ const WidgetTemplate = ({ image, title, subtitle }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(255, 255, 255, 0.3)", // Semi-transparent background
-          backdropFilter: "blur(10px)", // Frosted glass effect
-          padding: "15px", // Reduced padding for a more compact design
+          backgroundColor: "rgba(255, 255, 255, 0.1)", // Semi-transparent background
+          backdropFilter: "blur(20px)", // Frosted glass effect
+          padding: "16px", // Reduced padding for a more compact design
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between", // Space for buttons at the bottom
