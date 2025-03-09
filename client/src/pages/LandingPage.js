@@ -155,7 +155,7 @@ const LandingPage = () => {
         backgroundSize: "cover",
       }}
     >
-      <LogoHeader />
+      <LogoHeader forcedColorMode="dark" />
 
       {/* Small screen layout */}
       {isSmallScreen ? (

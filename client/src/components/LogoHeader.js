@@ -26,8 +26,10 @@ const Title = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
 }));
 
-const LogoHeader = () => {
+const LogoHeader = ({ forcedColorMode }) => {
   const { colorMode } = useColorMode();
+  // Use the passed prop or default to the current color mode
+  const mode = forcedColorMode || colorMode;
 
   return (
     <MainContainer>
@@ -36,14 +38,14 @@ const LogoHeader = () => {
           src={logo}
           alt="Logo"
           style={{
-            filter: colorMode === "dark" ? "invert(1)" : "none", // Invert only in dark mode
+            filter: mode === "dark" ? "invert(1)" : "none", // Invert only in dark mode
           }}
         />
       </LogoContainer>
       <Title
         variant="h4"
         component="h1"
-        color={colorMode === "dark" ? "white" : "black"}
+        color={mode === "dark" ? "white" : "black"}
       >
         The Linkup
       </Title>
