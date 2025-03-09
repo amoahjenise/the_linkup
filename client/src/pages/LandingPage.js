@@ -1,4 +1,6 @@
-import React, { memo } from "react";
+import React, { useEffect, memo } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -138,6 +140,14 @@ const TermsAndServiceWidget = memo(() => (
 const LandingPage = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <Box
@@ -211,7 +221,7 @@ const LandingPage = () => {
               Connect with new people and organize meetups around your
               interests.
             </Typography>
-            
+
             <Typography variant="body1" sx={{ mt: 2 }}>
               <a href="/terms-of-service" style={{ color: "white" }}>
                 Terms of Service
