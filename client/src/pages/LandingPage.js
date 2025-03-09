@@ -206,6 +206,12 @@ const LandingPage = () => {
               SIGN IN
             </CustomSignInButton>
 
+            {/* Add the description text here */}
+            <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
+              Connect with new people and organize meetups around your
+              interests.
+            </Typography>
+            
             <Typography variant="body1" sx={{ mt: 2 }}>
               <a href="/terms-of-service" style={{ color: "white" }}>
                 Terms of Service
@@ -220,12 +226,6 @@ const LandingPage = () => {
                 Cookie Use
               </a>
               .
-            </Typography>
-
-            {/* Add the description text here */}
-            <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
-              Connect with new people and organize meetups around your
-              interests.
             </Typography>
           </Grid>
         </Grid>
