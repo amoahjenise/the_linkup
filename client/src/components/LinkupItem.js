@@ -19,7 +19,7 @@ const compromise = nlp;
 
 // Container wrapper
 const Container = styled("div")(({ theme }) => ({
-  padding: "0.75rem 1rem",
+  padding: "0.5rem 1rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -111,7 +111,7 @@ const DistanceInfo = styled("div")(({ theme }) => ({
 
 const PostContent = styled("div")(({ colorMode }) => ({
   marginTop: "1rem", // Spacious margin for better separation
-  lineHeight: "1.75rem", // Improved line height for easy readability
+  lineHeight: "1.5rem", // Improved line height for easy readability
   fontSize: "1rem", // Balanced font size for content
   fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif', // Clean, modern font
   color: colorMode === "light" ? "#1C1E21" : "#E4E6EB", // High contrast for legibility
@@ -124,12 +124,11 @@ const PostContent = styled("div")(({ colorMode }) => ({
 
   "& p": {
     fontWeight: "400", // Normal weight for paragraphs
-    letterSpacing: "0.5px", // Subtle letter-spacing for readability
-    marginBottom: "12px", // Adequate spacing between paragraphs
+    marginBottom: "8px", // Adequate spacing between paragraphs
   },
 
   "& div:last-of-type": {
-    marginTop: "12px", // Increased margin for clean separation
+    marginTop: "2px", // Increased margin for clean separation
     fontWeight: "500", // Medium weight for metadata (timestamp, etc.)
     fontSize: "0.95rem", // Slightly smaller for metadata
     color: colorMode === "light" ? "#606770" : "#D1D4D9", // Softer colors for metadata
@@ -140,12 +139,11 @@ const PostContent = styled("div")(({ colorMode }) => ({
 const PostInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.85rem", // Balanced font size for metadata
+  fontSize: "0.8rem", // Balanced font size for metadata
   color: "#718096", // Light, soft color for metadata text
   gap: "12px", // Increased gap for better spacing between metadata items
-  marginTop: "4px", // Spacing from the post content
+  // marginTop: "4px", // Spacing from the post content
   fontWeight: "400", // Normal font weight for metadata
-  letterSpacing: "0.25px", // Subtle letter-spacing for clarity
   textTransform: "capitalize", // Optionally add a more polished look
 }));
 
