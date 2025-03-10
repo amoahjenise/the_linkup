@@ -15,14 +15,14 @@ INNER JOIN users ON link_ups.creator_id = users.id
 CROSS JOIN active_linkups
 WHERE
   (
-    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1 OR location ILIKE $1)
+    (SIMILARITY(activity, $1) > 0.2 OR SIMILARITY(creator_name, $1) > 0.2 OR date::TEXT ILIKE $1 OR SIMILARITY(payment_option, $1) > 0.2 OR SIMILARITY(location, $1) > 0.2)
     AND link_ups.status = 'active'
     AND link_ups.gender_preference && $2::text[]
   )
   OR
   (
-    (activity ILIKE $1 OR creator_name ILIKE $1 OR date::TEXT ILIKE $1 OR payment_option ILIKE $1 OR location ILIKE $1)
+    (SIMILARITY(activity, $1) > 0.2 OR SIMILARITY(creator_name, $1) > 0.2 OR date::TEXT ILIKE $1 OR SIMILARITY(payment_option, $1) > 0.2 OR SIMILARITY(location, $1) > 0.2)
     AND link_ups.status = 'active'
     AND creator_id = $3::uuid
   )
-ORDER BY link_ups.created_at DESC;
+ORDER BY SIMILARITY(activity, $1) DESC, link_ups.created_at DESC;
