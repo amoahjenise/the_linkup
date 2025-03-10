@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -10,12 +10,14 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import LogoHeader from "../components/LogoHeader";
-import WidgetTemplate from "../components/WidgetTemplate";
 import { styled } from "@mui/material/styles";
+import WidgetTemplate from "../components/WidgetTemplate";
 import Wallpaper from "../assets/Image5.jpg";
 import Wallpaper2 from "../assets/Image2.jpg";
 import { useTheme } from "@mui/material/styles";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
+import { LoadingPage } from "../pages";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 // Custom styled SignInButton and SignUpButton
 const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
@@ -63,7 +65,7 @@ const Footer = styled("footer")(({ theme }) => ({
 }));
 
 // Widgets for desktop view
-const SignUpWidget = memo(() => (
+const SignUpWidget = memo(({ isWidgetLoading }) => (
   <Card
     sx={{
       cursor: "default",
@@ -83,8 +85,27 @@ const SignUpWidget = memo(() => (
       height: "225px",
       width: "225px", // Max width for better layout on medium screens
       marginBottom: "20px", // Ensure there's spacing between widgets
+      opacity: isWidgetLoading ? 0.5 : 1, // Add opacity when loading
     }}
   >
+    {isWidgetLoading && (
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          borderRadius: "20px",
+        }}
+      >
+        <LoadingSpinner size={40} thickness={4} color="secondary" />
+      </Box>
+    )}
     <CardContent sx={{ textAlign: "center", color: "white" }}>
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
         Explore fun activities with The Linkup Platform
@@ -93,7 +114,7 @@ const SignUpWidget = memo(() => (
   </Card>
 ));
 
-const TermsAndServiceWidget = memo(() => (
+const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
   <Card
     sx={{
       cursor: "default",
@@ -110,8 +131,27 @@ const TermsAndServiceWidget = memo(() => (
       width: "225px", // Max width for better layout on medium screens
       maxWidth: "225px", // Max width for better layout on medium screens
       height: "225px",
+      opacity: isWidgetLoading ? 0.5 : 1, // Add opacity when loading
     }}
   >
+    {isWidgetLoading && (
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          borderRadius: "20px",
+        }}
+      >
+        <LoadingSpinner size={40} thickness={4} color="secondary" />
+      </Box>
+    )}
     <CardContent sx={{ textAlign: "center" }}>
       <Typography variant="h6" color="white" sx={{ fontWeight: "bold" }}>
         By signing up, you agree to the
@@ -142,12 +182,54 @@ const LandingPage = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(true); // loading state
+  const [isWidget1Loading, setWidget1Loading] = useState(true);
+  const [isWidget2Loading, setWidget2Loading] = useState(true);
+  const [isWidget3Loading, setWidget3Loading] = useState(true);
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 1 second delay
+
+    return () => clearTimeout(timer); // cleanup if component unmounts
+  }, []);
+
+  useEffect(() => {
+    // Simulate widget loading
+    const widget1Timer = setTimeout(() => setWidget1Loading(false), 500);
+    const widget2Timer = setTimeout(() => setWidget2Loading(false), 750);
+    const widget3Timer = setTimeout(() => setWidget3Loading(false), 1000);
+
+    return () => {
+      clearTimeout(widget1Timer);
+      clearTimeout(widget2Timer);
+      clearTimeout(widget3Timer);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "100dvh",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#000", // optional: matches your app background
+        }}
+      >
+        <LoadingPage size={60} thickness={4} color="secondary" />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -160,8 +242,8 @@ const LandingPage = () => {
         alignItems: "center",
         color: "white",
         background: isSmallScreen
-          ? `url(${Wallpaper2}) no-repeat center center fixed` // Apply wallpaper on mobile
-          : "linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))", // Default background for large screens
+          ? `url(${Wallpaper2}) no-repeat center center fixed` // Corrected the syntax
+          : `linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))`, // Default background for large screens
         backgroundSize: "cover",
       }}
     >
@@ -278,6 +360,7 @@ const LandingPage = () => {
               image={Wallpaper}
               title="Connect With New People and Organize Meetups"
               subtitle="Around your interests"
+              isWidgetLoading={isWidget1Loading}
             />
           </Grid>
 
@@ -295,8 +378,8 @@ const LandingPage = () => {
               justifyContent: "flex-start", // Ensure widgets are aligned to the top
             }}
           >
-            <TermsAndServiceWidget />
-            <SignUpWidget />
+            <TermsAndServiceWidget isWidgetLoading={isWidget2Loading} />
+            <SignUpWidget isWidgetLoading={isWidget3Loading} />
           </Grid>
         </Grid>
       )}

@@ -13,3 +13,5 @@ export { default as PrivacyPolicyPage } from "./PrivacyPolicyPage";
 export { default as CookieUsePage } from "./CookieUsePage";
 export { default as UserDataDeletionPage } from "./UserDataDeletionPage";
 export { default as DataAndPermissionsPage } from "./DataAndPermissionsPage";
+export { default as PricingPage } from "./PricingPage";
+export { default as LoadingPage } from "./LoadingPage";
