@@ -24,8 +24,13 @@ const LinkupRequestItemContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: theme.spacing(2),
   borderRadius: "8px", // Soft rounded corners for a modern look
+  border: `1px solid ${
+    colorMode === "light"
+      ? "rgba(229, 235, 243, 1)"
+      : "rgba(255, 255, 255, 0.1)"
+  }`,
+  padding: "1rem",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   transition: "box-shadow 0.2s ease, transform 0.2s ease", // Smoother and faster transition
   backgroundColor: colorMode === "dark" ? "rgb(16, 16, 16)" : "white",
@@ -38,7 +43,7 @@ const LinkupRequestItemContainer = styled("div")(({ theme, colorMode }) => ({
     transform: "translateY(0)", // Reset transform on click
   },
   "& + &": {
-    marginTop: theme.spacing(2), // Add spacing between list items
+    marginTop: theme.spacing(1.5), // Add spacing between list items
   },
 }));
 
@@ -67,7 +72,7 @@ const StatusChip = styled(Chip)(({ theme, status }) => {
     border: `1px solid ${color}`,
     borderRadius: "20px", // Rounded corners for a modern look
     fontWeight: 500,
-    fontSize: "0.875rem",
+    fontSize: "0.8rem",
   };
 });
 
@@ -110,7 +115,7 @@ const RequestText = styled(Typography)(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(1),
   marginTop: theme.spacing(1),
   marginRight: theme.spacing(1),
-  fontSize: "1rem",
+  fontSize: "0.875rem",
   fontWeight: 500,
 }));
 

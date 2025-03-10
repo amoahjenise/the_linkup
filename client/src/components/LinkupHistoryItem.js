@@ -15,8 +15,13 @@ const compromise = nlp;
 
 // Styled components
 const LinkupHistoryItemWrapper = styled("div")(({ theme, colorMode }) => ({
-  padding: theme.spacing(2),
   borderRadius: "8px", // Soft rounded corners for a modern look
+  border: `1px solid ${
+    colorMode === "light"
+      ? "rgba(229, 235, 243, 1)"
+      : "rgba(255, 255, 255, 0.1)"
+  }`,
+  padding: "1rem",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   transition: "box-shadow 0.2s ease, transform 0.2s ease", // Smoother and faster transition
   backgroundColor: colorMode === "dark" ? "rgb(16, 16, 16)" : "white",
@@ -29,7 +34,7 @@ const LinkupHistoryItemWrapper = styled("div")(({ theme, colorMode }) => ({
     transform: "translateY(0)", // Reset transform on click
   },
   "& + &": {
-    marginTop: theme.spacing(2), // Add spacing between list items
+    marginTop: theme.spacing(1.5), // Add spacing between list items
   },
 }));
 
@@ -47,7 +52,7 @@ const LinkupDetails = styled("div")(({ theme }) => ({
 }));
 
 const ActivityText = styled(Typography)(({ theme, colorMode }) => ({
-  fontSize: "1rem",
+  fontSize: "0.875rem",
   fontWeight: 500,
   color: colorMode === "dark" ? "white" : theme.palette.text.primary,
   marginBottom: theme.spacing(0.5),
@@ -85,12 +90,12 @@ const StyledChip = styled(Chip)(({ theme, status }) => {
     border: `1px solid ${color}`,
     borderRadius: "20px",
     fontWeight: 500,
-    fontSize: "0.875rem",
+    fontSize: "0.8rem",
   };
 });
 
 const DetailsText = styled(Typography)(({ theme, colorMode }) => ({
-  fontSize: "0.875rem",
+  fontSize: "0.8rem",
   color: colorMode === "dark" ? "gray" : theme.palette.text.secondary,
   marginBottom: theme.spacing(0.5),
 }));
