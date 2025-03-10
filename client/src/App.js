@@ -21,6 +21,7 @@ import {
   PrivacyPolicyPage,
   CookieUsePage,
   UserDataDeletionPage,
+  PricingPage,
 } from "./pages";
 import ErrorPage from "./components/ErrorPage";
 import LeftMenu from "./components/LeftMenu";
@@ -37,7 +38,6 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
-import PricingPage from "./pages/PricingPage";
 
 const publicPages = [
   "/",
