@@ -2,19 +2,22 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
 
 // Styled components using MUI's styled API
-const HeaderContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
+const HeaderContainer = styled(Box)(({ theme, colorMode }) => ({
+  width: "100%",
+  position: "sticky",
+  top: 0,
+  zIndex: theme.zIndex.appBar,
+  borderBottom:
+    colorMode === "dark"
+      ? `1px solid white`
+      : `1px solid ${theme.palette.divider}`,
+  color: colorMode === "dark" ? "white" : "black",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.97)",
   padding: theme.spacing(1),
-  borderBottomWidth: "1px",
-  borderBottomColor: "lightgrey",
-  borderBottomStyle: "solid",
-  transition: "background-color 0.3s ease", // Smooth transition for hover effect
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover, // Highlight background on hover
-  },
 }));
 
 const TextWrapper = styled(Box)({
@@ -24,8 +27,8 @@ const TextWrapper = styled(Box)({
 });
 
 const Title = styled(Typography)(({ theme }) => ({
-  fontSize: theme.typography.h6.fontSize, // Use theme typography size
-  fontWeight: theme.typography.fontWeightBold, // Use theme font weight
+  fontSize: "20px",
+  fontWeight: "bold",
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
@@ -33,8 +36,10 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 }));
 
 const ChannelListHeader = () => {
+  const { colorMode } = useColorMode(); // Use useColorMode hook
+
   return (
-    <HeaderContainer>
+    <HeaderContainer colorMode={colorMode}>
       <TextWrapper>
         <Title variant="h4">Messages</Title>
         <Subtitle variant="body2" color={"GrayText"}>
