@@ -33,7 +33,7 @@ const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
   padding: 8,
   width: "100%",
   position: "sticky",
-  top: 0,
+  top: -3,
   zIndex: theme.zIndex.appBar,
 }));
 

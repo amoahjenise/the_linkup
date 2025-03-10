@@ -19,7 +19,7 @@ const compromise = nlp;
 
 // Container wrapper
 const Container = styled("div")(({ theme }) => ({
-  padding: "0.5rem 1rem",
+  padding: "0.4rem 0.8rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -113,7 +113,7 @@ const PostContent = styled("div")(({ colorMode, theme }) => ({
   // Add 'theme' here
   marginTop: "1rem",
   lineHeight: "1.5rem",
-  fontSize: "1rem",
+  fontSize: "0.9rem",
   fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
   color: colorMode === "light" ? "#1C1E21" : "#E4E6EB",
 
@@ -131,13 +131,13 @@ const PostContent = styled("div")(({ colorMode, theme }) => ({
   "& div:last-of-type": {
     marginTop: "2px",
     fontWeight: "500",
-    fontSize: "0.95rem",
+    fontSize: "0.85rem",
     color: colorMode === "light" ? "#606770" : "#D1D4D9",
   },
 
   // ADD THIS MEDIA QUERY:
   [theme.breakpoints.down("sm")]: {
-    fontSize: "0.85rem", // Smaller font size for mobile
+    fontSize: "0.8rem", // Smaller font size for mobile
     "& div:last-of-type": {
       fontSize: "0.8rem", // Smaller meta font on mobile
     },

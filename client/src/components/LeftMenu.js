@@ -126,15 +126,15 @@ const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   width: "100%",
   height: footerHeight,
   display: "flex",
-  justifyContent: "space-between",
+  justifyContent: "space-evenly",
   alignItems: "center",
-  padding: "0 20px",
-  boxShadow: `0px -4px 12px rgba(0, 0, 0, 0.3)`,
+  padding: "0 15px",
   backgroundColor:
     colorMode === "dark"
       ? darkModeColors.background
       : lightModeColors.background,
-  borderRadius: "8px 8px 0 0",
+  boxShadow: `0px -4px 12px rgba(0, 0, 0, 0.3)`,
+  borderRadius: "10px 10px 0 0",
   zIndex: 1000,
 }));
 
