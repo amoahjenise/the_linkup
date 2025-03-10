@@ -75,10 +75,6 @@
 
 /* Time container */
 .react-datepicker__time-container {
-  border-left: 1px solid #2d2d2d;
-}
-
-.react-datepicker__time-container {
   .react-datepicker__time {
     background-color: #4e4e4e;
     border-left: 1px solid #2d2d2d;
@@ -86,7 +82,13 @@
 }
 
 .react-datepicker__time-box {
-  border-radius: 0 12px 12px 0;
+  color: #ffffff !important; /* Force white text color */
+  background-color: #4e4e4e; /* Maintain background */
+}
+
+.react-datepicker__time {
+  color: #ffffff !important; /* Force white text color */
+  background-color: #4e4e4e; /* Maintain background */
 }
 
 .react-datepicker__time-list-item {
