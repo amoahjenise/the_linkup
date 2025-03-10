@@ -8,6 +8,34 @@ import Avatar from "@mui/material/Avatar";
 import LinkupsModal from "./LinkupsModal";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import UserProfileEditModal from "./UserProfileEditModal";
+import { keyframes } from "@mui/system"; // Import this for animations
+
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+`;
+
+const BouncingNotifier = styled("div")(({ theme }) => ({
+  position: "absolute",
+  top: "-10px",
+  right: "-10px",
+  backgroundColor: "#FF4081",
+  color: "#fff",
+  padding: "4px 8px",
+  borderRadius: "12px",
+  fontSize: "0.75rem",
+  whiteSpace: "nowrap",
+  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+  animation: `${bounce} 1.5s infinite`,
+  zIndex: 10,
+}));
+
+const MoreButtonWrapper = styled("div")({
+  position: "relative", // Important for the notifier to anchor
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
 
 // Container
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
@@ -266,9 +294,17 @@ const UserProfile = ({
           <IconButton onClick={handleShare} aria-label="Share profile">
             <FaShare />
           </IconButton>
-          <IconButton onClick={handleMenuOpen} aria-label="More options">
-            <FaEllipsisH />
-          </IconButton>
+          <MoreButtonWrapper>
+            {isLoggedUserProfile &&
+              !userData?.instagram_url &&
+              !userData?.facebook_url &&
+              !userData?.twitter_url && (
+                <BouncingNotifier>Link your socials!</BouncingNotifier>
+              )}
+            <IconButton onClick={handleMenuOpen} aria-label="More options">
+              <FaEllipsisH />
+            </IconButton>
+          </MoreButtonWrapper>
         </HeaderRight>
       </Header>
       <BottomSection>
