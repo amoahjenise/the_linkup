@@ -9,7 +9,7 @@ const PageContainer = styled("div")(({ theme }) => ({
   padding: "2rem",
   //   backgroundColor: theme.palette.background.default,
   //   color: theme.palette.text.primary,
-  minHeight: "100vh",
+  minHeight: "100dvh",
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({

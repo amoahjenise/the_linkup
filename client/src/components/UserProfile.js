@@ -13,7 +13,7 @@ import UserProfileEditModal from "./UserProfileEditModal";
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100vh - 110px)" : "91vh", // Adjust height for mobile
+  height: isMobile ? "calc(100dvh - 110px)" : "91vh", // Adjust height for mobile
   overflow: "hidden",
   color: "#fff",
   paddingTop: isMobile ? "60px" : "0", // Add padding to avoid overlapping with the top navbar

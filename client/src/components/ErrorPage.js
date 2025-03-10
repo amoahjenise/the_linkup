@@ -10,7 +10,7 @@ const ErrorContainer = styled("div")(({ theme, colorMode }) => ({
   borderRadius: "8px", // Subtle rounded corners for the whole container
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)", // Soft shadow
   maxWidth: "calc(100vw - 80px)", // Adjust width to account for the left menu (assuming it's 80px wide)
-  minHeight: "100vh",
+  minHeight: "100dvh",
   alignItems: "center", // Center horizontally
   justifyContent: "center", // Center vertically
   textAlign: "center", // Center text horizontally

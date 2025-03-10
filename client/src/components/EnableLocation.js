@@ -11,7 +11,7 @@ const Root = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  minHeight: "100vh",
+  minHeight: "100dvh",
   textAlign: "center",
   marginTop: theme.spacing(8),
 }));

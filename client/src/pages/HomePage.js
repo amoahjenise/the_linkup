@@ -58,7 +58,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       top: 0,
       right: 0,
       width: "100%",
-      height: "100vh",
+      height: "100dvh",
       backgroundColor: colorMode === "dark" ? "black" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
@@ -95,7 +95,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100vh",
+    minHeight: "100dvh",
   },
 }));
 

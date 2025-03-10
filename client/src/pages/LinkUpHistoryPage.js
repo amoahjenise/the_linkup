@@ -36,7 +36,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       top: 0,
       right: 0,
       width: "100%",
-      height: "100vh",
+      height: "100dvh",
       backgroundColor: colorMode === "dark" ? "black" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
@@ -77,7 +77,7 @@ const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   paddingBottom: "60px",
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
-    minHeight: "100vh",
+    minHeight: "100dvh",
   },
 }));
 
@@ -665,7 +665,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
 
                   {/* Linkup items based on active tab */}
                   {activeTab === 0 && (
-                    <div>
+                    <div style={{ padding: 12 }}>
                       {linkups.filteredList.map((linkup) => (
                         <LinkupHistoryItem
                           key={linkup.id}
@@ -676,7 +676,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                     </div>
                   )}
                   {activeTab === 1 && (
-                    <div>
+                    <div style={{ padding: 12 }}>
                       {sentRequests.filteredList.map((request) => (
                         <LinkupRequestItem
                           key={request.id}
@@ -687,7 +687,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                     </div>
                   )}
                   {activeTab === 2 && (
-                    <div>
+                    <div style={{ padding: 12 }}>
                       {receivedRequests.filteredList.map((request) => (
                         <LinkupRequestItem
                           key={request.id}
