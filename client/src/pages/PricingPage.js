@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -13,40 +13,38 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useColorMode } from "@chakra-ui/react";
 import TopNavBar from "../components/TopNavBar";
 
-// Styled components
+// Styled Components
 const PageContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   height: "100dvh",
   width: "100vw",
-  overflow: "hidden",
 }));
 
-const ContentContainer = styled(Box)(({ theme }) => ({
+const ContentContainer = styled(Box)(({ theme, paddingTop }) => ({
   flex: 1,
-  overflowY: "auto",
   display: "flex",
   justifyContent: "center",
-  alignItems: "center",
   width: "100%",
-  paddingTop: theme.spacing(15), // Add padding to avoid overlap
+  overflowY: "auto",
+  paddingTop: paddingTop,
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+  boxSizing: "border-box",
 }));
 
-const PricingContainer = styled(Box)(({ theme, paddingTop }) => ({
-  padding: theme.spacing(4),
+const PricingWrapper = styled(Box)(({ theme }) => ({
   maxWidth: "1200px",
-  textAlign: "center",
-  minHeight: "100dvh",
+  width: "100%",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "center",
-  width: "100%",
-  paddingTop: paddingTop, // dynamic padding based on screen width
+  alignItems: "center",
+  paddingBottom: theme.spacing(4),
 }));
 
 const PlanCard = styled(Paper)(({ theme, isHighlighted }) => ({
   padding: theme.spacing(4),
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: theme.shape.borderRadius * 2,
   boxShadow: isHighlighted ? theme.shadows[6] : theme.shadows[3],
   border: isHighlighted ? `2px solid ${theme.palette.primary.main}` : "none",
   transition: "transform 0.3s ease, box-shadow 0.3s ease",
@@ -65,8 +63,6 @@ const FeatureList = styled(Box)(({ theme }) => ({
   textAlign: "left",
   marginTop: theme.spacing(2),
   flexGrow: 1,
-  overflowY: "auto",
-  maxHeight: "200px",
 }));
 
 const FeatureItem = styled(Box)(({ theme }) => ({
@@ -78,17 +74,22 @@ const FeatureItem = styled(Box)(({ theme }) => ({
 
 const Footer = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(6),
-  paddingBottom: theme.spacing(10), // Fixes footer being hidden behind mobile menu
+  paddingBottom: theme.spacing(6),
+  textAlign: "center",
 }));
 
 const PricingPage = () => {
   const { colorMode } = useColorMode();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between(500, 600)); // New breakpoint for 500px - 600px
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between(500, 600));
 
-  // Adjust padding based on screen width
-  const paddingTop = isMediumScreen ? 400 : isMobile ? 150 : 0;
+  // Ensure padding below TopNavBar (adjust as needed based on your nav height)
+  const paddingTop = isMediumScreen
+    ? theme.spacing(20) // ~160px
+    : isMobile
+    ? theme.spacing(15) // ~120px
+    : theme.spacing(12); // ~96px
 
   const plans = [
     {
@@ -124,27 +125,31 @@ const PricingPage = () => {
 
   return (
     <PageContainer>
+      {/* Top Navigation */}
       <TopNavBar title="Choose Your Plan" />
 
       {/* Scrollable Content */}
-      <ContentContainer>
-        <PricingContainer paddingTop={paddingTop}>
+      <ContentContainer paddingTop={paddingTop}>
+        <PricingWrapper>
           <Grid container spacing={4} justifyContent="center">
             {plans.map((plan, index) => (
-              <Grid item key={index} xs={12} sm={6} md={6} lg={4}>
+              <Grid item key={index} xs={12} sm={8} md={6} lg={4}>
                 <PlanCard isHighlighted={plan.isHighlighted}>
                   <Box>
                     <Typography
                       variant={isMobile ? "h6" : "h5"}
                       gutterBottom
                       color={colorMode === "dark" ? "white" : "black"}
+                      align="center"
                     >
                       {plan.title}
                     </Typography>
+
                     <Typography
                       variant={isMobile ? "h5" : "h4"}
                       gutterBottom
                       color={colorMode === "dark" ? "white" : "black"}
+                      align="center"
                     >
                       {plan.price}
                       <Typography
@@ -155,22 +160,26 @@ const PricingPage = () => {
                         /mo
                       </Typography>
                     </Typography>
+
                     <Typography
                       variant="body1"
                       color={colorMode === "dark" ? "white" : "textSecondary"}
                       gutterBottom
+                      align="center"
                     >
                       {plan.description}
                     </Typography>
                   </Box>
+
                   <FeatureList color={colorMode === "dark" ? "white" : "black"}>
                     {plan.features.map((feature, idx) => (
                       <FeatureItem key={idx}>
-                        <CheckCircleIcon color="primary" />
-                        <Typography variant="body1">{feature}</Typography>
+                        <CheckCircleIcon color="primary" fontSize="small" />
+                        <Typography variant="body2">{feature}</Typography>
                       </FeatureItem>
                     ))}
                   </FeatureList>
+
                   <Button
                     variant={plan.buttonVariant}
                     color="primary"
@@ -206,16 +215,15 @@ const PricingPage = () => {
             ))}
           </Grid>
 
-          {/* Footer */}
           <Footer>
             <Typography
               variant="body2"
               color={colorMode === "dark" ? "lightgray" : "textSecondary"}
             >
-              * You can cancel your subscription at any time.{" "}
+              * You can cancel your subscription at any time.
             </Typography>
           </Footer>
-        </PricingContainer>
+        </PricingWrapper>
       </ContentContainer>
     </PageContainer>
   );
