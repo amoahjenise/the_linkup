@@ -431,7 +431,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
               <PostContent colorMode={colorMode}>
                 {/* <div>{formatDate(date)}</div> */}
                 {renderLinkupItemText()}
-                <div>{capitalizeLocation(location)}</div>
+                <div>Location: {capitalizeLocation(location)}</div>
               </PostContent>
               <PostActionsContainer>
                 {loggedUser.user.id !== linkupItem.creator_id && (
