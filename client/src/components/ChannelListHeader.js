@@ -1,7 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
-import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 
@@ -17,18 +15,6 @@ const HeaderContainer = styled(Box)(({ theme }) => ({
   "&:hover": {
     backgroundColor: theme.palette.action.hover, // Highlight background on hover
   },
-}));
-
-const IconWrapper = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginRight: theme.spacing(2),
-  background: "linear-gradient(120deg, #0097A7, rgba(229, 235, 243, 1))",
-  color: theme.palette.primary.contrastText,
-  borderRadius: "50%",
-  padding: theme.spacing(1),
-  cursor: "pointer", // Indicate that the container is clickable
 }));
 
 const TextWrapper = styled(Box)({
@@ -49,15 +35,10 @@ const Subtitle = styled(Typography)(({ theme }) => ({
 const ChannelListHeader = () => {
   return (
     <HeaderContainer>
-      <Link to="/home" style={{ textDecoration: "none" }}>
-        <IconWrapper>
-          <ChatBubbleIcon />
-        </IconWrapper>
-      </Link>
       <TextWrapper>
-        <Title variant="h4">Discover New Linkups</Title>
-        <Subtitle variant="body2">
-          Check the feed to link up with people!
+        <Title variant="h4">Messages</Title>
+        <Subtitle variant="body2" color={"GrayText"}>
+          Please keep conversations respectful and safe!
         </Subtitle>
       </TextWrapper>
     </HeaderContainer>
