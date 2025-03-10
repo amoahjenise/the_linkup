@@ -17,8 +17,7 @@ import TopNavBar from "../components/TopNavBar";
 const PageContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  height: "100dvh",
-  width: "100vw",
+  width: "100%",
 }));
 
 const ContentContainer = styled(Box)(({ theme, paddingTop }) => ({
@@ -86,7 +85,7 @@ const PricingPage = () => {
 
   // Ensure padding below TopNavBar (adjust as needed based on your nav height)
   const paddingTop = isMediumScreen
-    ? theme.spacing(20) // ~160px
+    ? theme.spacing(4) // ~160px
     : isMobile
     ? theme.spacing(5) // ~120px
     : theme.spacing(12); // ~96px
