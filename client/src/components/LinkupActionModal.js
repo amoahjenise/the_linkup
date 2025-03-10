@@ -5,7 +5,7 @@ import { useColorMode } from "@chakra-ui/react";
 import logo from "../assets/logo.png";
 
 const Screen = styled("div")({
-  minHeight: "100vh",
+  minHeight: "100dvh",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

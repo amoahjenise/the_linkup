@@ -14,7 +14,7 @@ const ConversationsPageContainer = styled("div")({
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  height: "100vh", // Subtract the height of the TopNavBar (adjust if necessary)
+  height: "100dvh", // Subtract the height of the TopNavBar (adjust if necessary)
   width: "100%",
   overflowY: "hidden",
   padding: 0,

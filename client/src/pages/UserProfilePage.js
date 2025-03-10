@@ -21,7 +21,7 @@ import TopNavBar from "../components/TopNavBar";
 // Styled components
 const Container = styled(Box)(({ theme }) => ({
   overflowY: "auto", // Allow vertical scrolling only if content overflows
-  height: "100vh", // Make container occupy full viewport height
+  height: "100dvh", // Make container occupy full viewport height
   width: "100%", // Ensure it takes up full width
   paddingBottom: "5px", // Add padding for footer
   "@media (max-width: 900px)": {

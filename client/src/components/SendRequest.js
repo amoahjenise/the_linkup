@@ -17,7 +17,7 @@ import { getLinkupStatus } from "../api/linkUpAPI";
 
 const SendRequestContainer = styled("div")({
   display: "flex",
-  height: "100vh",
+  height: "100dvh",
 });
 
 const MainSection = styled("div")(({ theme }) => ({

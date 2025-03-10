@@ -153,7 +153,7 @@ const LandingPage = () => {
     <Box
       sx={{
         padding: "40px",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

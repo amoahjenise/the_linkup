@@ -13,7 +13,7 @@ const Container = styled("div")(({ theme }) => ({
   overflowY: "auto",
   marginLeft: "auto",
   marginRight: "auto",
-  minHeight: "100vh", // Set the minimum height of the container to cover the entire viewport height
+  minHeight: "100dvh", // Set the minimum height of the container to cover the entire viewport height
   padding: theme.spacing(2),
 }));
 

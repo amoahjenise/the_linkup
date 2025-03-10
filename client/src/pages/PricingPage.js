@@ -17,7 +17,7 @@ import TopNavBar from "../components/TopNavBar";
 const PageContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  height: "100vh",
+  height: "100dvh",
   width: "100vw",
   overflow: "hidden",
 }));
@@ -36,7 +36,7 @@ const PricingContainer = styled(Box)(({ theme, paddingTop }) => ({
   padding: theme.spacing(4),
   maxWidth: "1200px",
   textAlign: "center",
-  minHeight: "100vh",
+  minHeight: "100dvh",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",

@@ -13,7 +13,7 @@ import DataAndPermissionsPage from "./DataAndPermissionsPage";
 const SettingsPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flex: 1,
-  height: "100vh",
+  height: "100dvh",
   [theme.breakpoints.down("md")]: {
     flexDirection: "column",
   },
@@ -34,7 +34,7 @@ const RightSection = styled("div")(({ theme, colorMode }) => ({
   [theme.breakpoints.down("md")]: {
     display: "none",
   },
-  maxHeight: "100vh", // Ensures it fits the viewport height
+  maxHeight: "100dvh", // Ensures it fits the viewport height
   overflowY: "auto", // Enables vertical scrolling
 }));
 

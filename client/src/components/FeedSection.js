@@ -18,7 +18,7 @@ const Root = styled("div")({
   flexDirection: "column",
   borderRadius: "8px", // Subtle rounded corners for the whole feed
   maxWidth: "100vw",
-  minHeight: "100vh",
+  minHeight: "100dvh",
   marginBottom: 15,
 });
 
@@ -26,7 +26,7 @@ const LoadingContainer = styled("div")({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  minHeight: "100vh",
+  minHeight: "100dvh",
 });
 
 const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({

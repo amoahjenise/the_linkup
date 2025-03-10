@@ -18,7 +18,7 @@ const MainContainer = styled("div")(({ theme }) => ({
   flexDirection: "column",
   overflowY: "hidden",
   width: "100%",
-  height: "100vh",
+  height: "100dvh",
 }));
 
 const NotificationsList = styled("ul")(({ theme }) => ({

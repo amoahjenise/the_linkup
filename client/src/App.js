@@ -55,7 +55,7 @@ const AppWrapper = styled("div", {
 })(({ theme, isAuthenticated }) => ({
   ...(isAuthenticated && {
     display: "flex",
-    height: "100vh",
+    height: "100dvh",
     overflow: "hidden",
     "@media (max-width: 900px)": {
       paddingBottom: "60px", // Add padding for footer
