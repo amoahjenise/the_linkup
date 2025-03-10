@@ -157,13 +157,13 @@ const UserNameRow = styled("div")({
   fontWeight: 600,
 });
 
-// Online Status Dot (optional)
-const OnlineStatus = styled("div")({
+// Online Status Dot
+const OnlineStatus = styled("div")(({ isOnline }) => ({
   width: "10px",
   height: "10px",
   borderRadius: "50%",
-  backgroundColor: "#31A24C",
-});
+  backgroundColor: isOnline ? "#31A24C" : "#B0B0B0", // Green if online, gray if offline
+}));
 
 // Edit Profile Button with blur
 const TransparentButton = styled(Button)({
@@ -182,7 +182,7 @@ const TransparentButton = styled(Button)({
   },
 });
 
-// Time Ago Styling
+// Online status Styling
 const OnlineStatusContainer = styled("p")({
   display: "flex",
   alignItems: "center",
@@ -312,7 +312,7 @@ const UserProfile = ({
               </UserNameRow>
 
               <OnlineStatusContainer>
-                <OnlineStatus />
+                <OnlineStatus isOnline={userData?.is_online} />
                 <p style={{ marginLeft: 4 }}>
                   {userData?.is_online ? "Online" : "Offline"}
                 </p>
