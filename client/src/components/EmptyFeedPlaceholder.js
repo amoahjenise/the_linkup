@@ -25,14 +25,6 @@ const Message = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const Link = styled("a")(({ theme }) => ({
-  color: theme.palette.primary.main,
-  textDecoration: "none",
-  "&:hover": {
-    textDecoration: "underline",
-  },
-}));
-
 const EmptyFeedPlaceholder = () => {
   const { colorMode } = useColorMode();
 
@@ -44,11 +36,10 @@ const EmptyFeedPlaceholder = () => {
         colorMode={colorMode}
       />
 
-      <Message variant="h5">
-        There are no linkups available at the moment.
-      </Message>
+      <Message variant="h5">No linkups are available at the moment.</Message>
       <Typography variant="body1">
-        Start by creating a linkup to connect with others.
+        Create a new linkup to connect with others, or go to Settings &gt; User
+        Settings to adjust your preferences and see more results.
       </Typography>
     </PlaceholderContainer>
   );
