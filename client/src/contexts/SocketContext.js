@@ -117,6 +117,7 @@ export const SocketProvider = ({ children }) => {
     linkupManagementSocket.on("linkupExpired", (data) => {
       addSnackbar(data.message, { timeout: 7000 });
       showNotification("Linkup Expired", data.message);
+      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
     });
 
     linkupRequestSocket.on("new-linkup-request", (notification) => {
