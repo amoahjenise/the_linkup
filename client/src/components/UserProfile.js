@@ -19,7 +19,7 @@ const BouncingNotifier = styled("div")(({ theme }) => ({
   position: "absolute",
   top: "-10px",
   right: "-10px",
-  backgroundColor: "#FF4081",
+  backgroundColor: "#0097A7",
   color: "#fff",
   padding: "4px 8px",
   borderRadius: "12px",
@@ -28,6 +28,7 @@ const BouncingNotifier = styled("div")(({ theme }) => ({
   boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
   animation: `${bounce} 1.5s infinite`,
   zIndex: 10,
+  cursor: "default",
 }));
 
 const MoreButtonWrapper = styled("div")({
