@@ -88,7 +88,7 @@ const PricingPage = () => {
   const paddingTop = isMediumScreen
     ? theme.spacing(20) // ~160px
     : isMobile
-    ? theme.spacing(15) // ~120px
+    ? theme.spacing(5) // ~120px
     : theme.spacing(12); // ~96px
 
   const plans = [
