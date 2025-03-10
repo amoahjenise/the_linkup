@@ -13,9 +13,10 @@ import UserProfileEditModal from "./UserProfileEditModal";
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100vh - 110px)" : "91vh",
+  height: isMobile ? "calc(100vh - 110px)" : "91vh", // Adjust height for mobile
   overflow: "hidden",
   color: "#fff",
+  paddingTop: isMobile ? "60px" : "0", // Add padding to avoid overlapping with the top navbar
 }));
 
 // Background Image with Gradient Overlay
@@ -93,7 +94,7 @@ const IconButton = styled("button")({
 });
 
 // Bottom Section
-const BottomSection = styled("div")({
+const BottomSection = styled("div")(({ isMobile }) => ({
   position: "absolute",
   bottom: 0,
   width: "100%",
@@ -111,7 +112,8 @@ const BottomSection = styled("div")({
   flexDirection: "column",
   justifyContent: "space-between",
   transition: "background 0.5s ease-in-out",
-});
+  marginTop: isMobile ? "60px" : "0", // Add margin to avoid overlapping with the header
+}));
 
 // Title & Subtitle
 const Title = styled("h2")({
