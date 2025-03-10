@@ -435,7 +435,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
 
                 {/* Linkup items based on active tab */}
                 {activeTab === 0 && (
-                  <div style={{ padding: 12 }}>
+                  <div style={{ margin: 12 }}>
                     {linkups.filteredList.map((linkup) => (
                       <LinkupHistoryItem
                         key={linkup.id}
@@ -446,7 +446,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   </div>
                 )}
                 {activeTab === 1 && (
-                  <div style={{ padding: 12 }}>
+                  <div style={{ margin: 12 }}>
                     {sentRequests.filteredList.map((request) => (
                       <LinkupRequestItem
                         key={request.id}
@@ -457,7 +457,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
                   </div>
                 )}
                 {activeTab === 2 && (
-                  <div style={{ padding: 12 }}>
+                  <div style={{ margin: 12 }}>
                     {receivedRequests.filteredList.map((request) => (
                       <LinkupRequestItem
                         key={request.id}

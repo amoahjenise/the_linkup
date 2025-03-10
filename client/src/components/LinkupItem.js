@@ -39,7 +39,7 @@ const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
   borderRadius: "1rem",
   width: "100%",
   minHeight: "175px",
-  backgroundColor: colorMode === "dark" ? "#19262e" : "#FFFFFF",
+  backgroundColor: colorMode === "dark" ? "rgb(10, 70, 87, 0.2)" : "#FFFFFF",
   backdropFilter: "blur(12px)",
   boxShadow:
     colorMode === "light"
