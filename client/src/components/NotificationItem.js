@@ -8,7 +8,7 @@ const NotificationItemWrapper = styled("div")(
   ({ theme, isUnread, colorMode }) => ({
     display: "flex",
     alignItems: "center",
-    padding: "12px 16px",
+    padding: "12px 6px",
     cursor: "pointer",
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
@@ -61,7 +61,6 @@ const NotificationContent = styled("div")(({ theme }) => ({
   flexGrow: 1,
   display: "flex",
   flexDirection: "column",
-  gap: "2px",
 }));
 
 const NotificationTitle = styled(Typography)(({ theme, colorMode }) => ({
@@ -80,6 +79,19 @@ const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
       ? theme.palette.text.secondary // Light mode text color
       : "#B0B0B0", // Explicit light gray color for dark mode
   marginTop: theme.spacing(0.5),
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+
+  // Truncate based on screen size
+  "@media (max-width: 600px)": {
+    // Mobile: limit to 30 characters
+    maxWidth: "30ch",
+  },
+  "@media (min-width: 601px)": {
+    // Desktop: limit to 50 characters
+    maxWidth: "50ch",
+  },
 }));
 
 const NotificationTime = styled(Typography)(({ theme, colorMode }) => ({
