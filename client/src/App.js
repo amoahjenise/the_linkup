@@ -150,6 +150,19 @@ const App = () => {
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
 
+  // Detect if the device is mobile
+  const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // Hide the address bar on mobile devices
+  useEffect(() => {
+    if (isMobileDevice) {
+      // Trigger scroll after a short delay
+      setTimeout(() => {
+        window.scrollTo(0, 1);
+      }, 100);
+    }
+  }, [isMobileDevice]);
+
   useEffect(() => {
     const handleOnlineStatus = async () => {
       if (isSignedIn && userState?.user?.id) {

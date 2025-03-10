@@ -109,29 +109,38 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   },
 }));
 
-const PostContent = styled("div")(({ colorMode }) => ({
-  marginTop: "1rem", // Spacious margin for better separation
-  lineHeight: "1.5rem", // Improved line height for easy readability
-  fontSize: "1rem", // Balanced font size for content
-  fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif', // Clean, modern font
-  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB", // High contrast for legibility
+const PostContent = styled("div")(({ colorMode, theme }) => ({
+  // Add 'theme' here
+  marginTop: "1rem",
+  lineHeight: "1.5rem",
+  fontSize: "1rem",
+  fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
+  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB",
 
   "& div:first-of-type": {
-    fontWeight: "600", // Emphasis for the first div (title/heading)
-    color: colorMode === "light" ? "#242526" : "#DADDE1", // Subtle emphasis in dark mode
-    marginBottom: "10px", // Increased bottom margin for proper spacing
+    fontWeight: "600",
+    color: colorMode === "light" ? "#242526" : "#DADDE1",
+    marginBottom: "10px",
   },
 
   "& p": {
-    fontWeight: "400", // Normal weight for paragraphs
-    marginBottom: "8px", // Adequate spacing between paragraphs
+    fontWeight: "400",
+    marginBottom: "8px",
   },
 
   "& div:last-of-type": {
-    marginTop: "2px", // Increased margin for clean separation
-    fontWeight: "500", // Medium weight for metadata (timestamp, etc.)
-    fontSize: "0.95rem", // Slightly smaller for metadata
-    color: colorMode === "light" ? "#606770" : "#D1D4D9", // Softer colors for metadata
+    marginTop: "2px",
+    fontWeight: "500",
+    fontSize: "0.95rem",
+    color: colorMode === "light" ? "#606770" : "#D1D4D9",
+  },
+
+  // ADD THIS MEDIA QUERY:
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.85rem", // Smaller font size for mobile
+    "& div:last-of-type": {
+      fontSize: "0.8rem", // Smaller meta font on mobile
+    },
   },
 }));
 
@@ -139,12 +148,16 @@ const PostContent = styled("div")(({ colorMode }) => ({
 const PostInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  fontSize: "0.8rem", // Balanced font size for metadata
-  color: "#718096", // Light, soft color for metadata text
-  gap: "12px", // Increased gap for better spacing between metadata items
-  // marginTop: "4px", // Spacing from the post content
-  fontWeight: "400", // Normal font weight for metadata
-  textTransform: "capitalize", // Optionally add a more polished look
+  fontSize: "0.8rem",
+  color: "#718096",
+  gap: "12px",
+  fontWeight: "400",
+  textTransform: "capitalize",
+
+  // MODIFY THIS MEDIA QUERY:
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.7rem", // Smaller font size for mobile
+  },
 }));
 
 // Online status indicator
@@ -492,8 +505,8 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                     name: creator_name,
                     avatar: avatar,
                   }}
-                  width="80px"
-                  height="80px"
+                  width="100px"
+                  height="100px"
                 />
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -24,8 +24,8 @@ const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Dark mode text color
-  backgroundColor: colorMode === "dark" ? "#181818" : "#F2F2F2", // Dark/light mode background color
+  color: colorMode === "dark" ? "#E0E0E0" : "#333333",
+  backgroundColor: colorMode === "dark" ? "#181818" : "#F2F2F2",
   [theme.breakpoints.down("sm")]: {
     width: "90%",
     maxWidth: "90%",
@@ -44,7 +44,7 @@ const StyledTypography = styled(Typography)(({ textColor }) => ({
 const StyledTextField = styled(TextField)(({ textColor, isReadOnly }) => ({
   "& .MuiInputBase-root": {
     color: textColor,
-    pointerEvents: isReadOnly ? "none" : "auto", // Disable input in read-only mode
+    pointerEvents: isReadOnly ? "none" : "auto",
   },
   "& .MuiInputLabel-root": {
     color: textColor,
@@ -57,7 +57,7 @@ const StyledTextField = styled(TextField)(({ textColor, isReadOnly }) => ({
       borderColor: textColor,
     },
     "&.Mui-focused fieldset": {
-      borderColor: textColor, // Ensure focused state matches the text color
+      borderColor: textColor,
     },
   },
 }));
@@ -79,7 +79,7 @@ const SocialMediaField = ({
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         InputProps={{ readOnly: !isEditable }}
-        textColor={textColor} // Pass textColor to StyledTextField
+        textColor={textColor}
       />
     ) : url ? (
       <Link
@@ -111,6 +111,15 @@ const SocialMediaLinks = ({
   });
   const [isEditable, setIsEditable] = useState(false);
 
+  // Update socialLinks when userData changes
+  useEffect(() => {
+    setSocialLinks({
+      instagram: userData?.instagram_url || "",
+      facebook: userData?.facebook_url || "",
+      twitter: userData?.twitter_url || "",
+    });
+  }, [userData]);
+
   const handleSave = () => {
     onSave({
       instagram_url: socialLinks.instagram,
@@ -119,7 +128,6 @@ const SocialMediaLinks = ({
     });
   };
 
-  // Define colors for light and dark modes
   const textColor = colorMode === "light" ? "black" : "white";
 
   return (
@@ -159,7 +167,7 @@ const SocialMediaLinks = ({
                 setSocialLinks((prev) => ({ ...prev, instagram: value }))
               }
               isEditable={isEditable && isLoggedUserProfile}
-              textColor={textColor} // Pass textColor to SocialMediaField
+              textColor={textColor}
             />
             <SocialMediaField
               icon={<Facebook sx={{ color: "blue" }} />}
@@ -169,7 +177,7 @@ const SocialMediaLinks = ({
                 setSocialLinks((prev) => ({ ...prev, facebook: value }))
               }
               isEditable={isEditable && isLoggedUserProfile}
-              textColor={textColor} // Pass textColor to SocialMediaField
+              textColor={textColor}
             />
             <SocialMediaField
               icon={
@@ -184,7 +192,7 @@ const SocialMediaLinks = ({
                 setSocialLinks((prev) => ({ ...prev, twitter: value }))
               }
               isEditable={isEditable && isLoggedUserProfile}
-              textColor={textColor} // Pass textColor to SocialMediaField
+              textColor={textColor}
             />
           </Box>
         </StyledBox>
