@@ -9,7 +9,7 @@ const DropdownContainer = styled("div")(({ theme, colorMode }) => ({
 
 const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
   padding: theme.spacing(1),
-  paddingLeft: theme.spacing(2), // Align text within inputs
+  paddingLeft: theme.spacing(2),
   border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
   borderRadius: "8px",
   backgroundColor:
@@ -20,6 +20,10 @@ const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  transition: "border-color 0.2s ease-in-out",
+  "&:hover": {
+    borderColor: colorMode === "dark" ? "#6a6a6a" : "#aaa",
+  },
 }));
 
 const DropdownList = styled("div")(({ theme, colorMode }) => ({
@@ -52,9 +56,17 @@ const DropdownItem = styled("div")(({ theme, colorMode, selected }) => ({
   },
 }));
 
+const ArrowIcon = styled("svg")(({ isOpen, colorMode }) => ({
+  width: "20px",
+  height: "20px",
+  fill: colorMode === "dark" ? "#ffffff" : "#333333",
+  transition: "transform 0.3s ease",
+  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+}));
+
 const CustomDropdown = ({
   options = [],
-  value = null, // this is the primitive value e.g. "host"
+  value = null,
   onChange,
   placeholder = "Select an option",
   placeholderStyle = {},
@@ -77,7 +89,7 @@ const CustomDropdown = ({
   }, []);
 
   const handleSelect = (option) => {
-    onChange(option.value); // pass only the value
+    onChange(option.value);
     setIsOpen(false);
   };
 
@@ -89,6 +101,9 @@ const CustomDropdown = ({
         <span style={selectedOption ? {} : placeholderStyle}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
+        <ArrowIcon isOpen={isOpen} colorMode={colorMode} viewBox="0 0 20 20">
+          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.084l3.71-3.85a.75.75 0 111.08 1.04l-4.25 4.41a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" />
+        </ArrowIcon>
       </DropdownHeader>
 
       {isOpen && (
