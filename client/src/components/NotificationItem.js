@@ -46,15 +46,21 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
 }));
 
 const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
-  position: "relative",
-  bottom: "-20px", // Position at the bottom-right corner
-  right: "-45px",
-  width: "12px", // Slightly larger for better visibility
-  height: "12px",
-  borderRadius: "50%", // Circular shape
+  position: "absolute",
+  bottom: "-5px", // Adjust to place correctly below the avatar
+  right: "-5px", // Adjust to place correctly below the avatar
+  width: "14px", // Ensures it is a fixed size
+  height: "14px", // Ensures it is a fixed size
+  borderRadius: "50%", // Keeps it a circle
   backgroundColor: isOnline ? "#4CAF50" : "#B0B0B0", // Green for online, gray for offline
   border: `2px solid ${colorMode === "dark" ? "black" : "white"}`, // Border to stand out
   zIndex: 1,
+
+  // For responsiveness, you can add a media query to adjust the size on smaller screens
+  "@media (max-width: 600px)": {
+    width: "10px", // Smaller size for mobile
+    height: "10px", // Smaller size for mobile
+  },
 }));
 
 const NotificationContent = styled("div")(({ theme }) => ({
@@ -85,8 +91,8 @@ const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
 
   // Truncate based on screen size
   "@media (max-width: 600px)": {
-    // Mobile: limit to 25 characters
-    maxWidth: "25ch",
+    // Mobile: limit to 20 characters
+    maxWidth: "20ch",
   },
   "@media (min-width: 601px)": {
     // Desktop: limit to 50 characters
@@ -207,7 +213,7 @@ const NotificationItem = ({ notification, onClick }) => {
         </NotificationTitle>
         {notification.notification_type === "linkup_request" && (
           <NotificationMessage colorMode={colorMode}>
-            <span>Message: {notification.message}</span>
+            <span>{notification.message}</span>
           </NotificationMessage>
         )}
         {notification.notification_type === "new_message" && (
