@@ -482,6 +482,7 @@ const CreateLinkupWidget = ({
             onChange={(e) => setGenderPreference(e.value)}
             optionLabel="value"
             placeholder="Visible to who?"
+            filter
             className={`p-multiselect ${
               formErrors.genderPreference ? "error" : ""
             }`}
