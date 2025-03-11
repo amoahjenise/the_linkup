@@ -216,7 +216,7 @@ const CreateLinkupWidget = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState([]);
-  const [paymentOption, setPaymentOption] = useState("");
+  const [paymentOption, setPaymentOption] = useState(null);
   const loggedUser = useSelector((state) => state.loggedUser);
   const { id, name } = loggedUser?.user || {};
   const { addSnackbar } = useSnackbar();

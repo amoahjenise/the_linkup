@@ -18,7 +18,6 @@ const ModalOverlay = styled("div")({
   position: "sticky",
   top: 0,
   width: "100%",
-  padding: "20px", // Added padding for better spacing on mobile
 });
 
 const ModalContainer = styled("div")({
@@ -28,8 +27,19 @@ const ModalContainer = styled("div")({
   justifyContent: "center",
   position: "sticky",
   top: 0,
-  maxWidth: "600px", // Restrict width on larger screens
-  margin: "0 auto", // Center the container
+  maxWidth: "600px", // Desktop
+  margin: "0 auto",
+  height: "100%",
+  maxHeight: "90vh", // Limit modal height
+  overflowY: "auto", // Allow scrolling if content exceeds height
+  // padding: "20px",
+  boxSizing: "border-box",
+
+  // Mobile-specific tweaks
+  "@media (max-width: 600px)": {
+    padding: "10px",
+    maxWidth: "95%", // Reduce width on mobile
+  },
 });
 
 const ModalTitle = styled("h2")(({ theme }) => ({
