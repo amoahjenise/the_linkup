@@ -32,7 +32,6 @@ const ModalContainer = styled("div")({
   height: "100%",
   maxHeight: "90vh", // Limit modal height
   overflowY: "auto", // Allow scrolling if content exceeds height
-  // padding: "20px",
   boxSizing: "border-box",
 
   // Mobile-specific tweaks
@@ -45,7 +44,7 @@ const ModalContainer = styled("div")({
 const ModalTitle = styled("h2")(({ theme }) => ({
   fontWeight: "bold",
   marginBottom: theme.spacing(3),
-  fontSize: "1.5rem", // Slightly smaller title size for better fit
+  fontSize: "1.2rem", // Slightly smaller title size for better fit
 }));
 
 const ModalForm = styled("form")({
