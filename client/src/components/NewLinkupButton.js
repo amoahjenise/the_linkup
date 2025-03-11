@@ -7,7 +7,7 @@ const FloatingButton = styled(Button)(({ theme }) => ({
   top: "11%", // Adjust this value to place the button at the desired vertical position
   left: "50%",
   transform: "translateX(-50%)",
-  zIndex: 3000,
+  zIndex: 1100,
   minWidth: "auto",
   width: "56px",
   height: "56px",

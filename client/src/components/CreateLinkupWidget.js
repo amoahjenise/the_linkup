@@ -9,14 +9,13 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import { Tooltip, IconButton, Button, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useColorMode } from "@chakra-ui/react";
-import { MultiSelect } from "primereact/multiselect";
 import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
 import { PrimeReactContext } from "primereact/api";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
-import { Dropdown } from "primereact/dropdown";
 import LoadingSpinner from "./LoadingSpinner";
-import { debounce } from 'lodash';
+import CustomDropdown from "./CustomDropdown";
+import CustomMultiSelect from "./CustomMultiSelect";
 
 // Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
@@ -137,58 +136,6 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1, 4),
 }));
 
-const CustomDropdown = styled("div")(({ theme, colorMode, hasError }) => ({
-  width: "100%",
-  marginBottom: theme.spacing(2),
-  borderRadius: "8px", // Slightly rounded corners
-  border: `1px solid ${
-    hasError
-      ? theme.palette.error.main // Red border for error state
-      : colorMode === "dark"
-      ? "#4a4a4a"
-      : theme.palette.divider
-  }`, // Border color
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
-      : "rgba(130, 131, 129, 0.03)", // Light mode background
-  transition: "all 0.3s ease", // Smooth transitions for all properties
-  boxShadow: hasError
-    ? `0 0 0 3px ${theme.palette.error.light}` // Red shadow for error state
-    : "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
-
-  // Focus state
-  "&:focus-within": {
-    borderColor: hasError
-      ? theme.palette.error.main // Red border for error state
-      : theme.palette.primary.main, // Highlight border on focus
-    boxShadow: hasError
-      ? `0 0 0 3px ${theme.palette.error.light}` // Red shadow for error state
-      : `0 0 0 3px ${
-          colorMode === "dark"
-            ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
-            : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
-        }`,
-  },
-
-  // Hover state
-  "&:hover": {
-    borderColor: hasError
-      ? theme.palette.error.main // Red border for error state
-      : theme.palette.primary.main, // Highlight border on hover
-  },
-
-  // Disabled state
-  "&:disabled": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
-        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
-    cursor: "not-allowed", // Change cursor for disabled state
-  },
-}));
-
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
   padding: theme.spacing(1), // Slightly larger padding for better spacing
@@ -262,7 +209,7 @@ const ErrorText = styled("p")(({ theme }) => ({
   margin: "8px 0 4px 8px", // Consistent margin with standard input errors
 }));
 
-const CreateLinkupWidget = React.memo(({
+const CreateLinkupWidget = ({
   toggleWidget,
   setShouldFetchLinkups,
   scrollToTopCallback,
@@ -278,6 +225,13 @@ const CreateLinkupWidget = React.memo(({
   const [currentTheme, setCurrentTheme] = useState(""); // Initialize as an empty string
   const [formErrors, setFormErrors] = useState({}); // Track form errors
   const [isLoading, setIsLoading] = useState(false); // Initialize as false (boolean)
+
+  const paymentOptions = [
+    { label: "No Payment Option", value: "" },
+    { label: "Split The Bill", value: "split" },
+    { label: "I Will Pay", value: "iWillPay" },
+    { label: "Please Pay", value: "pleasePay" },
+  ];
 
   useEffect(() => {
     const applyTheme = async () => {
@@ -368,7 +322,7 @@ const CreateLinkupWidget = React.memo(({
         e.target.reset();
         setSelectedDate(null);
         setGenderPreference([]);
-        setPaymentOption("");
+        setPaymentOption(null);
         toggleWidget();
         setShouldFetchLinkups(true);
         scrollToTopCallback();
@@ -378,6 +332,18 @@ const CreateLinkupWidget = React.memo(({
     } catch (error) {
       addSnackbar(error.message);
     }
+  };
+
+  const handleFocus = (e) => {
+    e.target.readOnly = true; // Make the input field read-only
+    e.target.blur(); // Blur the input field to prevent the keyboard from opening
+  };
+
+  const placeholderStyle = {
+    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
+    opacity: 1, // Ensure placeholder is fully visible
+    fontWeight: 450,
+    fontFamily: "'Inter', sans-serif", // Match InputField placeholder font
   };
 
   // Gender options for MultiSelect
@@ -473,71 +439,29 @@ const CreateLinkupWidget = React.memo(({
           placeholderText="Date and Time"
           required
           colorMode={colorMode} // Pass colorMode to styled component
+          onFocus={handleFocus}
         />
         {/* MultiSelect for gender preference */}
-        <CustomDropdown colorMode={colorMode}>
-          <MultiSelect
-            id="gender-preference"
-            value={genderPreference}
-            options={genderOptions}
-            onChange={(e) => setGenderPreference(e.value)}
-            optionLabel="value"
-            placeholder="Visible to who?"
-            filter
-            className={`p-multiselect ${
-              formErrors.genderPreference ? "error" : ""
-            }`}
-            style={{
-              width: "100%",
-              border: "none", // Remove default border
-              backgroundColor: "transparent", // Transparent background
-              color: genderPreference.length
-                ? colorMode === "dark"
-                  ? "white"
-                  : "black"
-                : "grey",
-            }}
-            itemTemplate={(option) => (
-              <div
-                style={{
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {option.value}
-              </div>
-            )}
-          />
-          {/* Display error message if no gender is selected */}
-          {formErrors.genderPreference && (
-            <ErrorText>{formErrors.genderPreference}</ErrorText>
-          )}
-        </CustomDropdown>
-        <CustomDropdown colorMode={colorMode}>
-          <Dropdown
-            value={paymentOption}
-            options={[
-              { label: "No Payment Option", value: "" },
-              { label: "Split The Bill", value: "split" },
-              { label: "I Will Pay", value: "iWillPay" },
-              { label: "Please Pay", value: "pleasePay" },
-            ]}
-            onChange={(e) => setPaymentOption(e.value)}
-            placeholder="Who's Paying?"
-            style={{
-              width: "100%",
-              border: "none", // Remove default border
-              backgroundColor: "transparent", // Transparent background
-              color: paymentOption
-                ? colorMode === "dark"
-                  ? "white"
-                  : "black"
-                : "grey",
-            }}
-          />
-        </CustomDropdown>
-
+        <CustomMultiSelect
+          colorMode={colorMode}
+          options={genderOptions}
+          selectedValues={genderPreference}
+          setSelectedValues={setGenderPreference}
+          placeholder="Visible to who?"
+          placeholderStyle={placeholderStyle}
+          hasError={!!formErrors.genderPreference}
+        />
+        {formErrors.genderPreference && (
+          <ErrorText>{formErrors.genderPreference}</ErrorText>
+        )}
+        <CustomDropdown
+          options={paymentOptions}
+          value={paymentOption} // a string like "host"
+          onChange={(val) => setPaymentOption(val)} // gets the value string
+          placeholder="Who's Paying?"
+          placeholderStyle={placeholderStyle}
+          colorMode={colorMode}
+        />
         <CreateLinkUpButton
           type="submit"
           aria-label="create-linkup"
@@ -548,6 +472,6 @@ const CreateLinkupWidget = React.memo(({
       </Form>
     </WidgetContainer>
   );
-});
+};
 
 export default CreateLinkupWidget;

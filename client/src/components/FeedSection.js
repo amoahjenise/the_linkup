@@ -41,7 +41,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   position: "fixed",
   left: "50%",
   transform: "translateX(-50%)",
-  zIndex: 2000,
+  zIndex: 1100,
   padding: "5px 10px",
   fontSize: "12px",
   borderRadius: "20px",
