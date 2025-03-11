@@ -13,6 +13,7 @@ import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useLocationUpdate from "../hooks/useLocationUpdate";
+import { debounce } from "lodash";
 
 const PREFIX = "HomePage";
 const classes = {
@@ -318,14 +319,13 @@ const HomePage = ({ isMobile }) => {
   }, []);
 
   useEffect(() => {
-    // Ensure widget is always visible on desktop and only toggleable on mobile
-    const handleResize = () => {
+    const handleResize = debounce(() => {
       if (window.innerWidth > 600) {
         setIsWidgetVisible(true); // Always visible on desktop
       } else {
         setIsWidgetVisible(false); // Toggleable on mobile
       }
-    };
+    }, 200);
 
     window.addEventListener("resize", handleResize);
     handleResize(); // Call initially to set the correct state on load

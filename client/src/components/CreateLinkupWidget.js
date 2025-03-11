@@ -16,6 +16,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import { Dropdown } from "primereact/dropdown";
 import LoadingSpinner from "./LoadingSpinner";
+import { debounce } from 'lodash';
 
 // Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
@@ -261,7 +262,7 @@ const ErrorText = styled("p")(({ theme }) => ({
   margin: "8px 0 4px 8px", // Consistent margin with standard input errors
 }));
 
-const CreateLinkupWidget = ({
+const CreateLinkupWidget = React.memo(({
   toggleWidget,
   setShouldFetchLinkups,
   scrollToTopCallback,
@@ -547,6 +548,6 @@ const CreateLinkupWidget = ({
       </Form>
     </WidgetContainer>
   );
-};
+});
 
 export default CreateLinkupWidget;
