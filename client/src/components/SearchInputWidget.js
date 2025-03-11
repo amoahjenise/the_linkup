@@ -29,7 +29,7 @@ const InputContainer = styled("div")({
 
 // The Input takes the full available width and adds right padding to prevent text
 // from going underneath the icon.
-const Input = styled("input")({
+const Input = styled("input")(({ colorMode }) => ({
   flex: 1,
   height: "36px",
   padding: "0 16px",
@@ -38,7 +38,8 @@ const Input = styled("input")({
   border: "none",
   fontWeight: 600,
   outline: "none",
-});
+  color: colorMode === "dark" ? "#fff" : "#000",
+}));
 
 // The IconContainer is absolutely positioned to the right.
 // A hover effect is added for better UX.
@@ -65,6 +66,9 @@ const SearchInput = ({ handleInputChange }) => {
   const { colorMode } = useColorMode();
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+
+  const backgroundColor = colorMode === "dark" ? "rgb(18, 18, 18)" : "#fff";
+  const borderColor = colorMode === "dark" ? "rgba(255,255,255,0.2)" : "#ccc";
 
   const handleClick = () => {
     inputRef.current.focus();
@@ -93,7 +97,7 @@ const SearchInput = ({ handleInputChange }) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <Container colorMode={colorMode}>
+      <Container colorMode={colorMode} style={{ backgroundColor, borderColor }}>
         <InputContainer onClick={handleClick}>
           <Input
             ref={inputRef}
@@ -105,6 +109,8 @@ const SearchInput = ({ handleInputChange }) => {
             onFocus={handleFocus}
             onBlur={handleBlur}
             autoComplete="off"
+            colorMode={colorMode}
+            style={{ backgroundColor }}
           />
           <IconContainer onClick={searchValue ? handleClear : handleClick}>
             {searchValue ? (
