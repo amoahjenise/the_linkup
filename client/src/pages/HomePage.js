@@ -64,7 +64,8 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
       zIndex: 2000,
-      overflowY: "auto",
+      maxHeight: "100dvh", // Ensure it doesn't exceed viewport height
+      overflowY: "auto", // Make it scrollable if content overflows
     },
   },
   [`&.${classes.widgetButton}`]: {
@@ -297,6 +298,24 @@ const HomePage = ({ isMobile }) => {
       setIsWidgetVisible(!isWidgetVisible); // Toggle only for mobile screens
     }
   };
+
+  useEffect(() => {
+    const handleKeyboardShow = () => {
+      setIsWidgetVisible(true); // Keep widget visible when keyboard opens
+    };
+
+    const handleKeyboardHide = () => {
+      // Optional: Handle any cleanup or layout adjustments
+    };
+
+    window.addEventListener("keyboardDidShow", handleKeyboardShow);
+    window.addEventListener("keyboardDidHide", handleKeyboardHide);
+
+    return () => {
+      window.removeEventListener("keyboardDidShow", handleKeyboardShow);
+      window.removeEventListener("keyboardDidHide", handleKeyboardHide);
+    };
+  }, []);
 
   useEffect(() => {
     // Ensure widget is always visible on desktop and only toggleable on mobile
