@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@mui/material/styles";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const DropdownContainer = styled("div")(({ theme, colorMode, hasError }) => ({
   width: "100%",
@@ -187,6 +188,14 @@ const CustomMultiSelect = ({
     >
       <DropdownHeader colorMode={colorMode}>
         <SelectedChips>{renderSelectedText()}</SelectedChips>
+
+        <KeyboardArrowDownIcon
+          style={{
+            transition: "transform 0.3s ease",
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            color: colorMode === "dark" ? "#ccc" : "#333",
+          }}
+        />
       </DropdownHeader>
 
       {isOpen && (
