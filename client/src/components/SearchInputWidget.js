@@ -13,10 +13,8 @@ const Container = styled("div")(({ theme, colorMode }) => ({
     colorMode === "dark" ? "rgba(255,255,255,0.2)" : "#ccc"
   }`,
   transition: "box-shadow 0.3s ease, border-color 0.3s ease",
-  backgroundColor: colorMode === "dark" ? "rgb(18, 18, 18)" : "#fff",
   "&:hover": {
     boxShadow: "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
-    borderColor: colorMode === "dark" ? "rgba(255,255,255,0.4)" : "#999",
   },
 }));
 
@@ -67,7 +65,7 @@ const SearchInput = ({ handleInputChange }) => {
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
-  const backgroundColor = colorMode === "dark" ? "rgb(18, 18, 18)" : "#fff";
+  const backgroundColor = colorMode === "dark" ? "rgb(10, 10, 10)" : "#fff";
   const borderColor = colorMode === "dark" ? "rgba(255,255,255,0.2)" : "#ccc";
 
   const handleClick = () => {
@@ -111,6 +109,7 @@ const SearchInput = ({ handleInputChange }) => {
             autoComplete="off"
             colorMode={colorMode}
             style={{ backgroundColor }}
+            autoFocus={false}
           />
           <IconContainer onClick={searchValue ? handleClear : handleClick}>
             {searchValue ? (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, MenuItem, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useDispatch, useSelector } from "react-redux";
@@ -122,7 +122,7 @@ const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
 
 const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   position: "fixed",
-  bottom: 0,
+  bottom: "env(safe-area-inset-bottom, 0)", // Fallback to 0 if not supported
   width: "100%",
   height: footerHeight,
   display: "flex",
@@ -245,14 +245,34 @@ const LeftMenu = ({ isMobile }) => {
   const unreadMessagesCount = useSelector(
     (state) => state.messages.unreadMessagesCount
   );
-  const isInConversation = useSelector(
-    (state) => state.conversation.isInConversation
-  );
+
   const location = useLocation();
   const { colorMode } = useColorMode();
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
   const filterStyle =
     colorMode === "dark" ? "invert(0.879) grayscale(70%)" : "none";
+
+  useEffect(() => {
+    const handleKeyboardShow = (e) => {
+      // Adjust the footer position based on the keyboard height
+      setKeyboardHeight(e.detail.height);
+    };
+
+    const handleKeyboardHide = () => {
+      // Reset the footer position when the keyboard is closed
+      setKeyboardHeight(0);
+    };
+
+    window.addEventListener("keyboardDidShow", handleKeyboardShow);
+    window.addEventListener("keyboardDidHide", handleKeyboardHide);
+
+    return () => {
+      window.removeEventListener("keyboardDidShow", handleKeyboardShow);
+      window.removeEventListener("keyboardDidHide", handleKeyboardHide);
+    };
+  }, []);
 
   const handleMenuOpen = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -400,7 +420,12 @@ const LeftMenu = ({ isMobile }) => {
         </MainContainer>
       )}
       {isMobile && ( // Only render mobile menu when the state allows
-        <FooterContainer colorMode={colorMode}>
+        <FooterContainer
+          colorMode={colorMode}
+          style={{
+            bottom: keyboardHeight > 0 ? `calc(${keyboardHeight}px + 10px)` : 0,
+          }}
+        >
           <FooterMenuButton
             to="/home"
             icon={

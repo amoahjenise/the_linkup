@@ -300,40 +300,34 @@ const HomePage = ({ isMobile }) => {
     }
   };
 
-  useEffect(() => {
-    const handleKeyboardShow = () => {
-      setIsWidgetVisible(true); // Keep widget visible when keyboard opens
-    };
-
-    const handleKeyboardHide = () => {
-      // Optional: Handle any cleanup or layout adjustments
-    };
-
-    window.addEventListener("keyboardDidShow", handleKeyboardShow);
-    window.addEventListener("keyboardDidHide", handleKeyboardHide);
-
-    return () => {
-      window.removeEventListener("keyboardDidShow", handleKeyboardShow);
-      window.removeEventListener("keyboardDidHide", handleKeyboardHide);
-    };
-  }, []);
+  // Define the handleResize function with debounce
+  const handleResize = debounce(() => {
+    if (window.innerWidth > 600) {
+      setIsWidgetVisible(true); // Always visible on desktop
+    } else {
+      setIsWidgetVisible(false); // Toggleable on mobile
+    }
+  }, 60000); // Debounce delay of 300ms
 
   useEffect(() => {
-    const handleResize = debounce(() => {
-      if (window.innerWidth > 600) {
-        setIsWidgetVisible(true); // Always visible on desktop
-      } else {
-        setIsWidgetVisible(false); // Toggleable on mobile
-      }
-    }, 200);
+    // Set initial state based on the current window width
+    if (window.innerWidth > 600) {
+      setIsWidgetVisible(true);
+    } else {
+      setIsWidgetVisible(false);
+    }
 
+    // Add resize event listener
     window.addEventListener("resize", handleResize);
-    handleResize(); // Call initially to set the correct state on load
 
+    // Cleanup function: remove event listener and cancel debounce if the component is unmounted
     return () => {
       window.removeEventListener("resize", handleResize);
+      if (handleResize.cancel) {
+        handleResize.cancel(); // Only call cancel if debounce is supported
+      }
     };
-  }, []);
+  }, []); // Empty dependency array to run this effect only once on mount
 
   if (isLoading) {
     return <LoadingSpinner />; // Show loading state until userId is available
