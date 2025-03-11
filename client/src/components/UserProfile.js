@@ -297,9 +297,10 @@ const UserProfile = ({
           </IconButton>
           <MoreButtonWrapper>
             {isLoggedUserProfile &&
-              !userData?.instagram_url &&
-              !userData?.facebook_url &&
-              !userData?.twitter_url && (
+              userData &&
+              !userData.instagram_url &&
+              !userData.facebook_url &&
+              !userData.twitter_url && (
                 <BouncingNotifier>Link your socials!</BouncingNotifier>
               )}
             <IconButton onClick={handleMenuOpen} aria-label="More options">
