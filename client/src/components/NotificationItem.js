@@ -8,7 +8,7 @@ const NotificationItemWrapper = styled("div")(
   ({ theme, isUnread, colorMode }) => ({
     display: "flex",
     alignItems: "center",
-    padding: theme.spacing(2),
+    padding: "16px, 12px",
     cursor: "pointer",
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
@@ -46,11 +46,11 @@ const NotificationAvatar = styled(Avatar)(({ theme }) => ({
 }));
 
 const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
-  position: "absolute",
-  bottom: "-5px", // Adjust to place correctly below the avatar
-  right: "-5px", // Adjust to place correctly below the avatar
-  width: "14px", // Ensures it is a fixed size
-  height: "14px", // Ensures it is a fixed size
+  position: "relative",
+  bottom: "-18px", // Position at the bottom-right corner
+  right: "-46px",
+  width: "15px", // Ensures it is a fixed size
+  height: "15px", // Ensures it is a fixed size
   borderRadius: "50%", // Keeps it a circle
   backgroundColor: isOnline ? "#4CAF50" : "#B0B0B0", // Green for online, gray for offline
   border: `2px solid ${colorMode === "dark" ? "black" : "white"}`, // Border to stand out
@@ -58,8 +58,8 @@ const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
 
   // For responsiveness, you can add a media query to adjust the size on smaller screens
   "@media (max-width: 600px)": {
-    width: "10px", // Smaller size for mobile
-    height: "10px", // Smaller size for mobile
+    width: "12px", // Smaller size for mobile
+    height: "12px", // Smaller size for mobile
   },
 }));
 
