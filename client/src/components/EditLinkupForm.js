@@ -8,16 +8,17 @@ import { updateLinkup } from "../api/linkUpAPI";
 import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { MultiSelect } from "primereact/multiselect";
-import { Dropdown } from "primereact/dropdown";
 import { useColorMode } from "@chakra-ui/react";
 import { customGenderOptions } from "../utils/customGenderOptions";
+import CustomMultiSelect from "./CustomMultiSelect"; // Import the custom MultiSelect
+import CustomDropdown from "./CustomDropdown"; // Import the custom Dropdown
 
 const ModalOverlay = styled("div")({
   flex: "1",
   position: "sticky",
   top: 0,
   width: "100%",
+  padding: "20px", // Added padding for better spacing on mobile
 });
 
 const ModalContainer = styled("div")({
@@ -27,16 +28,20 @@ const ModalContainer = styled("div")({
   justifyContent: "center",
   position: "sticky",
   top: 0,
+  maxWidth: "600px", // Restrict width on larger screens
+  margin: "0 auto", // Center the container
 });
 
 const ModalTitle = styled("h2")(({ theme }) => ({
   fontWeight: "bold",
   marginBottom: theme.spacing(3),
+  fontSize: "1.5rem", // Slightly smaller title size for better fit
 }));
 
 const ModalForm = styled("form")({
   display: "flex",
   flexDirection: "column",
+  width: "100%",
 });
 
 const ModalLabel = styled("label")({
@@ -52,13 +57,14 @@ const ModalInput = styled("input")(({ theme, colorMode }) => ({
   fontSize: "14px",
   padding: theme.spacing(1),
   marginBottom: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
-  "&:focus": {
-    borderColor: theme.palette.primary.main,
-  },
   backgroundColor:
-    colorMode === "dark" ? "rgba(0, 0, 0, 0.4)" : "rgba(130, 131, 129, 0.03)",
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
+      : "rgba(130, 131, 129, 0.03)", // Light mode background
+  borderRadius: "8px", // Slightly rounded corners
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`, // Border color
 }));
 
 const ButtonGroup = styled("div")(({ theme }) => ({
@@ -66,32 +72,31 @@ const ButtonGroup = styled("div")(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   height: "40px",
+  flexDirection: "row", // Stack buttons horizontally
+  gap: theme.spacing(2), // Add space between buttons
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
   width: "100%",
   "&:focus": {
     borderColor: theme.palette.primary.main,
   },
   backgroundColor:
-    colorMode === "dark" ? "rgba(0, 0, 0, 0.4)" : "rgba(130, 131, 129, 0.03)",
-}));
-
-const CustomDropdown = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  textAlign: "start",
+    colorMode === "dark"
+      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
+      : "rgba(130, 131, 129, 0.03)", // Light mode background
+  borderRadius: "8px", // Slightly rounded corners
+  border: `1px solid ${
+    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
+  }`, // Border color
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
   width: "140px",
   border: "none",
   borderRadius: "4px",
-  marginRight: "10%",
   cursor: "pointer",
   transition: "background-color 0.3s ease",
   backgroundColor: "#0097A7",
@@ -294,70 +299,44 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
           {formErrors.date && <ErrorText>{formErrors.date}</ErrorText>}
 
           <ModalLabel htmlFor="genderPreference">Visible to who?</ModalLabel>
-          <CustomDropdown>
-            <MultiSelect
-              value={genderPreference}
-              options={genderOptions}
-              onChange={(e) => {
-                setGenderPreference(e.value);
-                setIsFormModified(true);
-              }}
-              optionLabel="value"
-              maxSelectedLabels={3}
-              className={`p-multiselect ${
-                formErrors.genderPreference ? "error" : ""
-              }`} // Add error class conditionally
-              style={{
-                width: "100%",
-                border: `1px solid ${
-                  colorMode === "dark" ? "#4a4a4a" : "#ddd"
-                }`,
-                backgroundColor:
-                  colorMode === "dark"
-                    ? "rgba(0, 0, 0, 0.4)"
-                    : "rgba(130, 131, 129, 0.03)",
-              }}
-            />
-            {formErrors.genderPreference && (
-              <ErrorText>{formErrors.genderPreference}</ErrorText>
-            )}
-          </CustomDropdown>
+          <CustomMultiSelect
+            colorMode={colorMode}
+            options={genderOptions}
+            selectedValues={genderPreference}
+            setSelectedValues={setGenderPreference}
+            placeholder="Visible to who?"
+            hasError={!!formErrors.genderPreference}
+          />
+          {formErrors.genderPreference && (
+            <ErrorText>{formErrors.genderPreference}</ErrorText>
+          )}
 
           <ModalLabel htmlFor="paymentOption">
             Who's Paying? (Optional)
           </ModalLabel>
-          <CustomDropdown>
-            <Dropdown
-              id="paymentOption"
-              aria-label="Who's Paying?"
-              value={paymentOption}
-              options={[
-                { label: "No Payment Option", value: "" },
-                { label: "Split The Bill", value: "split" },
-                { label: "I Will Pay", value: "iWillPay" },
-                { label: "Please Pay", value: "pleasePay" },
-              ]}
-              onChange={(e) => {
-                setPaymentOption(e.value);
-                setIsFormModified(true);
-              }}
-              className="w-full md:w-14rem"
-              style={{
-                width: "100%",
-                border: `1px solid ${
-                  colorMode === "dark" ? "#4a4a4a" : "#ddd"
-                }`,
-                backgroundColor:
-                  colorMode === "dark"
-                    ? "rgba(0, 0, 0, 0.4)"
-                    : "rgba(130, 131, 129, 0.03)",
-              }}
-            />
-          </CustomDropdown>
+          <CustomDropdown
+            options={[
+              { label: "No Payment Option", value: "" },
+              { label: "Split The Bill", value: "split" },
+              { label: "I Will Pay", value: "iWillPay" },
+              { label: "Please Pay", value: "pleasePay" },
+            ]}
+            value={paymentOption}
+            onChange={(val) => {
+              setPaymentOption(val);
+              setIsFormModified(true);
+            }}
+            placeholder="Who's Paying?"
+            colorMode={colorMode}
+          />
 
           <ButtonGroup>
-            <StyledButton type="submit">Update</StyledButton>
-            <CancelButton onClick={handleCancelClick}>Cancel</CancelButton>
+            <StyledButton type="submit" variant="contained">
+              Save Changes
+            </StyledButton>
+            <CancelButton variant="outlined" onClick={handleCancelClick}>
+              Cancel
+            </CancelButton>
           </ButtonGroup>
         </ModalForm>
       </ModalContainer>
