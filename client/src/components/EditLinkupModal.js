@@ -4,7 +4,6 @@ import { styled } from "@mui/material/styles";
 import EditLinkupForm from "./EditLinkupForm";
 import { useColorMode } from "@chakra-ui/react";
 
-// Styled component for the modal content
 const StyledModalContent = styled("div")(({ theme }) => ({
   position: "absolute",
   top: "50%",
@@ -14,10 +13,21 @@ const StyledModalContent = styled("div")(({ theme }) => ({
   padding: theme.spacing(4),
   outline: "none",
   width: "400px",
+  height: "auto",
+  maxHeight: "80vh",
+  overflowY: "auto",
   textAlign: "center",
   fontFamily: "Arial, sans-serif",
-  fontSize: "16px",
-  lineHeight: "1.5",
+  fontSize: "12px",
+  lineHeight: "1.35",
+
+  // 👇 This targets all buttons inside this modal
+  "& button": {
+    padding: "6px 12px", // smaller padding
+    fontSize: "12px", // smaller text
+    minWidth: "auto", // prevents MUI buttons from being too wide
+    borderRadius: "8px", // optional: smaller border radius for a cleaner look
+  },
 }));
 
 const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {

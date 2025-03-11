@@ -85,8 +85,8 @@ const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
 
   // Truncate based on screen size
   "@media (max-width: 600px)": {
-    // Mobile: limit to 30 characters
-    maxWidth: "30ch",
+    // Mobile: limit to 25 characters
+    maxWidth: "25ch",
   },
   "@media (min-width: 601px)": {
     // Desktop: limit to 50 characters
