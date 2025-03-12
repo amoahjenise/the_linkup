@@ -51,7 +51,7 @@ const DropdownItem = styled("div")(({ theme, colorMode, selected }) => ({
   "&:hover": {
     backgroundColor:
       colorMode === "dark"
-        ? "rgba(0, 123, 255, 0.1)"
+        ? "rgba(42, 93, 147, 0.55)"
         : "rgba(0, 123, 255, 0.05)",
   },
 }));

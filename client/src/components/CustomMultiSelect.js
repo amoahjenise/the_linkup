@@ -85,7 +85,7 @@ const DropdownItem = styled("li")(({ theme, colorMode, selected }) => ({
   "&:hover": {
     backgroundColor:
       colorMode === "dark"
-        ? "rgba(0, 123, 255, 0.1)"
+        ? "rgba(42, 93, 147, 0.55)"
         : "rgba(0, 123, 255, 0.05)",
   },
 }));
@@ -183,10 +183,9 @@ const CustomMultiSelect = ({
       ref={dropdownRef}
       colorMode={colorMode}
       hasError={hasError}
-      onClick={toggleDropdown}
       tabIndex={0}
     >
-      <DropdownHeader colorMode={colorMode}>
+      <DropdownHeader colorMode={colorMode} onClick={toggleDropdown}>
         <SelectedChips>{renderSelectedText()}</SelectedChips>
 
         <KeyboardArrowDownIcon
