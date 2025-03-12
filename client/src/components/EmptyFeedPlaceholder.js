@@ -15,8 +15,8 @@ const PlaceholderContainer = styled("div")(({ theme }) => ({
 }));
 
 const Illustration = styled("img")(({ theme, colorMode }) => ({
-  width: "200px",
-  height: "200px",
+  width: "75px",
+  height: "75px",
   marginBottom: theme.spacing(2),
   filter: colorMode === "dark" ? "invert(1)" : "invert(0)", // Apply inversion based on color mode
 }));
