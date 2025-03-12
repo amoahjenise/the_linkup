@@ -312,7 +312,10 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
             colorMode={colorMode}
             options={genderOptions}
             selectedValues={genderPreference}
-            setSelectedValues={setGenderPreference}
+            setSelectedValues={(newGenderPreferences) => {
+              setGenderPreference(newGenderPreferences);
+              setIsFormModified(true); // Ensure this is set when gender preference changes
+            }}
             placeholder="Visible to who?"
             hasError={!!formErrors.genderPreference}
           />
