@@ -8,7 +8,7 @@ const NotificationItemWrapper = styled("div")(
   ({ theme, isUnread, colorMode }) => ({
     display: "flex",
     alignItems: "center",
-    padding: "16px, 12px",
+    padding: "12px, 16px",
     cursor: "pointer",
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
@@ -49,8 +49,8 @@ const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
   position: "relative",
   bottom: "-18px", // Position at the bottom-right corner
   right: "-46px",
-  width: "15px", // Ensures it is a fixed size
-  height: "15px", // Ensures it is a fixed size
+  width: "12px", // Ensures it is a fixed size
+  height: "12px", // Ensures it is a fixed size
   borderRadius: "50%", // Keeps it a circle
   backgroundColor: isOnline ? "#4CAF50" : "#B0B0B0", // Green for online, gray for offline
   border: `2px solid ${colorMode === "dark" ? "black" : "white"}`, // Border to stand out
