@@ -1,8 +1,9 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Avatar, Typography, Tooltip } from "@mui/material";
+import { Typography } from "@mui/material";
 import moment from "moment";
 import { useColorMode } from "@chakra-ui/react";
+import NotificationAvatar from "./NotificationAvatar"; // Import your external component
 
 const NotificationItemWrapper = styled("div")(
   ({ theme, isUnread, colorMode }) => ({
@@ -37,32 +38,6 @@ const NotificationItemWrapper = styled("div")(
   })
 );
 
-const NotificationAvatar = styled(Avatar)(({ theme }) => ({
-  width: theme.spacing(6),
-  height: theme.spacing(6),
-  marginRight: theme.spacing(2),
-  border: `2px solid ${theme.palette.primary.main}`, // Add a border for a polished look
-  position: "relative", // Required for positioning the online indicator
-}));
-
-const OnlineIndicator = styled("div")(({ theme, isOnline, colorMode }) => ({
-  position: "relative",
-  bottom: "-18px", // Position at the bottom-right corner
-  right: "-46px",
-  width: "12px", // Ensures it is a fixed size
-  height: "12px", // Ensures it is a fixed size
-  borderRadius: "50%", // Keeps it a circle
-  backgroundColor: isOnline ? "#4CAF50" : "#B0B0B0", // Green for online, gray for offline
-  border: `2px solid ${colorMode === "dark" ? "black" : "white"}`, // Border to stand out
-  zIndex: 1,
-
-  // For responsiveness, you can add a media query to adjust the size on smaller screens
-  "@media (max-width: 600px)": {
-    width: "12px", // Smaller size for mobile
-    height: "12px", // Smaller size for mobile
-  },
-}));
-
 const NotificationContent = styled("div")(({ theme }) => ({
   flexGrow: 1,
   display: "flex",
@@ -70,8 +45,10 @@ const NotificationContent = styled("div")(({ theme }) => ({
 }));
 
 const NotificationTitle = styled(Typography)(({ theme, colorMode }) => ({
-  fontWeight: 500,
-  fontSize: "0.875rem",
+  fontWeight: 400,
+  fontSize: "0.825rem",
+  lineHeight: "1",
+
   color:
     colorMode === "light"
       ? theme.palette.text.primary // Light mode text color
@@ -79,7 +56,7 @@ const NotificationTitle = styled(Typography)(({ theme, colorMode }) => ({
 }));
 
 const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
-  fontSize: "0.875rem",
+  fontSize: "0.8rem",
   color:
     colorMode === "light"
       ? theme.palette.text.secondary // Light mode text color
@@ -88,6 +65,7 @@ const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
   overflow: "hidden",
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",
+  lineHeight: "1",
 
   // Truncate based on screen size
   "@media (max-width: 600px)": {
@@ -186,13 +164,12 @@ const NotificationItem = ({ notification, onClick }) => {
       onClick={onClick}
       colorMode={colorMode}
     >
-      <Tooltip title={getIsUserOnline() ? "Online" : "Offline"} arrow>
-        <OnlineIndicator isOnline={getIsUserOnline()} colorMode={colorMode} />
-      </Tooltip>
       <NotificationAvatar
-        alt={getDisplayName()}
         src={getDisplayAvatar()}
-      ></NotificationAvatar>
+        alt={getDisplayName()}
+        isOnline={getIsUserOnline()}
+      />
+
       <NotificationContent>
         <NotificationTitle colorMode={colorMode}>
           {notification.notification_type === "linkup_request" ? (

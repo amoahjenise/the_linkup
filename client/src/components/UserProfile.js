@@ -8,7 +8,8 @@ import Avatar from "@mui/material/Avatar";
 import LinkupsModal from "./LinkupsModal";
 import SocialMediaLinks from "../components/SocialMediaLinks";
 import UserProfileEditModal from "./UserProfileEditModal";
-import { keyframes } from "@mui/system"; // Import this for animations
+import { keyframes } from "@mui/system";
+import { Box } from "@mui/material";
 
 const bounce = keyframes`
   0%, 100% { transform: translateY(0); }
@@ -17,7 +18,7 @@ const bounce = keyframes`
 
 const BouncingNotifier = styled("div")(({ theme }) => ({
   position: "absolute",
-  top: "-10px",
+  top: "100%",
   right: "-10px",
   backgroundColor: "#0097A7",
   color: "#fff",
@@ -32,23 +33,21 @@ const BouncingNotifier = styled("div")(({ theme }) => ({
 }));
 
 const MoreButtonWrapper = styled("div")({
-  position: "relative", // Important for the notifier to anchor
+  position: "relative",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
 });
 
-// Container
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100dvh - 110px)" : "91vh", // Adjust height for mobile
+  height: isMobile ? "calc(100dvh - 110px)" : "85vh", // Reduced height
   overflow: "hidden",
   color: "#fff",
-  paddingTop: isMobile ? "60px" : "0", // Add padding to avoid overlapping with the top navbar
+  paddingTop: isMobile ? "60px" : "0",
 }));
 
-// Background Image with Gradient Overlay
 const BackgroundImage = styled("div")(({ userData }) => ({
   position: "absolute",
   top: 0,
@@ -69,11 +68,10 @@ const BackgroundImage = styled("div")(({ userData }) => ({
     backdropFilter: "blur(35px)",
     WebkitBackdropFilter: "blur(35px)",
     background:
-      "linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 110%)",
+      "linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%)", // Adjusted gradient
   },
 }));
 
-// Header
 const Header = styled("div")({
   position: "absolute",
   top: 0,
@@ -81,28 +79,12 @@ const Header = styled("div")({
   width: "100%",
   padding: "1rem",
   display: "flex",
-  justifyContent: "space-between",
+  justifyContent: "flex-end", // Align buttons to the right
   alignItems: "center",
   zIndex: 2,
+  gap: "0.5rem", // Add gap between buttons
 });
 
-const HeaderLeft = styled("div")({
-  display: "flex",
-  alignItems: "center",
-});
-
-const HeaderCenter = styled("div")({
-  display: "flex",
-  alignItems: "center",
-});
-
-const HeaderRight = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-});
-
-// Circular Icon Button with transparent blur effect
 const IconButton = styled("button")({
   width: "40px",
   height: "40px",
@@ -122,7 +104,6 @@ const IconButton = styled("button")({
   },
 });
 
-// Bottom Section
 const BottomSection = styled("div")(({ isMobile }) => ({
   position: "absolute",
   bottom: 0,
@@ -135,41 +116,32 @@ const BottomSection = styled("div")(({ isMobile }) => ({
         rgba(0, 0, 0, 0.3) 10%,
         rgba(0, 0, 0, 0) 100%
       )`,
-  padding: "1.5rem",
+  padding: isMobile ? "1rem" : "1.5rem", // Reduced padding for mobile
   zIndex: 2,
   display: "flex",
   flexDirection: "column",
-  justifyContent: "space-between",
-  transition: "background 0.5s ease-in-out",
-  marginTop: isMobile ? "60px" : "0", // Add margin to avoid overlapping with the header
+  gap: "1rem", // Add gap between elements
 }));
 
-// Title & Subtitle
 const Title = styled("h2")({
   margin: 0,
-  fontSize: "1.5rem",
+  fontSize: "1.25rem", // Smaller font size
   fontWeight: "bold",
   color: "#fff",
 });
 
 const Subtitle = styled("p")({
-  margin: "0.25rem 0 1rem",
-  fontSize: "1rem",
+  margin: "0.25rem 0",
+  fontSize: "1rem", // Smaller font size
   color: "#ccc",
 });
 
-// Layout Row
 const ProfileRow = styled("div")({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   width: "100%",
-});
-
-const LeftSide = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "1rem",
+  flexWrap: "wrap",
 });
 
 const RightSide = styled("div")({
@@ -178,15 +150,24 @@ const RightSide = styled("div")({
   gap: "0.5rem",
 });
 
-// Username + Verified Icon
-const UserNameRow = styled("div")({
+const LeftSide = styled("div")({
   display: "flex",
+  alignItems: "center",
+  gap: "1rem",
+});
+
+const UserNameRow = styled("div")({
+  display: "inline-flex", // This keeps items together inline
   alignItems: "center",
   gap: "0.25rem",
   fontWeight: 600,
+  fontSize: "1rem",
+  whiteSpace: "nowrap", // Prevents wrapping
+  overflow: "hidden", // Hides overflow
+  textOverflow: "ellipsis", // Adds ellipsis when too long
+  cursor: "default",
 });
 
-// Online Status Dot (optional)
 const OnlineStatus = styled("div")(({ isOnline }) => ({
   width: "10px",
   height: "10px",
@@ -194,7 +175,15 @@ const OnlineStatus = styled("div")(({ isOnline }) => ({
   backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
 }));
 
-// Edit Profile Button with blur
+const OnlineStatusContainer = styled("p")({
+  display: "flex",
+  alignItems: "center",
+  margin: "4px 0 0",
+  fontSize: "0.875rem",
+  color: "#aaa",
+  fontStyle: "italic",
+});
+
 const TransparentButton = styled(Button)({
   color: "#fff",
   borderColor: "#fff",
@@ -209,19 +198,9 @@ const TransparentButton = styled(Button)({
   "&:hover": {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
+  marginTop: "12px",
 });
 
-// Online Styling
-const OnlineStatusContainer = styled("p")({
-  display: "flex",
-  alignItems: "center",
-  margin: "4px 0 0",
-  fontSize: "0.75rem",
-  color: "#aaa",
-  fontStyle: "italic",
-});
-
-// Styled Menu for Social Media Links
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
     backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -289,44 +268,42 @@ const UserProfile = ({
     <UserProfileContainer isMobile={isMobile}>
       <BackgroundImage userData={userData} />
       <Header>
-        <HeaderLeft></HeaderLeft>
-        <HeaderCenter></HeaderCenter>
-        <HeaderRight>
-          <IconButton onClick={handleShare} aria-label="Share profile">
-            <FaShare />
+        <IconButton onClick={handleShare} aria-label="Share profile">
+          <FaShare />
+        </IconButton>
+        <MoreButtonWrapper>
+          {isLoggedUserProfile &&
+            userData &&
+            !userData.instagram_url &&
+            !userData.facebook_url &&
+            !userData.twitter_url && (
+              <BouncingNotifier>Link your socials!</BouncingNotifier>
+            )}
+          <IconButton onClick={handleMenuOpen} aria-label="More options">
+            <FaEllipsisH />
           </IconButton>
-          <MoreButtonWrapper>
-            {isLoggedUserProfile &&
-              userData &&
-              !userData.instagram_url &&
-              !userData.facebook_url &&
-              !userData.twitter_url && (
-                <BouncingNotifier>Link your socials!</BouncingNotifier>
-              )}
-            <IconButton onClick={handleMenuOpen} aria-label="More options">
-              <FaEllipsisH />
-            </IconButton>
-          </MoreButtonWrapper>
-        </HeaderRight>
+        </MoreButtonWrapper>
       </Header>
-      <BottomSection>
+      <BottomSection isMobile={isMobile}>
         <div>
           <Title>{userData?.bio}</Title>
-          <Subtitle>
-            {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
-            {userLocation}
-          </Subtitle>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#fff",
-              cursor: "pointer",
-              "&:hover": { textDecoration: "underline" },
-            }}
-            onClick={toggleLinkupsModal}
-          >
-            {userData?.total_linkups} Created Linkups
-          </Typography>
+          <Box display="flex" flexDirection="column" gap="0.8rem">
+            <Subtitle>
+              {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
+              {userLocation}
+            </Subtitle>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#fff",
+                cursor: "pointer",
+                "&:hover": { textDecoration: "underline" },
+              }}
+              onClick={toggleLinkupsModal}
+            >
+              {userData?.total_linkups} Created Linkups
+            </Typography>
+          </Box>
         </div>
 
         <Divider
@@ -336,18 +313,27 @@ const UserProfile = ({
           }}
         />
 
-        <ProfileRow>
+        <ProfileRow isMobile={isMobile}>
           <LeftSide>
             <Avatar
               alt="User Name"
               src={userData?.avatar}
-              sx={{ width: 56, height: 56 }}
+              sx={{ width: isMobile ? 80 : 100, height: isMobile ? 80 : 100 }} // Smaller avatar on mobile
             />
             <div>
-              <UserNameRow>
-                <span>@{userData?.name}</span>
-                <MdVerified />
-              </UserNameRow>
+              <Box
+                component="span"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                <UserNameRow>
+                  <span>@{userData?.name}</span>
+                  <MdVerified />
+                </UserNameRow>
+              </Box>
 
               <OnlineStatusContainer>
                 <OnlineStatus isOnline={userData?.is_online} />
