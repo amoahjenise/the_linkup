@@ -73,16 +73,7 @@ const SendbirdChat = () => {
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
-
-  // Reference to the conversation scroll container
-  const conversationEndRef = useRef(null);
-
-  // Function to scroll to the latest message
-  const scrollToBottom = () => {
-    if (conversationEndRef.current) {
-      conversationEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const scrollRef = useRef(null); // Reference for auto-scrolling
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -96,6 +87,13 @@ const SendbirdChat = () => {
         linkupResponse.linkup.request_status !== "accepted") ||
       linkupResponse.linkup.requester_status === "inactive"
     );
+  };
+
+  const handleKeyboardVisibility = () => {
+    if (scrollRef.current) {
+      // Scroll to the bottom of the conversation when the keyboard is opened
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -173,7 +171,6 @@ const SendbirdChat = () => {
               setIsInConversation={setIsInConversation}
             />
           )}
-          onMessageReceived={scrollToBottom} // Scroll to bottom on new message
         />
         {showSettings && (
           <SBChannelSettings
@@ -181,8 +178,6 @@ const SendbirdChat = () => {
             onCloseClick={() => setShowSettings(false)}
           />
         )}
-        {/* This div will help us scroll to the bottom */}
-        <div ref={conversationEndRef} />
       </>
     ) : null;
   }, [
@@ -207,7 +202,7 @@ const SendbirdChat = () => {
           renderHeader={() => <ChannelListHeader />}
         />
       </ChannelListWrap>
-      <ConversationWrap>{renderConversation}</ConversationWrap>
+      <ConversationWrap ref={scrollRef}>{renderConversation}</ConversationWrap>
     </>
   );
 
