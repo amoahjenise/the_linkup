@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
 import { FaEllipsisH, FaShare } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
@@ -10,6 +9,7 @@ import SocialMediaLinks from "../components/SocialMediaLinks";
 import UserProfileEditModal from "./UserProfileEditModal";
 import { keyframes } from "@mui/system";
 import { Box } from "@mui/material";
+import LoadingSpinner from "./LoadingSpinner";
 
 const bounce = keyframes`
   0%, 100% { transform: translateY(0); }
@@ -264,6 +264,11 @@ const UserProfile = ({
     handleMenuClose();
   };
 
+  // Conditionally render the loading spinner until the userData is available
+  if (!userData) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <UserProfileContainer isMobile={isMobile}>
       <BackgroundImage userData={userData} />
@@ -383,23 +388,6 @@ const UserProfile = ({
       />
     </UserProfileContainer>
   );
-};
-
-UserProfile.propTypes = {
-  isMobile: PropTypes.bool,
-  userData: PropTypes.object.isRequired,
-  calculateAge: PropTypes.func.isRequired,
-  userLocation: PropTypes.string,
-  toggleEditModal: PropTypes.func.isRequired,
-  handleSaveSocialMediaLinks: PropTypes.func.isRequired,
-  isLoggedUserProfile: PropTypes.bool.isRequired,
-  isEditModalOpen: PropTypes.bool.isRequired,
-  handleSaveChanges: PropTypes.func.isRequired,
-  isSocialMediaModalOpen: PropTypes.bool.isRequired,
-  toggleSocialMediaModal: PropTypes.func.isRequired,
-  isLinkupsModalOpen: PropTypes.bool.isRequired,
-  toggleLinkupsModal: PropTypes.func.isRequired,
-  addSnackbar: PropTypes.func.isRequired,
 };
 
 export default React.memo(UserProfile);
