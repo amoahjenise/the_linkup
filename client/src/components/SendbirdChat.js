@@ -11,7 +11,7 @@ import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
-import "./custom-sendbird.css";
+import "./CustomSendbirdMain.css";
 // Actions
 import { setIsInConversation } from "../redux/actions/conversationActions";
 
