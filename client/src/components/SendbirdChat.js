@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -72,6 +72,16 @@ const SendbirdChat = () => {
     setCurrentChannel(channel);
   }, []);
 
+  const checkMessageInputState = (linkupResponse, response) => {
+    return (
+      linkupResponse.linkup.request_status === "declined" ||
+      (!isOperator &&
+        response.messages.length === 1 &&
+        linkupResponse.linkup.request_status !== "accepted") ||
+      linkupResponse.linkup.requester_status === "inactive"
+    );
+  };
+
   useEffect(() => {
     const fetchChannelData = async () => {
       if (!currentChannel?._url) {
@@ -98,11 +108,7 @@ const SendbirdChat = () => {
           channel.createdAt
         );
         setMessageInputDisabled(
-          linkupResponse.linkup.request_status === "declined" ||
-            (!isOperator &&
-              response.messages.length === 1 &&
-              linkupResponse.linkup.request_status !== "accepted") ||
-            linkupResponse.linkup.requester_status === "inactive"
+          checkMessageInputState(linkupResponse, response)
         );
       } catch (error) {
         console.error("Error fetching channel data:", error);
@@ -111,81 +117,88 @@ const SendbirdChat = () => {
 
     fetchChannelData();
 
-    // Cleanup: Reset state when the component unmounts or when `currentChannel` changes
     return () => {
-      // Dispatch actions to reset the state when leaving the conversation
-      if (!currentChannel) {
+      if (!currentChannel?._url) {
         dispatch(setIsInConversation(false));
       }
     };
   }, [currentChannel, getGroupChannel, userId, isOperator, dispatch]);
 
-  const renderConversation = () => (
-    <>
-      <SBConversation
-        channelUrl={currentChannel._url}
-        onChatHeaderActionClick={() => setShowSettings(true)}
-        disabled={isMessageInputDisabled}
-        renderChannelHeader={() => (
-          <CustomChannelHeader
-            linkup={linkup}
-            channel={currentChannel}
-            onActionClick={() => setShowSettings(true)}
-            isOperator={isOperator}
-            isMobile={isMobile}
-            setCurrentChannel={setCurrentChannel}
-            setIsInConversation={setIsInConversation}
+  const renderChannelList = useMemo(() => {
+    return (
+      <FullWidthChannelList
+        allowProfileEdit={false}
+        isMessageReceiptStatusEnabled
+        isTypingIndicatorEnabled
+        selectedChannelUrl={currentChannel?._url}
+        disableAutoSelect
+        onChannelCreated={setCurrentChannel}
+        onChannelSelect={handleChannelSelect}
+        renderHeader={() => <ChannelListHeader />}
+      />
+    );
+  }, [currentChannel]);
+
+  const renderConversation = useMemo(() => {
+    return currentChannel ? (
+      <>
+        <SBConversation
+          channelUrl={currentChannel._url}
+          onChatHeaderActionClick={() => setShowSettings(true)}
+          disabled={isMessageInputDisabled}
+          renderChannelHeader={() => (
+            <CustomChannelHeader
+              linkup={linkup}
+              channel={currentChannel}
+              onActionClick={() => setShowSettings(true)}
+              isOperator={isOperator}
+              isMobile={isMobile}
+              setCurrentChannel={setCurrentChannel}
+              setIsInConversation={setIsInConversation}
+            />
+          )}
+        />
+        {showSettings && (
+          <SBChannelSettings
+            channelUrl={currentChannel?._url}
+            onCloseClick={() => setShowSettings(false)}
           />
         )}
-      />
-      {showSettings && (
-        <SBChannelSettings
-          channelUrl={currentChannel?._url}
-          onCloseClick={() => setShowSettings(false)}
+      </>
+    ) : null;
+  }, [
+    currentChannel,
+    isMessageInputDisabled,
+    linkup,
+    showSettings,
+    isMobile,
+    isOperator,
+  ]);
+
+  const renderDesktop = () => (
+    <>
+      <ChannelListWrap>
+        <SBChannelList
+          allowProfileEdit={false}
+          isMessageReceiptStatusEnabled
+          isTypingIndicatorEnabled
+          selectedChannelUrl={currentChannel?._url}
+          onChannelCreated={setCurrentChannel}
+          onChannelSelect={handleChannelSelect}
+          renderHeader={() => <ChannelListHeader />}
         />
-      )}
+      </ChannelListWrap>
+      <ConversationWrap>{renderConversation}</ConversationWrap>
     </>
   );
 
-  return (
-    <Container>
-      {!isMobile ? (
-        <>
-          <ChannelListWrap>
-            <SBChannelList
-              allowProfileEdit={false}
-              isMessageReceiptStatusEnabled
-              isTypingIndicatorEnabled
-              selectedChannelUrl={currentChannel?._url}
-              onChannelCreated={setCurrentChannel}
-              onChannelSelect={handleChannelSelect}
-              renderHeader={() => <ChannelListHeader />}
-            />
-          </ChannelListWrap>
-          <ConversationWrap>
-            {currentChannel && <>{renderConversation()}</>}
-          </ConversationWrap>
-        </>
-      ) : (
-        <MobileContainer>
-          {!currentChannel ? (
-            <FullWidthChannelList
-              allowProfileEdit={false}
-              isMessageReceiptStatusEnabled
-              isTypingIndicatorEnabled
-              selectedChannelUrl={currentChannel?._url}
-              disableAutoSelect
-              onChannelCreated={setCurrentChannel}
-              onChannelSelect={handleChannelSelect}
-              renderHeader={() => <ChannelListHeader />}
-            />
-          ) : (
-            <ConversationWrap>{renderConversation()}</ConversationWrap>
-          )}
-        </MobileContainer>
-      )}
-    </Container>
+  const renderMobile = () => (
+    <MobileContainer>
+      {!currentChannel ? renderChannelList : renderConversation}
+    </MobileContainer>
   );
+
+  return <Container>{!isMobile ? renderDesktop() : renderMobile()}</Container>;
 };
 
 export default SendbirdChat;
