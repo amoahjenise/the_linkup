@@ -14,6 +14,7 @@
 .sendbird-channel-list {
   position: relative;
   cursor: pointer;
+  border-right: 1px solid white;
   box-sizing: border-box;
   width: 100%;
   display: flex;
@@ -22,11 +23,27 @@
 }
 
 .sendbird-channel-preview {
-  width: 100%;
   border-bottom: none !important; /* This removes the bottom border */
 }
 
 .sendbird-conversation {
   border: none !important;
   box-shadow: none !important;
+  /* height: 100dvh - 60px; */
+}
+
+.sendbird-app__conversation-wrap {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.chat {
+  height: 100vh;
+  width: 100vw;
+}
+
+.customized-app,
+.sendbird-app__wrap {
+  height: 100vh;
+  width: 100%;
 }
