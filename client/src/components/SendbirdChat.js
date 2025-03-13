@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -67,6 +73,16 @@ const SendbirdChat = () => {
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
+
+  // Reference to the conversation scroll container
+  const conversationEndRef = useRef(null);
+
+  // Function to scroll to the latest message
+  const scrollToBottom = () => {
+    if (conversationEndRef.current) {
+      conversationEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -157,6 +173,7 @@ const SendbirdChat = () => {
               setIsInConversation={setIsInConversation}
             />
           )}
+          onMessageReceived={scrollToBottom} // Scroll to bottom on new message
         />
         {showSettings && (
           <SBChannelSettings
@@ -164,6 +181,8 @@ const SendbirdChat = () => {
             onCloseClick={() => setShowSettings(false)}
           />
         )}
+        {/* This div will help us scroll to the bottom */}
+        <div ref={conversationEndRef} />
       </>
     ) : null;
   }, [
