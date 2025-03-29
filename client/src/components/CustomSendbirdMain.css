@@ -1,14 +1,13 @@
-/* .sendbird-channel-list__body {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
+/* Mobile-specific fixes */
+@media (max-width: 600px) {
+  .sendbird-conversation {
+    height: calc(100vh - 60px) !important;
+  }
 
-.sendbird-channel-list__header {
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-} */
+  .sendbird-message-input {
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+}
 
 /* @media (max-width: 600px) { */
 .sendbird-channel-list {
@@ -29,22 +28,39 @@
 .sendbird-conversation {
   border: none !important;
   box-shadow: none !important;
-  height: 100% !important;
+  height: calc(100vh - 60px) !important; /* 60px header + 60px menu */
   width: 100% !important;
 }
 
 .sendbird-app__conversation-wrap {
   height: 100% !important;
   width: 100% !important;
+  overflow: hidden !important;
+  position: relative !important;
 }
 
-/* .chat {
-  height: 100% !important;
-  width: 100% !important;
-} */
-
 .customized-app,
+/* Disable viewport scaling */
 .sendbird-app__wrap {
-  height: 100% !important;
+  height: calc(100vh - 60px) !important;
   width: 100% !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+/* Input area positioning */
+.sendbird-message-input {
+  position: sticky !important;
+  bottom: 60px !important; /* Sit above the bottom menu */
+  background: var(--sendbird-light-background) !important;
+  padding-bottom: max(env(safe-area-inset-bottom), 10px) !important;
+}
+
+/* Keyboard visible state */
+.keyboard-visible .sendbird-conversation {
+  height: calc(100vh - 60px - 250px) !important; /* Adjust keyboard height */
+}
+
+.keyboard-visible .sendbird-message-input {
+  bottom: calc(60px + env(safe-area-inset-bottom)) !important;
 }
