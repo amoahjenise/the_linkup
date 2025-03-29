@@ -79,24 +79,33 @@ const SendbirdChat = () => {
   const conversationWrapRef = useRef(null);
 
   useEffect(() => {
+    // Detect keyboard visibility and set CSS variable
     const handleResize = () => {
-      if (conversationWrapRef.current) {
-        conversationWrapRef.current.scrollTop =
-          conversationWrapRef.current.scrollHeight;
-      }
+      const visualViewport = window.visualViewport || window;
+      const keyboardHeight = Math.max(
+        0,
+        window.innerHeight - visualViewport.height
+      );
+      document.documentElement.style.setProperty(
+        "--keyboard-height",
+        `${keyboardHeight}px`
+      );
+      document.body.classList.toggle("keyboard-visible", keyboardHeight > 50);
     };
 
-    // Add event listener for window resizing (this also accounts for keyboard resizing)
-    window.addEventListener("resize", handleResize);
-
-    // Initial scroll to bottom on mount
-    if (conversationWrapRef.current) {
-      conversationWrapRef.current.scrollTop =
-        conversationWrapRef.current.scrollHeight;
+    // Use visualViewport API if available for better accuracy
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+    } else {
+      window.addEventListener("resize", handleResize);
     }
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      } else {
+        window.removeEventListener("resize", handleResize);
+      }
     };
   }, []);
 
@@ -194,32 +203,30 @@ const SendbirdChat = () => {
   ]);
 
   const renderDesktop = () => (
-    <div className="customized-app">
-      <div className="sendbird-app__wrap">
-        <div className="sendbird-app__channellist-wrap">
-          <SBChannelList
-            allowProfileEdit={false}
-            isMessageReceiptStatusEnabled
-            isTypingIndicatorEnabled
-            selectedChannelUrl={currentChannel?._url}
-            onChannelCreated={setCurrentChannel}
-            onChannelSelect={handleChannelSelect}
-            renderHeader={() => <ChannelListHeader />}
-          />
-        </div>
+    <div className="sendbird-app__wrap">
+      <div className="sendbird-app__channellist-wrap">
+        <SBChannelList
+          allowProfileEdit={false}
+          isMessageReceiptStatusEnabled
+          isTypingIndicatorEnabled
+          selectedChannelUrl={currentChannel?._url}
+          onChannelCreated={setCurrentChannel}
+          onChannelSelect={handleChannelSelect}
+          renderHeader={() => <ChannelListHeader />}
+        />
+      </div>
 
-        <div
-          ref={conversationWrapRef}
-          className="sendbird-app__conversation-wrap"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            overflowY: "auto",
-            maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
-          }}
-        >
-          {renderConversation}
-        </div>
+      <div
+        ref={conversationWrapRef}
+        className="sendbird-app__conversation-wrap"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
+        }}
+      >
+        {renderConversation}
       </div>
     </div>
   );
