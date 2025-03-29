@@ -28,7 +28,7 @@
 .sendbird-conversation {
   border: none !important;
   box-shadow: none !important;
-  height: calc(100vh - 60px) !important; /* 60px header + 60px menu */
+  height: calc(100vh - 120px) !important; /* 60px header + 60px menu */
   width: 100% !important;
 }
 
