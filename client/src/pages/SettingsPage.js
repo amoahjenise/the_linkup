@@ -21,7 +21,7 @@ const SettingsPageContainer = styled("div")(({ theme }) => ({
 
 const MainSection = styled("div")(({ theme, colorMode }) => ({
   width: "65%",
-  borderRight: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
+  borderRight: `1px solid ${colorMode === "dark" ? "white" : "lightgrey"}`,
   [theme.breakpoints.down("md")]: {
     width: "100%",
     borderRight: "none",
