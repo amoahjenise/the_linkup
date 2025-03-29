@@ -29,7 +29,8 @@
 .sendbird-conversation {
   border: none !important;
   box-shadow: none !important;
-  /* height: 100dvh - 60px; */
+  height: 100% !important;
+  width: 100% !important;
 }
 
 .sendbird-app__conversation-wrap {
@@ -38,12 +39,12 @@
 }
 
 .chat {
-  height: 100vh;
-  width: 100vw;
+  height: 100% !important;
+  width: 100% !important;
 }
 
 .customized-app,
 .sendbird-app__wrap {
-  height: 100vh;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
 }
