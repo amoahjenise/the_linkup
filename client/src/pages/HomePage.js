@@ -36,7 +36,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.feedSection}`]: {
     flex: "2.5",
     overflowY: "auto",
-    borderRightWidth: "1px",
+    // borderRightWidth: "1px",
     borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
     [theme.breakpoints.down("md")]: {
       flex: "2", // Reduce feed width slightly on medium screens
@@ -50,6 +50,9 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     overflowY: "auto",
     display: "block",
     transition: "width 0.3s ease",
+    borderLeftWidth: "1px",
+    borderLeftColor: colorMode === "dark" ? "white" : "#D3D3D3",
+
     [theme.breakpoints.down("md")]: {
       flex: "2", // Reduce widget section width at medium screens
     },
@@ -60,6 +63,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       right: 0,
       width: "100%",
       height: "100dvh",
+      borderLeftWidth: 0,
       backgroundColor: colorMode === "dark" ? "black" : "white",
       boxShadow: "-2px 0px 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
@@ -120,6 +124,8 @@ const HomePage = ({ isMobile }) => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
+  const [widgetButtonClicked, setWidgetButtonClicked] = useState(false);
+  const [lastDesktopWidgetState, setLastDesktopWidgetState] = useState(true); // Track last desktop state
 
   // Call the useLocationUpdate hook in your component
   useLocationUpdate();
@@ -294,40 +300,46 @@ const HomePage = ({ isMobile }) => {
     }
   };
 
+  // Adjust toggleWidget to mark that the button has been clicked
   const toggleWidget = () => {
-    if (window.innerWidth <= 600) {
-      setIsWidgetVisible(!isWidgetVisible); // Toggle only for mobile screens
-    }
+    setWidgetButtonClicked(true); // Set this state to true when user clicks the button
+    setIsWidgetVisible(!isWidgetVisible); // Toggle visibility
   };
 
-  // Define the handleResize function with debounce
-  const handleResize = debounce(() => {
-    if (window.innerWidth > 600) {
-      setIsWidgetVisible(true); // Always visible on desktop
-    } else {
-      setIsWidgetVisible(false); // Toggleable on mobile
-    }
-  }, 60000); // Debounce delay of 300ms
+  // Adjust the handleResize function with additional check
+  const handleResize = debounce(
+    () => {
+      if (window.innerWidth <= 600) {
+        // Mobile behavior (debounced)
+        setLastDesktopWidgetState(isWidgetVisible); // Remember state before hiding
+        setIsWidgetVisible(false);
+      } else {
+        // Desktop behavior (instant)
+        if (widgetButtonClicked) {
+          setIsWidgetVisible(lastDesktopWidgetState); // Restore last desktop state
+        }
+      }
+    },
+    window.innerWidth <= 600 ? 12000 : 0
+  ); // Only debounce for mobile
 
   useEffect(() => {
-    // Set initial state based on the current window width
+    // Set initial state based on window width
     if (window.innerWidth > 600) {
-      setIsWidgetVisible(true);
+      setIsWidgetVisible(true); // Only show widget if button clicked
+      setLastDesktopWidgetState(true);
     } else {
-      setIsWidgetVisible(false);
+      setIsWidgetVisible(false); // Hide on mobile
     }
 
     // Add resize event listener
     window.addEventListener("resize", handleResize);
 
-    // Cleanup function: remove event listener and cancel debounce if the component is unmounted
     return () => {
+      // Cleanup
       window.removeEventListener("resize", handleResize);
-      if (handleResize.cancel) {
-        handleResize.cancel(); // Only call cancel if debounce is supported
-      }
     };
-  }, []); // Empty dependency array to run this effect only once on mount
+  }, [widgetButtonClicked]); // Depend on widgetButtonClicked to trigger on button click
 
   if (isLoading) {
     return <LoadingSpinner />; // Show loading state until userId is available

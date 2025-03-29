@@ -59,7 +59,9 @@ const LinkupsModal = ({ userId, open, onClose }) => {
   const [linkups, setLinkups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
+  const contentRef = useRef(null);
   const startY = useRef(0);
+  const [isAtTop, setIsAtTop] = useState(true);
 
   useEffect(() => {
     const fetchLinkups = async () => {
@@ -80,14 +82,27 @@ const LinkupsModal = ({ userId, open, onClose }) => {
     }
   }, [open, userId]);
 
+  // Check scroll position
+  const handleScroll = () => {
+    if (contentRef.current) {
+      setIsAtTop(contentRef.current.scrollTop === 0);
+    }
+  };
+
   // Handle swipe down to close on mobile
   const handleTouchStart = (e) => {
-    startY.current = e.touches[0].clientY;
+    // Only start tracking if at top of content
+    if (isAtTop) {
+      startY.current = e.touches[0].clientY;
+    }
   };
 
   const handleTouchMove = (e) => {
+    if (!isAtTop) return; // Only allow swipe when at top
+
     const deltaY = e.touches[0].clientY - startY.current;
-    if (deltaY > 100) {
+    // Require larger swipe distance (150px) and only downward
+    if (deltaY > 150) {
       onClose();
     }
   };
@@ -107,7 +122,7 @@ const LinkupsModal = ({ userId, open, onClose }) => {
             <CloseIcon />
           </CloseButton>
         </Header>
-        <Content>
+        <Content ref={contentRef} onScroll={handleScroll}>
           {isLoading ? (
             <Typography>Loading...</Typography>
           ) : linkups.length > 0 ? (
