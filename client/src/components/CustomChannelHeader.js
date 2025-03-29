@@ -18,7 +18,7 @@ const Header = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: theme.spacing(2),
+  padding: theme.spacing(1, 2),
   borderBottomWidth: "1px",
   borderBottom: "0.1px solid #lightgray",
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
@@ -46,29 +46,43 @@ const InfoBox = styled(Box)(({ theme }) => ({
 
 const Nickname = styled(Typography)(({ theme }) => ({
   fontWeight: 600,
-  fontSize: "1.1rem",
+  fontSize: "0.9rem",
 }));
 
 const ActivityText = styled(Typography)(({ theme }) => ({
-  fontSize: "0.9rem",
+  fontSize: "0.7rem",
   marginTop: theme.spacing(0.5),
+  padding: "2px 0", // Reduced vertical padding
+  margin: 0, // Remove margins
+  lineHeight: 1.2, // Tighter line spacing
+  "& > *": {
+    // Target all direct children
+    margin: "2px 0", // Reduced margin for children
+    padding: 0, // No padding on children
+  },
+  [theme.breakpoints.down("sm")]: {
+    padding: "1px 0", // Even tighter on mobile
+    "& > *": {
+      margin: "1px 0",
+    },
+  },
 }));
 
 const Status = styled(Typography)(({ theme, statusColor }) => ({
   display: "inline-block",
   textAlign: "center",
-  marginTop: "8px",
-  padding: theme.spacing(0.5, 1),
+  marginLeft: "4px",
+  padding: theme.spacing(0.25, 1),
   borderRadius: "12px", // Rounded corners for a pill-shaped button
   fontWeight: 600, // Slightly bolder text for emphasis
-  fontSize: "0.85rem", // Adjusted font size for better readability
+  fontSize: "0.7rem", // Adjusted font size for better readability
   textTransform: "capitalize",
   backgroundColor: statusColor.background,
   color: statusColor.color,
   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   border: `1px solid ${theme.palette.divider}`, // Border for a sharper outline
   transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transitions
-  width: "50%",
+  // width: "50%",
   cursor: "pointer",
   "&:hover": {
     transform: "scale(1.05)", // Slight zoom on hover
@@ -202,18 +216,20 @@ const CustomChannelHeader = ({
         <LoadingSpinner />
       ) : (
         <ChannelInfoContainer>
-          <UserAvatar userData={renderUserData()} width="60px" height="60px" />
+          <UserAvatar userData={renderUserData()} width="40px" height="40px" />
           <InfoBox>
-            <Nickname>{renderName()}</Nickname>
+            <Nickname>
+              {renderName()}{" "}
+              {linkup?.request_status && (
+                <Status
+                  onClick={handleLinkupStatusClick}
+                  statusColor={statusColors[linkupRequestStatus] || {}}
+                >
+                  {linkupRequestStatus}
+                </Status>
+              )}
+            </Nickname>
             <ActivityText>{renderLinkupItemText()}</ActivityText>
-            {linkup?.request_status && (
-              <Status
-                onClick={handleLinkupStatusClick}
-                statusColor={statusColors[linkupRequestStatus] || {}}
-              >
-                {linkupRequestStatus}
-              </Status>
-            )}
           </InfoBox>
         </ChannelInfoContainer>
       )}
