@@ -54,7 +54,7 @@ const ActivityText = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(0.5),
   padding: "2px 0", // Reduced vertical padding
   margin: 0, // Remove margins
-  lineHeight: 1.2, // Tighter line spacing
+  // lineHeight: 1.2, // Tighter line spacing
   "& > *": {
     // Target all direct children
     margin: "2px 0", // Reduced margin for children

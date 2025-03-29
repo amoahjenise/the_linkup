@@ -28,25 +28,34 @@ const Container = styled("div")(({ theme }) => ({
   width: "100%",
 }));
 
-const ChannelListWrap = styled("div")(({ theme }) => ({
-  borderRight: "1px solid lightgrey",
-  height: "100%",
-  overflowY: "auto",
-}));
-
-const ConversationWrap = styled("div")(({ theme }) => ({
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  overflowY: "auto",
-}));
-
 const MobileContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "100%", // Adjust height to account for footer
+  height: "calc(100vh - 60px)", // Deduct 60px for bottom menu
+  position: "relative",
+  overflow: "hidden",
 }));
+
+const ConversationWrapper = styled("div")({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  overflow: "hidden",
+  position: "relative",
+  paddingBottom: "env(safe-area-inset-bottom)", // Handle device notches
+});
+
+const KeyboardSpacer = styled("div")({
+  height: "0px",
+  transition: "height 0.3s ease",
+  "@media (max-width: 600px)": {
+    ".keyboard-visible &": {
+      height: "250px", // Adjust based on your keyboard height
+    },
+  },
+});
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
   width: "100%", // Full width for mobile
@@ -57,6 +66,9 @@ const SendbirdChat = () => {
   const [showSettings, setShowSettings] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
+  // Add keyboard visibility state
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const containerRef = useRef(null);
 
   const globalStore = useSendbirdStateContext();
 
@@ -73,7 +85,6 @@ const SendbirdChat = () => {
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
-  const scrollRef = useRef(null); // Reference for auto-scrolling
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -93,23 +104,34 @@ const SendbirdChat = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (conversationWrapRef.current) {
-        conversationWrapRef.current.scrollTop =
-          conversationWrapRef.current.scrollHeight;
+      // More accurate keyboard detection that accounts for bottom menu
+      const visualViewportHeight =
+        window.visualViewport?.height || window.innerHeight;
+      const isKeyboardVisible =
+        visualViewportHeight < window.screen.height - 200;
+
+      setKeyboardVisible(isKeyboardVisible);
+      document.body.classList.toggle("keyboard-visible", isKeyboardVisible);
+
+      if (isKeyboardVisible && containerRef.current) {
+        containerRef.current.style.transform = "translateY(0)";
       }
     };
 
-    // Add event listener for window resizing (this also accounts for keyboard resizing)
-    window.addEventListener("resize", handleResize);
-
-    // Initial scroll to bottom on mount
-    if (conversationWrapRef.current) {
-      conversationWrapRef.current.scrollTop =
-        conversationWrapRef.current.scrollHeight;
+    // Use visualViewport API if available for more accurate detection
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize);
+    } else {
+      window.addEventListener("resize", handleResize);
     }
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", handleResize);
+      } else {
+        window.removeEventListener("resize", handleResize);
+      }
+      document.body.classList.remove("keyboard-visible");
     };
   }, []);
 
@@ -238,8 +260,26 @@ const SendbirdChat = () => {
   );
 
   const renderMobile = () => (
-    <MobileContainer>
-      {!currentChannel ? renderChannelList : renderConversation}
+    <MobileContainer
+      ref={containerRef}
+      style={{
+        marginBottom: "60px", // Reserve space for bottom menu
+        height: keyboardVisible
+          ? `calc(100vh - 60px - ${
+              window.visualViewport?.height
+                ? window.screen.height - window.visualViewport.height
+                : 250
+            }px)`
+          : "calc(100vh - 60px)",
+      }}
+    >
+      {!currentChannel ? (
+        renderChannelList
+      ) : (
+        <ConversationWrapper>{renderConversation}</ConversationWrapper>
+      )}
+
+      <KeyboardSpacer />
     </MobileContainer>
   );
 
