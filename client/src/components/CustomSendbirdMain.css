@@ -52,24 +52,41 @@ body.keyboard-visible {
 /* Mobile-specific fixes */
 @media (max-width: 600px) {
   .sendbird-conversation {
-    height: calc(100vh - 60px) !important; /* Full height minus bottom menu */
+    height: calc(100vh - 60px) !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
-  
-  /* Prevent content shift when keyboard appears */
-  body.keyboard-visible .sendbird-app__wrap {
-    bottom: calc(60px + var(--keyboard-height, 250px)) !important;
+
+  .sendbird-conversation__messages {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
   }
-  
-  /* Adjust message list height when keyboard is visible */
+
+  .sendbird-message-input {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: white !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    z-index: 100 !important;
+    border-top: 1px solid #eee !important;
+  }
+
   body.keyboard-visible .sendbird-conversation__messages {
-    height: calc(100vh - 60px - var(--keyboard-height, 250px) - 120px) !important;
-    /* 60px bottom menu + keyboard height + 120px (header + input) */
+    height: calc(
+      100vh - 60px - var(--keyboard-height, 250px) - 60px
+    ) !important;
+  }
+
+  .sendbird-app__wrap {
+    height: calc(100vh - 60px) !important;
+    transform: none !important;
   }
 }
 
 /* Message list container */
-.sendbird-conversation__messages {
+/* .sendbird-conversation__messages {
   flex: 1 !important;
   min-height: 0 !important; /* Allows proper flex shrinking */
-  overflow-y: auto !important;
-}
+/* overflow-y: auto !important; */
+/* } */
