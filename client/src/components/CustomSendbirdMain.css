@@ -29,8 +29,7 @@
 .sendbird-conversation {
   border: none !important;
   box-shadow: none !important;
-  height: 100% !important;
-  width: 100% !important;
+  /* height: 100dvh - 60px; */
 }
 
 .sendbird-app__conversation-wrap {
@@ -38,55 +37,13 @@
   width: 100% !important;
 }
 
+.chat {
+  height: 100vh;
+  width: 100vw;
+}
+
 .customized-app,
 .sendbird-app__wrap {
-  height: 100% !important;
-  width: 100% !important;
+  height: 100vh;
+  width: 100%;
 }
-
-body.keyboard-visible {
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
-/* Mobile-specific fixes */
-@media (max-width: 600px) {
-  .sendbird-conversation {
-    height: calc(100vh - 60px) !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  .sendbird-conversation__messages {
-    flex: 1 !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-  }
-
-  .sendbird-message-input {
-    position: sticky !important;
-    bottom: 0 !important;
-    background: white !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
-    z-index: 100 !important;
-    border-top: 1px solid #eee !important;
-  }
-
-  body.keyboard-visible .sendbird-conversation__messages {
-    height: calc(
-      100vh - 60px - var(--keyboard-height, 250px) - 60px
-    ) !important;
-  }
-
-  .sendbird-app__wrap {
-    height: calc(100vh - 60px) !important;
-    transform: none !important;
-  }
-}
-
-/* Message list container */
-/* .sendbird-conversation__messages {
-  flex: 1 !important;
-  min-height: 0 !important; /* Allows proper flex shrinking */
-/* overflow-y: auto !important; */
-/* } */
