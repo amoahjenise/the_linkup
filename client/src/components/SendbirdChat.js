@@ -203,30 +203,32 @@ const SendbirdChat = () => {
   ]);
 
   const renderDesktop = () => (
-    <div className="sendbird-app__wrap">
-      <div className="sendbird-app__channellist-wrap">
-        <SBChannelList
-          allowProfileEdit={false}
-          isMessageReceiptStatusEnabled
-          isTypingIndicatorEnabled
-          selectedChannelUrl={currentChannel?._url}
-          onChannelCreated={setCurrentChannel}
-          onChannelSelect={handleChannelSelect}
-          renderHeader={() => <ChannelListHeader />}
-        />
-      </div>
+    <div className="customized-app">
+      <div className="sendbird-app__wrap">
+        <div className="sendbird-app__channellist-wrap">
+          <SBChannelList
+            allowProfileEdit={false}
+            isMessageReceiptStatusEnabled
+            isTypingIndicatorEnabled
+            selectedChannelUrl={currentChannel?._url}
+            onChannelCreated={setCurrentChannel}
+            onChannelSelect={handleChannelSelect}
+            renderHeader={() => <ChannelListHeader />}
+          />
+        </div>
 
-      <div
-        ref={conversationWrapRef}
-        className="sendbird-app__conversation-wrap"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
-        }}
-      >
-        {renderConversation}
+        <div
+          ref={conversationWrapRef}
+          className="sendbird-app__conversation-wrap"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+            maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
+          }}
+        >
+          {renderConversation}
+        </div>
       </div>
     </div>
   );
