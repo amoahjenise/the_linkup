@@ -42,7 +42,7 @@ const MoreButtonWrapper = styled("div")({
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100dvh - 110px)" : "85vh", // Reduced height
+  height: isMobile ? "calc(100dvh - 110px)" : "calc(100% - 60px)", // Reduced height
   overflow: "hidden",
   color: "#fff",
   paddingTop: isMobile ? "60px" : "0",
