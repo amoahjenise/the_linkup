@@ -22,17 +22,34 @@ import "./CustomSendbirdMain.css";
 import { setIsInConversation } from "../redux/actions/conversationActions";
 
 // Styled components
+// Styled components with mobile keyboard handling
 const Container = styled("div")(({ theme }) => ({
   display: "flex",
-  height: "100%",
+  height: "100vh",
   width: "100%",
+  position: "fixed",
+  top: 0,
+  left: 0,
+  overflow: "hidden",
 }));
 
 const MobileContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "100%", // Adjust height to account for footer
+  height: "calc(100vh - 60px)", // Account for bottom menu
+  position: "relative",
+  overflow: "hidden",
+}));
+
+const ConversationWrapper = styled("div")(({ theme }) => ({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  overflow: "hidden",
+  position: "relative",
+  paddingBottom: "env(safe-area-inset-bottom)",
 }));
 
 const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
@@ -44,7 +61,8 @@ const SendbirdChat = () => {
   const [showSettings, setShowSettings] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
-
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const containerRef = useRef(null);
   const globalStore = useSendbirdStateContext();
 
   // Add dispatch hook
@@ -60,7 +78,6 @@ const SendbirdChat = () => {
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
-  const scrollRef = useRef(null); // Reference for auto-scrolling
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -79,26 +96,41 @@ const SendbirdChat = () => {
   const conversationWrapRef = useRef(null);
 
   useEffect(() => {
-    // Detect keyboard visibility and set CSS variable
     const handleResize = () => {
       const visualViewport = window.visualViewport || window;
       const keyboardHeight = Math.max(
         0,
-        window.innerHeight - visualViewport.height
+        window.screen.height - visualViewport.height
       );
+
       document.documentElement.style.setProperty(
         "--keyboard-height",
         `${keyboardHeight}px`
       );
-      document.body.classList.toggle("keyboard-visible", keyboardHeight > 50);
+      const isKeyboardVisible = keyboardHeight > 50;
+      setKeyboardVisible(isKeyboardVisible);
+      document.body.classList.toggle("keyboard-visible", isKeyboardVisible);
+
+      if (isKeyboardVisible && containerRef.current) {
+        containerRef.current.style.transform = "translateY(0)";
+      }
     };
 
-    // Use visualViewport API if available for better accuracy
+    const handleTouchMove = (e) => {
+      if (document.body.classList.contains("keyboard-visible")) {
+        e.preventDefault();
+      }
+    };
+
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", handleResize);
     } else {
       window.addEventListener("resize", handleResize);
     }
+
+    document.body.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
 
     return () => {
       if (window.visualViewport) {
@@ -106,6 +138,7 @@ const SendbirdChat = () => {
       } else {
         window.removeEventListener("resize", handleResize);
       }
+      document.body.removeEventListener("touchmove", handleTouchMove);
     };
   }, []);
 
@@ -203,39 +236,53 @@ const SendbirdChat = () => {
   ]);
 
   const renderDesktop = () => (
-    <div className="customized-app">
-      <div className="sendbird-app__wrap">
-        <div className="sendbird-app__channellist-wrap">
-          <SBChannelList
-            allowProfileEdit={false}
-            isMessageReceiptStatusEnabled
-            isTypingIndicatorEnabled
-            selectedChannelUrl={currentChannel?._url}
-            onChannelCreated={setCurrentChannel}
-            onChannelSelect={handleChannelSelect}
-            renderHeader={() => <ChannelListHeader />}
-          />
-        </div>
+    // <div className="customized-app">
+    <div className="sendbird-app__wrap">
+      <div className="sendbird-app__channellist-wrap">
+        <SBChannelList
+          allowProfileEdit={false}
+          isMessageReceiptStatusEnabled
+          isTypingIndicatorEnabled
+          selectedChannelUrl={currentChannel?._url}
+          onChannelCreated={setCurrentChannel}
+          onChannelSelect={handleChannelSelect}
+          renderHeader={() => <ChannelListHeader />}
+        />
+      </div>
 
-        <div
-          ref={conversationWrapRef}
-          className="sendbird-app__conversation-wrap"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            overflowY: "auto",
-            maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
-          }}
-        >
-          {renderConversation}
-        </div>
+      <div
+        ref={conversationWrapRef}
+        className="sendbird-app__conversation-wrap"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
+        }}
+      >
+        {renderConversation}
       </div>
     </div>
+    // </div>
   );
 
   const renderMobile = () => (
-    <MobileContainer>
-      {!currentChannel ? renderChannelList : renderConversation}
+    <MobileContainer
+      ref={containerRef}
+      style={{
+        marginBottom: "60px",
+        height: keyboardVisible
+          ? `calc(100vh - 60px - ${
+              window.visualViewport?.height
+                ? window.screen.height - window.visualViewport.height
+                : 250
+            }px)`
+          : "calc(100vh - 60px)",
+      }}
+    >
+      <ConversationWrapper>
+        {!currentChannel ? renderChannelList : renderConversation}
+      </ConversationWrapper>
     </MobileContainer>
   );
 
