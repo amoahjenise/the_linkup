@@ -12,12 +12,12 @@ const HeaderContainer = styled(Box)(({ theme, colorMode }) => ({
   zIndex: theme.zIndex.appBar,
   borderBottom:
     colorMode === "dark"
-      ? `1px solid white`
+      ? `1px solid gray`
       : `1px solid ${theme.palette.divider}`,
   color: colorMode === "dark" ? "white" : "black",
   backgroundColor:
     colorMode === "dark" ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.97)",
-  padding: theme.spacing(1),
+  padding: theme.spacing(0.9),
 }));
 
 const TextWrapper = styled(Box)({

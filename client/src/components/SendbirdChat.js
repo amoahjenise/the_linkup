@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -17,8 +11,6 @@ import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
 import "./CustomSendbirdMain.css";
-// Actions
-import { setIsInConversation } from "../redux/actions/conversationActions";
 
 // Styled components
 const Container = styled("div")(({ theme }) => ({
@@ -32,6 +24,10 @@ const MobileContainer = styled("div")(({ theme }) => ({
   flexDirection: "column",
   width: "100%",
   height: "100%", // Adjust height to account for footer
+}));
+
+const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
+  width: "100%", // Full width for mobile
 }));
 
 const SendbirdChat = () => {
@@ -69,38 +65,11 @@ const SendbirdChat = () => {
     );
   };
 
-  const conversationWrapRef = useRef(null);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (conversationWrapRef.current) {
-        conversationWrapRef.current.scrollTop =
-          conversationWrapRef.current.scrollHeight;
-      }
-    };
-
-    // Add event listener for window resizing (this also accounts for keyboard resizing)
-    window.addEventListener("resize", handleResize);
-
-    // Initial scroll to bottom on mount
-    if (conversationWrapRef.current) {
-      conversationWrapRef.current.scrollTop =
-        conversationWrapRef.current.scrollHeight;
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   useEffect(() => {
     const fetchChannelData = async () => {
       if (!currentChannel?._url) {
-        dispatch(setIsInConversation(false));
         return;
       }
-
-      dispatch(setIsInConversation(true));
 
       try {
         const linkupResponse = await getLinkupByConversation(
@@ -127,32 +96,24 @@ const SendbirdChat = () => {
     };
 
     fetchChannelData();
-
-    return () => {
-      if (!currentChannel?._url) {
-        dispatch(setIsInConversation(false));
-      }
-    };
-  }, [currentChannel, getGroupChannel, userId, isOperator, dispatch]);
+  }, [currentChannel?._url, userId]);
 
   const renderChannelList = useMemo(() => {
     return (
-      <div className="sendbird-app__wrap">
-        <div className="sendbird-app__channellist-wrap">
-          <SBChannelList
-            allowProfileEdit={false}
-            isMessageReceiptStatusEnabled
-            isTypingIndicatorEnabled
-            selectedChannelUrl={currentChannel?._url}
-            disableAutoSelect
-            onChannelCreated={setCurrentChannel}
-            onChannelSelect={handleChannelSelect}
-            renderHeader={() => <ChannelListHeader />}
-          />
-        </div>
+      <div className="sendbird-app__channellist-wrap">
+        <FullWidthChannelList
+          allowProfileEdit={false}
+          isMessageReceiptStatusEnabled
+          isTypingIndicatorEnabled
+          selectedChannelUrl={currentChannel?._url}
+          disableAutoSelect
+          onChannelCreated={setCurrentChannel}
+          onChannelSelect={handleChannelSelect}
+          renderHeader={() => <ChannelListHeader />}
+        />
       </div>
     );
-  }, [currentChannel]);
+  }, [currentChannel?._url, handleChannelSelect]);
 
   const renderConversation = useMemo(() => {
     return currentChannel ? (
@@ -166,7 +127,6 @@ const SendbirdChat = () => {
             isOperator={isOperator}
             isMobile={isMobile}
             setCurrentChannel={setCurrentChannel}
-            setIsInConversation={setIsInConversation}
           />
         )}
       />
@@ -188,7 +148,6 @@ const SendbirdChat = () => {
       </div>
 
       <div
-        ref={conversationWrapRef}
         className="sendbird-app__conversation-wrap"
         style={{
           display: "flex",
