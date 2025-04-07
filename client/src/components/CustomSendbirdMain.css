@@ -28,14 +28,14 @@
 
 @media (max-width: 600px) {
   .sendbird-conversation {
-    height: calc(100dvh - 100px) !important;
+    height: calc(100dvh - 60px) !important;
   }
 }
 
 .sendbird-conversation {
   box-sizing: border-box !important;
   overflow-y: auto !important;
-  height: calc(120dvh) !important;
+  height: calc(100dvh) !important;
   border: none !important;
   box-shadow: none !important;
 }

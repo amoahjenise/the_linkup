@@ -19,33 +19,49 @@ import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { LoadingPage } from "../pages";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-// Custom styled SignInButton and SignUpButton
+// Enhanced styled SignInButton and SignUpButton with improved UI/UX
 const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
   backgroundColor: "rgba(0, 151, 167, 0.8)",
   color: "white",
+  padding: "10px 24px",
+  borderRadius: "6px",
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "15px",
+  letterSpacing: "0.25px",
+  boxShadow: "none",
+  transition: "all 0.2s ease-in-out",
   "&:hover": {
     backgroundColor: "rgba(0, 151, 167, 1)",
+    transform: "translateY(-1px)",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
-  padding: "6px 20px", // Added padding to match the button style
-  borderRadius: "4px", // Slight border radius for a cleaner look
-  textTransform: "none", // Prevents text from being uppercased
-  fontWeight: 600, // Bold text
-  letterSpacing: "0.5px", // Adjusts spacing between letters
-  fontSize: "14px", // Standard font size for the button text
+  "&:active": {
+    transform: "translateY(0)",
+    boxShadow: "none",
+  },
 }));
 
 const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
   backgroundColor: "rgba(0, 151, 167, 0.9)",
   color: "white",
+  padding: "10px 24px",
+  borderRadius: "6px",
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "15px",
+  letterSpacing: "0.25px",
+  boxShadow: "none",
+  transition: "all 0.2s ease-in-out",
   "&:hover": {
     backgroundColor: "rgba(0, 151, 167, 1)",
+    transform: "translateY(-1px)",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
-  padding: "6px 20px", // Added padding to match the button style
-  borderRadius: "4px", // Slight border radius for a cleaner look
-  textTransform: "none", // Prevents text from being uppercased
-  fontWeight: 600, // Bold text
-  letterSpacing: "0.5px", // Adjusts spacing between letters
-  fontSize: "14px", // Standard font size for the button text
+  "&:active": {
+    transform: "translateY(0)",
+    boxShadow: "none",
+  },
 }));
 
 // Footer component styled
