@@ -323,7 +323,10 @@ const CreateLinkupWidget = ({
         setSelectedDate(null);
         setGenderPreference([]);
         setPaymentOption(null);
-        toggleWidget();
+        // Only toggle the widget in mobile view
+        if (window.innerWidth <= 600) {
+          toggleWidget();
+        }
         setShouldFetchLinkups(true);
         scrollToTopCallback();
       } else {
