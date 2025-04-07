@@ -1,4 +1,13 @@
-import { GET_USER_SETTINGS, SAVE_USER_SETTINGS } from "./actionTypes";
+import {
+  SET_DEFAULT_SETTINGS,
+  GET_USER_SETTINGS,
+  SAVE_USER_SETTINGS,
+} from "./actionTypes";
+
+// userSettingsActions.js
+export const setDefaultSettings = () => ({
+  type: SET_DEFAULT_SETTINGS,
+});
 
 export const getUserSettings = (settings) => ({
   type: GET_USER_SETTINGS,
