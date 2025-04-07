@@ -79,10 +79,22 @@ const SendbirdChat = () => {
   const conversationWrapRef = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
+    const interval = setInterval(() => {
       if (conversationWrapRef.current) {
         conversationWrapRef.current.scrollTop =
           conversationWrapRef.current.scrollHeight;
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, [currentChannel]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (conversationWrapRef.current) {
+        conversationWrapRef.current.scrollTo({
+          top: conversationWrapRef.current.scrollHeight,
+          behavior: "smooth",
+        });
       }
     };
 
@@ -115,11 +127,13 @@ const SendbirdChat = () => {
         );
         setLinkup(linkupResponse.linkup);
 
-        const channel = await getGroupChannel()(currentChannel._url); // Call the selector function
+        const channel = await getGroupChannel()(currentChannel._url);
         const operator = channel?.members.find(
           (member) => member.role === "operator"
         );
-        setIsOperator(operator && operator.userId === userId);
+
+        const isCurrentUserOperator = operator?.userId === userId;
+        setIsOperator(isCurrentUserOperator); // Only updates if value changes
 
         const response = await getChannelFirstTwoMessages(
           currentChannel._url,
@@ -134,13 +148,12 @@ const SendbirdChat = () => {
     };
 
     fetchChannelData();
-
     return () => {
       if (!currentChannel?._url) {
         dispatch(setIsInConversation(false));
       }
     };
-  }, [currentChannel, getGroupChannel, userId, isOperator, dispatch]);
+  }, [currentChannel, getGroupChannel, userId, dispatch]);
 
   const renderChannelList = useMemo(() => {
     return (
@@ -215,7 +228,7 @@ const SendbirdChat = () => {
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
-            maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
+            maxHeight: isMobile ? "calc(100dvh - 60px)" : "100vh",
           }}
         >
           {renderConversation}
