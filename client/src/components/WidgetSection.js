@@ -19,6 +19,7 @@ const WidgetSection = ({
   toggleWidget,
   setShouldFetchLinkups,
   scrollToTopCallback,
+  isMobile
 }) => {
   const handleFilterChange = (selectedCategories) => {
     console.log("Selected Categories:", selectedCategories);
@@ -33,6 +34,7 @@ const WidgetSection = ({
           toggleWidget={toggleWidget}
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTopCallback}
+          isMobile={isMobile}
         />
       </Widget>
 

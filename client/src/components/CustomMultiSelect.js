@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Checkbox from "@mui/material/Checkbox";
 
 const DropdownContainer = styled("div")(({ theme, colorMode, hasError }) => ({
   width: "100%",
@@ -110,6 +111,10 @@ const Chip = styled("div")(({ theme, colorMode }) => ({
   flexShrink: 0,
 }));
 
+const OptionLabel = styled("span")({
+  marginLeft: "8px",
+});
+
 const CustomMultiSelect = ({
   colorMode,
   options,
@@ -204,7 +209,19 @@ const CustomMultiSelect = ({
             selected={isAllSelected}
             onClick={() => handleOptionClick({ value: "SELECT_ALL" })}
           >
-            {isAllSelected ? "Deselect All" : "Select All"}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Checkbox
+                checked={isAllSelected}
+                indeterminate={selectedValues.length > 0 && !isAllSelected}
+                style={{
+                  color: colorMode === "dark" ? "#fff" : "#333",
+                  padding: "4px",
+                }}
+              />
+              <OptionLabel>
+                {isAllSelected ? "Deselect All" : "Select All"}
+              </OptionLabel>
+            </div>
           </DropdownItem>
 
           {options.map((option) => (
@@ -214,7 +231,16 @@ const CustomMultiSelect = ({
               selected={selectedValues.includes(option.value)}
               onClick={() => handleOptionClick(option)}
             >
-              {option.value}
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Checkbox
+                  checked={selectedValues.includes(option.value)}
+                  style={{
+                    color: colorMode === "dark" ? "#fff" : "#333",
+                    padding: "4px",
+                  }}
+                />
+                <OptionLabel>{option.value}</OptionLabel>
+              </div>
             </DropdownItem>
           ))}
         </DropdownList>

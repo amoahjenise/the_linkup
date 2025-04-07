@@ -36,13 +36,12 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.${classes.feedSection}`]: {
     flex: "2.5",
     overflowY: "auto",
-    // borderRightWidth: "1px",
     borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
     [theme.breakpoints.down("md")]: {
-      flex: "2", // Reduce feed width slightly on medium screens
+      flex: "2",
     },
     [theme.breakpoints.down("sm")]: {
-      flex: "1", // Full width on smaller screens
+      flex: "1",
     },
   },
   [`&.${classes.widgetSection}`]: {
@@ -54,10 +53,10 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     borderLeftColor: colorMode === "dark" ? "white" : "#D3D3D3",
 
     [theme.breakpoints.down("md")]: {
-      flex: "2", // Reduce widget section width at medium screens
+      flex: "2",
     },
     [theme.breakpoints.down("sm")]: {
-      flex: "2", // Reduce widget section width at medium screens
+      flex: "2",
       position: "fixed",
       top: 0,
       right: 0,
@@ -69,8 +68,8 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
       zIndex: 2000,
-      maxHeight: "100dvh", // Ensure it doesn't exceed viewport height
-      overflowY: "auto", // Make it scrollable if content overflows
+      maxHeight: "100dvh",
+      overflowY: "auto",
     },
   },
   [`&.${classes.widgetButton}`]: {
@@ -80,9 +79,8 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     zIndex: 1100,
     borderRadius: "50%",
     backgroundColor: theme.palette.mode === "dark" ? "#2D3748" : "#D3D3D3",
-    display: "block",
-    [theme.breakpoints.down("sm")]: {
-      display: "none", // Hide on small screens
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
     },
   },
   [`&.${classes.widgetCloseButton}`]: {
@@ -121,17 +119,16 @@ const HomePage = ({ isMobile }) => {
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
   const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
-  const [widgetButtonClicked, setWidgetButtonClicked] = useState(false);
-  const [lastDesktopWidgetState, setLastDesktopWidgetState] = useState(true); // Track last desktop state
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
+  const wasManuallyToggled = useRef(false);
 
-  // Call the useLocationUpdate hook in your component
   useLocationUpdate();
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -148,41 +145,29 @@ const HomePage = ({ isMobile }) => {
     async (page) => {
       setIsFetchingNextPage(true);
       try {
-        if (!userId || page < 1 || PAGE_SIZE < 1) return; // Validate userId and page values
+        if (!userId || page < 1 || PAGE_SIZE < 1) return;
 
-        const adjustedPage = page - 1; // Adjust page for zero-based indexing
-        const sqlOffset = adjustedPage * PAGE_SIZE; // This should be a valid number now
+        const adjustedPage = page - 1;
+        const sqlOffset = adjustedPage * PAGE_SIZE;
 
-        console.log(
-          "Fetching linkups - Page:",
-          page,
-          "Page Size:",
-          PAGE_SIZE,
-          "SQL Offset:",
-          sqlOffset
-        );
-
-        // Fetch linkups from the API
         const response = await getLinkups(
           userId,
           gender,
           0,
-          sqlOffset + PAGE_SIZE, // Adjust fetching logic
+          sqlOffset + PAGE_SIZE,
           latitude,
           longitude
         );
 
         if (response.success) {
-          // Filter only active linkups
           const activeLinkups = response.linkupList.filter(
             (linkup) => linkup.status === "active"
           );
 
-          // Calculate distance for each linkup and set isUserCreated
           const updatedLinkupList = activeLinkups.map((linkup) => ({
             ...linkup,
-            isUserCreated: linkup.creator_id === userId, // Check if the current user created the linkup
-            createdAtTimestamp: linkup.created_at, // Assign the created_at timestamp
+            isUserCreated: linkup.creator_id === userId,
+            createdAtTimestamp: linkup.created_at,
             distance: calculateDistance(
               latitude,
               longitude,
@@ -191,22 +176,14 @@ const HomePage = ({ isMobile }) => {
             ),
           }));
 
-          // Sort the updated list by createdAtTimestamp, then by distance
           updatedLinkupList.sort((a, b) => {
-            // Sort by createdAtTimestamp (newest first)
             const createdAtComparison =
               new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
-
-            if (createdAtComparison !== 0) return createdAtComparison; // If they are different, use this result
-
-            // If createdAt is the same, sort by distance
-            return a.distance - b.distance; // Ascending order by distance
+            if (createdAtComparison !== 0) return createdAtComparison;
+            return a.distance - b.distance;
           });
 
-          // Dispatch updated linkups to Redux store
           dispatch(fetchLinkupsSuccess(updatedLinkupList));
-
-          // Update state for current page and fetched linkup IDs
           setCurrentPage(page);
           const newFetchedLinkupIds = updatedLinkupList.map(
             (linkup) => linkup.id
@@ -218,26 +195,23 @@ const HomePage = ({ isMobile }) => {
       } catch (error) {
         console.error("Error fetching linkups:", error);
       } finally {
-        // Ensure fetching state is reset
         setIsFetchingNextPage(false);
-        setIsLoading(false); // Set loading to false after fetching
+        setIsLoading(false);
       }
     },
     [dispatch, fetchedLinkupIds, gender, latitude, longitude, userId]
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = 10; // Set threshold for triggering new fetch
+    const threshold = 10;
     if (
       feedSectionRef.current &&
       feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
         feedSectionRef.current.clientHeight + threshold
     ) {
       if (currentPage < totalPages && !isFetchingNextPage) {
-        const newPageSize = PAGE_SIZE + (currentPage - 1) * PAGE_SIZE; // Increment the page size
+        const newPageSize = PAGE_SIZE + (currentPage - 1) * PAGE_SIZE;
         fetchLinkupsAndPoll(currentPage + 1, newPageSize);
-      } else {
-        console.log("No more pages to fetch or currently fetching...");
       }
     }
   }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
@@ -257,12 +231,8 @@ const HomePage = ({ isMobile }) => {
 
   useEffect(() => {
     const scrollContainer = feedSectionRef.current;
-
-    // Check if the scroll container exists before adding the event listener
     if (scrollContainer) {
       scrollContainer.addEventListener("scroll", handleScroll);
-
-      // Clean up the event listener when the component unmounts
       return () => {
         scrollContainer.removeEventListener("scroll", handleScroll);
       };
@@ -271,13 +241,11 @@ const HomePage = ({ isMobile }) => {
 
   const fetchLinkupRequests = useCallback(async () => {
     try {
-      dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
+      dispatch(showNewLinkupButton(false));
       if (!userId) return;
       const response = await getLinkupRequests(userId);
       if (response.success) {
         dispatch(fetchLinkupRequestsSuccess(response.linkupRequestList));
-      } else {
-        console.error("Error fetching linkup requests:", response.message);
       }
     } catch (error) {
       console.error("Error fetching linkup requests:", error);
@@ -289,7 +257,7 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
-    dispatch(showNewLinkupButton(false)); // Dispatch action to show the NewLinkupButton
+    dispatch(showNewLinkupButton(false));
     fetchLinkupsAndPoll(1);
     scrollToTop();
   }, [dispatch, fetchLinkupsAndPoll]);
@@ -300,49 +268,44 @@ const HomePage = ({ isMobile }) => {
     }
   };
 
-  // Adjust toggleWidget to mark that the button has been clicked
-  const toggleWidget = () => {
-    setWidgetButtonClicked(true); // Set this state to true when user clicks the button
-    setIsWidgetVisible(!isWidgetVisible); // Toggle visibility
-  };
+  const toggleWidget = useCallback(() => {
+    wasManuallyToggled.current = true;
+    setIsWidgetVisible((prev) => !prev);
+  }, []);
 
-  // Adjust the handleResize function with additional check
-  const handleResize = debounce(
-    () => {
-      if (window.innerWidth <= 600) {
-        // Mobile behavior (debounced)
-        setLastDesktopWidgetState(isWidgetVisible); // Remember state before hiding
-        setIsWidgetVisible(false);
-      } else {
-        // Desktop behavior (instant)
-        if (widgetButtonClicked) {
-          setIsWidgetVisible(lastDesktopWidgetState); // Restore last desktop state
-        }
-      }
-    },
-    window.innerWidth <= 600 ? 12000 : 0
-  ); // Only debounce for mobile
+  const handleResize = useCallback(() => {
+    const newIsMobile = window.innerWidth <= 600;
+    setIsMobileView(newIsMobile);
+
+    if (!wasManuallyToggled.current) {
+      setIsWidgetVisible(!newIsMobile);
+    }
+  }, []);
 
   useEffect(() => {
-    // Set initial state based on window width
-    if (window.innerWidth > 600) {
-      setIsWidgetVisible(true); // Only show widget if button clicked
-      setLastDesktopWidgetState(true);
-    } else {
-      setIsWidgetVisible(false); // Hide on mobile
-    }
+    const initialIsMobile = window.innerWidth <= 600;
+    setIsMobileView(initialIsMobile);
+    setIsWidgetVisible(!initialIsMobile);
 
-    // Add resize event listener
-    window.addEventListener("resize", handleResize);
+    const debouncedHandleResize = debounce(() => {
+      const currentIsMobile = window.innerWidth <= 600;
+      if (isMobileView !== currentIsMobile) {
+        handleResize();
+      }
+    }, 100);
 
+    window.addEventListener("resize", debouncedHandleResize);
     return () => {
-      // Cleanup
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedHandleResize);
     };
-  }, [widgetButtonClicked]); // Depend on widgetButtonClicked to trigger on button click
+  }, [handleResize, isMobileView]);
+
+  useEffect(() => {
+    wasManuallyToggled.current = false;
+  }, [isMobileView]);
 
   if (isLoading) {
-    return <LoadingSpinner />; // Show loading state until userId is available
+    return <LoadingSpinner />;
   }
 
   return (
@@ -366,10 +329,11 @@ const HomePage = ({ isMobile }) => {
         }`}
         colorMode={colorMode}
       >
-        {window.innerWidth <= 600 && (
+        {isMobileView && (
           <IconButton
             className={classes.widgetCloseButton}
             onClick={toggleWidget}
+            onTouchStart={(e) => e.preventDefault()}
           >
             <CloseIcon
               style={{ color: colorMode === "dark" ? "white" : "black" }}
@@ -380,24 +344,25 @@ const HomePage = ({ isMobile }) => {
           toggleWidget={toggleWidget}
           setShouldFetchLinkups={setShouldFetchLinkups}
           scrollToTopCallback={scrollToTop}
+          isMobile={isMobileView}
         />
       </StyledDiv>
 
-      {/* Floating Filter Icon Button */}
-      {window.innerWidth <= 600 && (
+      {isMobileView && !isWidgetVisible && (
         <IconButton
           className={classes.widgetButton}
           onClick={toggleWidget}
+          onTouchStart={(e) => e.preventDefault()}
           style={{
             position: "fixed",
             bottom: "100px",
             right: "32px",
-            zIndex: 1000, // Ensure it's on top of other elements
+            zIndex: 1000,
             color: "white",
             backgroundColor: "#0097A7",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // Circular shadow effect
-            borderRadius: "50%", // Make the button circular
-            padding: "12px", // Add padding for a circular look
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+            borderRadius: "50%",
+            padding: "12px",
           }}
         >
           <AddIcon />
