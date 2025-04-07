@@ -447,7 +447,7 @@ const CreateLinkupWidget = ({
           options={genderOptions}
           selectedValues={genderPreference}
           setSelectedValues={setGenderPreference}
-          placeholder="Visible to who?"
+          placeholder="Visible to Whom?"
           placeholderStyle={placeholderStyle}
           hasError={!!formErrors.genderPreference}
         />
