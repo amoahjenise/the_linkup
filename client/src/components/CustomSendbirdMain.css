@@ -20,24 +20,31 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start; /* Adjust as needed */
+  border-right: none !important; /* This removes the bottom border */
 }
 
 .sendbird-channel-preview {
   border-bottom: none !important; /* This removes the bottom border */
 }
 
+@media (max-width: 600px) {
+  .sendbird-conversation {
+    height: calc(100dvh - 60px) !important;
+  }
+}
+
 .sendbird-conversation {
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  height: calc(100dvh) !important;
   border: none !important;
   box-shadow: none !important;
-  /* height: 100dvh - 60px; */
 }
 
 .sendbird-app__conversation-wrap {
-  height: 90% !important;
   width: 100% !important;
 }
 
 .sendbird-app__wrap {
-  /* height: 100vh; */
-  width: 100%;
+  width: 100% !important;
 }

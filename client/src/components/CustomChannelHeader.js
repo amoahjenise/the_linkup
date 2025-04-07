@@ -1,11 +1,9 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Box, Typography, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreMenu from "./MoreMenu";
 import moment from "moment";
-import LoadingSpinner from "./LoadingSpinner";
 import { getRequestByLinkupIdAndSenderId } from "../api/linkupRequestAPI";
 import nlp from "compromise";
 import UserAvatar from "./UserAvatar";
@@ -20,7 +18,7 @@ const Header = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   padding: theme.spacing(1, 2),
   borderBottomWidth: "1px",
-  borderBottom: "0.1px solid #lightgray",
+  borderBottom: `0.1px solid ${theme.palette.divider}`,
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
   top: 0,
   position: "sticky",
@@ -52,41 +50,28 @@ const Nickname = styled(Typography)(({ theme }) => ({
 const ActivityText = styled(Typography)(({ theme }) => ({
   fontSize: "0.7rem",
   marginTop: theme.spacing(0.5),
-  padding: "2px 0", // Reduced vertical padding
-  margin: 0, // Remove margins
-  // lineHeight: 1.2, // Tighter line spacing
-  "& > *": {
-    // Target all direct children
-    margin: "2px 0", // Reduced margin for children
-    padding: 0, // No padding on children
-  },
-  [theme.breakpoints.down("sm")]: {
-    padding: "1px 0", // Even tighter on mobile
-    "& > *": {
-      margin: "1px 0",
-    },
-  },
+  padding: "2px 0",
+  margin: 0,
 }));
 
-const Status = styled(Typography)(({ theme, statusColor }) => ({
+const StatusWrapper = styled("span")(({ theme, background, color }) => ({
   display: "inline-block",
   textAlign: "center",
   marginLeft: "4px",
   padding: theme.spacing(0.25, 1),
-  borderRadius: "12px", // Rounded corners for a pill-shaped button
-  fontWeight: 600, // Slightly bolder text for emphasis
-  fontSize: "0.7rem", // Adjusted font size for better readability
+  borderRadius: "12px",
+  fontWeight: 600,
+  fontSize: "0.7rem",
   textTransform: "capitalize",
-  backgroundColor: statusColor.background,
-  color: statusColor.color,
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
-  border: `1px solid ${theme.palette.divider}`, // Border for a sharper outline
-  transition: "background-color 0.3s ease, color 0.3s ease", // Smooth transitions
-  // width: "50%",
+  backgroundColor: background,
+  color: color,
+  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  border: `1px solid ${theme.palette.divider}`,
+  transition: "all 0.3s ease",
   cursor: "pointer",
   "&:hover": {
-    transform: "scale(1.05)", // Slight zoom on hover
-    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)", // Enhanced shadow on hover
+    transform: "scale(1.05)",
+    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)",
   },
 }));
 
@@ -101,12 +86,9 @@ const CustomChannelHeader = ({
   linkup,
   channel,
   isOperator,
-  loading,
   isMobile,
   setCurrentChannel,
-  setIsInConversation,
 }) => {
-  const dispatch = useDispatch();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [linkupRequestStatus, setLinkupRequestStatus] = useState(null);
   const [shouldFetchLinkups, setShouldFetchLinkups] = useState(false);
@@ -200,39 +182,39 @@ const CustomChannelHeader = ({
       : navigate("/history/requests-sent");
   };
 
+  const statusColor = statusColors[linkupRequestStatus] || {};
+
   return (
     <Header>
       {isMobile && (
         <BackButton
           onClick={() => {
             setCurrentChannel(null);
-            dispatch(setIsInConversation(false));
           }}
         >
           <ArrowBackIcon />
         </BackButton>
       )}
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <ChannelInfoContainer>
-          <UserAvatar userData={renderUserData()} width="40px" height="40px" />
-          <InfoBox>
-            <Nickname>
-              {renderName()}{" "}
-              {linkup?.request_status && (
-                <Status
-                  onClick={handleLinkupStatusClick}
-                  statusColor={statusColors[linkupRequestStatus] || {}}
-                >
-                  {linkupRequestStatus}
-                </Status>
-              )}
-            </Nickname>
-            <ActivityText>{renderLinkupItemText()}</ActivityText>
-          </InfoBox>
-        </ChannelInfoContainer>
-      )}
+
+      <ChannelInfoContainer>
+        <UserAvatar userData={renderUserData()} width="40px" height="40px" />
+        <InfoBox>
+          <Nickname>
+            {renderName()}{" "}
+            {linkup?.request_status && (
+              <StatusWrapper
+                onClick={handleLinkupStatusClick}
+                background={statusColor.background}
+                color={statusColor.color}
+              >
+                {linkupRequestStatus}
+              </StatusWrapper>
+            )}
+          </Nickname>
+          <ActivityText>{renderLinkupItemText()}</ActivityText>
+        </InfoBox>
+      </ChannelInfoContainer>
+
       {isOperator && (
         <MoreMenu
           showGoToItem
