@@ -14,13 +14,12 @@
 .sendbird-channel-list {
   position: relative;
   cursor: pointer;
-  border-right: 1px solid white;
+  border-right: 1px solid gray;
   box-sizing: border-box;
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-start; /* Adjust as needed */
-  border-right: none !important; /* This removes the bottom border */
 }
 
 .sendbird-channel-preview {
@@ -29,14 +28,14 @@
 
 @media (max-width: 600px) {
   .sendbird-conversation {
-    height: calc(100dvh - 60px) !important;
+    height: calc(100dvh - 100px) !important;
   }
 }
 
 .sendbird-conversation {
   box-sizing: border-box !important;
   overflow-y: auto !important;
-  height: calc(100dvh) !important;
+  height: calc(120dvh) !important;
   border: none !important;
   box-shadow: none !important;
 }
