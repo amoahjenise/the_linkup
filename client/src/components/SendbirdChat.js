@@ -10,7 +10,6 @@ import { styled } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import SBConversation from "@sendbird/uikit-react/GroupChannel";
 import SBChannelList from "@sendbird/uikit-react/GroupChannelList";
-import SBChannelSettings from "@sendbird/uikit-react/ChannelSettings";
 import sendbirdSelectors from "@sendbird/uikit-react/sendbirdSelectors";
 import { useSendbirdStateContext } from "@sendbird/uikit-react";
 import ChannelListHeader from "./ChannelListHeader";
@@ -35,13 +34,8 @@ const MobileContainer = styled("div")(({ theme }) => ({
   height: "100%", // Adjust height to account for footer
 }));
 
-const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
-  width: "100%", // Full width for mobile
-}));
-
 const SendbirdChat = () => {
   const [currentChannel, setCurrentChannel] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
 
@@ -60,7 +54,6 @@ const SendbirdChat = () => {
 
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
-  const scrollRef = useRef(null); // Reference for auto-scrolling
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -144,54 +137,41 @@ const SendbirdChat = () => {
 
   const renderChannelList = useMemo(() => {
     return (
-      <FullWidthChannelList
-        allowProfileEdit={false}
-        isMessageReceiptStatusEnabled
-        isTypingIndicatorEnabled
-        selectedChannelUrl={currentChannel?._url}
-        disableAutoSelect
-        onChannelCreated={setCurrentChannel}
-        onChannelSelect={handleChannelSelect}
-        renderHeader={() => <ChannelListHeader />}
-      />
+      <div className="sendbird-app__wrap">
+        <div className="sendbird-app__channellist-wrap">
+          <SBChannelList
+            allowProfileEdit={false}
+            isMessageReceiptStatusEnabled
+            isTypingIndicatorEnabled
+            selectedChannelUrl={currentChannel?._url}
+            disableAutoSelect
+            onChannelCreated={setCurrentChannel}
+            onChannelSelect={handleChannelSelect}
+            renderHeader={() => <ChannelListHeader />}
+          />
+        </div>
+      </div>
     );
   }, [currentChannel]);
 
   const renderConversation = useMemo(() => {
     return currentChannel ? (
-      <div className="sendbird-app__conversation-wrap">
-        <SBConversation
-          channelUrl={currentChannel._url}
-          onChatHeaderActionClick={() => setShowSettings(true)}
-          disabled={isMessageInputDisabled}
-          renderChannelHeader={() => (
-            <CustomChannelHeader
-              linkup={linkup}
-              channel={currentChannel}
-              onActionClick={() => setShowSettings(true)}
-              isOperator={isOperator}
-              isMobile={isMobile}
-              setCurrentChannel={setCurrentChannel}
-              setIsInConversation={setIsInConversation}
-            />
-          )}
-        />
-        {showSettings && (
-          <SBChannelSettings
-            channelUrl={currentChannel?._url}
-            onCloseClick={() => setShowSettings(false)}
+      <SBConversation
+        channelUrl={currentChannel._url}
+        disabled={isMessageInputDisabled}
+        renderChannelHeader={() => (
+          <CustomChannelHeader
+            linkup={linkup}
+            channel={currentChannel}
+            isOperator={isOperator}
+            isMobile={isMobile}
+            setCurrentChannel={setCurrentChannel}
+            setIsInConversation={setIsInConversation}
           />
         )}
-      </div>
+      />
     ) : null;
-  }, [
-    currentChannel,
-    isMessageInputDisabled,
-    linkup,
-    showSettings,
-    isMobile,
-    isOperator,
-  ]);
+  }, [currentChannel, isMessageInputDisabled, linkup, isMobile, isOperator]);
 
   const renderDesktop = () => (
     <div className="sendbird-app__wrap">
@@ -207,7 +187,18 @@ const SendbirdChat = () => {
         />
       </div>
 
-      {renderConversation}
+      <div
+        ref={conversationWrapRef}
+        className="sendbird-app__conversation-wrap"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
+        }}
+      >
+        {renderConversation}
+      </div>
     </div>
   );
 
