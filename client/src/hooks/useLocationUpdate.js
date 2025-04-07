@@ -7,176 +7,252 @@ import { updateCurrentUser } from "../redux/actions/userActions";
 const useLocationUpdate = () => {
   const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser, shallowEqual);
+  const [locationPermission, setLocationPermission] = useState("prompt");
   const [isIncognito, setIsIncognito] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const userIdRef = useRef(loggedUser?.user?.id);
   const lastLocation = useRef({ lat: null, lon: null });
   const watchIdRef = useRef(null);
   const lastUpdateTime = useRef(0);
-  const displayedErrors = useRef(new Set()); // Track displayed errors
-  const incognitoAlertShown = useRef(false); // Track if Incognito alert has been shown
+  const errorTimeoutRef = useRef(null);
+  const retryCountRef = useRef(0);
+  const maxRetries = 3;
 
+  // Update user reference when it changes
   useEffect(() => {
-    if (loggedUser?.user?.id) {
-      userIdRef.current = loggedUser.user.id;
-    }
+    userIdRef.current = loggedUser?.user?.id;
   }, [loggedUser?.user?.id]);
 
-  const detectIncognito = async () => {
-    try {
-      const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-      if (!fs) return false;
-
-      return new Promise((resolve) => {
-        fs(
-          window.TEMPORARY,
-          100,
-          () => resolve(false),
-          () => resolve(true)
-        );
-      });
-    } catch {
-      return true;
-    }
-  };
-
+  // Check for incognito mode
   useEffect(() => {
-    const detectIncognitoMode = async () => {
-      const result = await detectIncognito();
-      setIsIncognito(result);
+    const checkIncognito = async () => {
+      try {
+        // More reliable incognito detection
+        if (window.navigator.storage && window.navigator.storage.estimate) {
+          const { quota } = await window.navigator.storage.estimate();
+          setIsIncognito(quota < 120000000); // Typical incognito quota is ~110MB
+        } else {
+          // Fallback detection
+          const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+          if (fs) {
+            await new Promise((resolve) => {
+              fs(
+                window.TEMPORARY,
+                100,
+                () => resolve(false),
+                () => resolve(true)
+              );
+            }).then(setIsIncognito);
+          }
+        }
+      } catch {
+        setIsIncognito(true);
+      }
     };
 
-    detectIncognitoMode();
-  }, []); // Ensure this effect runs only once during initial mount.
+    checkIncognito();
+  }, []);
 
+  // Check location permission status
+  useEffect(() => {
+    const checkPermission = async () => {
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const permission = await navigator.permissions.query({
+            name: "geolocation",
+          });
+          setLocationPermission(permission.state);
+
+          permission.onchange = () => {
+            setLocationPermission(permission.state);
+          };
+        }
+      } catch (error) {
+        console.error("Permission API not supported", error);
+      }
+    };
+
+    checkPermission();
+  }, []);
+
+  // Show permission modal if needed
+  useEffect(() => {
+    if (locationPermission === "prompt" && !showPermissionModal) {
+      setShowPermissionModal(true);
+    }
+  }, [locationPermission, showPermissionModal]);
+
+  // Location change detection with hysteresis
   const hasLocationChanged = useCallback((newLat, newLon) => {
-    const threshold = 0.001;
     const { lat: prevLat, lon: prevLon } = lastLocation.current;
-
     if (prevLat === null || prevLon === null) return true;
+
+    // Minimum distance threshold (in degrees)
+    const threshold = 0.0005; // ~50 meters
     return (
       Math.abs(newLat - prevLat) > threshold ||
       Math.abs(newLon - prevLon) > threshold
     );
   }, []);
 
+  // Optimized location saving with retry logic
   const saveLocation = useCallback(
     async (latitude, longitude) => {
       const now = Date.now();
-      if (now - lastUpdateTime.current < 30000) return; // Limit updates
 
-      if (hasLocationChanged(latitude, longitude)) {
-        lastLocation.current = { lat: latitude, lon: longitude };
-        lastUpdateTime.current = now;
+      // Throttle updates to every 2 minutes unless significant movement
+      if (
+        now - lastUpdateTime.current < 120000 &&
+        !hasLocationChanged(latitude, longitude)
+      ) {
+        return;
+      }
 
-        try {
-          const resultAction = await dispatch(
-            fetchLocation({ lat: latitude, lon: longitude })
+      lastLocation.current = { lat: latitude, lon: longitude };
+      lastUpdateTime.current = now;
+
+      try {
+        // Clear any pending error timeouts
+        if (errorTimeoutRef.current) {
+          clearTimeout(errorTimeoutRef.current);
+          errorTimeoutRef.current = null;
+        }
+
+        const resultAction = await dispatch(
+          fetchLocation({ lat: latitude, lon: longitude })
+        );
+
+        if (fetchLocation.fulfilled.match(resultAction)) {
+          const resultPostLocation = await postLocation(
+            userIdRef.current,
+            resultAction.payload.city,
+            resultAction.payload.country,
+            latitude,
+            longitude,
+            true
           );
 
-          if (fetchLocation.fulfilled.match(resultAction)) {
-            const resultPostLocation = await postLocation(
-              userIdRef.current,
-              resultAction.payload.city,
-              resultAction.payload.country,
-              latitude,
-              longitude,
-              true
-            );
+          dispatch(updateCurrentUser(resultPostLocation.user));
+          retryCountRef.current = 0; // Reset retry counter on success
+        } else {
+          throw new Error("Failed to fetch location");
+        }
+      } catch (error) {
+        console.error("Location update error:", error);
+        retryCountRef.current += 1;
 
-            dispatch(updateCurrentUser(resultPostLocation.user));
-          } else {
-            console.error("Failed to fetch location:", resultAction.error);
-            const errorMsg = "Failed to update location. Please try again.";
-            if (!displayedErrors.current.has(errorMsg)) {
-              alert(errorMsg);
-              displayedErrors.current.add(errorMsg);
-            }
-          }
-        } catch (error) {
-          console.error("Error updating location:", error);
-          const errorMsg = "Failed to update location. Please try again.";
-          if (!displayedErrors.current.has(errorMsg)) {
-            alert(errorMsg);
-            displayedErrors.current.add(errorMsg);
-          }
+        if (retryCountRef.current <= maxRetries) {
+          // Exponential backoff for retries
+          errorTimeoutRef.current = setTimeout(() => {
+            saveLocation(latitude, longitude);
+          }, Math.min(1000 * 2 ** retryCountRef.current, 30000)); // Max 30s delay
+        } else {
+          console.warn("Max retries reached for location update");
+          retryCountRef.current = 0;
         }
       }
     },
     [dispatch, hasLocationChanged]
   );
 
+  // Main geolocation watcher
   useEffect(() => {
-    if (isIncognito && !incognitoAlertShown.current) {
-      alert("Geolocation is blocked in Incognito Mode. Try using normal mode.");
-      incognitoAlertShown.current = true; // Mark the alert as shown
-      return;
-    }
-
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      console.warn("Geolocation not supported");
       return;
     }
 
-    const checkPermissionAndWatch = async () => {
-      try {
-        const permission = await navigator.permissions.query({
-          name: "geolocation",
-        });
+    if (isIncognito) {
+      console.warn("Incognito mode detected - location services limited");
+      return;
+    }
 
-        if (permission.state === "denied") {
-          alert(
-            "Location access is denied. If you're in Incognito Mode, switch to normal mode."
-          );
-          return;
-        }
+    if (locationPermission === "denied") {
+      console.warn("Location permission denied");
+      return;
+    }
 
-        if (!userIdRef.current || watchIdRef.current !== null) return;
+    const watchOptions = {
+      enableHighAccuracy: false, // Better battery life
+      maximumAge: 300000, // 5 minutes cache
+      timeout: 15000, // 15 second timeout
+    };
 
-        watchIdRef.current = navigator.geolocation.watchPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            saveLocation(latitude, longitude);
-          },
-          (error) => {
-            console.error("Error getting location:", error);
+    const handlePosition = (position) => {
+      const { latitude, longitude } = position.coords;
+      saveLocation(latitude, longitude);
+    };
 
-            let errorMessage = "An unknown location error occurred.";
-            if (error.code === 1)
-              errorMessage =
-                "Location access was denied. Check browser settings or exit Incognito Mode.";
-            else if (error.code === 2)
-              errorMessage = "Location is unavailable.";
-            else if (error.code === 3)
-              errorMessage = "Location request timed out.";
+    const handleError = (error) => {
+      console.error("Geolocation error:", error);
 
-            if (!displayedErrors.current.has(errorMessage)) {
-              alert(errorMessage);
-              displayedErrors.current.add(errorMessage);
-            }
-          },
-          {
-            enableHighAccuracy: false,
-            maximumAge: 60000,
-            timeout: 10000,
+      // Don't show immediate alerts - we'll handle this through UI components
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          setLocationPermission("denied");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          console.warn("Location information unavailable");
+          break;
+        case error.TIMEOUT:
+          if (retryCountRef.current < maxRetries) {
+            retryCountRef.current += 1;
+            setTimeout(() => {
+              navigator.geolocation.getCurrentPosition(
+                handlePosition,
+                handleError,
+                watchOptions
+              );
+            }, 1000 * retryCountRef.current);
           }
-        );
-      } catch (err) {
-        console.error("Error checking location permissions:", err);
+          break;
+        default:
+          console.warn("Unknown geolocation error");
       }
     };
 
-    checkPermissionAndWatch();
+    // Start watching position
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      handlePosition,
+      handleError,
+      watchOptions
+    );
+
+    // Initial position request
+    navigator.geolocation.getCurrentPosition(
+      handlePosition,
+      handleError,
+      watchOptions
+    );
 
     return () => {
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
     };
-  }, [saveLocation, isIncognito]);
+  }, [saveLocation, isIncognito, locationPermission]);
 
-  return null;
+  // Return state for UI components to handle permission requests
+  return {
+    locationPermission,
+    isIncognito,
+    showPermissionModal,
+    requestPermission: () => {
+      // This would trigger the browser's native permission prompt
+      navigator.geolocation.getCurrentPosition(
+        () => setLocationPermission("granted"),
+        () => setLocationPermission("denied"),
+        { enableHighAccuracy: false }
+      );
+      setShowPermissionModal(false);
+    },
+    dismissPermissionModal: () => setShowPermissionModal(false),
+  };
 };
 
 export default useLocationUpdate;
