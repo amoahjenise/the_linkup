@@ -1,5 +1,6 @@
 .sendbird-channel-list {
-  border-right: 1px solid gray !important;
+  border-right-width: 1px !important;
+  /* border-right: 1px solid gray !important; */
   box-sizing: border-box !important;
 }
 

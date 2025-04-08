@@ -92,7 +92,7 @@ const HistorySection = styled("div")(({ theme }) => ({
 const FilterBarContainer = styled("div")(({ theme }) => ({
   display: "flex",
   overflowY: "auto",
-  borderLeft: "1px solid #D3D3D3",
+  borderLeftWidth: "1px",
   padding: theme.spacing(1, 2),
 }));
 
@@ -495,7 +495,6 @@ const LinkUpHistoryPage = ({ isMobile }) => {
             style={{
               width: "30%",
               overflowY: "auto",
-              borderLeft: "1px solid #D3D3D3",
             }}
           >
             <FilterBar

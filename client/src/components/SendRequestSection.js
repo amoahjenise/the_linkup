@@ -9,7 +9,6 @@ const Container = styled("div")(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   width: "100%",
-  borderRight: "1px solid #e1e8ed",
 }));
 
 const MessagesContainer = styled("div")(({ theme }) => ({

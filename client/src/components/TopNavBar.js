@@ -10,10 +10,11 @@ const CustomAppBar = styled(({ colorMode, ...other }) => <AppBar {...other} />)(
     position: "sticky",
     top: 0,
     zIndex: theme.zIndex.appBar,
-    borderBottom:
-      colorMode === "dark"
-        ? `1px solid white`
-        : `1px solid ${theme.palette.divider}`,
+    // borderBottom:
+    //   colorMode === "dark"
+    //     ? `1px solid white`
+    //     : `1px solid ${theme.palette.divider}`,
+    borderBottomWidth: "1px",
     color: colorMode === "dark" ? "white" : "black",
     backgroundColor:
       colorMode === "dark"
