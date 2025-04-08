@@ -84,7 +84,7 @@ export const SocketProvider = ({ children }) => {
       // Gender filter
       if (
         genderRange.length > 0 &&
-        !genderRange.some((g) => g.key === linkup.creator_gender)
+        !genderRange.some((g) => g.value === linkup.creator_gender)
       ) {
         return false;
       }
