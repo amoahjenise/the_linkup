@@ -6,6 +6,7 @@ import {
   UPDATE_LINKUP_LIST,
   MARK_LINKUPS_AS_EXPIRED_SUCCESS,
   SHOW_NEW_LINKUP_BUTTON,
+  MERGE_LINKUPS_SUCCESS,
 } from "../actions/actionTypes";
 
 const initialState = {
@@ -40,6 +41,28 @@ const linkupsReducer = (state = initialState, action) => {
         linkupList: action.payload, // Update the link-up list with the new data
         successMessage: "Linkups marked as expired!",
       };
+    case MERGE_LINKUPS_SUCCESS: {
+      const { newLinkups, isInitialLoad } = action.payload;
+
+      if (isInitialLoad) {
+        return { ...state, linkupList: newLinkups };
+      }
+
+      const updatedLinkups = [...state.linkupList];
+
+      newLinkups.forEach((newLinkup) => {
+        const existingIndex = updatedLinkups.findIndex(
+          (l) => l.id === newLinkup.id
+        );
+        if (existingIndex >= 0) {
+          updatedLinkups[existingIndex] = newLinkup;
+        } else {
+          updatedLinkups.push(newLinkup);
+        }
+      });
+
+      return { ...state, linkupList: updatedLinkups };
+    }
     case SHOW_NEW_LINKUP_BUTTON:
       return {
         ...state,
