@@ -12,6 +12,8 @@ const HeaderContainer = styled(Box, {
     colorMode === "dark"
       ? `1px solid ${theme.palette.grey[800]}`
       : `1px solid ${theme.palette.grey[200]}`,
+  boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
+
   color:
     colorMode === "dark" ? theme.palette.grey[100] : theme.palette.grey[900],
   padding: theme.spacing(1.25, 2),

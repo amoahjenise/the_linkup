@@ -1,15 +1,61 @@
 {
-  "short_name": "Linkup",
-  "name": "Linkup",
+  "short_name": "The Linkup",
+  "name": "The Linkup - Connect, Meet, and Link Up",
+  "description": "Your go-to platform for connecting with new people and organizing meetups around your interests",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "logo.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     }
   ],
-  "start_url": ".",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait-primary",
+  "categories": ["social", "lifestyle", "events"],
+  "background_color": "#ffffff",
+  "shortcuts": [
+    {
+      "name": "Find Linkups",
+      "short_name": "Linkups",
+      "description": "Browse upcoming events near you",
+      "url": "/linkups"
+    },
+    {
+      "name": "Create Linkup",
+      "short_name": "Create",
+      "description": "Organize a new event",
+      "url": "/create-linkup"
+    },
+    {
+      "name": "My Profile",
+      "short_name": "Profile",
+      "description": "View your profile",
+      "url": "/profile"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=ca.thelinkup.app",
+      "id": "ca.thelinkup.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/ca/app/the-linkup/id1234567890"
+    }
+  ],
+  "prefer_related_applications": false,
+  "iarc_rating_id": "e84b072d",
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link"
+    }
+  }
 }
