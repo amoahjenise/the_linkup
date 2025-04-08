@@ -102,7 +102,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
 }));
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 20;
 
 const HomePage = ({ isMobile }) => {
   const dispatch = useDispatch();
@@ -206,7 +206,7 @@ const HomePage = ({ isMobile }) => {
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = 5;
+    const threshold = `20`;
     if (
       feedSectionRef.current &&
       feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
