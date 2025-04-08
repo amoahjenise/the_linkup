@@ -1,55 +1,37 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { styled } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
+import { useSelector } from "react-redux";
+import { useSendbirdStateContext } from "@sendbird/uikit-react";
 import SBConversation from "@sendbird/uikit-react/GroupChannel";
 import SBChannelList from "@sendbird/uikit-react/GroupChannelList";
 import sendbirdSelectors from "@sendbird/uikit-react/sendbirdSelectors";
-import { useSendbirdStateContext } from "@sendbird/uikit-react";
 import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
-import "./CustomSendbirdMain.css";
 
-// Styled components
-const Container = styled("div")(({ theme }) => ({
-  display: "flex",
-  height: "100%",
-  width: "100%",
-}));
-
-const MobileContainer = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  height: "100%", // Adjust height to account for footer
-}));
-
-const FullWidthChannelList = styled(SBChannelList)(({ theme }) => ({
-  width: "100%", // Full width for mobile
-}));
+const MOBILE_BREAKPOINT = "600px";
+const BOTTOM_MENU_HEIGHT = 60; // Your bottom menu height
 
 const SendbirdChat = () => {
   const [currentChannel, setCurrentChannel] = useState(null);
-  const isMobile = useMediaQuery("(max-width:600px)");
   const [isMessageInputDisabled, setMessageInputDisabled] = useState(true);
-
   const globalStore = useSendbirdStateContext();
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const userId = loggedUser?.user?.id;
+  const [linkup, setLinkup] = useState(null);
+  const [isOperator, setIsOperator] = useState(false);
 
-  // Add dispatch hook
-  const dispatch = useDispatch();
+  // Calculate dynamic height for mobile
+  const mobileHeight = `calc(100vh - ${BOTTOM_MENU_HEIGHT}px)`;
 
-  // Move the selector call to a separate function
+  // Mobile detection using Sendbird's recommended approach
+  const isMobile = () => {
+    return window.innerWidth <= parseInt(MOBILE_BREAKPOINT);
+  };
+
   const getGroupChannel = useCallback(() => {
     return sendbirdSelectors.getGetGroupChannel(globalStore);
   }, [globalStore]);
-
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const userId = loggedUser?.user?.id;
-
-  const [linkup, setLinkup] = useState(null);
-  const [isOperator, setIsOperator] = useState(false);
 
   const handleChannelSelect = useCallback((channel) => {
     setCurrentChannel(channel);
@@ -67,26 +49,23 @@ const SendbirdChat = () => {
 
   useEffect(() => {
     const fetchChannelData = async () => {
-      if (!currentChannel?._url) {
-        return;
-      }
+      if (!currentChannel?._url) return;
 
       try {
-        const linkupResponse = await getLinkupByConversation(
-          currentChannel._url
-        );
-        setLinkup(linkupResponse.linkup);
+        const [linkupResponse, channel, response] = await Promise.all([
+          getLinkupByConversation(currentChannel._url),
+          getGroupChannel()(currentChannel._url),
+          getChannelFirstTwoMessages(
+            currentChannel._url,
+            currentChannel.createdAt
+          ),
+        ]);
 
-        const channel = await getGroupChannel()(currentChannel._url); // Call the selector function
+        setLinkup(linkupResponse.linkup);
         const operator = channel?.members.find(
           (member) => member.role === "operator"
         );
-        setIsOperator(operator && operator.userId === userId);
-
-        const response = await getChannelFirstTwoMessages(
-          currentChannel._url,
-          channel.createdAt
-        );
+        setIsOperator(operator?.userId === userId);
         setMessageInputDisabled(
           checkMessageInputState(linkupResponse, response)
         );
@@ -96,78 +75,68 @@ const SendbirdChat = () => {
     };
 
     fetchChannelData();
-  }, [currentChannel?._url, userId]);
+  }, [currentChannel?._url, userId, getGroupChannel]);
 
-  const renderChannelList = useMemo(() => {
-    return (
-      <div className="sendbird-app__channellist-wrap">
-        <FullWidthChannelList
-          allowProfileEdit={false}
-          isMessageReceiptStatusEnabled
-          isTypingIndicatorEnabled
-          selectedChannelUrl={currentChannel?._url}
-          disableAutoSelect
-          onChannelCreated={setCurrentChannel}
-          onChannelSelect={handleChannelSelect}
-          renderHeader={() => <ChannelListHeader />}
-        />
-      </div>
-    );
-  }, [currentChannel?._url, handleChannelSelect]);
-
-  const renderConversation = useMemo(() => {
-    return currentChannel ? (
-      <SBConversation
-        channelUrl={currentChannel._url}
-        disabled={isMessageInputDisabled}
-        renderChannelHeader={() => (
-          <CustomChannelHeader
-            linkup={linkup}
-            channel={currentChannel}
-            isOperator={isOperator}
-            isMobile={isMobile}
-            setCurrentChannel={setCurrentChannel}
-          />
-        )}
+  const renderChannelList = useMemo(
+    () => (
+      <SBChannelList
+        allowProfileEdit={false}
+        isMessageReceiptStatusEnabled
+        isTypingIndicatorEnabled
+        selectedChannelUrl={currentChannel?._url}
+        disableAutoSelect
+        onChannelCreated={setCurrentChannel}
+        onChannelSelect={handleChannelSelect}
+        renderHeader={() => <ChannelListHeader />}
       />
-    ) : null;
-  }, [currentChannel, isMessageInputDisabled, linkup, isMobile, isOperator]);
+    ),
+    [currentChannel?._url, handleChannelSelect]
+  );
 
-  const renderDesktop = () => (
-    <div className="sendbird-app__wrap">
-      <div className="sendbird-app__channellist-wrap">
-        <SBChannelList
-          allowProfileEdit={false}
-          isMessageReceiptStatusEnabled
-          isTypingIndicatorEnabled
-          selectedChannelUrl={currentChannel?._url}
-          onChannelCreated={setCurrentChannel}
-          onChannelSelect={handleChannelSelect}
-          renderHeader={() => <ChannelListHeader />}
+  const renderConversation = useMemo(
+    () =>
+      currentChannel && (
+        <SBConversation
+          channelUrl={currentChannel._url}
+          disabled={isMessageInputDisabled}
+          renderChannelHeader={() => (
+            <CustomChannelHeader
+              linkup={linkup}
+              channel={currentChannel}
+              isOperator={isOperator}
+              isMobile={isMobile()}
+              setCurrentChannel={setCurrentChannel}
+            />
+          )}
+          onBackClick={() => setCurrentChannel(null)} // Mobile back button handler
         />
-      </div>
+      ),
+    [currentChannel, isMessageInputDisabled, linkup, isOperator]
+  );
 
-      <div
-        className="sendbird-app__conversation-wrap"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          maxHeight: isMobile ? "calc(100vh - 60px)" : "100vh", // Apply maxHeight only on mobile
-        }}
-      >
-        {renderConversation}
-      </div>
+  return (
+    <div>
+      {isMobile() ? (
+        // Mobile layout - single panel at a time
+        <div
+          style={{
+            height: mobileHeight,
+            width: "100vw",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {!currentChannel ? renderChannelList : renderConversation}
+        </div>
+      ) : (
+        // Desktop layout - side by side
+        <div style={{ display: "flex", height: "100vh", width: "100vw" }}>
+          <div style={{ width: "320px" }}>{renderChannelList}</div>
+          <div style={{ flex: 1 }}>{renderConversation}</div>
+        </div>
+      )}
     </div>
   );
-
-  const renderMobile = () => (
-    <MobileContainer>
-      {!currentChannel ? renderChannelList : renderConversation}
-    </MobileContainer>
-  );
-
-  return <Container>{!isMobile ? renderDesktop() : renderMobile()}</Container>;
 };
 
 export default SendbirdChat;

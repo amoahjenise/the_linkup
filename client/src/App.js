@@ -39,6 +39,8 @@ import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
 
+const MOBILE_BREAKPOINT = "600px";
+
 const publicPages = [
   "/",
   "/sign-in",
@@ -242,6 +244,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <SendbirdProvider
+        breakpoint={MOBILE_BREAKPOINT}
         appId={REACT_APP_SENDBIRD_APP_ID}
         userId={userState?.user?.id}
         accessToken={userState?.user?.access_token}
