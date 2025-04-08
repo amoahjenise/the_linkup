@@ -141,8 +141,8 @@ const SendbirdChat = () => {
             />
           )}
           onBackClick={() => setCurrentChannel(null)}
-          replyType={isMobile ? "QUOTE_REPLY" : "THREAD"}
-          showSearchIcon={!isMobile}
+          // replyType={isMobile ? "QUOTE_REPLY" : "THREAD"}
+          // showSearchIcon={!isMobile}
           isReactionEnabled={!isMobile}
           renderMessageList={(props) => (
             <MessageListWithAutoScroll {...props} />
