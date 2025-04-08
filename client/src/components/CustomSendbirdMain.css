@@ -22,6 +22,10 @@
   justify-content: flex-start; /* Adjust as needed */
 }
 
+.sendbird-app__channellist-wrap {
+  overflow-y: auto !important;
+}
+
 .sendbird-channel-preview {
   border-bottom: none !important; /* This removes the bottom border */
 }

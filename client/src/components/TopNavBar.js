@@ -4,19 +4,23 @@ import { AppBar, Toolbar, Typography, Tabs, Tab } from "@mui/material";
 import { useColorMode } from "@chakra-ui/react";
 import ToggleColorMode from "./ToggleColorMode";
 
-const CustomAppBar = styled(AppBar)(({ theme, colorMode }) => ({
-  width: "100%",
-  position: "sticky",
-  top: 0,
-  zIndex: theme.zIndex.appBar,
-  borderBottom:
-    colorMode === "dark"
-      ? `1px solid white`
-      : `1px solid ${theme.palette.divider}`,
-  color: colorMode === "dark" ? "white" : "black",
-  backgroundColor:
-    colorMode === "dark" ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.97)",
-}));
+const CustomAppBar = styled(({ colorMode, ...other }) => <AppBar {...other} />)(
+  ({ theme, colorMode }) => ({
+    width: "100%",
+    position: "sticky",
+    top: 0,
+    zIndex: theme.zIndex.appBar,
+    borderBottom:
+      colorMode === "dark"
+        ? `1px solid white`
+        : `1px solid ${theme.palette.divider}`,
+    color: colorMode === "dark" ? "white" : "black",
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(0, 0, 0, 0.95)"
+        : "rgba(255, 255, 255, 0.97)",
+  })
+);
 
 const HeaderText = styled(Typography)(({ theme }) => ({
   fontSize: "20px",
