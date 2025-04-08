@@ -5,7 +5,9 @@ import Typography from "@mui/material/Typography";
 import { useColorMode } from "@chakra-ui/react"; // Import useColorMode from Chakra UI
 
 // Styled components using MUI's styled API
-const HeaderContainer = styled(Box)(({ theme, colorMode }) => ({
+const HeaderContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   width: "100%",
   position: "sticky",
   top: 0,
