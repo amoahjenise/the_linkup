@@ -39,14 +39,14 @@ const Title = styled(Typography)(({ theme }) => ({
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
-  fontSize: "0.875rem",
+  fontSize: "0.8rem",
   fontWeight: 400,
   color:
     theme.palette.mode === "dark"
       ? theme.palette.grey[400]
       : theme.palette.grey[600],
   letterSpacing: "0.01em",
-  lineHeight: 1.4,
+  lineHeight: 1.2,
 }));
 
 const ChannelListHeader = () => {
