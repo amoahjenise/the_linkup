@@ -263,9 +263,9 @@ const App = () => {
       >
         <BrowserRouter>
           <AppWrapper isAuthenticated={isAuthenticated}>
-            {isAuthenticated && !isRegistering && (
+            {/* {isAuthenticated && !isRegistering && (
               <LeftMenu isMobile={isMobile} />
-            )}
+            )} */}
             {publicPages.includes(window.location.pathname) ? (
               <RoutesComponent isMobile={isMobile} userState={userState} />
             ) : (

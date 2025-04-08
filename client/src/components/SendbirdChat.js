@@ -8,6 +8,8 @@ import ChannelListHeader from "./ChannelListHeader";
 import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
+import { useMediaQuery } from "@mui/material";
+import "./CustomSendbirdMain.css";
 
 const BOTTOM_MENU_HEIGHT = 60; // Your bottom menu height
 
@@ -18,6 +20,7 @@ const SendbirdChat = () => {
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [linkup, setLinkup] = useState(null);
   const [isOperator, setIsOperator] = useState(false);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // Hooks and context
   const globalStore = useSendbirdStateContext();
@@ -111,15 +114,19 @@ const SendbirdChat = () => {
         <SBConversation
           channelUrl={currentChannel._url}
           disabled={isMessageInputDisabled}
-          renderChannelHeader={() => (
-            <CustomChannelHeader
-              linkup={linkup}
-              channel={currentChannel}
-              isOperator={isOperator}
-              setCurrentChannel={setCurrentChannel}
-            />
-          )}
+          // renderChannelHeader={() => (
+          //   <CustomChannelHeader
+          //     linkup={linkup}
+          //     channel={currentChannel}
+          //     isOperator={isOperator}
+          //     isMobile={true}
+          //     setCurrentChannel={setCurrentChannel}
+          //   />
+          // )}
           onBackClick={() => setCurrentChannel(null)}
+          replyType={isMobile ? "QUOTE_REPLY" : "THREAD"}
+          showSearchIcon={!isMobile}
+          isReactionEnabled={!isMobile}
         />
       ),
     [currentChannel, isMessageInputDisabled, linkup, isOperator]
@@ -128,7 +135,7 @@ const SendbirdChat = () => {
   return (
     <div
       style={{
-        height: `calc(${windowHeight}px - ${BOTTOM_MENU_HEIGHT}px)`,
+        height: `${windowHeight}px`,
         width: "100%",
         overflow: "hidden",
       }}

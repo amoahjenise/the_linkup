@@ -7,11 +7,11 @@
   border-bottom: none !important; /* This removes the bottom border */
 }
 
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .sendbird-conversation {
     height: calc(100dvh - 60px) !important;
   }
-}
+} */
 
 .sendbird-conversation {
   box-sizing: border-box !important;
