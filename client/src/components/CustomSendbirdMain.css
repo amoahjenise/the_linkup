@@ -1,21 +1,82 @@
+/* Channel list container - base styles */
 .sendbird-channel-list {
   border-right-width: 1px !important;
-  /* border-right: 1px solid gray !important; */
   box-sizing: border-box !important;
+  background-color: transparent !important;
+}
+
+/* Mobile padding - applies only to screens ≤ 600px */
+@media (max-width: 600px) {
+  .sendbird-channel-list {
+    padding: 8px !important;
+  }
 }
 
 .sendbird-channel-preview {
-  border-bottom: none !important; /* This removes the bottom border */
+  border-bottom: none !important;
+  border: 1px solid rgba(63, 75, 91, 0.25) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-/* @media (max-width: 600px) {
-  .sendbird-conversation {
-    height: calc(100dvh - 60px) !important;
+/* Individual channel preview items */
+@media (max-width: 600px) {
+  .sendbird-channel-preview {
+    border-bottom: none !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 16px !important;
+    cursor: pointer !important;
+    border: 1px solid rgba(63, 75, 91, 0.25) !important;
+    background-color: var(--preview-bg, rgba(0, 0, 0, 0.015)) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--preview-shadow, 0 2px 8px rgba(0, 0, 0, 0.05)) !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+    margin-bottom: 8px !important;
+    margin-top: 10px !important;
+    height: 100px !important;
+    overflow: hidden !important;
   }
-} */
+}
 
+/* Unread state - you'll need to add this class dynamically */
+.sendbird-channel-preview--unread {
+  --preview-bg: rgba(173, 216, 230, 0.15) !important;
+}
+
+/* Hover state */
+.sendbird-channel-preview:hover {
+  border-radius: 8px !important;
+  --preview-bg-hover: rgba(210, 210, 210, 0.2) !important;
+  background-color: var(--preview-bg-hover) !important;
+}
+
+.sendbird-channel-preview--unread:hover {
+  --preview-bg-hover: rgba(144, 200, 215, 0.2) !important;
+}
+
+/* Dark mode styles - apply to parent container */
+.dark-mode .sendbird-channel-preview,
+[data-theme="dark"] .sendbird-channel-preview {
+  --preview-bg: rgb(16, 16, 16) !important;
+  --preview-shadow: 0 2px 8px rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark-mode .sendbird-channel-preview:hover,
+[data-theme="dark"] .sendbird-channel-preview:hover {
+  --preview-bg-hover: rgba(200, 200, 200, 0.1) !important;
+}
+
+/* Conversation area */
 .sendbird-conversation {
   box-sizing: border-box !important;
   border: none !important;
   box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Remove margin from last item */
+.sendbird-channel-preview:last-child {
+  margin-bottom: 0 !important;
 }

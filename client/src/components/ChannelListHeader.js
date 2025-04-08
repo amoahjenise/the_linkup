@@ -57,7 +57,7 @@ const ChannelListHeader = () => {
     <HeaderContainer colorMode={colorMode}>
       <TextWrapper>
         <Title variant="h1">Messages</Title>
-        <Subtitle variant="body2">Keep conversations respectful</Subtitle>
+        <Subtitle variant="body2">Keep conversations respectful!</Subtitle>
       </TextWrapper>
     </HeaderContainer>
   );
