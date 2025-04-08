@@ -14,10 +14,9 @@
 
 .sendbird-channel-preview {
   border-bottom: none !important;
+  padding: 16px !important;
   border: 1px solid rgba(63, 75, 91, 0.25) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+  border-radius: 0 !important; /* Changed from 12px to 0 for square corners */
 }
 
 /* Individual channel preview items */
@@ -46,8 +45,13 @@
 }
 
 /* Hover state */
+@media (max-width: 600px) {
+  .sendbird-channel-preview:hover {
+    border-radius: 8px !important;
+  }
+}
+
 .sendbird-channel-preview:hover {
-  border-radius: 8px !important;
   --preview-bg-hover: rgba(210, 210, 210, 0.2) !important;
   background-color: var(--preview-bg-hover) !important;
 }
