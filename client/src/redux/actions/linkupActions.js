@@ -7,7 +7,8 @@ import {
   UPDATE_LINKUP_SUCCESS,
   UPDATE_LINKUP_FAILURE,
   UPDATE_LINKUP_LIST,
-  SHOW_NEW_LINKUP_BUTTON
+  SHOW_NEW_LINKUP_BUTTON,
+  MERGE_LINKUPS_SUCCESS
 } from "./actionTypes";
 
 export const showNewLinkupButton = (show) => ({
@@ -30,12 +31,10 @@ export const fetchLinkupsSuccess = (linkups) => ({
   payload: linkups,
 });
 
-export const fetchLinkupsFailure = (error) => {
-  return {
-    type: FETCH_LINKUPS_FAILURE,
-    payload: error,
-  };
-};
+export const fetchLinkupsFailure = (error) => ({
+  type: FETCH_LINKUPS_FAILURE,
+  payload: error,
+});
 
 export const setIsLoading = (isLoading) => ({
   type: SET_IS_LOADING,
@@ -47,10 +46,14 @@ export const updateLinkupList = (newLinkup) => ({
   payload: newLinkup,
 });
 
+export const mergeLinkupsSuccess = (newLinkups, isInitialLoad = false) => ({
+  type: MERGE_LINKUPS_SUCCESS,
+  payload: { newLinkups, isInitialLoad }
+});
+
 export const updateLinkup = (linkupId, updatedLinkupData) => {
   return async (dispatch) => {
     try {
-      // Perform the actual update operation using your API or service
       const result = await updateLinkupAPI(linkupId, updatedLinkupData);
       if (result.success) {
         dispatch(updateLinkupSuccess(result.linkup));

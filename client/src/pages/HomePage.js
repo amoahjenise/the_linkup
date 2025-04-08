@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import FeedSection from "../components/FeedSection";
 import WidgetSection from "../components/WidgetSection";
-import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
+import { mergeLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
@@ -102,7 +102,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
 }));
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 20;
 
 const HomePage = ({ isMobile }) => {
   const dispatch = useDispatch();
@@ -143,7 +143,6 @@ const HomePage = ({ isMobile }) => {
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
       setIsFetchingNextPage(true);
-      setIsLoading(true);
       try {
         if (!userId || page < 1 || PAGE_SIZE < 1) return;
 
@@ -183,12 +182,16 @@ const HomePage = ({ isMobile }) => {
             return a.distance - b.distance;
           });
 
-          dispatch(fetchLinkupsSuccess(updatedLinkupList));
+          // Use merge action instead of replace/append
+          dispatch(mergeLinkupsSuccess(updatedLinkupList, page === 1));
+
           setCurrentPage(page);
           const newFetchedLinkupIds = updatedLinkupList.map(
             (linkup) => linkup.id
           );
-          setFetchedLinkupIds([...fetchedLinkupIds, ...newFetchedLinkupIds]);
+          setFetchedLinkupIds((prev) => [
+            ...new Set([...prev, ...newFetchedLinkupIds]),
+          ]);
         } else {
           console.error("Error fetching linkups:", response.message);
         }
@@ -199,19 +202,29 @@ const HomePage = ({ isMobile }) => {
         setIsLoading(false);
       }
     },
-    [dispatch, fetchedLinkupIds, gender, latitude, longitude, userId]
+    [dispatch, gender, latitude, longitude, userId]
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = 30;
+    const threshold = `20`;
     if (
       feedSectionRef.current &&
       feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
         feedSectionRef.current.clientHeight + threshold
     ) {
       if (currentPage < totalPages && !isFetchingNextPage) {
-        const newPageSize = PAGE_SIZE + (currentPage - 1) * PAGE_SIZE;
-        fetchLinkupsAndPoll(currentPage + 1, newPageSize);
+        // Save current scroll position
+        const scrollTop = feedSectionRef.current.scrollTop;
+        const scrollHeight = feedSectionRef.current.scrollHeight;
+
+        fetchLinkupsAndPoll(currentPage + 1).then(() => {
+          // Restore scroll position after update
+          if (feedSectionRef.current) {
+            const newScrollHeight = feedSectionRef.current.scrollHeight;
+            feedSectionRef.current.scrollTop =
+              scrollTop + (newScrollHeight - scrollHeight);
+          }
+        });
       }
     }
   }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
