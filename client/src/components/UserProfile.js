@@ -123,18 +123,19 @@ const BottomSection = styled("div")(({ isMobile }) => ({
   gap: "1rem", // Add gap between elements
 }));
 
-const Title = styled("h2")({
+const Title = styled("h2")(({ isMobile }) => ({
   margin: 0,
-  fontSize: "1.25rem", // Smaller font size
+  fontSize: isMobile ? "1.5rem" : "2rem", // Larger font size for desktop
   fontWeight: "bold",
   color: "#fff",
-});
+  marginBottom: "2.5rem",
+}));
 
-const Subtitle = styled("p")({
+const Subtitle = styled("p")(({ isMobile }) => ({
   margin: "0.25rem 0",
-  fontSize: "1rem", // Smaller font size
+  fontSize: isMobile ? "1.1rem" : "1.25rem", // Larger font size for desktop
   color: "#ccc",
-});
+}));
 
 const ProfileRow = styled("div")({
   display: "flex",
@@ -156,17 +157,17 @@ const LeftSide = styled("div")({
   gap: "1rem",
 });
 
-const UserNameRow = styled("div")({
+const UserNameRow = styled("div")(({ isMobile }) => ({
   display: "inline-flex", // This keeps items together inline
   alignItems: "center",
   gap: "0.25rem",
   fontWeight: 600,
-  fontSize: "1rem",
+  fontSize: isMobile ? "1rem" : "1.25rem", // Larger font size for desktop
   whiteSpace: "nowrap", // Prevents wrapping
   overflow: "hidden", // Hides overflow
   textOverflow: "ellipsis", // Adds ellipsis when too long
   cursor: "default",
-});
+}));
 
 const OnlineStatus = styled("div")(({ isOnline }) => ({
   width: "10px",
@@ -175,22 +176,22 @@ const OnlineStatus = styled("div")(({ isOnline }) => ({
   backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
 }));
 
-const OnlineStatusContainer = styled("p")({
+const OnlineStatusContainer = styled("p")(({ isMobile }) => ({
   display: "flex",
   alignItems: "center",
   margin: "4px 0 0",
-  fontSize: "0.875rem",
+  fontSize: isMobile ? "0.875rem" : "1rem", // Larger font size for desktop
   color: "#aaa",
   fontStyle: "italic",
-});
+}));
 
-const TransparentButton = styled(Button)({
+const TransparentButton = styled(Button)(({ isMobile }) => ({
   color: "#fff",
   borderColor: "#fff",
   textTransform: "none",
   borderRadius: "24px",
-  padding: "0.25rem 1rem",
-  fontSize: "0.85rem",
+  padding: isMobile ? "0.25rem 1rem" : "0.5rem 1.5rem", // Larger padding for desktop
+  fontSize: isMobile ? "0.85rem" : "1rem", // Larger font size for desktop
   backdropFilter: "blur(10px)",
   backgroundColor: "rgba(255, 255, 255, 0.1)",
   border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -199,7 +200,7 @@ const TransparentButton = styled(Button)({
     backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
   marginTop: "12px",
-});
+}));
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
@@ -291,9 +292,9 @@ const UserProfile = ({
       </Header>
       <BottomSection isMobile={isMobile}>
         <div>
-          <Title>{userData?.bio}</Title>
+          <Title isMobile={isMobile}>{userData?.bio}</Title>
           <Box display="flex" flexDirection="column" gap="0.8rem">
-            <Subtitle>
+            <Subtitle isMobile={isMobile}>
               {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
               {userLocation}
             </Subtitle>
@@ -301,6 +302,7 @@ const UserProfile = ({
               variant="body2"
               sx={{
                 color: "#fff",
+                fontSize: isMobile ? "0.95rem" : "1rem", // Larger font size for desktop
                 cursor: "pointer",
                 "&:hover": { textDecoration: "underline" },
               }}
@@ -334,13 +336,13 @@ const UserProfile = ({
                   gap: "4px",
                 }}
               >
-                <UserNameRow>
+                <UserNameRow isMobile={isMobile}>
                   <span>@{userData?.name}</span>
                   <MdVerified />
                 </UserNameRow>
               </Box>
 
-              <OnlineStatusContainer>
+              <OnlineStatusContainer isMobile={isMobile}>
                 <OnlineStatus isOnline={userData?.is_online} />
                 <p style={{ marginLeft: 4 }}>
                   {userData?.is_online ? "Online" : "Offline"}
@@ -351,7 +353,11 @@ const UserProfile = ({
 
           <RightSide>
             {isLoggedUserProfile && (
-              <TransparentButton onClick={toggleEditModal} variant="outlined">
+              <TransparentButton
+                isMobile={isMobile}
+                onClick={toggleEditModal}
+                variant="outlined"
+              >
                 Edit
               </TransparentButton>
             )}
