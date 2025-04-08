@@ -146,8 +146,7 @@ const App = () => {
   };
 
   const myStringSet = {
-    MESSAGE_INPUT__PLACE_HOLDER__DISABLED:
-      "This chat is temporarily disabled until the recipient responds or accepts the request.",
+    MESSAGE_INPUT__PLACE_HOLDER__DISABLED: "Disabled - awaiting reply.",
   };
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;

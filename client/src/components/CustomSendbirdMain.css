@@ -1,66 +1,82 @@
-/* Channel list container - base styles */
+/* Base container styles */
 .sendbird-channel-list {
   border-right-width: 1px !important;
   box-sizing: border-box !important;
   background-color: transparent !important;
 }
 
-/* Mobile padding - applies only to screens ≤ 600px */
+/* Mobile-specific styles */
 @media (max-width: 600px) {
   .sendbird-channel-list {
     padding: 8px !important;
   }
-}
 
-.sendbird-channel-preview {
-  border-bottom: none !important;
-  padding: 16px !important;
-  border: 1px solid rgba(63, 75, 91, 0.25) !important;
-  border-radius: 0 !important; /* Changed from 12px to 0 for square corners */
-}
-
-/* Individual channel preview items */
-@media (max-width: 600px) {
   .sendbird-channel-preview {
-    border-bottom: none !important;
     display: flex !important;
     align-items: center !important;
     padding: 16px !important;
-    cursor: pointer !important;
-    border: 1px solid rgba(63, 75, 91, 0.25) !important;
-    background-color: var(--preview-bg, rgba(0, 0, 0, 0.015)) !important;
-    border-radius: 12px !important;
-    box-shadow: var(--preview-shadow, 0 2px 8px rgba(0, 0, 0, 0.05)) !important;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
-    margin-bottom: 8px !important;
-    margin-top: 10px !important;
+    margin: 10px 0 8px 0 !important;
     height: 100px !important;
-    overflow: hidden !important;
+    border-radius: 12px !important;
   }
-}
 
-/* Unread state - you'll need to add this class dynamically */
-.sendbird-channel-preview--unread {
-  --preview-bg: rgba(173, 216, 230, 0.15) !important;
-}
-
-/* Hover state */
-@media (max-width: 600px) {
   .sendbird-channel-preview:hover {
     border-radius: 8px !important;
   }
 }
 
-.sendbird-channel-preview:hover {
-  --preview-bg-hover: rgba(210, 210, 210, 0.2) !important;
-  background-color: var(--preview-bg-hover) !important;
+/* Channel preview core styles */
+.sendbird-channel-preview {
+  border: 1px solid rgba(63, 75, 91, 0.25) !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  background-color: var(--preview-bg, rgba(0, 0, 0, 0.015)) !important;
+  box-shadow: var(--preview-shadow, 0 2px 8px rgba(0, 0, 0, 0.05)) !important;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+  overflow: hidden !important;
+  max-width: 100% !important; /* Prevent horizontal expansion */
+  word-wrap: break-word !important; /* Handle long text */
+}
+
+/* Message input container fix */
+.sendbird-message-input {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Conversation area constraints */
+.sendbird-conversation {
+  box-sizing: border-box !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  overflow-x: hidden !important;
+}
+
+/* Desktop-only styles (applies when screen is wider than 600px) */
+@media (min-width: 601px) {
+  .sendbird-conversation {
+    max-width: 60vw !important;
+  }
+}
+
+/* Unread states */
+.sendbird-channel-preview--unread {
+  --preview-bg: rgba(173, 216, 230, 0.15) !important;
 }
 
 .sendbird-channel-preview--unread:hover {
   --preview-bg-hover: rgba(144, 200, 215, 0.2) !important;
 }
 
-/* Dark mode styles - apply to parent container */
+/* Hover states */
+.sendbird-channel-preview:hover {
+  --preview-bg-hover: rgba(210, 210, 210, 0.2) !important;
+  background-color: var(--preview-bg-hover) !important;
+}
+
+/* Dark mode */
 .dark-mode .sendbird-channel-preview,
 [data-theme="dark"] .sendbird-channel-preview {
   --preview-bg: rgb(16, 16, 16) !important;
@@ -72,15 +88,7 @@
   --preview-bg-hover: rgba(200, 200, 200, 0.1) !important;
 }
 
-/* Conversation area */
-.sendbird-conversation {
-  box-sizing: border-box !important;
-  border: none !important;
-  box-shadow: none !important;
-  background-color: transparent !important;
-}
-
-/* Remove margin from last item */
+/* Last item spacing */
 .sendbird-channel-preview:last-child {
   margin-bottom: 0 !important;
 }
