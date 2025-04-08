@@ -11,7 +11,6 @@ const HeaderContainer = styled(Box, {
   width: "100%",
   position: "sticky",
   top: 0,
-  zIndex: theme.zIndex.appBar,
   borderBottom:
     colorMode === "dark"
       ? `1px solid ${theme.palette.grey[800]}`
