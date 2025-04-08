@@ -8,16 +8,12 @@ import { useColorMode } from "@chakra-ui/react";
 const HeaderContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== "colorMode",
 })(({ theme, colorMode }) => ({
-  width: "100%",
-  position: "sticky",
-  top: 0,
   borderBottom:
     colorMode === "dark"
       ? `1px solid ${theme.palette.grey[800]}`
       : `1px solid ${theme.palette.grey[200]}`,
   color:
     colorMode === "dark" ? theme.palette.grey[100] : theme.palette.grey[900],
-
   padding: theme.spacing(1.25, 2),
   backdropFilter: "blur(8px)",
   transition: "all 0.3s ease",
