@@ -11,12 +11,13 @@ import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce";
 import Button from "@mui/material/Button";
+import { Skeleton } from "@mui/material";
 
 const Root = styled("div")({
   position: "relative",
   display: "flex",
   flexDirection: "column",
-  borderRadius: "8px", // Subtle rounded corners for the whole feed
+  borderRadius: "8px",
   maxWidth: "100vw",
   minHeight: "100dvh",
   marginBottom: 15,
@@ -54,15 +55,18 @@ const StyledButton = styled(Button)(({ theme }) => ({
     background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))",
     transform: "translateX(-50%) translateY(-5px)",
   },
-
-  // Default bottom value for larger screens (above mobile)
   bottom: "10%",
-
-  // Adjust position for mobile view
   [theme.breakpoints.down("sm")]: {
-    bottom: "70px", // Adjust this value based on your footer height
+    bottom: "70px",
   },
 }));
+
+const SkeletonFeed = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "16px",
+  padding: "16px",
+});
 
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
@@ -71,7 +75,6 @@ const calculateAge = (dob) => {
   const month = currentDate.getMonth();
   const day = currentDate.getDate();
 
-  // Adjust the age if the birthday hasn't occurred yet this year
   if (
     month < birthDate.getMonth() ||
     (month === birthDate.getMonth() && day < birthDate.getDate())
@@ -85,6 +88,7 @@ const calculateAge = (dob) => {
 const FeedSection = ({
   linkupList,
   isLoading,
+  setIsLoading,
   setShouldFetchLinkups,
   onRefreshClick,
   userId,
@@ -97,50 +101,57 @@ const FeedSection = ({
     (state) => state.linkups.showNewLinkupButton
   );
   const { userSettings } = useSelector((state) => state.userSettings);
-  const [loading, setLoading] = useState(false);
-  const [filteredLinkups, setFilteredLinkups] = useState(linkupList); // Initial filtered list based on linkupList
-  const [showScrollToTopButton, setShowScrollToTopButton] = useState(false); // State to control button visibility
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [filteredLinkups, setFilteredLinkups] = useState([]);
+  const [showScrollToTopButton, setShowScrollToTopButton] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const distanceRange = userSettings?.distanceRange || [0, 1000];
   const ageRange = userSettings?.ageRange || [18, 99];
   const genderRange = userSettings?.genderRange || [];
 
-  // Apply filtering logic based on user settings
+  // Apply filtering logic with loading state
   useEffect(() => {
+    if (!linkupList || linkupList.length === 0) {
+      setFilteredLinkups([]);
+      return;
+    }
+
     const filterLinkups = () => {
-      return linkupList.filter((linkup) => {
-        // Skip filtering if the linkup belongs to the logged-in user
-        if (linkup.creator_id === userId) {
+      setIsFiltering(true);
+      try {
+        return linkupList.filter((linkup) => {
+          if (linkup.creator_id === userId) {
+            return true;
+          }
+
+          const distance = linkup.distance || 0;
+          if (distance < distanceRange[0] || distance > distanceRange[1]) {
+            return false;
+          }
+
+          const age = calculateAge(linkup.date_of_birth) || 0;
+          if (age < ageRange[0] || age > ageRange[1]) {
+            return false;
+          }
+
+          if (
+            genderRange.length > 0 &&
+            !genderRange.includes(linkup.creator_gender)
+          ) {
+            return false;
+          }
+
           return true;
-        }
-
-        // Distance filter
-        const distance = linkup.distance || 0;
-        if (distance < distanceRange[0] || distance > distanceRange[1]) {
-          return false;
-        }
-
-        // Age filter
-        const age = calculateAge(linkup.date_of_birth) || 0;
-        if (age < ageRange[0] || age > ageRange[1]) {
-          return false;
-        }
-
-        // Gender filter (if any selected)
-        if (
-          genderRange.length > 0 &&
-          !genderRange.includes(linkup.creator_gender)
-        ) {
-          return false;
-        }
-
-        return true;
-      });
+        });
+      } finally {
+        setIsFiltering(false);
+      }
     };
 
     const filtered = filterLinkups();
     setFilteredLinkups(filtered);
-  }, [linkupList, userSettings]); // Re-run filter when linkupList or userSettings change
+  }, [linkupList, userSettings, userId]);
 
   const scrollToTop = () => {
     if (feedRef.current) {
@@ -151,35 +162,28 @@ const FeedSection = ({
     }
   };
 
-  // Handle scroll position to toggle the scroll-to-top button
   const handleScroll = () => {
     if (feedRef.current) {
-      const scrollPosition = feedRef.current.scrollTop;
-      // Show button when scrolled down more than 200px
-      setShowScrollToTopButton(scrollPosition > 200);
+      setShowScrollToTopButton(feedRef.current.scrollTop > 200);
     }
   };
 
-  // Add scroll event listener when the component mounts
   useEffect(() => {
-    if (feedRef.current) {
-      feedRef.current.addEventListener("scroll", handleScroll);
+    const currentRef = feedRef.current;
+    if (currentRef) {
+      currentRef.addEventListener("scroll", handleScroll);
     }
-
     return () => {
-      if (feedRef.current) {
-        feedRef.current.removeEventListener("scroll", handleScroll);
+      if (currentRef) {
+        currentRef.removeEventListener("scroll", handleScroll);
       }
     };
   }, []);
 
-  // Persist debounced function using useRef to avoid recreation
   const debounceSearchRef = useRef(
     debounce(async (value) => {
       try {
-        setLoading(true);
-
-        // Make API call with the search query and user settings
+        setSearchLoading(true);
         const response = await searchLinkups(
           value,
           userId,
@@ -187,38 +191,52 @@ const FeedSection = ({
           distanceRange,
           ageRange
         );
-        dispatch(fetchLinkupsSuccess(response.linkupList)); // Dispatch updated linkups from API
-        setFilteredLinkups(response.linkupList); // Set filtered linkups state with the result
+        dispatch(fetchLinkupsSuccess(response.linkupList));
+        setFilteredLinkups(response.linkupList);
       } catch (error) {
-        console.error("Error fetching linkups:", error);
+        console.error("Error searching linkups:", error);
       } finally {
-        setLoading(false);
+        setSearchLoading(false);
       }
     }, 300)
   );
 
-  // Function to handle input change and trigger search
   const handleInputChange = (event) => {
+    setSearchLoading(true);
     debounceSearchRef.current(event.target.value);
   };
+
+  // Combined loading states
+  const showLoading = isLoading || isFiltering || searchLoading;
+  const showContent = !isLoading && !isFiltering && !searchLoading;
 
   return (
     <Root>
       <TopNavBar title="Home" />
-      {/* Search Input Component */}
       <SearchInputContainer>
-        <SearchInput handleInputChange={handleInputChange} loading={loading} />
+        <SearchInput
+          handleInputChange={handleInputChange}
+          loading={searchLoading}
+        />
       </SearchInputContainer>
-      {/* Show LoadingSpinner when filtering or fetching data */}
-      {(isLoading || loading) && (
+
+      {showLoading && (
         <LoadingContainer>
-          <LoadingSpinner />
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <SkeletonFeed>
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} variant="rounded" width="100%" height={120} />
+              ))}
+            </SkeletonFeed>
+          )}
         </LoadingContainer>
       )}
-      {/* Render filtered linkups or empty state */}
-      {!isLoading && !loading && (
-        <div>
-          {filteredLinkups.length === 0 ? (
+
+      {showContent && (
+        <>
+          {linkupList.length === 0 ? (
             <EmptyFeedPlaceholder />
           ) : (
             filteredLinkups.map((linkup) => (
@@ -233,13 +251,12 @@ const FeedSection = ({
             ))
           )}
           {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
-
           {showScrollToTopButton && (
             <StyledButton variant="contained" onClick={scrollToTop}>
               Scroll to Top
             </StyledButton>
           )}
-        </div>
+        </>
       )}
     </Root>
   );

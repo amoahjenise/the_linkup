@@ -103,7 +103,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
 }));
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 30;
 
 const HomePage = ({ isMobile }) => {
   const dispatch = useDispatch();
@@ -144,6 +144,7 @@ const HomePage = ({ isMobile }) => {
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
       setIsFetchingNextPage(true);
+      setIsLoading(true);
       try {
         if (!userId || page < 1 || PAGE_SIZE < 1) return;
 
@@ -203,7 +204,7 @@ const HomePage = ({ isMobile }) => {
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = 10;
+    const threshold = 30;
     if (
       feedSectionRef.current &&
       feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
@@ -314,7 +315,8 @@ const HomePage = ({ isMobile }) => {
         {userId && (
           <FeedSection
             linkupList={linkupList}
-            isLoading={isFetchingNextPage}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
             setShouldFetchLinkups={setShouldFetchLinkups}
             onRefreshClick={refreshLinkups}
             userId={userId}

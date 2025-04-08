@@ -235,7 +235,7 @@ const CreateLinkupWidget = ({
 
   useEffect(() => {
     const applyTheme = async () => {
-      setIsLoading(true); // Set loading state to true
+      // setIsLoading(true); // Set loading state to true
       try {
         const themeLink = document.getElementById("theme-link");
         const initialTheme = themeLink.getAttribute("href").includes("dark")
@@ -281,11 +281,6 @@ const CreateLinkupWidget = ({
       ? currentDate
       : minTimeDefault
     : currentDate;
-
-  const capitalizeFirstLetter = (string) => {
-    if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
 
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
