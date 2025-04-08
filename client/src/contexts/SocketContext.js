@@ -9,6 +9,7 @@ import {
 } from "../utils/notificationUtils";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 import { calculateDistance, calculateAge } from "../utils/utils"; // Utility functions for distance and age
+import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
 
 const SocketContext = createContext();
 
@@ -45,9 +46,23 @@ export const SocketProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    // Function to check if a linkup matches the user's settings
     const isLinkupWithinUserSettings = (linkup) => {
-      if (!userSettings || !loggedUser) return false;
+      if (!loggedUser) return false;
+
+      // Use default values if userSettings is missing or incomplete
+      const ageRange = userSettings?.ageRange || [18, 99];
+      const distanceRange = userSettings?.distanceRange || [0, 50];
+      const genderRange =
+        userSettings?.genderRange?.length > 0
+          ? userSettings.genderRange
+          : [
+              { key: "men", value: "Men" },
+              { key: "women", value: "Women" },
+              ...customGenderOptions.map((gender) => ({
+                key: gender.toLowerCase(),
+                value: gender,
+              })),
+            ];
 
       // Distance filter
       const distance = calculateDistance(
@@ -56,23 +71,20 @@ export const SocketProvider = ({ children }) => {
         linkup.latitude,
         linkup.longitude
       );
-      if (
-        distance < userSettings.distanceRange[0] ||
-        distance > userSettings.distanceRange[1]
-      ) {
+      if (distance < distanceRange[0] || distance > distanceRange[1]) {
         return false;
       }
 
       // Age filter
       const age = calculateAge(linkup.date_of_birth) || 0;
-      if (age < userSettings.ageRange[0] || age > userSettings.ageRange[1]) {
+      if (age < ageRange[0] || age > ageRange[1]) {
         return false;
       }
 
-      // Gender filter (if any selected)
+      // Gender filter
       if (
-        userSettings.genderRange.length > 0 &&
-        !userSettings.genderRange.includes(linkup.creator_gender)
+        genderRange.length > 0 &&
+        !genderRange.some((g) => g.key === linkup.creator_gender)
       ) {
         return false;
       }

@@ -11,6 +11,7 @@ const NotificationItemWrapper = styled("div")(
     alignItems: "center",
     padding: "16px 16px",
     cursor: "pointer",
+    border: "1px solid rgba(63, 75, 91, 0.25)",
     backgroundColor: isUnread
       ? "rgba(173, 216, 230, 0.15)"
       : colorMode === "dark"

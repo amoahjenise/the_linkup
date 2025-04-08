@@ -416,7 +416,11 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
             <div style={{ flex: 2, marginRight: "1rem" }}>
               <UserInfo>
                 <Name>
-                  <UserName>{creator_name}</UserName>
+                  <UserName>
+                    <Link to={`/profile/${creator_id}`} className={UserName}>
+                      {creator_name}
+                    </Link>
+                  </UserName>
                   <Tooltip
                     title={linkupItem.is_online ? "Online" : "Offline"}
                     arrow
