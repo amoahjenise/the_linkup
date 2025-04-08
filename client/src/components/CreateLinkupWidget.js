@@ -367,7 +367,7 @@ const CreateLinkupWidget = ({
                     }`}
       </style>
       <Header>
-        <span>Linkup</span>
+        <span>Create Linkup</span>
       </Header>
       <Form onSubmit={handleCreateLinkUp}>
         <InputField

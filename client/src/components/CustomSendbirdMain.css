@@ -57,7 +57,7 @@
 /* Desktop-only styles (applies when screen is wider than 600px) */
 @media (min-width: 601px) {
   .sendbird-conversation {
-    max-width: 60vw !important;
+    max-width: 58vw !important;
   }
 }
 

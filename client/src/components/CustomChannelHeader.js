@@ -16,7 +16,7 @@ const Header = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: theme.spacing(1.5, 2),
+  padding: theme.spacing(1.2, 2),
   borderBottomWidth: "1px",
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
   top: 0,
