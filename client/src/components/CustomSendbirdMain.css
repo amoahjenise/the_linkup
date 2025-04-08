@@ -1,29 +1,6 @@
-/* .sendbird-channel-list__body {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.sendbird-channel-list__header {
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-} */
-
-/* @media (max-width: 600px) { */
 .sendbird-channel-list {
-  position: relative;
-  cursor: pointer;
-  border-right: 1px solid gray;
-  box-sizing: border-box;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start; /* Adjust as needed */
-}
-
-.sendbird-app__channellist-wrap {
-  overflow-y: auto !important;
+  border-right: 1px solid gray !important;
+  box-sizing: border-box !important;
 }
 
 .sendbird-channel-preview {
@@ -38,16 +15,6 @@
 
 .sendbird-conversation {
   box-sizing: border-box !important;
-  overflow-y: auto !important;
-  height: calc(100dvh) !important;
   border: none !important;
   box-shadow: none !important;
-}
-
-.sendbird-app__conversation-wrap {
-  width: 100% !important;
-}
-
-.sendbird-app__wrap {
-  width: 100% !important;
 }
