@@ -128,3 +128,114 @@
 .sendbird-channel-preview:last-child {
   margin-bottom: 0 !important;
 }
+/* Base container styles */
+.sendbird-channel-list {
+  border-right-width: 1px !important;
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 600px) {
+  .sendbird-channel-list {
+    padding: 8px !important;
+  }
+
+  .sendbird-channel-preview {
+    display: flex !important;
+    align-items: center !important;
+    padding: 16px !important;
+    margin: 8px 0 !important;
+    height: 100px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(63, 75, 91, 0.25) !important;
+    background-color: rgba(0, 0, 0, 0.015) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+    overflow: hidden !important;
+  }
+
+  .sendbird-channel-preview:hover {
+    border-radius: 8px !important;
+    background-color: rgba(210, 210, 210, 0.2) !important;
+  }
+
+  /* Unread states for mobile */
+  .sendbird-channel-preview--unread {
+    background-color: rgba(173, 216, 230, 0.15) !important;
+  }
+
+  .sendbird-channel-preview--unread:hover {
+    background-color: rgba(144, 200, 215, 0.2) !important;
+  }
+
+  /* Dark mode for mobile */
+  .dark-mode .sendbird-channel-preview,
+  [data-theme="dark"] .sendbird-channel-preview {
+    background-color: rgb(16, 16, 16) !important;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .dark-mode .sendbird-channel-preview:hover,
+  [data-theme="dark"] .sendbird-channel-preview:hover {
+    background-color: rgba(200, 200, 200, 0.1) !important;
+  }
+}
+
+/* Desktop styles (minimal changes) */
+@media (min-width: 601px) {
+  .sendbird-channel-preview {
+    border: 1px solid rgba(63, 75, 91, 0.25) !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+    background-color: var(--preview-bg, rgba(0, 0, 0, 0.015)) !important;
+    box-shadow: var(--preview-shadow, 0 2px 8px rgba(0, 0, 0, 0.05)) !important;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .sendbird-conversation {
+    max-width: 58vw !important;
+  }
+}
+
+/* Header styles (unchanged) */
+[data-theme="dark"] .sendbird-channel-list__header,
+.dark .sendbird-channel-list__header {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="light"] .sendbird-channel-list__header,
+.light .sendbird-channel-list__header {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+@supports not (backdrop-filter: blur(8px)) {
+  .sendbird-channel-list__header {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+  }
+  [data-theme="light"] .sendbird-channel-list__header,
+  .light .sendbird-channel-list__header {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+  }
+}
+
+.sendbird-channel-list__header {
+  background-color: transparent !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Message input container fix */
+.sendbird-message-input {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Conversation area constraints */
+.sendbird-conversation {
+  box-sizing: border-box !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  overflow-x: hidden !important;
+}
