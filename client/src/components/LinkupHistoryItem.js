@@ -158,11 +158,11 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
   const getPaymentOptionText = () => {
     switch (payment_option) {
       case "split":
-        return `You would like to split the bill for this activity.`;
+        return `You would like to split the bill for this linkup.`;
       case "pleasePay":
-        return `You would like the requester to pay for this activity.`;
+        return `You would like the requester to pay for this linkup.`;
       case "iWillPay":
-        return `You are willing to pay the bill for this activity.`;
+        return `You are willing to pay the bill for this linkup.`;
       default:
         return "";
     }

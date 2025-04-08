@@ -38,7 +38,7 @@ const SubSectionItem = styled(Typography)(({ theme, active }) => ({
 const Content = styled("div")(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
-  borderLeft: "1px solid #D3D3D3",
+  borderLeftWidth: "1px",
 }));
 
 const Title = styled(Typography)(({ theme }) => ({

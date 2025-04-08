@@ -229,15 +229,15 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
     const subject = isMyLinkup ? "You" : post.creator_name;
     switch (post.payment_option) {
       case "split":
-        return `${subject} would like to split the bill for this activity.`;
+        return `${subject} would like to split the bill for this linkup.`;
       case "pleasePay":
         return `${subject} would like ${
           isMyLinkup ? "the requester" : "you"
-        } to pay for this activity.`;
+        } to pay for this linkup.`;
       case "iWillPay":
         return `${subject} ${
           isMyLinkup ? "are" : "is"
-        } willing to pay the bill for this activity.`;
+        } willing to pay the bill for this linkup.`;
       default:
         return "";
     }
