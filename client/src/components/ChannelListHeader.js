@@ -17,7 +17,7 @@ const HeaderContainer = styled(Box)(({ theme, colorMode }) => ({
   color: colorMode === "dark" ? "white" : "black",
   backgroundColor:
     colorMode === "dark" ? "rgba(0, 0, 0, 0.95)" : "rgba(255, 255, 255, 0.97)",
-  padding: theme.spacing(0.9),
+  padding: theme.spacing(0.95),
 }));
 
 const TextWrapper = styled(Box)({
