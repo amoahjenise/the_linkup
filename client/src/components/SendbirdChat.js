@@ -167,7 +167,6 @@ const SendbirdChat = () => {
     width: isMobile ? "100%" : "320px",
     minWidth: isMobile ? "auto" : "320px",
     height: "100%",
-    borderRight: isMobile ? "none" : "1px solid #e6e6e6",
   };
 
   const conversationStyle = {
