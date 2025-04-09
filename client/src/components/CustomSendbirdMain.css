@@ -138,6 +138,7 @@
 /* Mobile-specific styles */
 @media (max-width: 600px) {
   .sendbird-channel-list {
+    border-right: none !important;
     padding: 8px !important;
   }
 
