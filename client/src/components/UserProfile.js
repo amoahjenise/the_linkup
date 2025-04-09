@@ -42,18 +42,18 @@ const MoreButtonWrapper = styled("div")({
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100dvh - 110px)" : "calc(100% - 60px)", // Reduced height
-  overflow: "hidden",
+  height: isMobile ? "calc(100dvh - 110px)" : "calc(100% - 60px)", // Changed to full viewport height
+  overflow: "auto",
   color: "#fff",
-  paddingTop: isMobile ? "60px" : "0",
+  display: "flex",
+  flexDirection: "column",
 }));
 
-const BackgroundImage = styled("div")(({ userData }) => ({
-  position: "absolute",
+const BackgroundImage = styled("div")(({ userData, isMobile }) => ({
+  position: isMobile ? "absolute" : "fixed",
   top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
+  width: isMobile ? "100%" : "calc(100% - 100px)", // Subtract left menu width
+  height: "100dvh", // Use viewport height instead of 100%
   backgroundImage: `url(${userData?.avatar})`,
   backgroundSize: "cover",
   backgroundPosition: "center",
@@ -68,21 +68,31 @@ const BackgroundImage = styled("div")(({ userData }) => ({
     backdropFilter: "blur(35px)",
     WebkitBackdropFilter: "blur(35px)",
     background:
-      "linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%)", // Adjusted gradient
+      "linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%)",
   },
 }));
 
+const ContentWrapper = styled("div")(({ isMobile }) => ({
+  position: "relative",
+  zIndex: 2,
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  paddingTop: isMobile ? "60px" : "0",
+  // minHeight: "100%",
+}));
+
 const Header = styled("div")({
-  position: "absolute",
+  position: "sticky",
   top: 0,
   left: 0,
   width: "100%",
   padding: "1rem",
   display: "flex",
-  justifyContent: "flex-end", // Align buttons to the right
+  justifyContent: "flex-end",
   alignItems: "center",
-  zIndex: 2,
-  gap: "0.5rem", // Add gap between buttons
+  zIndex: 10,
+  gap: "0.5rem",
 });
 
 const IconButton = styled("button")({
@@ -105,45 +115,53 @@ const IconButton = styled("button")({
 });
 
 const BottomSection = styled("div")(({ isMobile }) => ({
-  position: "absolute",
-  bottom: 0,
   width: "100%",
-  backdropFilter: "blur(2px)",
-  WebkitBackdropFilter: "blur(2px)",
-  background: `linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.3) 10%,
-        rgba(0, 0, 0, 0) 100%
-      )`,
-  padding: isMobile ? "1rem" : "1.5rem", // Reduced padding for mobile
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem", // Add gap between elements
+  padding: isMobile ? "1rem" : "1.5rem",
+  marginTop: "auto",
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    backdropFilter: "blur(2px)",
+    WebkitBackdropFilter: "blur(2px)",
+    background: `linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.3) 10%,
+      rgba(0, 0, 0, 0) 100%
+    )`,
+    zIndex: -1,
+  },
 }));
 
 const Title = styled("h2")(({ isMobile }) => ({
   margin: 0,
-  fontSize: isMobile ? "1.5rem" : "2rem", // Larger font size for desktop
+  fontSize: "1.25rem",
   fontWeight: "bold",
   color: "#fff",
-  marginBottom: "2.5rem",
+  marginBottom: "1rem",
+  wordBreak: "break-word",
 }));
 
 const Subtitle = styled("p")(({ isMobile }) => ({
   margin: "0.25rem 0",
-  fontSize: isMobile ? "1.1rem" : "1.25rem", // Larger font size for desktop
+  fontSize: isMobile ? "1.1rem" : "1.25rem",
   color: "#ccc",
+  wordBreak: "break-word",
 }));
 
-const ProfileRow = styled("div")({
+const ProfileRow = styled("div")(({ isMobile }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   width: "100%",
   flexWrap: "wrap",
-});
+  gap: isMobile ? "1rem" : "0",
+}));
 
 const RightSide = styled("div")({
   display: "flex",
@@ -155,17 +173,18 @@ const LeftSide = styled("div")({
   display: "flex",
   alignItems: "center",
   gap: "1rem",
+  flexWrap: "wrap",
 });
 
 const UserNameRow = styled("div")(({ isMobile }) => ({
-  display: "inline-flex", // This keeps items together inline
+  display: "inline-flex",
   alignItems: "center",
   gap: "0.25rem",
   fontWeight: 600,
-  fontSize: isMobile ? "1rem" : "1.25rem", // Larger font size for desktop
-  whiteSpace: "nowrap", // Prevents wrapping
-  overflow: "hidden", // Hides overflow
-  textOverflow: "ellipsis", // Adds ellipsis when too long
+  fontSize: isMobile ? "1rem" : "1.25rem",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
   cursor: "default",
 }));
 
@@ -180,7 +199,7 @@ const OnlineStatusContainer = styled("p")(({ isMobile }) => ({
   display: "flex",
   alignItems: "center",
   margin: "4px 0 0",
-  fontSize: isMobile ? "0.875rem" : "1rem", // Larger font size for desktop
+  fontSize: isMobile ? "0.875rem" : "1rem",
   color: "#aaa",
   fontStyle: "italic",
 }));
@@ -190,8 +209,8 @@ const TransparentButton = styled(Button)(({ isMobile }) => ({
   borderColor: "#fff",
   textTransform: "none",
   borderRadius: "24px",
-  padding: isMobile ? "0.25rem 1rem" : "0.5rem 1.5rem", // Larger padding for desktop
-  fontSize: isMobile ? "0.85rem" : "1rem", // Larger font size for desktop
+  padding: isMobile ? "0.25rem 1rem" : "0.5rem 1.5rem",
+  fontSize: isMobile ? "0.85rem" : "1rem",
   backdropFilter: "blur(10px)",
   backgroundColor: "rgba(255, 255, 255, 0.1)",
   border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -199,7 +218,7 @@ const TransparentButton = styled(Button)(({ isMobile }) => ({
   "&:hover": {
     backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
-  marginTop: "12px",
+  marginTop: isMobile ? "8px" : "0",
 }));
 
 const StyledMenu = styled(Menu)(({ theme }) => ({
@@ -265,105 +284,115 @@ const UserProfile = ({
     handleMenuClose();
   };
 
-  // Conditionally render the loading spinner until the userData is available
   if (!userData) {
     return <LoadingSpinner />;
   }
 
   return (
     <UserProfileContainer isMobile={isMobile}>
-      <BackgroundImage userData={userData} />
-      <Header>
-        <IconButton onClick={handleShare} aria-label="Share profile">
-          <FaShare />
-        </IconButton>
-        <MoreButtonWrapper>
-          {isLoggedUserProfile &&
-            userData &&
-            !userData.instagram_url &&
-            !userData.facebook_url &&
-            !userData.twitter_url && (
-              <BouncingNotifier>Link your socials!</BouncingNotifier>
-            )}
-          <IconButton onClick={handleMenuOpen} aria-label="More options">
-            <FaEllipsisH />
+      <BackgroundImage userData={userData} isMobile={isMobile} />
+
+      <ContentWrapper isMobile={isMobile}>
+        <Header>
+          <IconButton onClick={handleShare} aria-label="Share profile">
+            <FaShare />
           </IconButton>
-        </MoreButtonWrapper>
-      </Header>
-      <BottomSection isMobile={isMobile}>
-        <div>
-          <Title isMobile={isMobile}>{userData?.bio}</Title>
-          <Box display="flex" flexDirection="column" gap="0.8rem">
-            <Subtitle isMobile={isMobile}>
-              {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
-              {userLocation}
-            </Subtitle>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "#fff",
-                fontSize: isMobile ? "0.95rem" : "1rem", // Larger font size for desktop
-                cursor: "pointer",
-                "&:hover": { textDecoration: "underline" },
-              }}
-              onClick={toggleLinkupsModal}
-            >
-              {userData?.total_linkups} Created Linkups
-            </Typography>
-          </Box>
-        </div>
+          <MoreButtonWrapper>
+            {isLoggedUserProfile &&
+              userData &&
+              !userData.instagram_url &&
+              !userData.facebook_url &&
+              !userData.twitter_url && (
+                <BouncingNotifier>Link your socials!</BouncingNotifier>
+              )}
+            <IconButton onClick={handleMenuOpen} aria-label="More options">
+              <FaEllipsisH />
+            </IconButton>
+          </MoreButtonWrapper>
+        </Header>
 
-        <Divider
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            margin: "1rem 0",
-          }}
-        />
+        <Box flex={1} />
 
-        <ProfileRow isMobile={isMobile}>
-          <LeftSide>
-            <Avatar
-              alt="User Name"
-              src={userData?.avatar}
-              sx={{ width: isMobile ? 80 : 100, height: isMobile ? 80 : 100 }} // Smaller avatar on mobile
-            />
-            <div>
-              <Box
-                component="span"
+        <BottomSection isMobile={isMobile}>
+          <div>
+            <Title isMobile={isMobile}>{userData?.bio}</Title>
+            <Box display="flex" flexDirection="column" gap="0.8rem">
+              <Subtitle isMobile={isMobile}>
+                {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
+                {userLocation}
+              </Subtitle>
+              <Typography
+                variant="body2"
                 sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
+                  color: "#fff",
+                  fontSize: isMobile ? "0.95rem" : "1rem",
+                  cursor: "pointer",
+                  "&:hover": { textDecoration: "underline" },
                 }}
+                onClick={toggleLinkupsModal}
               >
-                <UserNameRow isMobile={isMobile}>
-                  <span>@{userData?.name}</span>
-                  <MdVerified />
-                </UserNameRow>
-              </Box>
+                {userData?.total_linkups} Created Linkups
+              </Typography>
+            </Box>
+          </div>
 
-              <OnlineStatusContainer isMobile={isMobile}>
-                <OnlineStatus isOnline={userData?.is_online} />
-                <p style={{ marginLeft: 4 }}>
-                  {userData?.is_online ? "Online" : "Offline"}
-                </p>
-              </OnlineStatusContainer>
-            </div>
-          </LeftSide>
+          <Divider
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              margin: "1rem 0",
+            }}
+          />
 
-          <RightSide>
-            {isLoggedUserProfile && (
-              <TransparentButton
-                isMobile={isMobile}
-                onClick={toggleEditModal}
-                variant="outlined"
-              >
-                Edit
-              </TransparentButton>
-            )}
-          </RightSide>
-        </ProfileRow>
-      </BottomSection>
+          <ProfileRow isMobile={isMobile}>
+            <LeftSide>
+              <Avatar
+                alt="User Name"
+                src={userData?.avatar}
+                sx={{
+                  width: isMobile ? 80 : 100,
+                  height: isMobile ? 80 : 100,
+                  flexShrink: 0,
+                }}
+              />
+              <div>
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  <UserNameRow isMobile={isMobile}>
+                    <span>@{userData?.name}</span>
+                    <MdVerified />
+                  </UserNameRow>
+                </Box>
+
+                <OnlineStatusContainer isMobile={isMobile}>
+                  <OnlineStatus isOnline={userData?.is_online} />
+                  <p style={{ marginLeft: 4 }}>
+                    {userData?.is_online ? "Online" : "Offline"}
+                  </p>
+                </OnlineStatusContainer>
+              </div>
+            </LeftSide>
+
+            <RightSide>
+              {isLoggedUserProfile && (
+                <TransparentButton
+                  isMobile={isMobile}
+                  onClick={toggleEditModal}
+                  variant="outlined"
+                >
+                  Edit
+                </TransparentButton>
+              )}
+            </RightSide>
+          </ProfileRow>
+        </BottomSection>
+      </ContentWrapper>
+
       <StyledMenu
         anchorEl={anchorEl}
         open={open}
@@ -374,6 +403,7 @@ const UserProfile = ({
       >
         <MenuItem onClick={handleSocialMediaClick}>Social Media Links</MenuItem>
       </StyledMenu>
+
       <UserProfileEditModal
         isOpen={isEditModalOpen}
         onClose={toggleEditModal}

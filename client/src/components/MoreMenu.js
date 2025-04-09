@@ -175,12 +175,24 @@ const MoreMenu = ({
         }}
         PaperProps={{
           style: {
+            minWidth: 200,
+            borderRadius: "12px",
+            overflow: "hidden",
+            backdropFilter: "blur(12px)",
+            border:
+              colorMode === "dark"
+                ? "1px solid rgba(255, 255, 255, 0.1)"
+                : "1px solid rgba(0, 0, 0, 0.1)",
             color: "white",
             backgroundColor:
               colorMode === "dark"
                 ? "rgba(18, 78, 88, 1)"
                 : "rgba(8, 98, 110, 1)",
-            boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.3)",
+            // boxShadow: "0px 0px 10px 2px rgba(255, 215, 0, 0.3)",
+            boxShadow:
+              colorMode === "dark"
+                ? "0px 0px 10px 2px rgba(255, 215, 0, 0.2)"
+                : "0px 4px 20px rgba(0, 0, 0, 0.15)",
           },
         }}
       >
@@ -246,7 +258,28 @@ const MoreMenu = ({
         ].map(
           (item, index) =>
             item.condition && (
-              <MenuItem key={index} onClick={item.action}>
+              <MenuItem
+                key={index}
+                onClick={item.action}
+                sx={{
+                  py: 0.75,
+                  px: 2,
+                  fontSize: "0.875rem",
+                  gap: 2,
+                  "&:hover": {
+                    backgroundColor:
+                      colorMode === "dark"
+                        ? "rgba(255, 255, 255, 0.08)"
+                        : "rgba(0, 0, 0, 0.04)",
+                  },
+                  "&:active": {
+                    backgroundColor:
+                      colorMode === "dark"
+                        ? "rgba(255, 255, 255, 0.12)"
+                        : "rgba(0, 0, 0, 0.08)",
+                  },
+                }}
+              >
                 {item.label}
               </MenuItem>
             )

@@ -18,7 +18,7 @@ const CustomAppBar = styled(({ colorMode, ...other }) => <AppBar {...other} />)(
     color: colorMode === "dark" ? "white" : "black",
     backgroundColor:
       colorMode === "dark"
-        ? "rgba(0, 0, 0, 0.95)"
+        ? "rgba(0, 0, 0, 0.93)"
         : "rgba(255, 255, 255, 0.97)",
   })
 );
@@ -33,7 +33,12 @@ const TopNavBar = ({ title, tabs, selectedTab, onChangeTab }) => {
 
   return (
     <CustomAppBar elevation={0} colorMode={colorMode}>
-      <Toolbar>
+      <Toolbar
+        sx={{
+          padding: { xs: "0 16px", sm: "0 24px" },
+          justifyContent: "center", // This centers all items in the toolbar
+        }}
+      >
         <HeaderText variant="h6">{title}</HeaderText>
         {/* <ToggleColorMode /> */}
       </Toolbar>
