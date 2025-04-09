@@ -4,29 +4,32 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useColorMode } from "@chakra-ui/react";
 
-// Styled components with enhanced typography and subtle animations
+// Styled components with centered text
 const HeaderContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== "colorMode",
 })(({ theme, colorMode }) => ({
   borderBottom:
     colorMode === "dark"
-      ? `1px solid ${theme.palette.grey[800]}`
+      ? `1px solid rgba(0, 0, 0, 0.12)`
       : `1px solid ${theme.palette.grey[200]}`,
   boxShadow: "0 1px 1px rgba(0, 0, 0, 0.12)",
-
   color:
     colorMode === "dark" ? theme.palette.grey[100] : theme.palette.grey[900],
   padding: theme.spacing(1.25, 2),
   backdropFilter: "blur(8px)",
   transition: "all 0.3s ease",
+  display: "flex",
+  justifyContent: "center", // Center horizontally
 }));
 
 const TextWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-
+  alignItems: "center", // Center items horizontally in column layout
+  textAlign: "center", // Center text within each Typography component
   cursor: "default",
   gap: theme.spacing(0.25),
+  maxWidth: "800px", // Optional: set a max width for better readability
 }));
 
 const Title = styled(Typography)(({ theme }) => ({
@@ -35,6 +38,7 @@ const Title = styled(Typography)(({ theme }) => ({
   letterSpacing: "-0.015em",
   lineHeight: 1.3,
   fontFamily: "'Inter', -apple-system, sans-serif",
+  width: "100%", // Ensure text-align center works
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
@@ -46,6 +50,7 @@ const Subtitle = styled(Typography)(({ theme }) => ({
       : theme.palette.grey[600],
   letterSpacing: "0.01em",
   lineHeight: 1.2,
+  width: "100%", // Ensure text-align center works
 }));
 
 const ChannelListHeader = () => {
