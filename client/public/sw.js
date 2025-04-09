@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-globals */
+const BADGE_API_ENABLED = "setAppBadge" in navigator;
 const CACHE_NAME = "thelinkup-v4";
 const OFFLINE_URL = "/offline.html";
 const CORE_ASSETS = [
@@ -57,8 +58,12 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Skip non-GET requests and API calls
-  if (request.method !== "GET" || request.url.includes("/api/")) {
+  // Skip non-GET requests, API calls, and non-HTTP(S) requests
+  if (
+    request.method !== "GET" ||
+    request.url.includes("/api/") ||
+    !request.url.startsWith("http")
+  ) {
     return;
   }
 
@@ -75,19 +80,37 @@ self.addEventListener("fetch", (event) => {
   // For other requests, try cache first then network
   event.respondWith(
     caches.match(request).then((cached) => {
-      // Return cached response if available
-      if (cached) {
-        return cached;
-      }
+      if (cached) return cached;
 
-      // Otherwise fetch from network and cache it
       return fetch(request).then((response) => {
-        // Only cache successful, non-opaque responses
-        if (response && response.status === 200 && response.type === "basic") {
+        // Create a clean copy of the request
+        const cacheRequest = new Request(request.url, {
+          headers: request.headers,
+          method: "GET",
+          mode: "same-origin", // Ensures cacheable response
+          credentials: "omit",
+          redirect: "follow",
+        });
+
+        // Verify the response is cacheable
+        if (
+          response &&
+          response.status === 200 &&
+          response.type === "basic" &&
+          request.url.startsWith("http") &&
+          !request.url.includes("chrome-extension://")
+        ) {
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseToCache);
-          });
+
+          caches
+            .open(CACHE_NAME)
+            .then((cache) => {
+              // Use the clean request copy
+              return cache.put(cacheRequest, responseToCache).catch((err) => {
+                console.warn("Could not cache:", request.url, err);
+              });
+            })
+            .catch(console.warn);
         }
         return response;
       });
@@ -97,23 +120,23 @@ self.addEventListener("fetch", (event) => {
 
 // Push notifications with badge support
 self.addEventListener("push", async (event) => {
+  if (!BADGE_API_ENABLED) return;
+
   try {
     const data = event.data?.json();
     if (!data) return;
 
     await self.registration.showNotification(data.title, {
       body: data.body,
-      icon: data.icon,
+      icon: "/icon-192x192.png",
       badge: "/badge-icon.png",
-      data: { url: data.url }, // Add URL for navigation
+      data: { url: data.url },
     });
 
     // Update app badge count if supported
-    if ("setAppBadge" in navigator) {
-      await navigator.setAppBadge(data.unreadCount || 1);
-    }
+    await navigator.setAppBadge(data.unreadCount || 1);
   } catch (error) {
-    console.error("Error handling push event:", error);
+    console.error("Push notification failed:", error);
   }
 });
 
@@ -123,23 +146,21 @@ self.addEventListener("notificationclick", (event) => {
 
   // Navigate to specific URL if provided in notification data
   if (event.notification.data?.url) {
-    event.waitUntil(clients.openWindow(event.notification.data.url));
+    event.waitUntil(self.clients.openWindow(event.notification.data.url));
   }
 });
 
 // Handle messages from clients (e.g., badge updates)
 self.addEventListener("message", async (event) => {
+  if (!BADGE_API_ENABLED) return;
+
   try {
     if (event.data?.type === "UPDATE_BADGE") {
-      if ("setAppBadge" in navigator) {
-        await navigator.setAppBadge(event.data.count);
-      }
+      await navigator.setAppBadge(event.data.count).catch(console.error);
     } else if (event.data?.type === "CLEAR_BADGE") {
-      if ("clearAppBadge" in navigator) {
-        await navigator.clearAppBadge();
-      }
+      await navigator.clearAppBadge().catch(console.error);
     }
   } catch (error) {
-    console.error("Error handling message event:", error);
+    console.error("Badge operation failed:", error);
   }
 });
