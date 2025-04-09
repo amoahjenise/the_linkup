@@ -1,7 +1,7 @@
 {
   "short_name": "The Linkup",
-  "name": "The Linkup - Connect, Meet, and Link Up",
-  "description": "Your go-to platform for connecting with new people and organizing meetups around your interests",
+  "name": "The Linkup",
+  "description": "Connect with new people and organize meetups around your interests.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
