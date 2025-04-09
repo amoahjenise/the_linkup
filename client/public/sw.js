@@ -1,49 +1,42 @@
 /* eslint-disable no-restricted-globals */
-
-const CACHE_NAME = "thelinkup-v1";
-const OFFLINE_URL = "/offline.html";
-const urlsToCache = [
-  "/",
-  "/index.html",
-  "/favicon.ico",
-  "/favicon-96x96.png",
-  "/favicon.svg",
-  "/apple-touch-icon.png",
-  "/web-app-manifest-192x192.png",
-  "/web-app-manifest-512x512.png",
-  "/themes/bootstrap4-light-blue/theme.css",
-  "/themes/bootstrap4-dark-blue/theme.css",
+const CACHE_NAME = 'thelinkup-v3';
+const OFFLINE_URL = '/offline.html';
+const CORE_ASSETS = [
+  '/',
+  '/index.html',
+  '/static/js/bundle.js', // React's main JS bundle
+  '/static/css/main.css'  // React's main CSS
 ];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(CORE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  
+  // Skip non-GET and API requests
+  if (request.method !== 'GET' || request.url.includes('/api/')) {
+    return;
+  }
 
+  // Handle HTML navigation requests
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .catch(() => caches.match(OFFLINE_URL))
+        .then(response => response || caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Cache-first for static assets
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      if (event.request.mode === "navigate") return caches.match(OFFLINE_URL);
-      return fetch(event.request);
-    })
-  );
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) return caches.delete(cache);
-        })
-      );
-    })
+    caches.match(request)
+      .then(cached => cached || fetch(request))
   );
 });
