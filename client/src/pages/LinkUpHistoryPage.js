@@ -26,7 +26,9 @@ const classes = {
   slideOut: `${PREFIX}-slideOut`,
 };
 
-const StyledDiv = styled("div")(({ theme, colorMode }) => ({
+const StyledDiv = styled("div", {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   [`&.${classes.widgetSection}`]: {
     flex: "1",
     overflowY: "auto",

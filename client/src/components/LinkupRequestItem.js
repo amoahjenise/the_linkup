@@ -20,7 +20,9 @@ import nlp from "compromise";
 
 const compromise = nlp;
 
-const LinkupRequestItemContainer = styled("div")(({ theme, colorMode }) => ({
+const LinkupRequestItemContainer = styled("div", {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -110,7 +112,9 @@ const ButtonGroup = styled("div")(({ theme }) => ({
   gap: theme.spacing(1), // Add consistent spacing between buttons
 }));
 
-const RequestText = styled(Typography)(({ theme, colorMode }) => ({
+const RequestText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   margin: 0,
   marginBottom: theme.spacing(1),
   marginTop: theme.spacing(1),
@@ -119,7 +123,9 @@ const RequestText = styled(Typography)(({ theme, colorMode }) => ({
   fontWeight: 500,
 }));
 
-const DetailsText = styled(Typography)(({ theme, colorMode }) => ({
+const DetailsText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   fontSize: "0.875rem",
   color: colorMode === "dark" ? "gray" : theme.palette.text.secondary,
   marginBottom: theme.spacing(0.5),

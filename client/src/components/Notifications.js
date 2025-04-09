@@ -100,7 +100,7 @@ const Notifications = () => {
     <MainContainer>
       <TopNavBar title="Notifications" />
       {isLoading ? (
-        <LoadingSpinner marginTop="350px" />
+        <LoadingSpinner />
       ) : notifications.length === 0 ? (
         <NoNotificationsContainer>
           <EmptyNotificationsPlaceholder />
@@ -108,9 +108,8 @@ const Notifications = () => {
       ) : (
         <NotificationsList>
           {notifications.map((notification) => (
-            <div style={{ marginBottom: 8 }}>
+            <div key={notification.id} style={{ marginBottom: 8 }}>
               <MemoizedNotificationItem
-                key={notification.id}
                 notification={notification}
                 onClick={() => handleNotificationClick(notification)}
               />
