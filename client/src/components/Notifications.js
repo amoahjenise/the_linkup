@@ -11,8 +11,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
 import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
+import { updateAppBadge } from "../utils/badgeUtils"; // Import your badge utility
 
-// Define styled components
+// Styled components
 const MainContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -52,39 +53,31 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [unreadCountChanged, setUnreadCountChanged] = useState(0);
+  const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
 
-  // Memoized badge update function
-  const updateBadge = useCallback((count) => {
-    // Only update if count is a number
+  // Badge update handler using the utility
+  const updateBadge = useCallback(async (count) => {
     if (typeof count !== "number") return;
 
-    // Update badge if API is available
-    if ("setAppBadge" in navigator) {
-      navigator.setAppBadge(count).catch((error) => {
-        console.error("Error setting badge:", error);
-      });
-    }
+    setIsUpdatingBadge(true);
+    try {
+      const success = await updateAppBadge(count);
 
-    // Send to service worker when ready
-    const updateSWBadge = () => {
-      if (navigator.serviceWorker?.controller) {
-        navigator.serviceWorker.controller.postMessage({
-          type: "UPDATE_BADGE",
+      if (!success && navigator.serviceWorker) {
+        const sw = await navigator.serviceWorker.ready;
+        await sw.active?.postMessage({
+          type: count > 0 ? "UPDATE_BADGE" : "CLEAR_BADGE",
           count: count,
         });
       }
-    };
-
-    if (navigator.serviceWorker) {
-      if (navigator.serviceWorker.controller) {
-        updateSWBadge();
-      } else {
-        // Wait for controller to be ready
-        navigator.serviceWorker.ready.then(updateSWBadge);
-      }
+    } catch (error) {
+      console.error("Badge update error:", error);
+    } finally {
+      setIsUpdatingBadge(false);
     }
   }, []);
 
+  // Fetch notifications
   const fetchUnreadNotifications = useCallback(async () => {
     try {
       const response = await getNotifications(id);
@@ -98,22 +91,27 @@ const Notifications = () => {
     }
   }, [id]);
 
-  // Initial load and badge clear when viewing notifications
+  // Initial load and badge clear
   useEffect(() => {
-    fetchUnreadNotifications();
-    // Only clear badge if we have notifications
-    if (unreadNotificationsCount > 0) {
-      updateBadge(0);
-    }
-  }, [fetchUnreadNotifications]); // Removed updateBadge from dependencies
+    const initialize = async () => {
+      await fetchUnreadNotifications();
+      if (unreadNotificationsCount > 0) {
+        await updateBadge(0);
+      }
+    };
+    initialize();
+  }, [fetchUnreadNotifications, unreadNotificationsCount, updateBadge]);
 
   // Handle unread count changes
   useEffect(() => {
-    if (unreadNotificationsCount !== unreadCountChanged) {
-      fetchUnreadNotifications();
-      setUnreadCountChanged(unreadNotificationsCount);
-      updateBadge(unreadNotificationsCount);
-    }
+    const handleCountChange = async () => {
+      if (unreadNotificationsCount !== unreadCountChanged) {
+        await fetchUnreadNotifications();
+        setUnreadCountChanged(unreadNotificationsCount);
+        await updateBadge(unreadNotificationsCount);
+      }
+    };
+    handleCountChange();
   }, [
     unreadNotificationsCount,
     fetchUnreadNotifications,
@@ -121,24 +119,30 @@ const Notifications = () => {
     updateBadge,
   ]);
 
+  // Handle notification clicks
   const handleNotificationClick = async (notification) => {
     try {
       if (!notification.is_read) {
         await markNotificationAsRead(notification.id);
         const newCount = unreadNotificationsCount - 1;
         dispatch(updateUnreadNotificationsCount(newCount));
-        updateBadge(newCount);
+        await updateBadge(newCount);
       }
 
-      if (notification.notification_type === "linkup_request") {
-        navigate("/messages");
-      } else if (notification.notification_type === "linkup_request_action") {
-        navigate("/history/requests-sent");
-      } else if (notification.notification_type === "new_message") {
-        navigate("/messages");
+      // Navigation logic
+      switch (notification.notification_type) {
+        case "linkup_request":
+        case "new_message":
+          navigate("/messages");
+          break;
+        case "linkup_request_action":
+          navigate("/history/requests-sent");
+          break;
+        default:
+          break;
       }
     } catch (error) {
-      console.log("Error marking notification as read:", error);
+      console.log("Error handling notification:", error);
     }
   };
 
