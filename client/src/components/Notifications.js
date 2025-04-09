@@ -11,9 +11,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import TopNavBar from "../components/TopNavBar";
 import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
-import { updateAppBadge } from "../utils/badgeUtils"; // Import your badge utility
+import { useBadge } from "../utils/badgeUtils"; // Updated import to use the hook
 
-// Styled components
+// Styled components (unchanged)
 const MainContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -53,29 +53,9 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [unreadCountChanged, setUnreadCountChanged] = useState(0);
-  const [isUpdatingBadge, setIsUpdatingBadge] = useState(false);
 
-  // Badge update handler using the utility
-  const updateBadge = useCallback(async (count) => {
-    if (typeof count !== "number") return;
-
-    setIsUpdatingBadge(true);
-    try {
-      const success = await updateAppBadge(count);
-
-      if (!success && navigator.serviceWorker) {
-        const sw = await navigator.serviceWorker.ready;
-        await sw.active?.postMessage({
-          type: count > 0 ? "UPDATE_BADGE" : "CLEAR_BADGE",
-          count: count,
-        });
-      }
-    } catch (error) {
-      console.error("Badge update error:", error);
-    } finally {
-      setIsUpdatingBadge(false);
-    }
-  }, []);
+  // Use the badge hook
+  const { updateBadge } = useBadge();
 
   // Fetch notifications
   const fetchUnreadNotifications = useCallback(async () => {
@@ -85,9 +65,7 @@ const Notifications = () => {
     } catch (error) {
       console.log("Error fetching unread notifications:", error);
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 300);
+      setTimeout(() => setIsLoading(false), 300);
     }
   }, [id]);
 
@@ -95,29 +73,19 @@ const Notifications = () => {
   useEffect(() => {
     const initialize = async () => {
       await fetchUnreadNotifications();
-      if (unreadNotificationsCount > 0) {
-        await updateBadge(0);
-      }
+      // Always clear badge when entering notifications page
+      await updateBadge(0);
     };
     initialize();
-  }, [fetchUnreadNotifications, unreadNotificationsCount, updateBadge]);
+  }, [fetchUnreadNotifications, updateBadge]);
 
   // Handle unread count changes
   useEffect(() => {
-    const handleCountChange = async () => {
-      if (unreadNotificationsCount !== unreadCountChanged) {
-        await fetchUnreadNotifications();
-        setUnreadCountChanged(unreadNotificationsCount);
-        await updateBadge(unreadNotificationsCount);
-      }
-    };
-    handleCountChange();
-  }, [
-    unreadNotificationsCount,
-    fetchUnreadNotifications,
-    unreadCountChanged,
-    updateBadge,
-  ]);
+    if (unreadNotificationsCount !== unreadCountChanged) {
+      fetchUnreadNotifications();
+      setUnreadCountChanged(unreadNotificationsCount);
+    }
+  }, [unreadNotificationsCount, fetchUnreadNotifications, unreadCountChanged]);
 
   // Handle notification clicks
   const handleNotificationClick = async (notification) => {

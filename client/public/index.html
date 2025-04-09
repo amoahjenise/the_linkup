@@ -102,6 +102,23 @@
       });
     }
   </script>
+  <!-- iOS Badge Handler -->
+  <script>
+    if (window.navigator.standalone) {
+      window.handleBadgeUpdate = function (count) {
+        try {
+          // iOS 16.4+ Web App Badge API
+          if (window.webkit && window.webkit.messageHandlers.badge) {
+            window.webkit.messageHandlers.badge.postMessage(count);
+          }
+          // Fallback
+          document.title = count > 0 ? '(' + count + ') The Linkup' : 'The Linkup';
+        } catch (e) {
+          console.log('iOS badge error:', e);
+        }
+      };
+    }
+  </script>
 </body>
 
 </html>

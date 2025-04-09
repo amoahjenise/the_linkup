@@ -151,16 +151,24 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 // Handle messages from clients (e.g., badge updates)
-self.addEventListener("message", async (event) => {
-  if (!BADGE_API_ENABLED) return;
-
-  try {
-    if (event.data?.type === "UPDATE_BADGE") {
-      await navigator.setAppBadge(event.data.count).catch(console.error);
-    } else if (event.data?.type === "CLEAR_BADGE") {
-      await navigator.clearAppBadge().catch(console.error);
+self.addEventListener('message', async (event) => {
+  if (event.data?.type === 'UPDATE_BADGE' || event.data?.type === 'CLEAR_BADGE') {
+    try {
+      // Forward to all clients
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'BADGE_UPDATE',
+          count: event.data.count
+        });
+      });
+      
+      // Update badge if supported
+      if ('setAppBadge' in navigator) {
+        await navigator.setAppBadge(event.data.count).catch(console.error);
+      }
+    } catch (error) {
+      console.error('SW badge handling error:', error);
     }
-  } catch (error) {
-    console.error("Badge operation failed:", error);
   }
 });
