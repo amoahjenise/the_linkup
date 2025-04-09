@@ -36,7 +36,8 @@ const darkModeColors = {
 };
 
 const MainContainer = styled("div")(({ theme, colorMode }) => ({
-  width: "25%",
+  width: "280px", // Fixed width instead of percentage
+  minWidth: "280px", // Prevent shrinking
   height: "100%",
   overflowY: "auto",
   padding: theme.spacing(4),
@@ -49,11 +50,11 @@ const MainContainer = styled("div")(({ theme, colorMode }) => ({
       ? darkModeColors.background
       : lightModeColors.background,
   "@media (max-width: 1380px)": {
-    width: "12%",
+    width: "12%", // Fixed compact width
+    minWidth: "12%", // Prevent shrinking
     padding: theme.spacing(2),
   },
 }));
-
 const MenuList = styled("ul")({
   listStyleType: "none",
   padding: 0,
