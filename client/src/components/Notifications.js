@@ -53,6 +53,38 @@ const Notifications = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [unreadCountChanged, setUnreadCountChanged] = useState(0);
 
+  // Memoized badge update function
+  const updateBadge = useCallback((count) => {
+    // Only update if count is a number
+    if (typeof count !== "number") return;
+
+    // Update badge if API is available
+    if ("setAppBadge" in navigator) {
+      navigator.setAppBadge(count).catch((error) => {
+        console.error("Error setting badge:", error);
+      });
+    }
+
+    // Send to service worker when ready
+    const updateSWBadge = () => {
+      if (navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: "UPDATE_BADGE",
+          count: count,
+        });
+      }
+    };
+
+    if (navigator.serviceWorker) {
+      if (navigator.serviceWorker.controller) {
+        updateSWBadge();
+      } else {
+        // Wait for controller to be ready
+        navigator.serviceWorker.ready.then(updateSWBadge);
+      }
+    }
+  }, []);
+
   const fetchUnreadNotifications = useCallback(async () => {
     try {
       const response = await getNotifications(id);
@@ -66,22 +98,36 @@ const Notifications = () => {
     }
   }, [id]);
 
+  // Initial load and badge clear when viewing notifications
   useEffect(() => {
     fetchUnreadNotifications();
-  }, [fetchUnreadNotifications]);
+    // Only clear badge if we have notifications
+    if (unreadNotificationsCount > 0) {
+      updateBadge(0);
+    }
+  }, [fetchUnreadNotifications]); // Removed updateBadge from dependencies
 
+  // Handle unread count changes
   useEffect(() => {
     if (unreadNotificationsCount !== unreadCountChanged) {
       fetchUnreadNotifications();
       setUnreadCountChanged(unreadNotificationsCount);
+      updateBadge(unreadNotificationsCount);
     }
-  }, [unreadNotificationsCount, fetchUnreadNotifications, unreadCountChanged]);
+  }, [
+    unreadNotificationsCount,
+    fetchUnreadNotifications,
+    unreadCountChanged,
+    updateBadge,
+  ]);
 
   const handleNotificationClick = async (notification) => {
     try {
       if (!notification.is_read) {
         await markNotificationAsRead(notification.id);
-        dispatch(updateUnreadNotificationsCount(unreadNotificationsCount - 1));
+        const newCount = unreadNotificationsCount - 1;
+        dispatch(updateUnreadNotificationsCount(newCount));
+        updateBadge(newCount);
       }
 
       if (notification.notification_type === "linkup_request") {

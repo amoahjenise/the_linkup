@@ -25,6 +25,7 @@
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
+  "badge": "/badge-icon.png",
   "theme_color": "#000000",
   "background_color": "#ffffff",
   "orientation": "portrait-primary",
