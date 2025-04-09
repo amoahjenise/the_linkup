@@ -38,6 +38,7 @@ import "@sendbird/uikit-react/dist/index.css";
 import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
+import { useBadge } from "./utils/badgeUtils";
 
 const MOBILE_BREAKPOINT = "600px";
 
@@ -122,6 +123,7 @@ const App = () => {
   const { user } = useUser();
   const [authError, setAuthError] = useState(false);
   const { colorMode } = useColorMode();
+  const { updateBadge } = useBadge();
 
   const myColorSet = {
     "--sendbird-light-primary-500": "#00487c",
@@ -153,6 +155,41 @@ const App = () => {
 
   // Detect if the device is mobile
   const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // Added this effect for global badge management
+  useEffect(() => {
+    if (!userState?.user?.id) return;
+
+    const updateAllBadges = async () => {
+      try {
+        const [messagesRes, notificationsRes] = await Promise.all([
+          getUnreadMessagesCount(userState.user.id),
+          getUnreadNotificationsCount(userState.user.id),
+        ]);
+
+        const totalUnread =
+          Number(messagesRes.unread_count || 0) +
+          Number(notificationsRes.unreadCount || 0);
+
+        dispatch(setUnreadMessagesCount(Number(messagesRes.unread_count)));
+        dispatch(
+          updateUnreadNotificationsCount(Number(notificationsRes.unreadCount))
+        );
+
+        await updateBadge(totalUnread);
+      } catch (error) {
+        console.error("Badge update error:", error);
+      }
+    };
+
+    // Initial update
+    updateAllBadges();
+
+    // Periodic refresh (every 5 minutes)
+    const interval = setInterval(updateAllBadges, 300000);
+
+    return () => clearInterval(interval);
+  }, [userState?.user?.id, dispatch, updateBadge]);
 
   // Hide the address bar on mobile devices
   useEffect(() => {
