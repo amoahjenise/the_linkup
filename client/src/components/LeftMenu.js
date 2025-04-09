@@ -18,7 +18,7 @@ import CustomUserButton from "./UserButton";
 import useSendbirdHandlers from "../handlers/useSendbirdHandlers";
 import { setUnreadMessagesCount } from "../redux/actions/messageActions";
 
-const footerHeight = "60px";
+const footerHeight = "64px";
 
 // Define colors for light and dark modes
 const lightModeColors = {
@@ -40,7 +40,6 @@ const MainContainer = styled("div")(({ theme, colorMode }) => ({
   height: "100%",
   overflowY: "auto",
   padding: theme.spacing(4),
-  // borderRight: `1px solid ${colorMode === "dark" ? "white" : "lightgrey"}`,
   borderRightWidth: "1px",
   position: "sticky",
   left: 0,
@@ -68,7 +67,10 @@ const StyledHamburgerMenu = styled(Menu)(({ colorMode }) => ({
         ? darkModeColors.background
         : lightModeColors.background,
     borderRadius: "8px",
-    boxShadow: `0px 4px 12px rgba(0, 0, 0, 0.3)`,
+    boxShadow:
+      colorMode === "dark"
+        ? "0px 0px 10px 2px rgba(255, 215, 0, 0.1)"
+        : "0px 4px 20px rgba(0, 0, 0, 0.1)",
     margin: "0 auto",
     overflow: "hidden",
     width: "180px",
@@ -123,20 +125,31 @@ const StyledMenuItem = styled("li")(({ theme, isActive, colorMode }) => ({
 
 const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   position: "fixed",
-  bottom: "env(safe-area-inset-bottom, 0)", // Fallback to 0 if not supported
+  bottom: "env(safe-area-inset-bottom, 0)",
   width: "100%",
   height: footerHeight,
   display: "flex",
-  justifyContent: "space-evenly",
+  justifyContent: "space-around",
   alignItems: "center",
-  padding: "0 15px",
-  backgroundColor:
-    colorMode === "dark"
-      ? darkModeColors.background
-      : lightModeColors.background,
-  boxShadow: `0px -4px 12px rgba(0, 0, 0, 0.3)`,
-  borderRadius: "10px 10px 0 0",
+  padding: "0 5px",
+  backgroundColor: "rgba(0, 0, 0, 0)", // Fully transparent background
+  background: `
+    linear-gradient(
+      to top,
+      ${
+        colorMode === "dark"
+          ? "rgba(18, 18, 18, 0.8)"
+          : "rgba(255, 255, 255, 0.8)"
+      } 0%,
+      transparent 100%
+    )
+  `,
   zIndex: 1000,
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  borderTop: `1px solid ${
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"
+  }`,
 }));
 
 const MenuItemLink = styled(Link)({
@@ -206,35 +219,46 @@ const BadgeStyled = styled(Badge)(({ theme, colorMode }) => ({
   },
 }));
 
-const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => (
-  <Link to={to} style={{ textDecoration: "none" }}>
-    <IconWithSpacing
-      style={{
-        backgroundColor: isActive
-          ? colorMode === "dark"
-            ? darkModeColors.hover
-            : lightModeColors.hover
-          : "transparent",
-        borderRadius: "8px",
-        padding: "10px",
-        transition: "background-color 0.3s",
-      }}
-    >
-      {badgeContent ? (
-        <BadgeStyled
-          badgeContent={badgeContent}
-          overlap="circular"
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          colorMode={colorMode}
-        >
-          {icon}
-        </BadgeStyled>
-      ) : (
-        icon
-      )}
-    </IconWithSpacing>
-  </Link>
-);
+const FooterMenuButton = ({ to, icon, badgeContent, isActive, colorMode }) => {
+  const iconColor = isActive
+    ? "#ffffff" // White when active for all icons
+    : colorMode === "dark"
+    ? "rgba(255, 255, 255, 0.7)" // Light grey when not active in dark mode
+    : "rgba(0, 0, 0, 0.6)"; // Light grey when not active in light mode
+
+  return (
+    <Link to={to} style={{ textDecoration: "none" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "44px",
+          height: "44px",
+          borderRadius: "12px",
+          transition: "all 0.3s ease",
+        }}
+      >
+        {badgeContent ? (
+          <Badge
+            badgeContent={badgeContent}
+            color="error"
+            overlap="circular"
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            {React.cloneElement(icon, {
+              style: { color: iconColor, fontSize: "1.5rem" },
+            })}
+          </Badge>
+        ) : (
+          React.cloneElement(icon, {
+            style: { color: iconColor, fontSize: "1.5rem" },
+          })
+        )}
+      </div>
+    </Link>
+  );
+};
 
 const LeftMenu = ({ isMobile }) => {
   const dispatch = useDispatch();
@@ -420,7 +444,7 @@ const LeftMenu = ({ isMobile }) => {
           </MenuList>
         </MainContainer>
       )}
-      {isMobile && ( // Only render mobile menu when the state allows
+      {isMobile && (
         <FooterContainer
           colorMode={colorMode}
           style={{
@@ -429,63 +453,26 @@ const LeftMenu = ({ isMobile }) => {
         >
           <FooterMenuButton
             to="/home"
-            icon={
-              <HomeIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
-              />
-            }
+            icon={<HomeIcon />}
             isActive={location.pathname === "/home"}
             colorMode={colorMode}
           />
           <FooterMenuButton
             to="/notifications"
-            icon={
-              <Badge badgeContent={unreadNotificationsCount} color="error">
-                <NotificationsIcon
-                  style={{
-                    color:
-                      colorMode === "dark"
-                        ? darkModeColors.text
-                        : lightModeColors.text,
-                  }}
-                />
-              </Badge>
-            }
+            icon={<NotificationsIcon />}
+            badgeContent={unreadNotificationsCount}
             isActive={location.pathname === "/notifications"}
             colorMode={colorMode}
           />
           <FooterMenuButton
             to="/profile/me"
-            icon={
-              <AccountCircleIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
-              />
-            }
+            icon={<AccountCircleIcon />}
             isActive={location.pathname === "/profile/me"}
             colorMode={colorMode}
           />
           <FooterMenuButton
             to="/history"
-            icon={
-              <HistoryIcon
-                style={{
-                  color:
-                    colorMode === "dark"
-                      ? darkModeColors.text
-                      : lightModeColors.text,
-                }}
-              />
-            }
+            icon={<HistoryIcon />}
             isActive={
               location.pathname === "/history" ||
               location.pathname === "/history/requests-sent" ||
@@ -495,30 +482,23 @@ const LeftMenu = ({ isMobile }) => {
           />
           <FooterMenuButton
             to="/messages"
-            icon={
-              <Badge badgeContent={unreadMessagesCount} color="error">
-                <MessageIcon
-                  style={{
-                    color:
-                      colorMode === "dark"
-                        ? darkModeColors.text
-                        : lightModeColors.text,
-                  }}
-                />
-              </Badge>
-            }
+            icon={<MessageIcon />}
+            badgeContent={unreadMessagesCount}
             isActive={location.pathname === "/messages"}
             colorMode={colorMode}
           />
-          <IconButton onClick={handleMenuOpen}>
-            <MenuIcon
-              style={{
-                color:
-                  colorMode === "dark"
-                    ? darkModeColors.text
-                    : lightModeColors.text,
-              }}
-            />
+          <IconButton
+            onClick={handleMenuOpen}
+            style={{
+              width: "44px",
+              height: "44px",
+              color:
+                colorMode === "dark"
+                  ? "rgba(255, 255, 255, 0.7)"
+                  : "rgba(0, 0, 0, 0.6)",
+            }}
+          >
+            <MenuIcon style={{ fontSize: "1.5rem" }} />
           </IconButton>
         </FooterContainer>
       )}

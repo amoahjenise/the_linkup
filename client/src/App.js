@@ -60,7 +60,7 @@ const AppWrapper = styled("div", {
     height: "100dvh",
     overflow: "hidden",
     "@media (max-width: 900px)": {
-      paddingBottom: "60px", // Add padding for footer
+      paddingBottom: "64px", // Add padding for footer
     },
   }),
 }));

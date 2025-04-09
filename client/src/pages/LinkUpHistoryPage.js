@@ -76,7 +76,7 @@ const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
   display: "flex",
   width: "100%",
   minHeight: "110vh",
-  paddingBottom: "60px",
+  paddingBottom: "64px",
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
     minHeight: "100dvh",
