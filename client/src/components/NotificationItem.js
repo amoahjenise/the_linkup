@@ -5,39 +5,39 @@ import moment from "moment";
 import { useColorMode } from "@chakra-ui/react";
 import NotificationAvatar from "./NotificationAvatar"; // Import your external component
 
-const NotificationItemWrapper = styled("div")(
-  ({ theme, isUnread, colorMode }) => ({
-    display: "flex",
-    alignItems: "center",
-    padding: "16px 16px",
-    cursor: "pointer",
-    border: "1px solid rgba(63, 75, 91, 0.25)",
+const NotificationItemWrapper = styled("div", {
+  shouldForwardProp: (prop) => prop !== "isUnread" && prop !== "colorMode",
+})(({ theme, isUnread, colorMode }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: "16px 16px",
+  cursor: "pointer",
+  border: "1px solid rgba(63, 75, 91, 0.25)",
+  backgroundColor: isUnread
+    ? "rgba(173, 216, 230, 0.15)"
+    : colorMode === "dark"
+    ? "rgb(16, 16, 16)"
+    : "rgba(0, 0, 0, 0.015)",
+  borderRadius: "12px",
+  boxShadow:
+    colorMode === "dark"
+      ? "0 2px 8px rgba(255, 255, 255, 0.08)"
+      : "0 2px 8px rgba(0, 0, 0, 0.05)",
+  transition: "background-color 0.2s ease, box-shadow 0.2s ease",
+  height: "100px",
+  overflow: "hidden",
+  "&:hover": {
+    borderRadius: "8px",
     backgroundColor: isUnread
-      ? "rgba(173, 216, 230, 0.15)"
+      ? "rgba(144, 200, 215, 0.2)"
       : colorMode === "dark"
-      ? "rgb(16, 16, 16)"
-      : "rgba(0, 0, 0, 0.015)",
-    borderRadius: "12px",
-    boxShadow:
-      colorMode === "dark"
-        ? "0 2px 8px rgba(255, 255, 255, 0.08)" // Subtle shadow for dark mode
-        : "0 2px 8px rgba(0, 0, 0, 0.05)", // Subtle shadow for light mode
-    transition: "background-color 0.2s ease, box-shadow 0.2s ease",
-    height: "100px", // Fixed height for 3 lines of text
-    overflow: "hidden", // Ensure text doesn't overflow
-    "&:hover": {
-      borderRadius: "8px",
-      backgroundColor: isUnread
-        ? "rgba(144, 200, 215, 0.2)"
-        : colorMode === "dark"
-        ? "rgba(200, 200, 200, 0.1)"
-        : "rgba(210, 210, 210, 0.2)",
-    },
-    "&:last-child": {
-      marginBottom: "0", // Remove margin for the last item
-    },
-  })
-);
+      ? "rgba(200, 200, 200, 0.1)"
+      : "rgba(210, 210, 210, 0.2)",
+  },
+  "&:last-child": {
+    marginBottom: "0",
+  },
+}));
 
 const NotificationContent = styled("div")(({ theme }) => ({
   flexGrow: 1,
@@ -45,47 +45,39 @@ const NotificationContent = styled("div")(({ theme }) => ({
   flexDirection: "column",
 }));
 
-const NotificationTitle = styled(Typography)(({ theme, colorMode }) => ({
+const NotificationTitle = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   fontWeight: 400,
   fontSize: "0.825rem",
   lineHeight: "1",
-
-  color:
-    colorMode === "light"
-      ? theme.palette.text.primary // Light mode text color
-      : "#FFFFFF", // Explicit white color for dark mode
+  color: colorMode === "light" ? theme.palette.text.primary : "#FFFFFF",
 }));
 
-const NotificationMessage = styled(Typography)(({ theme, colorMode }) => ({
+const NotificationMessage = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   fontSize: "0.8rem",
-  color:
-    colorMode === "light"
-      ? theme.palette.text.secondary // Light mode text color
-      : "#B0B0B0", // Explicit light gray color for dark mode
+  color: colorMode === "light" ? theme.palette.text.secondary : "#B0B0B0",
   marginTop: theme.spacing(0.5),
   overflow: "hidden",
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",
   lineHeight: "1",
-
-  // Truncate based on screen size
   "@media (max-width: 600px)": {
-    // Mobile: limit to 20 characters
     maxWidth: "20ch",
   },
   "@media (min-width: 601px)": {
-    // Desktop: limit to 50 characters
     maxWidth: "50ch",
   },
 }));
 
-const NotificationTime = styled(Typography)(({ theme, colorMode }) => ({
+const NotificationTime = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   fontSize: "0.75rem",
   marginTop: theme.spacing(0.5),
-  color:
-    colorMode === "light"
-      ? theme.palette.text.secondary // Light mode text color
-      : "#B0B0B0", // Explicit light gray color for dark mode
+  color: colorMode === "light" ? theme.palette.text.secondary : "#B0B0B0",
 }));
 
 const NotificationItem = ({ notification, onClick }) => {

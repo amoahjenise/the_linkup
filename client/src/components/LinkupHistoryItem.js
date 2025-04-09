@@ -14,7 +14,9 @@ import nlp from "compromise";
 const compromise = nlp;
 
 // Styled components
-const LinkupHistoryItemWrapper = styled("div")(({ theme, colorMode }) => ({
+const LinkupHistoryItemWrapper = styled("div", {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   borderRadius: "8px", // Soft rounded corners for a modern look
   border: `1px solid ${
     colorMode === "light"
@@ -51,7 +53,9 @@ const LinkupDetails = styled("div")(({ theme }) => ({
   justifyContent: "space-between",
 }));
 
-const ActivityText = styled(Typography)(({ theme, colorMode }) => ({
+const ActivityText = styled(Typography, {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   fontSize: "0.875rem",
   fontWeight: 500,
   color: colorMode === "dark" ? "white" : theme.palette.text.primary,

@@ -24,6 +24,7 @@ const HeaderContainer = styled(Box, {
 const TextWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
+
   cursor: "default",
   gap: theme.spacing(0.25),
 }));

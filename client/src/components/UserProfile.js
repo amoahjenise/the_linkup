@@ -78,8 +78,6 @@ const ContentWrapper = styled("div")(({ isMobile }) => ({
   flex: 1,
   display: "flex",
   flexDirection: "column",
-  paddingTop: isMobile ? "60px" : "0",
-  // minHeight: "100%",
 }));
 
 const Header = styled("div")({
