@@ -63,17 +63,27 @@ const ModalLabel = styled("label")({
 
 const ModalInput = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  fontSize: "14px",
-  padding: theme.spacing(1),
-  marginBottom: theme.spacing(2),
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
-      : "rgba(130, 131, 129, 0.03)", // Light mode background
-  borderRadius: "8px", // Slightly rounded corners
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`, // Border color
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
+  borderRadius: "8px",
+  outline: "none",
+  transition: "border-color 0.2s, box-shadow 0.2s",
+  "&:hover": {
+    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+  },
+  "&:focus": {
+    borderColor: "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
+    }`,
+  },
+  "&::placeholder": {
+    color: colorMode === "dark" ? "#71767B" : "#8B98A5",
+  },
+  marginBottom: theme.spacing(1.5),
 }));
 
 const ButtonGroup = styled("div")(({ theme }) => ({
@@ -86,20 +96,26 @@ const ButtonGroup = styled("div")(({ theme }) => ({
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
-  marginBottom: theme.spacing(2),
-  padding: theme.spacing(1),
   width: "100%",
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
+  borderRadius: "8px",
+  outline: "none",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   "&:focus": {
-    borderColor: theme.palette.primary.main,
+    borderColor: "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
+    }`,
   },
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
-      : "rgba(130, 131, 129, 0.03)", // Light mode background
-  borderRadius: "8px", // Slightly rounded corners
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`, // Border color
+  marginBottom: theme.spacing(1.5),
+  "&:hover": {
+    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+  },
+  cursor: "pointer",
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
