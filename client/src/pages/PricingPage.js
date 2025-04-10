@@ -12,6 +12,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useColorMode } from "@chakra-ui/react";
 import TopNavBar from "../components/TopNavBar";
+import { useSnackbar } from "../contexts/SnackbarContext";
 
 // Styled Components
 const PageContainer = styled(Box)(({ theme }) => ({
@@ -82,6 +83,7 @@ const PricingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between(500, 600));
+  const { addSnackbar } = useSnackbar();
 
   // Ensure padding below TopNavBar (adjust as needed based on your nav height)
   const paddingTop = isMediumScreen
@@ -98,7 +100,6 @@ const PricingPage = () => {
       features: [
         "Create up to 2 linkups per month",
         "Join up to 10 linkups per month",
-        "Basic profile customization",
         "Ads-supported experience",
       ],
       buttonText: "Current Plan",
@@ -111,7 +112,6 @@ const PricingPage = () => {
       description: "Unlock premium features",
       features: [
         "Create and join unlimited linkups",
-        "Advanced profile customization (banners)",
         "Boost linkup visibility (priority ranking in search)",
         "Advanced analytics (who viewed your linkup, engagement insights)",
         "Ad-free experience (no interruptions)",
@@ -204,6 +204,11 @@ const PricingPage = () => {
                             ? "rgba(255, 255, 255, 0.5)"
                             : "rgba(0, 0, 0, 0.5)",
                       },
+                    }}
+                    onClick={() => {
+                      if (plan.title === "Pro Plan") {
+                        addSnackbar("Coming Soon!");
+                      }
                     }}
                     disabled={plan.title === "Free Plan"}
                   >

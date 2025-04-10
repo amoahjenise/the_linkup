@@ -345,7 +345,7 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
                 }}
               >
                 <CustomInstallAppButton onClick={handleInstallClick}>
-                  INSTALL APP
+                  DOWNLOAD APP
                 </CustomInstallAppButton>
               </Box>
             )}
