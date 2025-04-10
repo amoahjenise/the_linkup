@@ -28,9 +28,11 @@ const LoadingContainer = styled("div")({
   justifyContent: "center",
   alignItems: "center",
   minHeight: "100dvh",
+  transition: "opacity 0.3s ease",
+  opacity: (props) => (props.show ? 1 : 0),
 });
 
-const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
+const SearchInputContainer = styled("div")(({ theme }) => ({
   padding: 8,
   width: "100%",
   position: "sticky",
@@ -94,6 +96,7 @@ const FeedSection = ({
   userId,
   gender,
   feedRef,
+  colorMode,
 }) => {
   const dispatch = useDispatch();
   const userSentRequests = useSelector((state) => state.userSentRequests);
@@ -207,11 +210,13 @@ const FeedSection = ({
   };
 
   // Combined loading states
-  const showLoading = isLoading || isFiltering || searchLoading;
-  const showContent = !isLoading && !isFiltering && !searchLoading;
+  // Replace the showLoading and showContent logic with:
+  const showLoading =
+    (isLoading || searchLoading) && filteredLinkups.length === 0;
+  const showContent = !isLoading || filteredLinkups.length > 0;
 
   return (
-    <Root>
+    <Root colorMode={colorMode}>
       <TopNavBar title="Home" />
       <SearchInputContainer>
         <SearchInput
