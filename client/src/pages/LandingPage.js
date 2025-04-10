@@ -173,7 +173,7 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
       <Typography variant="h6" color="white" sx={{ fontWeight: "bold" }}>
         By signing up, you agree to the
       </Typography>
-      <Typography variant="body1" sx={{ mt: 2, color: "white" }}>
+      <Typography variant="body2" sx={{ mt: 2, color: "white" }}>
         <a href="/terms-of-service" style={{ color: "white" }}>
           Terms of Service
         </a>
@@ -361,7 +361,7 @@ const LandingPage = ({
               interests.
             </Typography>
 
-            <Typography variant="body1" sx={{ mt: 2 }}>
+            <Typography variant="body2" sx={{ mt: 2 }}>
               <a href="/terms-of-service" style={{ color: "white" }}>
                 Terms of Service
               </a>{" "}
