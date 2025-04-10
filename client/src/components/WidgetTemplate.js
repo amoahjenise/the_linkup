@@ -3,84 +3,114 @@ import { Box, Typography } from "@mui/material";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { styled } from "@mui/material/styles";
 
-// Custom styled SignInButton and SignUpButton
-const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
-  backgroundColor: "rgba(0, 151, 167, 0.8)",
-  color: "white",
+// Shared button styles to reduce duplication
+const sharedButtonStyles = {
+  padding: "8px 16px",
+  borderRadius: "4px",
+  textTransform: "none",
+  fontWeight: 600,
+  letterSpacing: "0.5px",
+  fontSize: "14px",
+  transition: "all 0.2s ease",
+  flex: 1, // Make buttons share space equally
   "&:hover": {
-    backgroundColor: "rgba(0, 151, 167, 1)",
+    transform: "translateY(-1px)",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
   },
-  padding: "6px 20px", // Added padding to match the button style
-  borderRadius: "4px", // Slight border radius for a cleaner look
-  textTransform: "none", // Prevents text from being uppercased
-  fontWeight: 600, // Bold text
-  letterSpacing: "0.5px", // Adjusts spacing between letters
-  fontSize: "14px", // Standard font size for the button text
+};
+
+// Custom styled buttons using the shared styles
+const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
+  ...sharedButtonStyles,
+  backgroundColor: "rgba(0, 255, 209, 0.8)", // Bright neon teal
+  color: "white", // Dark blue-gray for text
+  boxShadow: "0 0 8px rgba(0, 255, 209, 0.6)", // Glow effect
+  "&:hover": {
+    backgroundColor: "rgba(0, 255, 209, 1)",
+    boxShadow: "0 0 12px rgba(0, 255, 209, 0.8)", // Stronger glow on hover
+  },
 }));
 
 const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
-  backgroundColor: "rgba(0, 151, 167, 0.9)",
-  color: "white",
+  ...sharedButtonStyles,
+  backgroundColor: "rgba(0, 230, 190, 0.9)", // Slightly deeper neon teal
+  color: "white", // Dark blue-gray for text
+  boxShadow: "0 0 8px rgba(0, 230, 190, 0.6)", // Glow effect
   "&:hover": {
-    backgroundColor: "rgba(0, 151, 167, 1)",
+    backgroundColor: "rgba(0, 230, 190, 1)",
+    boxShadow: "0 0 12px rgba(0, 230, 190, 0.8)", // Stronger glow on hover
   },
-  padding: "6px 20px", // Added padding to match the button style
-  borderRadius: "4px", // Slight border radius for a cleaner look
-  textTransform: "none", // Prevents text from being uppercased
-  fontWeight: 600, // Bold text
-  letterSpacing: "0.5px", // Adjusts spacing between letters
-  fontSize: "14px", // Standard font size for the button text
 }));
 
-// WidgetTemplate Component
-const WidgetTemplate = ({ image, title, subtitle }) => {
+const CustomInstallAppButton = styled("button")(({ theme }) => ({
+  ...sharedButtonStyles,
+  backgroundColor: "rgba(255, 20, 147, 0.9)", // Neon pink (DeepPink)
+  color: "white",
+  border: "none",
+  cursor: "pointer",
+  width: "100%",
+  boxShadow: "0 0 8px rgba(255, 20, 147, 0.6)", // Adds glow effect
+  "&:hover": {
+    backgroundColor: "rgba(255, 20, 147, 1)",
+    boxShadow: "0 0 12px rgba(255, 20, 147, 0.8)", // Enhanced glow on hover
+  },
+}));
+
+const WidgetTemplate = ({
+  image,
+  title,
+  subtitle,
+  handleInstallClick,
+  showInstallButton,
+}) => {
   return (
     <Box
       sx={{
         position: "relative",
-        width: "300px", // Fixed width
-        height: "460px", // Fixed height
-        borderRadius: "16px", // Slightly smaller border radius for a cleaner look
+        width: "300px",
+        height: "100%",
+        borderRadius: "16px",
         overflow: "hidden",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Slightly more prominent shadow
-        minWidth: "300px", // Prevent resizing below this width
-        minHeight: "450px", // Prevent resizing below this height
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        minWidth: "300px",
+        minHeight: "450px",
       }}
     >
       {/* Image Container */}
       <Box
         sx={{
           width: "100%",
-          height: "60%", // Adjusted to allow more space for content
+          height: "55%",
           backgroundImage: `url(${image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      ></Box>
+      />
 
-      {/* Content Container with Frosted Glass Effect */}
+      {/* Content Container */}
       <Box
         sx={{
           position: "absolute",
-          top: "50%", // Position content below the image
+          top: "55%",
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(255, 255, 255, 0.1)", // Semi-transparent background
-          backdropFilter: "blur(20px)", // Frosted glass effect
-          padding: "16px", // Reduced padding for a more compact design
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(20px)",
+          padding: "16px",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between", // Space for buttons at the bottom
         }}
       >
-        <Box>
+        {/* Text Content */}
+        <Box sx={{ flex: 1 }}>
           <Typography
             variant="h6"
             color="white"
             sx={{
               fontWeight: "bold",
-              marginBottom: "4px", // Reduced space between title and subtitle
+              marginBottom: "4px",
+              lineHeight: 1.3,
             }}
           >
             {title}
@@ -90,47 +120,55 @@ const WidgetTemplate = ({ image, title, subtitle }) => {
             color="white"
             sx={{
               opacity: 0.8,
-              marginBottom: "12px", // Slight margin to add breathing room between subtitle and buttons
+              marginBottom: "16px",
+              lineHeight: 1.4,
             }}
           >
             {subtitle}
           </Typography>
         </Box>
 
-        {/* Action Buttons */}
+        {/* Buttons Container */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
-            gap: "10px", // Space between buttons
+            gap: "8px",
           }}
         >
-          {/* Sign Up Button */}
-          <CustomSignUpButton
+          {/* Auth Buttons Row */}
+          <Box
             sx={{
-              width: "100%", // Make button take full width
+              display: "flex",
+              gap: "8px",
+              width: "100%",
             }}
-            variant="contained"
-            forceRedirectUrl="/registration" // Redirect to /registration after signing up
-            fallbackRedirectUrl="/registration"
-            mode="modal"
           >
-            SIGN UP
-          </CustomSignUpButton>
+            <CustomSignUpButton
+              variant="contained"
+              forceRedirectUrl="/registration"
+              fallbackRedirectUrl="/registration"
+              mode="modal"
+            >
+              Sign Up
+            </CustomSignUpButton>
 
-          {/* Sign In Button */}
-          <CustomSignInButton
-            sx={{
-              width: "100%", // Make button take full width
-            }}
-            variant="contained"
-            forceRedirectUrl="/home" // Redirect to /home after signing in
-            fallbackRedirectUrl="/home"
-            mode="modal"
-          >
-            SIGN IN
-          </CustomSignInButton>
+            <CustomSignInButton
+              variant="contained"
+              forceRedirectUrl="/home"
+              fallbackRedirectUrl="/home"
+              mode="modal"
+            >
+              Sign In
+            </CustomSignInButton>
+          </Box>
+
+          {/* Install Button */}
+          {true && (
+            <CustomInstallAppButton onClick={handleInstallClick}>
+              Install App
+            </CustomInstallAppButton>
+          )}
         </Box>
       </Box>
     </Box>

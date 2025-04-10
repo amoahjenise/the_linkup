@@ -1,23 +1,30 @@
 /* eslint-disable no-restricted-globals */
 const BADGE_API_ENABLED = "setAppBadge" in navigator;
-const CACHE_NAME = "thelinkup-v4";
+const CACHE_NAME = `thelinkup-${new Date().toISOString()}`;
 const OFFLINE_URL = "/offline.html";
+
 const CORE_ASSETS = [
   "/",
   "/index.html",
   "/static/js/bundle.js",
   "/static/css/main.css",
-  // Add essential icons
   "/favicon.ico",
   "/favicon.svg",
   "/apple-touch-icon.png",
   "/favicon-96x96.png",
-  "/badge-icon.png", // For notification badges
+  "/badge-icon.png",
   "/logo.png",
 ];
 
-// Installation - Cache core assets
+// Development mode detection
+const isDevelopment =
+  self.location.hostname === "localhost" ||
+  self.location.hostname === "127.0.0.1";
+
+// INSTALL
 self.addEventListener("install", (event) => {
+  if (isDevelopment) return;
+
   event.waitUntil(
     caches
       .open(CACHE_NAME)
@@ -25,14 +32,11 @@ self.addEventListener("install", (event) => {
         console.log("[Service Worker] Caching core assets");
         return cache.addAll(CORE_ASSETS);
       })
-      .then(() => {
-        console.log("[Service Worker] Skipping waiting");
-        return self.skipWaiting();
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activation - Clean up old caches
+// ACTIVATE
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
@@ -47,78 +51,60 @@ self.addEventListener("activate", (event) => {
           })
         );
       })
-      .then(() => {
-        console.log("[Service Worker] Claiming clients");
-        return self.clients.claim();
-      })
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch - Network first with cache fallback
+// FETCH
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Skip non-GET requests, API calls, and non-HTTP(S) requests
   if (
     request.method !== "GET" ||
+    request.url.includes("hot-update.json") ||
     request.url.includes("/api/") ||
     !request.url.startsWith("http")
   ) {
     return;
   }
 
-  // Handle navigation requests
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .catch(() => caches.match(OFFLINE_URL))
-        .then((response) => response || caches.match("/index.html"))
-    );
-    return;
-  }
-
-  // For other requests, try cache first then network
+  // Respond with the cache first if available, otherwise fetch and cache
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
+    caches.match(request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
 
-      return fetch(request).then((response) => {
-        // Create a clean copy of the request
-        const cacheRequest = new Request(request.url, {
-          headers: request.headers,
-          method: "GET",
-          mode: "same-origin", // Ensures cacheable response
-          credentials: "omit",
-          redirect: "follow",
-        });
+      return fetch(request)
+        .then((response) => {
+          if (
+            response &&
+            response.status === 200 &&
+            response.type === "basic" &&
+            request.url.startsWith("http") &&
+            !request.url.includes("chrome-extension://")
+          ) {
+            // Clone the response early so we can use it for both caching and returning it to the client
+            const responseClone = response.clone();
 
-        // Verify the response is cacheable
-        if (
-          response &&
-          response.status === 200 &&
-          response.type === "basic" &&
-          request.url.startsWith("http") &&
-          !request.url.includes("chrome-extension://")
-        ) {
-          const responseToCache = response.clone();
-
-          caches
-            .open(CACHE_NAME)
-            .then((cache) => {
-              // Use the clean request copy
-              return cache.put(cacheRequest, responseToCache).catch((err) => {
+            // Cache the cloned response
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone).catch((err) => {
                 console.warn("Could not cache:", request.url, err);
               });
-            })
-            .catch(console.warn);
-        }
-        return response;
-      });
+            });
+
+            // Return the original response to the client
+            return response;
+          }
+
+          // If the response is not suitable, just return it
+          return response;
+        })
+        .catch(() => caches.match(OFFLINE_URL));
     })
   );
 });
 
-// Push notifications with badge support
+// PUSH
 self.addEventListener("push", async (event) => {
   if (!BADGE_API_ENABLED) return;
 
@@ -133,42 +119,40 @@ self.addEventListener("push", async (event) => {
       data: { url: data.url },
     });
 
-    // Update app badge count if supported
     await navigator.setAppBadge(data.unreadCount || 1);
   } catch (error) {
     console.error("Push notification failed:", error);
   }
 });
 
-// Handle notification clicks
+// NOTIFICATION CLICK
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-
-  // Navigate to specific URL if provided in notification data
   if (event.notification.data?.url) {
     event.waitUntil(self.clients.openWindow(event.notification.data.url));
   }
 });
 
-// Handle messages from clients (e.g., badge updates)
-self.addEventListener('message', async (event) => {
-  if (event.data?.type === 'UPDATE_BADGE' || event.data?.type === 'CLEAR_BADGE') {
+// MESSAGE
+self.addEventListener("message", async (event) => {
+  if (
+    event.data?.type === "UPDATE_BADGE" ||
+    event.data?.type === "CLEAR_BADGE"
+  ) {
     try {
-      // Forward to all clients
       const clients = await self.clients.matchAll();
-      clients.forEach(client => {
+      clients.forEach((client) => {
         client.postMessage({
-          type: 'BADGE_UPDATE',
-          count: event.data.count
+          type: "BADGE_UPDATE",
+          count: event.data.count,
         });
       });
-      
-      // Update badge if supported
-      if ('setAppBadge' in navigator) {
+
+      if ("setAppBadge" in navigator) {
         await navigator.setAppBadge(event.data.count).catch(console.error);
       }
     } catch (error) {
-      console.error('SW badge handling error:', error);
+      console.error("SW badge handling error:", error);
     }
   }
 });

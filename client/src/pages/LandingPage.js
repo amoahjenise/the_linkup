@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
+  Button,
   Grid,
   Typography,
   Card,
@@ -19,48 +20,48 @@ import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { LoadingPage } from "../pages";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-// Enhanced styled SignInButton and SignUpButton with improved UI/UX
-const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
-  backgroundColor: "rgba(0, 151, 167, 0.8)",
-  color: "white",
-  padding: "10px 24px",
-  borderRadius: "6px",
+// Shared button styles to reduce duplication
+const sharedButtonStyles = {
+  padding: "8px 16px",
+  borderRadius: "4px",
   textTransform: "none",
   fontWeight: 600,
-  fontSize: "15px",
-  letterSpacing: "0.25px",
-  boxShadow: "none",
-  transition: "all 0.2s ease-in-out",
+  letterSpacing: "0.5px",
+  fontSize: "14px",
+  width: "100%",
+  transition: "all 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-1px)",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+  },
+};
+
+// Custom styled buttons using the shared styles
+const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
+  ...sharedButtonStyles,
+  backgroundColor: "rgba(0, 151, 167, 0.8)",
+  color: "white",
   "&:hover": {
     backgroundColor: "rgba(0, 151, 167, 1)",
-    transform: "translateY(-1px)",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-  },
-  "&:active": {
-    transform: "translateY(0)",
-    boxShadow: "none",
   },
 }));
 
 const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
+  ...sharedButtonStyles,
   backgroundColor: "rgba(0, 151, 167, 0.9)",
   color: "white",
-  padding: "10px 24px",
-  borderRadius: "6px",
-  textTransform: "none",
-  fontWeight: 600,
-  fontSize: "15px",
-  letterSpacing: "0.25px",
-  boxShadow: "none",
-  transition: "all 0.2s ease-in-out",
   "&:hover": {
     backgroundColor: "rgba(0, 151, 167, 1)",
-    transform: "translateY(-1px)",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
-  "&:active": {
-    transform: "translateY(0)",
-    boxShadow: "none",
+}));
+
+const CustomInstallAppButton = styled("button")(({ theme }) => ({
+  ...sharedButtonStyles,
+  backgroundColor: "white", // Neon pink (DeepPink)
+  color: "black",
+  "&:hover": {
+    backgroundColor: "white",
+    boxShadow: "0 0 12px rgba(255, 237, 237, 0.8)", // Enhanced glow on hover
   },
 }));
 
@@ -193,7 +194,12 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
 ));
 
 // Main LandingPage component
-const LandingPage = () => {
+const LandingPage = ({
+  installPromptEvent,
+  showInstallButton,
+  setInstallPromptEvent,
+  setShowInstallButton,
+}) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
   const navigate = useNavigate();
@@ -202,6 +208,41 @@ const LandingPage = () => {
   const [isWidget1Loading, setWidget1Loading] = useState(true);
   const [isWidget2Loading, setWidget2Loading] = useState(true);
   const [isWidget3Loading, setWidget3Loading] = useState(true);
+
+  const handleInstallClick = () => {
+    console.log("Install clicked, prompt event:", installPromptEvent);
+
+    if (!installPromptEvent) {
+      // Check for deferredPrompt as fallback
+      if (window.deferredPrompt) {
+        window.deferredPrompt.prompt();
+        window.deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === "accepted") {
+            console.log("User accepted the install prompt");
+          } else {
+            console.log("User dismissed the install prompt");
+          }
+          window.deferredPrompt = null;
+        });
+        return;
+      }
+
+      // Final fallback
+      console.log("No install prompt available - showing browser default");
+      return;
+    }
+
+    installPromptEvent.prompt();
+    installPromptEvent.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted the install prompt");
+      } else {
+        console.log("User dismissed the install prompt");
+      }
+      setInstallPromptEvent(null);
+      setShowInstallButton(false);
+    });
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -335,6 +376,19 @@ const LandingPage = () => {
               </a>
               .
             </Typography>
+            {true && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                }}
+              >
+                <CustomInstallAppButton onClick={handleInstallClick}>
+                  INSTALL APP
+                </CustomInstallAppButton>
+              </Box>
+            )}
           </Grid>
         </Grid>
       ) : (
@@ -377,6 +431,8 @@ const LandingPage = () => {
               title="Connect With New People and Organize Meetups"
               subtitle="Around your interests"
               isWidgetLoading={isWidget1Loading}
+              handleInstallClick={handleInstallClick}
+              showInstallButton={showInstallButton}
             />
           </Grid>
 
