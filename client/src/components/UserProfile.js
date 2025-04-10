@@ -319,18 +319,28 @@ const UserProfile = ({
                 {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
                 {userLocation}
               </Subtitle>
-              <Typography
-                variant="body2"
+              <Box
                 sx={{
-                  color: "#fff",
-                  fontSize: isMobile ? "0.95rem" : "1rem",
-                  cursor: "pointer",
-                  "&:hover": { textDecoration: "underline" },
+                  display: "inline-block", // This ensures the container only takes text width
+                  lineHeight: "1.5",
                 }}
-                onClick={toggleLinkupsModal}
               >
-                {userData?.total_linkups} Created Linkups
-              </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#fff",
+                    fontSize: isMobile ? "0.95rem" : "1rem",
+                    display: "inline", // Makes it inline with text flow
+                    cursor: "pointer", // Shows pointer cursor
+                    "&:hover": {
+                      textDecoration: "underline",
+                    },
+                  }}
+                  onClick={toggleLinkupsModal}
+                >
+                  {userData?.total_linkups} Created Linkups
+                </Typography>
+              </Box>
             </Box>
           </div>
 
