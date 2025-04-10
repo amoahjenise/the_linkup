@@ -60,6 +60,7 @@ const WidgetTemplate = ({
   image,
   title,
   subtitle,
+  isWidgetLoading,
   handleInstallClick,
   showInstallButton,
 }) => {
@@ -164,7 +165,7 @@ const WidgetTemplate = ({
           </Box>
 
           {/* Install Button */}
-          {true && (
+          {showInstallButton && (
             <CustomInstallAppButton onClick={handleInstallClick}>
               Install App
             </CustomInstallAppButton>

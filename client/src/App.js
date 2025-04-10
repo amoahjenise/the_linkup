@@ -68,12 +68,8 @@ const AppWrapper = styled("div", {
 
 const RoutesComponent = ({
   isMobile,
-  userState,
-  installPromptEvent,
   showInstallButton,
-  setInstallPromptEvent,
-  setShowInstallButton,
-  isAppInstalled,
+  handleInstallClick,
 }) => (
   <Routes>
     <Route
@@ -81,10 +77,8 @@ const RoutesComponent = ({
       exact
       element={
         <LandingPage
-          installPromptEvent={installPromptEvent}
           showInstallButton={showInstallButton}
-          setInstallPromptEvent={setInstallPromptEvent}
-          setShowInstallButton={setShowInstallButton}
+          handleInstallClick={handleInstallClick}
         />
       }
     />
@@ -179,48 +173,68 @@ const App = () => {
 
   const [isAppInstalled, setIsAppInstalled] = useState(false);
 
+  const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+
+  useEffect(() => {
+    // Enhanced device detection
+    const userAgent = navigator.userAgent.toLowerCase();
+    setIsIOS(/iphone|ipad|ipod/.test(userAgent));
+    setIsAndroid(/android/.test(userAgent));
+  }, []);
+
+  const handleInstallClick = () => {
+    if (isIOS) {
+      // iOS-specific instructions
+      alert(`To install this app:
+  1. Tap the Share icon (📤)
+  2. Select "Add to Home Screen"
+  3. Tap "Add" in the top right`);
+      return;
+    }
+
+    // Standard PWA installation flow
+    if (installPromptEvent) {
+      installPromptEvent.prompt();
+      installPromptEvent.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          setIsAppInstalled(true);
+        }
+        setInstallPromptEvent(null);
+        setShowInstallButton(false);
+      });
+    } else if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+      window.deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          setIsAppInstalled(true);
+        }
+        window.deferredPrompt = null;
+      });
+    } else {
+      // Fallback instructions
+      if (isAndroid) {
+        alert('Please use Chrome\'s menu (⋮) and select "Install App"');
+      } else {
+        alert("Look for the install option in your browser's menu");
+      }
+    }
+  };
+
   useEffect(() => {
     // Check PWA installation status
     const checkPWAStatus = () => {
-      // Method 1: Check display mode
+      // More reliable installation detection without getInstalledRelatedApps
       const isStandalone = window.matchMedia(
         "(display-mode: standalone)"
       ).matches;
-
-      // Method 2: iOS specific check
       const isIOSStandalone = window.navigator.standalone;
-
-      // Method 3: Check if launched from home screen (more reliable)
       const isLaunchedFromHomeScreen =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone ||
+        isStandalone ||
+        isIOSStandalone ||
         document.referrer.includes("android-app://");
 
-      setIsAppInstalled(
-        isStandalone || isIOSStandalone || isLaunchedFromHomeScreen
-      );
-
-      // Only try getInstalledRelatedApps in top-level context
-      if (
-        window === window.top &&
-        "getInstalledRelatedApps" in window.navigator
-      ) {
-        try {
-          navigator
-            .getInstalledRelatedApps()
-            .then((apps) => {
-              console.log("Installed related apps:", apps);
-              if (apps && apps.length > 0) {
-                setIsAppInstalled(true);
-              }
-            })
-            .catch((err) => {
-              console.log("getInstalledRelatedApps error:", err);
-            });
-        } catch (err) {
-          console.log("getInstalledRelatedApps failed:", err);
-        }
-      }
+      setIsAppInstalled(isLaunchedFromHomeScreen);
     };
 
     // Initial check
@@ -228,12 +242,10 @@ const App = () => {
 
     // Listen for changes in display mode
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
-    const mediaQueryListener = () => checkPWAStatus();
-    mediaQuery.addListener(mediaQueryListener);
+    const listener = () => checkPWAStatus();
+    mediaQuery.addEventListener("change", listener);
 
-    return () => {
-      mediaQuery.removeListener(mediaQueryListener);
-    };
+    return () => mediaQuery.removeEventListener("change", listener);
   }, []);
 
   useEffect(() => {
@@ -405,12 +417,8 @@ const App = () => {
             {publicPages.includes(window.location.pathname) ? (
               <RoutesComponent
                 isMobile={isMobile}
-                userState={userState}
-                installPromptEvent={installPromptEvent}
-                showInstallButton={showInstallButton && !isAppInstalled} // Only show if not installed
-                setInstallPromptEvent={setInstallPromptEvent}
-                setShowInstallButton={setShowInstallButton}
-                isAppInstalled={isAppInstalled}
+                showInstallButton={!isAppInstalled} // Only show if not installed
+                handleInstallClick={handleInstallClick}
               />
             ) : (
               <>
@@ -420,12 +428,8 @@ const App = () => {
                   ) : (
                     <RoutesComponent
                       isMobile={isMobile}
-                      userState={userState}
-                      installPromptEvent={installPromptEvent}
-                      showInstallButton={showInstallButton && !isAppInstalled} // Only show if not installed
-                      setInstallPromptEvent={setInstallPromptEvent}
-                      setShowInstallButton={setShowInstallButton}
-                      isAppInstalled={isAppInstalled}
+                      showInstallButton={!isAppInstalled} // Only show if not installed
+                      handleInstallClick={handleInstallClick}
                     />
                   )}
                 </SignedIn>

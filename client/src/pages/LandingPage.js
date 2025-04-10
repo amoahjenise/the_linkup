@@ -194,12 +194,7 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
 ));
 
 // Main LandingPage component
-const LandingPage = ({
-  installPromptEvent,
-  showInstallButton,
-  setInstallPromptEvent,
-  setShowInstallButton,
-}) => {
+const LandingPage = ({ showInstallButton, handleInstallClick }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
   const navigate = useNavigate();
@@ -208,41 +203,6 @@ const LandingPage = ({
   const [isWidget1Loading, setWidget1Loading] = useState(true);
   const [isWidget2Loading, setWidget2Loading] = useState(true);
   const [isWidget3Loading, setWidget3Loading] = useState(true);
-
-  const handleInstallClick = () => {
-    console.log("Install clicked, prompt event:", installPromptEvent);
-
-    if (!installPromptEvent) {
-      // Check for deferredPrompt as fallback
-      if (window.deferredPrompt) {
-        window.deferredPrompt.prompt();
-        window.deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === "accepted") {
-            console.log("User accepted the install prompt");
-          } else {
-            console.log("User dismissed the install prompt");
-          }
-          window.deferredPrompt = null;
-        });
-        return;
-      }
-
-      // Final fallback
-      console.log("No install prompt available - showing browser default");
-      return;
-    }
-
-    installPromptEvent.prompt();
-    installPromptEvent.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted the install prompt");
-      } else {
-        console.log("User dismissed the install prompt");
-      }
-      setInstallPromptEvent(null);
-      setShowInstallButton(false);
-    });
-  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -376,7 +336,7 @@ const LandingPage = ({
               </a>
               .
             </Typography>
-            {true && (
+            {showInstallButton && (
               <Box
                 sx={{
                   display: "flex",
