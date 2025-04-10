@@ -74,7 +74,7 @@ const Notifications = () => {
     const initialize = async () => {
       await fetchUnreadNotifications();
       // Always clear badge when entering notifications page
-      await updateBadge(0);
+      // await updateBadge(0);
     };
     initialize();
   }, [fetchUnreadNotifications, updateBadge]);
