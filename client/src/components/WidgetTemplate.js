@@ -167,7 +167,7 @@ const WidgetTemplate = ({
           {/* Install Button */}
           {showInstallButton && (
             <CustomInstallAppButton onClick={handleInstallClick}>
-              Install App
+              Download App
             </CustomInstallAppButton>
           )}
         </Box>

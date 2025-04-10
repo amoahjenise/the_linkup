@@ -70,14 +70,13 @@ const StyledButton = styled(Button)(({ theme, disabled }) => ({
 
 const DeactivateAccount = ({ colorMode }) => {
   const [confirmation, setConfirmation] = useState("");
-  const isConfirmValid = confirmation === "CONFIRM";
+  const confirmationText = "C O N F I R M"; // Display version with spaces
+  const isConfirmValid = confirmation === confirmationText.replace(/\s/g, ""); // Validation checks without spaces
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { signOut } = useClerk();
-
   const inputTextColor = colorMode === "dark" ? "white" : "black";
 
   const handleDeactivate = async () => {
@@ -85,11 +84,9 @@ const DeactivateAccount = ({ colorMode }) => {
       try {
         const response = await deactivateUser(loggedUser.user.id);
         if (response.data.success) {
-          // Clerk Sign Out
           await signOut();
-          // App sign out
-          dispatch({ type: "LOGOUT" }); // Dispatch the action to trigger state reset
-          navigate("/"); // Redirect to landing page
+          dispatch({ type: "LOGOUT" });
+          navigate("/");
         }
         addSnackbar(response.data.message);
       } catch (error) {
@@ -102,20 +99,36 @@ const DeactivateAccount = ({ colorMode }) => {
     <Section>
       <SectionTitle>Deactivate Your Account</SectionTitle>
       <SectionContent>
-        We’re sorry to hear that you want to deactivate your account. Please
+        We're sorry to hear that you want to deactivate your account. Please
         note that your account will be deactivated, not deleted. While your
         account is deactivated: You will no longer appear in searches. Your
         linkups and requests will be hidden from view. However, any previous
         messages you initiated with users will still be visible to those with
-        whom you’ve conversed, although the chat input will be disabled.
+        whom you've conversed, although the chat input will be disabled.
       </SectionContent>
-      <SectionContent>To confirm, type "CONFIRM" below:</SectionContent>
+      <SectionContent>
+        To confirm, type "
+        <span
+          style={{
+            unicodeBidi: "bidi-override",
+            letterSpacing: "2px",
+            userSelect: "none",
+          }}
+        >
+          {confirmationText}
+        </span>
+        " below:
+        <span style={{ display: "none" }}>
+          Confirmation Confirmación Bestätigung
+        </span>
+      </SectionContent>
       <StyledTextField
         variant="outlined"
         value={confirmation}
         onChange={(e) => setConfirmation(e.target.value)}
         textColor={inputTextColor}
         autoComplete="off"
+        placeholder="Type the confirmation word"
       />
       <StyledButton
         variant="contained"
