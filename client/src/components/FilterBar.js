@@ -3,15 +3,15 @@ import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
 
-// Styled components using MUI v5's styled API
-const FilterMain = styled("div")({
+const FilterMain = styled("div")(({ theme }) => ({
   flex: "1",
   top: 0,
   overflowY: "auto",
   minWidth: 320,
-});
+  padding: theme.spacing(2),
+}));
 
-const FilterContainer = styled("div")(({ theme }) => ({
+const FilterContainer = styled("div")(({ theme, colorMode }) => ({
   flex: "1",
   padding: theme.spacing(2),
   display: "flex",
@@ -19,18 +19,46 @@ const FilterContainer = styled("div")(({ theme }) => ({
   justifyContent: "center",
   top: 0,
   overflowY: "auto",
-  borderRadius: "10px", // Rounded corners
+  borderRadius: "10px",
+  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
 }));
 
 const FormControlStyled = styled(FormControl)(({ theme }) => ({
-  // minWidth: 200,
-  marginBottom: theme.spacing(2), // Added spacing between the two selects
+  marginBottom: theme.spacing(2),
 }));
 
-const Title = styled("div")(({ theme }) => ({
-  fontSize: "18px", // Adjust the font size for the title
-  fontWeight: "bold", // Make the title bold
-  marginBottom: theme.spacing(1), // Add spacing below the title
+const Title = styled("div")(({ theme, colorMode }) => ({
+  fontSize: "18px",
+  fontWeight: "bold",
+  marginBottom: theme.spacing(1),
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+}));
+
+const StyledSelect = styled(Select)(({ theme, colorMode }) => ({
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  "&:before": {
+    borderBottomColor: colorMode === "dark" ? "#2F3336" : "#EFF3F4",
+  },
+  "&:hover:not(.Mui-disabled):before": {
+    borderBottomColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+  },
+  "&:after": {
+    borderBottomColor: "#0097A7",
+  },
+  "& .MuiSvgIcon-root": {
+    color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  },
+}));
+
+const StyledMenuItem = styled(MenuItem)(({ theme, colorMode }) => ({
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+  "&:hover": {
+    backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
+  },
+  "&.Mui-selected": {
+    backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
+  },
 }));
 
 const FilterBar = ({
@@ -45,66 +73,84 @@ const FilterBar = ({
   let statusOptions = ["All", "Active", "Closed", "Expired"];
 
   if (activeTab === 1 || activeTab === 2) {
-    // Modify status options for the "Requests Sent" and "Requests Received" tabs
     statusOptions = ["All", "Pending", "Accepted", "Declined", "Expired"];
   }
 
   const dateOptions = ["All", "Today", "Last 7 days", "Last 30 days"];
 
-  const textColor = colorMode === "dark" ? "white" : "black";
-
-  const labelColor = colorMode === "dark" ? "#00CFFF" : undefined; // Use undefined to keep the default label color
-
-  const underlineStyles = {
-    "&:before": {
-      borderBottomColor: colorMode === "dark" ? "white" : "gray", // Default line
-    },
-    "&:hover:not(.Mui-disabled):before": {
-      borderBottomColor: colorMode === "dark" ? "white" : "gray", // On hover
-    },
-    "&:after": {
-      borderBottomColor:
-        colorMode === "dark" ? "white" : "theme.palette.primary.main", // After interaction
-    },
-  };
-
   return (
     <FilterMain data-testid="sidebarColumn">
-      <FilterContainer>
-        <Title>Filters</Title>
+      <FilterContainer colorMode={colorMode}>
+        <Title colorMode={colorMode}>Filters</Title>
         <FormControlStyled variant="outlined">
-          <InputLabel style={{ color: labelColor }}>Status</InputLabel>
-          <Select
+          <InputLabel
+            sx={{
+              color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+              "&.Mui-focused": {
+                color: "#0097A7",
+              },
+            }}
+          >
+            Status
+          </InputLabel>
+          <StyledSelect
+            colorMode={colorMode}
             variant="standard"
             value={activeStatus}
             onChange={(event) => onStatusChange(event.target.value)}
             label="Status"
-            style={{ color: textColor }}
-            sx={underlineStyles} // Apply the underline styles here
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+                  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+                },
+              },
+            }}
           >
             {statusOptions.map((status) => (
-              <MenuItem key={status} value={status}>
+              <StyledMenuItem key={status} value={status} colorMode={colorMode}>
                 {status}
-              </MenuItem>
+              </StyledMenuItem>
             ))}
-          </Select>
+          </StyledSelect>
         </FormControlStyled>
         <FormControlStyled variant="outlined">
-          <InputLabel style={{ color: labelColor }}>Date</InputLabel>
-          <Select
+          <InputLabel
+            sx={{
+              color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+              "&.Mui-focused": {
+                color: "#0097A7",
+              },
+            }}
+          >
+            Date
+          </InputLabel>
+          <StyledSelect
+            colorMode={colorMode}
             variant="standard"
             value={dateFilter}
             onChange={(event) => onDateFilterChange(event.target.value)}
             label="Date"
-            style={{ color: textColor }}
-            sx={underlineStyles} // Apply the underline styles here
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+                  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+                },
+              },
+            }}
           >
             {dateOptions.map((dateOption) => (
-              <MenuItem key={dateOption} value={dateOption}>
+              <StyledMenuItem
+                key={dateOption}
+                value={dateOption}
+                colorMode={colorMode}
+              >
                 {dateOption}
-              </MenuItem>
+              </StyledMenuItem>
             ))}
-          </Select>
+          </StyledSelect>
         </FormControlStyled>
       </FilterContainer>
     </FilterMain>
