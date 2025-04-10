@@ -153,7 +153,7 @@ const InfoIconStyled = styled(IconButton)(({ theme }) => ({
 const ErrorText = styled("p")(({ theme }) => ({
   color: theme.palette.error.main,
   fontSize: "12px",
-  margin: "8px 0 4px 8px", // Consistent margin with standard input errors
+  margin: "0 0 8px 8px",
 }));
 
 const CreateLinkupWidget = ({
@@ -237,6 +237,11 @@ const CreateLinkupWidget = ({
 
     // Custom validation
     const errors = {};
+
+    if (!selectedDate) {
+      errors.date = "Please select a date and time";
+    }
+
     if (genderPreference.length === 0) {
       errors.genderPreference = "Please select at least one gender preference.";
     }
@@ -377,14 +382,15 @@ const CreateLinkupWidget = ({
           timeIntervals={15}
           timeCaption="Time"
           dateFormat="MMMM d, yyyy h:mm aa"
-          minDate={new Date()} // Set the minimum date to the current date
-          minTime={minTime} // Set the minimum time to the current time
+          minDate={new Date()}
+          minTime={minTime}
           maxTime={maxTime}
           placeholderText="Date and Time"
           required
-          colorMode={colorMode} // Pass colorMode to styled component
+          colorMode={colorMode}
           onFocus={handleFocus}
         />
+        {formErrors.date && <ErrorText>{formErrors.date}</ErrorText>}{" "}
         {/* MultiSelect for gender preference */}
         <CustomMultiSelect
           colorMode={colorMode}
