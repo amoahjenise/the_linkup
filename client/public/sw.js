@@ -14,7 +14,6 @@ const CORE_ASSETS = [
   "/favicon-96x96.png",
   "/badge-icon.png",
   "/logo.png",
-  "/manifest.json",
 ];
 
 // Development mode detection
@@ -57,12 +56,9 @@ self.addEventListener("activate", (event) => {
 });
 
 // FETCH
-// FETCH
 self.addEventListener("fetch", (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // Skip non-GET requests, API calls, and hot updates
   if (
     request.method !== "GET" ||
     request.url.includes("hot-update.json") ||
@@ -72,61 +68,39 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Handle navigation requests (HTML pages)
-  if (request.mode === "navigate") {
-    event.respondWith(
-      (async () => {
-        try {
-          // First try to get from network
-          const networkResponse = await fetch(request);
-          if (networkResponse.ok) return networkResponse;
-
-          // If network fails, fall back to cache
-          const cachedResponse = await caches.match("/index.html");
-          return cachedResponse || Response.redirect(OFFLINE_URL);
-        } catch (error) {
-          // If both fail, show offline page
-          const cachedResponse = await caches.match("/index.html");
-          return cachedResponse || Response.redirect(OFFLINE_URL);
-        }
-      })()
-    );
-    return;
-  }
-
-  // For all other requests (JS, CSS, images, etc.)
+  // Respond with the cache first if available, otherwise fetch and cache
   event.respondWith(
-    (async () => {
-      // Try cache first
-      const cachedResponse = await caches.match(request);
+    caches.match(request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
 
-      try {
-        // If not in cache, fetch from network
-        const networkResponse = await fetch(request);
+      return fetch(request)
+        .then((response) => {
+          if (
+            response &&
+            response.status === 200 &&
+            response.type === "basic" &&
+            request.url.startsWith("http") &&
+            !request.url.includes("chrome-extension://")
+          ) {
+            // Clone the response early so we can use it for both caching and returning it to the client
+            const responseClone = response.clone();
 
-        // Cache successful responses
-        if (networkResponse.ok) {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(request, networkResponse.clone());
-        }
+            // Cache the cloned response
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone).catch((err) => {
+                console.warn("Could not cache:", request.url, err);
+              });
+            });
 
-        return networkResponse;
-      } catch (error) {
-        // For CSS/JS, return empty response rather than offline page
-        if (
-          request.destination === "script" ||
-          request.destination === "style" ||
-          request.destination === "image"
-        ) {
-          return new Response("", {
-            status: 404,
-            statusText: "Not Found",
-          });
-        }
-        return caches.match(OFFLINE_URL);
-      }
-    })()
+            // Return the original response to the client
+            return response;
+          }
+
+          // If the response is not suitable, just return it
+          return response;
+        })
+        .catch(() => caches.match(OFFLINE_URL));
+    })
   );
 });
 
