@@ -270,10 +270,21 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
+    // Only show loading spinner if we're not already loading
+    if (!isLoading && !isFetchingNextPage) {
+      setIsLoading(true);
+    }
+
     dispatch(showNewLinkupButton(false));
-    fetchLinkupsAndPoll(1);
-    scrollToTop();
-  }, [dispatch, fetchLinkupsAndPoll]);
+
+    // Use a timeout to ensure the UI has time to update before fetching
+    setTimeout(() => {
+      fetchLinkupsAndPoll(1).finally(() => {
+        setIsLoading(false);
+        scrollToTop();
+      });
+    }, 100);
+  }, [dispatch, fetchLinkupsAndPoll, isLoading, isFetchingNextPage]);
 
   const scrollToTop = () => {
     if (feedSectionRef.current) {
@@ -334,6 +345,7 @@ const HomePage = ({ isMobile }) => {
             userId={userId}
             gender={gender}
             feedRef={feedSectionRef}
+            colorMode={colorMode}
           />
         )}
       </StyledDiv>
