@@ -407,6 +407,7 @@ const UserProfile = ({
         onClose={toggleEditModal}
         userData={userData}
         onSave={handleSaveChanges}
+        isMobile={isMobile}
       />
       <LinkupsModal
         userId={userData?.id}

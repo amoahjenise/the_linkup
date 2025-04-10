@@ -6,141 +6,190 @@ import {
   TextField,
   Typography,
   Paper,
+  useMediaQuery,
 } from "@mui/material";
 import AvatarUpdate from "../components/AvatarUpdate";
 import { useColorMode } from "@chakra-ui/react";
 
-// StyledPaper for the modal container
-const StyledPaper = styled(Paper)(({ theme, colorMode }) => ({
-  borderRadius: 12,
+// StyledPaper for the modal container with improved responsiveness
+const StyledPaper = styled(Paper)(({ theme, colorMode, fullScreen }) => ({
+  borderRadius: fullScreen ? 0 : 16,
   position: "absolute",
   width: "100%",
-  maxWidth: 400,
+  maxWidth: 600,
+  maxHeight: "90vh",
   boxShadow: theme.shadows[5],
   padding: theme.spacing(3),
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  color: colorMode === "dark" ? "#E0E0E0" : "#333333", //  dark mode text color
-  backgroundColor: colorMode === "dark" ? "#181818" : "#F2F2F2", //  dark/light mode background color
+  top: fullScreen ? 0 : "50%",
+  left: fullScreen ? 0 : "50%",
+  transform: fullScreen ? "none" : "translate(-50%, -50%)",
+  color: colorMode === "dark" ? "#E0E0E0" : "#333333",
+  backgroundColor: colorMode === "dark" ? "#1E1E1E" : "#FFFFFF",
+  display: "flex",
+  flexDirection: "column",
+  outline: "none",
+  overflowY: "auto",
   [theme.breakpoints.down("sm")]: {
-    width: "90%",
-    maxWidth: "90%",
+    width: "100%",
+    maxWidth: "100%",
+    maxHeight: "100vh",
+    borderRadius: 0,
     padding: theme.spacing(2),
   },
 }));
 
-// Styled TextField with border color handling
+// Styled TextField with fixed label positioning
 const StyledTextField = styled(TextField)(({ theme, colorMode }) => ({
   marginTop: theme.spacing(2),
   width: "100%",
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // White border in dark mode, default grey in light mode
+      borderColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
+      transition: "border-color 0.2s ease",
     },
     "&:hover fieldset": {
-      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // Maintain border color on hover
+      borderColor: colorMode === "dark" ? "#616161" : "#BDBDBD",
     },
     "&.Mui-focused fieldset": {
-      borderColor: colorMode === "dark" ? "#FFFFFF" : "#BDBDBD", // Maintain border color when focused
+      borderColor: colorMode === "dark" ? "#90CAF9" : "#2196F3",
+      borderWidth: 1,
     },
   },
   "& .MuiInputBase-input": {
-    color: colorMode === "dark" ? "#FFFFFF" : "#333333", // Input text color
+    color: colorMode === "dark" ? "#FFFFFF" : "#333333",
+    padding: "12px 14px",
   },
   "& .MuiInputLabel-root": {
-    color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
+    color: colorMode === "dark" ? "#B0B0B0" : "#666666",
+    "&.Mui-focused": {
+      color: colorMode === "dark" ? "#90CAF9" : "#2196F3",
+    },
+  },
+  "& .MuiFormLabel-filled": {
+    transform: "translate(14px, -9px) scale(0.75)",
   },
 }));
 
-// DialogContent for the content inside the modal
+// DialogContent with improved spacing
 const DialogContent = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-}));
-
-// AvatarContainer for the avatar section
-const AvatarContainer = styled("div")(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  cursor: "pointer",
-}));
-
-// BioTextField for the editable bio input
-const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
-  marginTop: theme.spacing(2),
-  backgroundColor: colorMode === "dark" ? "transparent" : "white", // Input text color
   width: "100%",
+  overflowY: "auto",
+  padding: theme.spacing(0, 1),
+}));
+
+// AvatarContainer with better touch targets
+const AvatarContainer = styled("div")(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+  cursor: "pointer",
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+}));
+
+// BioTextField with proper sizing and label positioning
+const BioTextField = styled(TextField)(({ theme, colorMode }) => ({
+  marginTop: theme.spacing(3),
+  backgroundColor: colorMode === "dark" ? "#252525" : "#FAFAFA",
+  width: "100%",
+  borderRadius: 8,
+  "& .MuiInputBase-inputMultiline": {
+    padding: "12px 14px",
+    minHeight: "80px", // Reduced from 120px
+  },
   "& .MuiInputBase-input": {
-    color: colorMode === "dark" ? "#E0E0E0" : "#333333", // Input text color
+    color: colorMode === "dark" ? "#E0E0E0" : "#333333",
   },
   "& .MuiInputLabel-root": {
-    color: colorMode === "dark" ? "#B0B0B0" : "#333333", // Label color
+    color: colorMode === "dark" ? "#B0B0B0" : "#666666",
+    "&.Mui-focused": {
+      color: colorMode === "dark" ? "#90CAF9" : "#2196F3",
+    },
+  },
+  "& .MuiFormLabel-filled": {
+    transform: "translate(14px, -9px) scale(0.75)",
   },
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: colorMode === "dark" ? "#FFFFFF" : theme.palette.grey[400], // White border in dark mode, default grey in light mode
+      borderColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
     },
     "&:hover fieldset": {
-      borderColor:
-        colorMode === "dark" ? "#FFFFFF" : theme.palette.primary.main, // Hover border color
+      borderColor: colorMode === "dark" ? "#616161" : "#BDBDBD",
     },
     "&.Mui-focused fieldset": {
-      borderColor:
-        colorMode === "dark" ? "#FFFFFF" : theme.palette.primary.main, // Focused border color
+      borderColor: colorMode === "dark" ? "#90CAF9" : "#2196F3",
+      borderWidth: 1,
     },
   },
 }));
 
-// CharCount for character count display
+// CharCount with better visibility
 const CharCount = styled(Typography)(({ theme, charsRemaining }) => ({
   marginTop: theme.spacing(1),
-  color: charsRemaining <= 10 ? "#FF5252" : "inherit",
+  color: charsRemaining <= 10 ? "#FF5252" : theme.palette.text.secondary,
   alignSelf: "flex-end",
+  fontSize: "0.75rem",
+  fontWeight: 500,
 }));
 
-// ButtonGroup for Save and Cancel buttons
+// ButtonGroup with improved button sizing
 const ButtonGroup = styled("div")(({ theme }) => ({
   display: "flex",
-  justifyContent: "space-between",
-  marginTop: theme.spacing(3),
+  justifyContent: "flex-end",
+  marginTop: theme.spacing(4),
   width: "100%",
+  gap: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    position: "sticky",
+    bottom: 0,
+    padding: theme.spacing(2, 0),
+    backgroundColor: "inherit",
+    zIndex: 1,
+  },
 }));
 
-// StyledButton for Save and Cancel buttons
+// StyledButton with better visual hierarchy
 const StyledButton = styled(Button)(({ theme, colorMode, isCancel }) => ({
-  flex: 1,
-  "&:first-of-type": {
-    marginRight: theme.spacing(2),
-  },
-  backgroundColor: isCancel
-    ? colorMode === "dark"
-      ? "#B0B0B0" // Gray for Cancel in dark mode
-      : "#B0B0B0" // Gray for Cancel in light mode
-    : "#0097A7", // Color for Save
-  color: "#FFFFFF",
+  minWidth: 100,
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 9999,
+  fontWeight: 700,
+  textTransform: "none",
+  boxShadow: "none",
   "&:hover": {
-    backgroundColor: isCancel
-      ? colorMode === "dark"
-        ? "#9E9E9E" // Darker gray for Cancel hover in dark mode
-        : "#9E9E9E" // Darker gray for Cancel hover in light mode
-      : "#007b86", // Darker color for Save hover
+    boxShadow: "none",
   },
+  ...(isCancel
+    ? {
+        color: colorMode === "dark" ? "#E0E0E0" : "#333333",
+        backgroundColor: colorMode === "dark" ? "#333333" : "#F0F0F0",
+        "&:hover": {
+          backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
+        },
+      }
+    : {
+        backgroundColor: colorMode === "dark" ? "#0097A7" : "#1DA1F2",
+        color: "#FFFFFF",
+        "&:hover": {
+          backgroundColor: colorMode === "dark" ? "#007b86" : "#1991DB",
+        },
+      }),
 }));
 
-// MAX_BIO_LENGTH and MIN_CHARS_REMAINING_TO_DISPLAY for bio text area
 const MAX_BIO_LENGTH = 160;
 const MIN_CHARS_REMAINING_TO_DISPLAY = 10;
 
 const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
   const { colorMode } = useColorMode();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const [editedBio, setEditedBio] = useState(userData?.bio || "");
   const [updatedAvatar, setUpdatedAvatar] = useState(userData?.avatar || null);
   const [editedName, setEditedName] = useState(userData?.name || "");
 
   useEffect(() => {
     if (isOpen && userData) {
-      // Reset the state with userData values when the modal is opened
       setEditedBio(userData.bio || "");
       setUpdatedAvatar(userData.avatar || null);
       setEditedName(userData.name || "");
@@ -151,7 +200,6 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
     onSave(editedBio, updatedAvatar, editedName);
   };
 
-  // Format the date of birth using Intl.DateTimeFormat
   const formattedDOB = userData?.date_of_birth
     ? new Intl.DateTimeFormat("en-GB", {
         year: "numeric",
@@ -161,13 +209,26 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
     : "";
 
   if (!userData) {
-    return null; // Don't render the modal if userData is null
+    return null;
   }
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
-      <StyledPaper colorMode={colorMode}>
-        <Typography variant="h6">Edit Profile</Typography>
+    <Modal
+      open={isOpen}
+      onClose={onClose}
+      sx={{
+        display: "flex",
+        alignItems: isMobile ? "flex-end" : "center",
+        justifyContent: "center",
+        backdropFilter: "blur(2px)",
+      }}
+      disableScrollLock={false}
+    >
+      <StyledPaper colorMode={colorMode} fullScreen={isMobile}>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+          Edit Profile
+        </Typography>
+
         <DialogContent>
           <AvatarContainer>
             <AvatarUpdate
@@ -185,9 +246,12 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             InputProps={{
               readOnly: true,
             }}
-            onChange={(e) => setEditedName(e.target.value)}
             fullWidth
             margin="normal"
+            colorMode={colorMode}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
 
           <StyledTextField
@@ -199,12 +263,17 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             }}
             fullWidth
             margin="normal"
+            colorMode={colorMode}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
 
           <BioTextField
             label="Bio"
             multiline
-            minRows={6}
+            minRows={1} // Reduced from minRows={4}
+            maxRows={5} // Reduced from maxRows={8}
             variant="outlined"
             value={editedBio}
             onChange={(e) => {
@@ -213,7 +282,13 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
                 setEditedBio(newBio);
               }
             }}
-            colorMode={colorMode} // Pass colorMode prop
+            colorMode={colorMode}
+            inputProps={{
+              maxLength: MAX_BIO_LENGTH,
+            }}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
           {MAX_BIO_LENGTH - editedBio.length <=
             MIN_CHARS_REMAINING_TO_DISPLAY && (
@@ -222,20 +297,18 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             </CharCount>
           )}
         </DialogContent>
+
         <ButtonGroup>
+          <StyledButton onClick={onClose} colorMode={colorMode} isCancel={true}>
+            Cancel
+          </StyledButton>
           <StyledButton
             onClick={handleSave}
             colorMode={colorMode}
-            isCancel={false} // Not the cancel button
+            isCancel={false}
+            disabled={!editedName.trim()}
           >
             Save
-          </StyledButton>
-          <StyledButton
-            onClick={onClose}
-            colorMode={colorMode}
-            isCancel={true} // This is the cancel button
-          >
-            Cancel
           </StyledButton>
         </ButtonGroup>
       </StyledPaper>
