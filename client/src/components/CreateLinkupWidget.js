@@ -19,16 +19,14 @@ import CustomMultiSelect from "./CustomMultiSelect";
 
 // Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
-  flex: "1",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "center",
   padding: theme.spacing(2),
-  maxWidth: "310px",
-  borderRadius: "16px",
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`,
+  width: "100%",
+  maxWidth: "380px", // Optimal width for form inputs
+  borderRadius: "12px",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
+  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
   boxShadow:
     colorMode === "dark"
       ? "0 4px 12px rgba(255, 255, 255, 0.08)"
@@ -37,21 +35,20 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   "&:hover": {
     boxShadow:
       colorMode === "dark"
-        ? "0 8px 24px rgba(255, 255, 255, 0.15)"
+        ? "0 4px 24px rgba(255, 255, 255, 0.15)"
         : "0 8px 24px rgba(0, 0, 0, 0.15)",
   },
   fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif",
-  backgroundColor: colorMode === "dark" ? "rgba(200, 200, 200, 0.1)" : "white",
+    "'TwitterChirp', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
 }));
 
 const Header = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  marginBottom: theme.spacing(2),
-  fontWeight: "700",
-  fontSize: "20px",
+  marginBottom: theme.spacing(1),
+  fontWeight: "500",
+  fontSize: "1.25rem",
   letterSpacing: "0.5px",
   textTransform: "capitalize",
   color: colorMode === "dark" ? "#00E5FF" : "#007B86",
@@ -71,136 +68,86 @@ const Header = styled("div")(({ theme, colorMode }) => ({
 const Form = styled("form")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  padding: theme.spacing(1, 4),
+  padding: theme.spacing(1, 1.5),
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   width: "100%",
-  padding: theme.spacing(1), // Match padding with InputField
-  fontFamily: "Arial, sans-serif", // Consistent font family
-  fontWeight: 400, // Consistent font weight
-  paddingLeft: theme.spacing(2), // Align text within inputs
-  marginBottom: theme.spacing(2),
-  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Text color
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
-      : "rgba(130, 131, 129, 0.03)", // Light mode background
-  borderRadius: "8px", // Slightly rounded corners
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`, // Border color
-  outline: "none", // Remove default outline
-  transition: "all 0.3s ease", // Smooth transitions for all properties
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
-
-  // Focus state
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
+  borderRadius: "8px",
+  outline: "none",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   "&:focus": {
-    borderColor: theme.palette.primary.main, // Highlight border on focus
-    boxShadow: `0 0 0 3px ${
-      colorMode === "dark"
-        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
-        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+    borderColor: "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
     }`,
   },
-
-  // Placeholder styling
-  "&::placeholder": {
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
-    opacity: 1, // Ensure placeholder is fully visible
-  },
-
-  // Hover state
+  marginBottom: theme.spacing(1.5),
   "&:hover": {
-    borderColor: theme.palette.primary.main, // Highlight border on hover
+    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
   },
-
-  // Disabled state
-  "&:disabled": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
-        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
-    cursor: "not-allowed", // Change cursor for disabled state
-  },
+  cursor: "pointer",
 }));
 
 const CreateLinkUpButton = styled(Button)(({ theme }) => ({
-  background: "#0097A7",
+  backgroundColor: "#0097A7",
+  color: "#FFFFFF",
+  borderRadius: "9999px",
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  fontWeight: 700,
+  textTransform: "none",
+  transition: "background-color 0.2s",
   "&:hover": {
-    background: "#007b86",
+    backgroundColor: "#007B86",
   },
-  color: "#fff",
-  borderRadius: "20px",
-  padding: theme.spacing(1, 4),
+  "&:disabled": {
+    backgroundColor: "#0097A780",
+  },
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: theme.spacing(1), // Slightly larger padding for better spacing
-  fontFamily: "Arial, sans-serif", // Consistent font family
-  fontWeight: 400, // Consistent font weight
-  paddingLeft: theme.spacing(2), // Align text within inputs
-  marginBottom: theme.spacing(2),
-  color: colorMode === "dark" ? "#FFFFFF" : "#000000", // Text color
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)" // Dark mode background
-      : "rgba(130, 131, 129, 0.03)", // Light mode background
-  borderRadius: "8px", // Slightly rounded corners
-  border: `1px solid ${
-    colorMode === "dark" ? "#4a4a4a" : theme.palette.divider
-  }`, // Border color
-  outline: "none", // Remove default outline
-  transition: "all 0.3s ease", // Smooth transitions for all properties
-  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)", // Subtle shadow for depth
-
-  // Focus state
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
+  borderRadius: "8px",
+  outline: "none",
+  transition: "border-color 0.2s, box-shadow 0.2s",
+  "&:hover": {
+    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+  },
   "&:focus": {
-    borderColor: theme.palette.primary.main, // Highlight border on focus
-    boxShadow: `0 0 0 3px ${
-      colorMode === "dark"
-        ? "rgba(0, 123, 255, 0.25)" // Dark mode focus shadow
-        : "rgba(0, 123, 255, 0.25)" // Light mode focus shadow
+    borderColor: "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
     }`,
   },
-
-  // Placeholder styling
   "&::placeholder": {
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
-    opacity: 1, // Ensure placeholder is fully visible
+    color: colorMode === "dark" ? "#71767B" : "#8B98A5",
   },
-
-  // Hover state
-  "&:hover": {
-    borderColor: theme.palette.primary.main, // Highlight border on hover
-  },
-
-  // Disabled state
-  "&:disabled": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(130, 131, 129, 0.05)" // Dark mode disabled background
-        : "rgba(130, 131, 129, 0.02)", // Light mode disabled background
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Disabled text color
-    cursor: "not-allowed", // Change cursor for disabled state
-  },
+  marginBottom: theme.spacing(1.5),
 }));
 
 const InputWithIcon = styled("div")({
   position: "relative",
-  display: "flex",
+  width: "100%",
 });
 
 const InfoIconStyled = styled(IconButton)(({ theme }) => ({
-  width: "0%",
-  height: "50%",
   position: "absolute",
-  right: theme.spacing(1),
-  top: theme.spacing(0.8),
-  pointerEvents: "auto",
-  color: "lightgray",
+  right: "8px",
+  top: "40%",
+  transform: "translateY(-50%)",
+  color: "lightslategray",
+  padding: "2px",
 }));
 
 const ErrorText = styled("p")(({ theme }) => ({
@@ -338,10 +285,9 @@ const CreateLinkupWidget = ({
   };
 
   const placeholderStyle = {
-    color: colorMode === "dark" ? "#B0B0B0" : "#808080", // Placeholder text color
-    opacity: 1, // Ensure placeholder is fully visible
-    fontWeight: 450,
-    fontFamily: "'Inter', sans-serif", // Match InputField placeholder font
+    color: "#71767B",
+    fontSize: "0.9375rem",
+    fontWeight: 400,
   };
 
   // Gender options for MultiSelect

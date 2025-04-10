@@ -5,43 +5,35 @@ import Checkbox from "@mui/material/Checkbox";
 
 const DropdownContainer = styled("div")(({ theme, colorMode, hasError }) => ({
   width: "100%",
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(1.5),
   borderRadius: "8px",
   border: `1px solid ${
     hasError
       ? theme.palette.error.main
       : colorMode === "dark"
-      ? "#4a4a4a"
-      : theme.palette.divider
+      ? "#2F3336"
+      : "#EFF3F4"
   }`,
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)"
-      : "rgba(130, 131, 129, 0.03)",
-  transition: "all 0.3s ease",
-  boxShadow: hasError
-    ? `0 0 0 3px ${theme.palette.error.light}`
-    : "0 2px 4px rgba(0, 0, 0, 0.05)",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   position: "relative",
   cursor: "pointer",
-
   "&:focus-within": {
-    borderColor: hasError
-      ? theme.palette.error.main
-      : theme.palette.primary.main,
-    boxShadow: hasError
-      ? `0 0 0 3px ${theme.palette.error.light}`
-      : `0 0 0 3px ${
-          colorMode === "dark"
-            ? "rgba(0, 123, 255, 0.25)"
-            : "rgba(0, 123, 255, 0.25)"
-        }`,
+    borderColor: hasError ? theme.palette.error.main : "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      hasError
+        ? theme.palette.error.light
+        : colorMode === "dark"
+        ? "rgba(0, 151, 167, 0.2)"
+        : "rgba(0, 151, 167, 0.1)"
+    }`,
   },
-
   "&:hover": {
     borderColor: hasError
       ? theme.palette.error.main
-      : theme.palette.primary.main,
+      : colorMode === "dark"
+      ? "#4E5155"
+      : "#D6D9DB",
   },
 }));
 
@@ -49,45 +41,42 @@ const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: theme.spacing(1),
-  paddingLeft: theme.spacing(2), // Align text within inputs
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
 }));
 
 const DropdownList = styled("ul")(({ theme, colorMode }) => ({
   position: "absolute",
-  top: "100%",
+  top: "calc(100% + 4px)",
   left: 0,
   right: 0,
-  backgroundColor: colorMode === "dark" ? "rgba(0,0,0,1)" : "#fff",
-  border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
+  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
   borderRadius: "8px",
   maxHeight: "200px",
   overflowY: "auto",
-  zIndex: 10,
+  zIndex: 1000,
   listStyle: "none",
-  padding: 0,
+  padding: "4px 0",
   margin: 0,
-  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
 }));
 
 const DropdownItem = styled("li")(({ theme, colorMode, selected }) => ({
-  padding: theme.spacing(1.5),
+  padding: "8px 16px",
   display: "flex",
-  justifyContent: "space-between",
   alignItems: "center",
-  color: colorMode === "dark" ? "#fff" : "#333",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
   backgroundColor: selected
     ? colorMode === "dark"
-      ? "rgba(0, 123, 255, 0.25)"
-      : "rgba(0, 123, 255, 0.1)"
+      ? "#1C3D5A"
+      : "#E1F5FE"
     : "transparent",
   cursor: "pointer",
-
+  transition: "background-color 0.2s",
   "&:hover": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(42, 93, 147, 0.55)"
-        : "rgba(0, 123, 255, 0.05)",
+    backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
   },
 }));
 
@@ -98,22 +87,26 @@ const SelectedChips = styled("div")(({ theme }) => ({
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
   alignItems: "center",
+  gap: "4px",
 }));
 
 const Chip = styled("div")(({ theme, colorMode }) => ({
-  backgroundColor:
-    colorMode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
-  color: colorMode === "dark" ? "#fff" : "#333",
-  padding: `${theme.spacing(0.5)} ${theme.spacing(1)}`,
+  backgroundColor: colorMode === "dark" ? "#2F3336" : "#EFF3F4",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  padding: "4px 8px",
   borderRadius: "12px",
-  fontSize: "0.8rem",
-  marginRight: theme.spacing(0.5),
+  fontSize: "0.8125rem",
   flexShrink: 0,
 }));
 
 const OptionLabel = styled("span")({
   marginLeft: "8px",
+  fontSize: "0.9375rem",
 });
+
+const PlaceholderText = styled("span")(({ colorMode }) => ({
+  color: colorMode === "dark" ? "#71767B" : "#8B98A5",
+}));
 
 const CustomMultiSelect = ({
   colorMode,
@@ -132,9 +125,9 @@ const CustomMultiSelect = ({
   const handleOptionClick = (option) => {
     if (option.value === "SELECT_ALL") {
       if (selectedValues.length === options.length) {
-        setSelectedValues([]); // Deselect all
+        setSelectedValues([]);
       } else {
-        setSelectedValues(options.map((opt) => opt.value)); // Select all
+        setSelectedValues(options.map((opt) => opt.value));
       }
     } else {
       if (selectedValues.includes(option.value)) {
@@ -161,9 +154,9 @@ const CustomMultiSelect = ({
   const renderSelectedText = () => {
     if (selectedValues.length === 0)
       return (
-        <span style={{ color: "grey", ...placeholderStyle }}>
+        <PlaceholderText colorMode={colorMode} style={placeholderStyle}>
           {placeholder}
-        </span>
+        </PlaceholderText>
       );
 
     const selectedLabels = selectedValues.slice(0, 2);
@@ -189,15 +182,20 @@ const CustomMultiSelect = ({
       colorMode={colorMode}
       hasError={hasError}
       tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          toggleDropdown();
+        }
+      }}
     >
       <DropdownHeader colorMode={colorMode} onClick={toggleDropdown}>
         <SelectedChips>{renderSelectedText()}</SelectedChips>
-
         <KeyboardArrowDownIcon
           style={{
-            transition: "transform 0.3s ease",
+            transition: "transform 0.2s ease",
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-            color: colorMode === "dark" ? "#ccc" : "#333",
+            color: colorMode === "dark" ? "#71767B" : "#8B98A5",
+            fontSize: "20px",
           }}
         />
       </DropdownHeader>
@@ -208,20 +206,24 @@ const CustomMultiSelect = ({
             colorMode={colorMode}
             selected={isAllSelected}
             onClick={() => handleOptionClick({ value: "SELECT_ALL" })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleOptionClick({ value: "SELECT_ALL" });
+              }
+            }}
+            tabIndex={0}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Checkbox
-                checked={isAllSelected}
-                indeterminate={selectedValues.length > 0 && !isAllSelected}
-                style={{
-                  color: colorMode === "dark" ? "#fff" : "#333",
-                  padding: "4px",
-                }}
-              />
-              <OptionLabel>
-                {isAllSelected ? "Deselect All" : "Select All"}
-              </OptionLabel>
-            </div>
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={selectedValues.length > 0 && !isAllSelected}
+              style={{
+                color: colorMode === "dark" ? "#0097A7" : "#0097A7",
+                padding: "0 8px 0 0",
+              }}
+            />
+            <OptionLabel>
+              {isAllSelected ? "Deselect All" : "Select All"}
+            </OptionLabel>
           </DropdownItem>
 
           {options.map((option) => (
@@ -230,17 +232,21 @@ const CustomMultiSelect = ({
               colorMode={colorMode}
               selected={selectedValues.includes(option.value)}
               onClick={() => handleOptionClick(option)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleOptionClick(option);
+                }
+              }}
+              tabIndex={0}
             >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <Checkbox
-                  checked={selectedValues.includes(option.value)}
-                  style={{
-                    color: colorMode === "dark" ? "#fff" : "#333",
-                    padding: "4px",
-                  }}
-                />
-                <OptionLabel>{option.value}</OptionLabel>
-              </div>
+              <Checkbox
+                checked={selectedValues.includes(option.value)}
+                style={{
+                  color: colorMode === "dark" ? "#0097A7" : "#0097A7",
+                  padding: "0 8px 0 0",
+                }}
+              />
+              <OptionLabel>{option.value}</OptionLabel>
             </DropdownItem>
           ))}
         </DropdownList>

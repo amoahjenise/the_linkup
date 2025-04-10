@@ -8,60 +8,69 @@ const DropdownContainer = styled("div")(({ theme, colorMode }) => ({
 }));
 
 const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
-  padding: theme.spacing(1),
-  paddingLeft: theme.spacing(2),
-  border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
   borderRadius: "8px",
-  backgroundColor:
-    colorMode === "dark"
-      ? "rgba(130, 131, 129, 0.1)"
-      : "rgba(130, 131, 129, 0.03)",
   cursor: "pointer",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  transition: "border-color 0.2s ease-in-out",
+  transition: "border-color 0.2s, box-shadow 0.2s",
   "&:hover": {
-    borderColor: colorMode === "dark" ? "#6a6a6a" : "#aaa",
+    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+  },
+  "&:focus-within": {
+    borderColor: "#0097A7",
+    boxShadow: `0 0 0 2px ${
+      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
+    }`,
   },
 }));
 
 const DropdownList = styled("div")(({ theme, colorMode }) => ({
   position: "absolute",
-  top: "100%",
+  top: "calc(100% + 4px)",
   left: 0,
   right: 0,
   zIndex: 1000,
-  border: `1px solid ${colorMode === "dark" ? "#4a4a4a" : "#D3D3D3"}`,
+  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
   borderRadius: "8px",
-  backgroundColor: colorMode === "dark" ? "rgb(0, 0, 0)" : "white",
-  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
   maxHeight: "200px",
   overflowY: "auto",
+  padding: "4px 0",
 }));
 
 const DropdownItem = styled("div")(({ theme, colorMode, selected }) => ({
-  padding: theme.spacing(1),
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
   backgroundColor: selected
     ? colorMode === "dark"
-      ? "rgba(0, 123, 255, 0.25)"
-      : "rgba(0, 123, 255, 0.1)"
+      ? "#1C3D5A"
+      : "#E1F5FE"
     : "transparent",
   cursor: "pointer",
+  transition: "background-color 0.2s",
   "&:hover": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(42, 93, 147, 0.55)"
-        : "rgba(0, 123, 255, 0.05)",
+    backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
   },
 }));
 
 const ArrowIcon = styled("svg")(({ isOpen, colorMode }) => ({
   width: "20px",
   height: "20px",
-  fill: colorMode === "dark" ? "#ffffff" : "#333333",
-  transition: "transform 0.3s ease",
+  fill: colorMode === "dark" ? "#71767B" : "#8B98A5",
+  transition: "transform 0.2s ease",
   transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+}));
+
+const PlaceholderText = styled("span")(({ colorMode }) => ({
+  color: colorMode === "dark" ? "#71767B" : "#8B98A5",
 }));
 
 const CustomDropdown = ({
@@ -69,7 +78,7 @@ const CustomDropdown = ({
   value = null,
   onChange,
   placeholder = "Select an option",
-  placeholderStyle = {},
+  placeholderStyle,
   colorMode = "dark",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -97,10 +106,23 @@ const CustomDropdown = ({
 
   return (
     <DropdownContainer ref={dropdownRef} colorMode={colorMode}>
-      <DropdownHeader onClick={() => setIsOpen(!isOpen)} colorMode={colorMode}>
-        <span style={selectedOption ? {} : placeholderStyle}>
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
+      <DropdownHeader
+        onClick={() => setIsOpen(!isOpen)}
+        colorMode={colorMode}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setIsOpen(!isOpen);
+          }
+        }}
+      >
+        {selectedOption ? (
+          <span>{selectedOption.label}</span>
+        ) : (
+          <PlaceholderText colorMode={colorMode} style={placeholderStyle}>
+            {placeholder}
+          </PlaceholderText>
+        )}
         <ArrowIcon isOpen={isOpen} colorMode={colorMode} viewBox="0 0 20 20">
           <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.084l3.71-3.85a.75.75 0 111.08 1.04l-4.25 4.41a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" />
         </ArrowIcon>
@@ -116,6 +138,12 @@ const CustomDropdown = ({
                 onClick={() => handleSelect(option)}
                 colorMode={colorMode}
                 selected={isSelected}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleSelect(option);
+                  }
+                }}
+                tabIndex={0}
               >
                 {option.label}
               </DropdownItem>
