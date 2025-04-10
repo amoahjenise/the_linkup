@@ -40,7 +40,6 @@ const RightSection = styled("div")(({ theme, colorMode }) => ({
 
 const SlidingSection = styled("div")(({ theme, show, colorMode }) => ({
   position: "fixed",
-  top: "64px",
   right: 0,
   width: "100%",
   height: "100%",
@@ -48,7 +47,7 @@ const SlidingSection = styled("div")(({ theme, show, colorMode }) => ({
   boxShadow: `-2px 0 5px ${colorMode === "dark" ? "#000000" : "#aaaaaa"}`,
   transform: show ? "translateX(0)" : "translateX(100%)",
   transition: "transform 0.3s ease",
-  zIndex: 1000,
+  zIndex: 2000,
   overflowY: "auto",
   [theme.breakpoints.up("md")]: {
     display: "none",
