@@ -66,9 +66,28 @@ const AppWrapper = styled("div", {
   }),
 }));
 
-const RoutesComponent = ({ isMobile }) => (
+const RoutesComponent = ({
+  isMobile,
+  userState,
+  installPromptEvent,
+  showInstallButton,
+  setInstallPromptEvent,
+  setShowInstallButton,
+  isAppInstalled,
+}) => (
   <Routes>
-    <Route path="/" exact element={<LandingPage />} />
+    <Route
+      path="/"
+      exact
+      element={
+        <LandingPage
+          installPromptEvent={installPromptEvent}
+          showInstallButton={showInstallButton}
+          setInstallPromptEvent={setInstallPromptEvent}
+          setShowInstallButton={setShowInstallButton}
+        />
+      }
+    />
     <Route path="/registration" element={<SignupPage />} />
     <Route path="/terms-of-service" element={<TermsOfServicePage />} />
     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -123,6 +142,8 @@ const App = () => {
   const { user } = useUser();
   const [authError, setAuthError] = useState(false);
   const { colorMode } = useColorMode();
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
   const { updateBadge } = useBadge();
 
   const myColorSet = {
@@ -155,6 +176,85 @@ const App = () => {
 
   // Detect if the device is mobile
   const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+  useEffect(() => {
+    // Check PWA installation status
+    const checkPWAStatus = () => {
+      // Method 1: Check display mode
+      const isStandalone = window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches;
+
+      // Method 2: iOS specific check
+      const isIOSStandalone = window.navigator.standalone;
+
+      // Method 3: Check if launched from home screen (more reliable)
+      const isLaunchedFromHomeScreen =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone ||
+        document.referrer.includes("android-app://");
+
+      setIsAppInstalled(
+        isStandalone || isIOSStandalone || isLaunchedFromHomeScreen
+      );
+
+      // Only try getInstalledRelatedApps in top-level context
+      if (
+        window === window.top &&
+        "getInstalledRelatedApps" in window.navigator
+      ) {
+        try {
+          navigator
+            .getInstalledRelatedApps()
+            .then((apps) => {
+              console.log("Installed related apps:", apps);
+              if (apps && apps.length > 0) {
+                setIsAppInstalled(true);
+              }
+            })
+            .catch((err) => {
+              console.log("getInstalledRelatedApps error:", err);
+            });
+        } catch (err) {
+          console.log("getInstalledRelatedApps failed:", err);
+        }
+      }
+    };
+
+    // Initial check
+    checkPWAStatus();
+
+    // Listen for changes in display mode
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
+    const mediaQueryListener = () => checkPWAStatus();
+    mediaQuery.addListener(mediaQueryListener);
+
+    return () => {
+      mediaQuery.removeListener(mediaQueryListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      console.log("BeforeInstallPrompt event caught", e);
+      e.preventDefault();
+
+      // Store on window as fallback
+      window.deferredPrompt = e;
+
+      // Update state
+      setInstallPromptEvent(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
+  }, []);
 
   // Added this effect for global badge management
   useEffect(() => {
@@ -303,7 +403,15 @@ const App = () => {
               <LeftMenu isMobile={isMobile} />
             )}
             {publicPages.includes(window.location.pathname) ? (
-              <RoutesComponent isMobile={isMobile} userState={userState} />
+              <RoutesComponent
+                isMobile={isMobile}
+                userState={userState}
+                installPromptEvent={installPromptEvent}
+                showInstallButton={showInstallButton && !isAppInstalled} // Only show if not installed
+                setInstallPromptEvent={setInstallPromptEvent}
+                setShowInstallButton={setShowInstallButton}
+                isAppInstalled={isAppInstalled}
+              />
             ) : (
               <>
                 <SignedIn>
@@ -313,6 +421,11 @@ const App = () => {
                     <RoutesComponent
                       isMobile={isMobile}
                       userState={userState}
+                      installPromptEvent={installPromptEvent}
+                      showInstallButton={showInstallButton && !isAppInstalled} // Only show if not installed
+                      setInstallPromptEvent={setInstallPromptEvent}
+                      setShowInstallButton={setShowInstallButton}
+                      isAppInstalled={isAppInstalled}
                     />
                   )}
                 </SignedIn>
