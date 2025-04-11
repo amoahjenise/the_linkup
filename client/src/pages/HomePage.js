@@ -270,20 +270,23 @@ const HomePage = ({ isMobile }) => {
   }, [fetchLinkupRequests]);
 
   const refreshLinkups = useCallback(() => {
-    // Only show loading spinner if we're not already loading
-    if (!isLoading && !isFetchingNextPage) {
-      setIsLoading(true);
-    }
+    return new Promise((resolve) => {
+      // Only show loading spinner if we're not already loading
+      if (!isLoading && !isFetchingNextPage) {
+        setIsLoading(true);
+      }
 
-    dispatch(showNewLinkupButton(false));
+      dispatch(showNewLinkupButton(false));
 
-    // Use a timeout to ensure the UI has time to update before fetching
-    setTimeout(() => {
-      fetchLinkupsAndPoll(1).finally(() => {
-        setIsLoading(false);
-        scrollToTop();
-      });
-    }, 100);
+      // Use a timeout to ensure the UI has time to update before fetching
+      setTimeout(() => {
+        fetchLinkupsAndPoll(1).finally(() => {
+          setIsLoading(false);
+          scrollToTop();
+          resolve(); // Resolve the promise when done
+        });
+      }, 100);
+    });
   }, [dispatch, fetchLinkupsAndPoll, isLoading, isFetchingNextPage]);
 
   const scrollToTop = () => {
@@ -346,6 +349,7 @@ const HomePage = ({ isMobile }) => {
             gender={gender}
             feedRef={feedSectionRef}
             colorMode={colorMode}
+            isMobile={isMobile}
           />
         )}
       </StyledDiv>

@@ -12,15 +12,34 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 import debounce from "lodash/debounce";
 import Button from "@mui/material/Button";
 import { Skeleton } from "@mui/material";
+// import PullToRefresh from "react-pull-to-refresh";
+// import { CircularProgress } from "@mui/material";
+import { keyframes } from "@mui/system";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
-const Root = styled("div")({
+const Root = styled("div")(({ theme, isMobile }) => ({
   position: "relative",
   display: "flex",
   flexDirection: "column",
   borderRadius: "8px",
   maxWidth: "100vw",
   minHeight: "100dvh",
-  marginBottom: 15,
+  marginBottom: isMobile ? 64 : 15,
+}));
+
+// Animation for the arrow
+const rotate = keyframes`
+  0% { transform: rotate(0deg); opacity: 0.5; }
+  50% { transform: rotate(180deg); opacity: 1; }
+  100% { transform: rotate(360deg); opacity: 0.5; }
+`;
+
+// Styled arrow component
+const RefreshArrow = styled(ArrowDownwardIcon)({
+  animation: `${rotate} 1s infinite`,
+  color: "#0097A7", // Your brand color
+  fontSize: "2rem",
+  transition: "transform 0.3s ease",
 });
 
 const LoadingContainer = styled("div")({
@@ -30,7 +49,7 @@ const LoadingContainer = styled("div")({
   minHeight: "100dvh",
 });
 
-const SearchInputContainer = styled("div")(({ theme, colorMode }) => ({
+const SearchInputContainer = styled("div")(({ theme }) => ({
   padding: 8,
   width: "100%",
   position: "sticky",
@@ -94,6 +113,8 @@ const FeedSection = ({
   userId,
   gender,
   feedRef,
+  colorMode,
+  isMobile,
 }) => {
   const dispatch = useDispatch();
   const userSentRequests = useSelector((state) => state.userSentRequests);
@@ -206,20 +227,97 @@ const FeedSection = ({
     debounceSearchRef.current(event.target.value);
   };
 
-  // Combined loading states
+  // // Combined loading states
   const showLoading = isLoading || isFiltering || searchLoading;
   const showContent = !isLoading && !isFiltering && !searchLoading;
 
+  // const PullToRefreshContainer = ({ onRefresh, children }) => {
+  //   const [pulling, setPulling] = useState(false);
+  //   const [refreshing, setRefreshing] = useState(false);
+
+  //   return (
+  //     <div
+  //       style={{ position: "relative" }}
+  //       onTouchStart={(e) => {
+  //         if (window.scrollY === 0) {
+  //           setPulling(true);
+  //         }
+  //       }}
+  //       onTouchMove={(e) => {
+  //         if (pulling && window.scrollY === 0) {
+  //           const pullDistance = e.touches[0].clientY;
+  //           if (pullDistance > 80) {
+  //             // 80px threshold
+  //             setRefreshing(true);
+
+  //             Promise.all([
+  //               new Promise((resolve) => setTimeout(resolve, 500)), // Minimum 1 second display
+  //             ]).finally(() => {
+  //               onRefresh();
+  //               setRefreshing(false);
+  //             });
+  //           }
+  //         }
+  //       }}
+  //       onTouchEnd={() => {
+  //         setPulling(false);
+  //         if (!refreshing) {
+  //           setRefreshing(false);
+  //         }
+  //       }}
+  //     >
+  //       {(pulling || refreshing) && (
+  //         <div
+  //           style={{
+  //             position: "absolute",
+  //             top: 0,
+  //             left: 0,
+  //             right: 0,
+  //             display: "flex",
+  //             justifyContent: "center",
+  //             padding: "16px 0",
+  //             height: "60px",
+  //             alignItems: "center",
+  //           }}
+  //         >
+  //           {/* {refreshing ? (
+  //             <CircularProgress color="primary" />
+  //           ) : ( */}
+  //           <ArrowDownwardIcon
+  //             style={{
+  //               animation: refreshing ? `${rotate} 1s infinite` : "none",
+  //               color: "#0097A7",
+  //               fontSize: "1.5rem",
+  //               transform: `rotate(${refreshing ? 180 : 0}deg)`,
+  //               transition: "transform 0.3s ease",
+  //               opacity: 0.6,
+  //             }}
+  //           />
+  //           {/* )} */}
+  //         </div>
+  //       )}
+  //       <div
+  //         style={{
+  //           transform: refreshing ? "translateY(60px)" : "none",
+  //           transition: "transform 0.3s ease",
+  //         }}
+  //       >
+  //         {children}
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
   return (
-    <Root>
+    <Root isMobile={isMobile}>
       <TopNavBar title="Home" />
+      {/* <PullToRefreshContainer onRefresh={onRefreshClick}> */}
       <SearchInputContainer>
         <SearchInput
           handleInputChange={handleInputChange}
           loading={searchLoading}
         />
       </SearchInputContainer>
-
       {showLoading && (
         <LoadingContainer>
           {isLoading ? (
@@ -233,7 +331,6 @@ const FeedSection = ({
           )}
         </LoadingContainer>
       )}
-
       {showContent && (
         <>
           {linkupList.length === 0 ? (
@@ -258,6 +355,7 @@ const FeedSection = ({
           )}
         </>
       )}
+      {/* </PullToRefreshContainer> */}
     </Root>
   );
 };
