@@ -3,21 +3,72 @@ import { Box, Typography } from "@mui/material";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { styled } from "@mui/material/styles";
 
-// Shared button styles to reduce duplication
 const sharedButtonStyles = {
   padding: "8px 16px",
-  borderRadius: "4px",
+  borderRadius: "24px", // Fully rounded for contemporary look
   textTransform: "none",
-  fontWeight: 600,
+  fontWeight: 500,
   letterSpacing: "0.5px",
   fontSize: "14px",
-  transition: "all 0.2s ease",
+  width: "auto",
   flex: 1, // Make buttons share space equally
+  transition: `
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s ease
+  `, // Smooth, coordinated transitions
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "10px", // Slightly more spacing between icon and text
+  cursor: "pointer",
+  border: "1.5px solid transparent", // Thicker border for modern look
+  position: "relative",
+  overflow: "hidden", // For potential pseudo-elements
   "&:hover": {
-    transform: "translateY(-1px)",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)", // Subtle floating effect
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.98)", // Gentle press-down effect
+    transitionDuration: "0.1s", // Faster feedback on press
+  },
+  "&::before": {
+    // Modern background hover effect
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(255, 255, 255, 0.1)",
+    opacity: 0,
+    transition: "opacity 0.3s ease",
+  },
+  "&:hover::before": {
+    opacity: 1,
   },
 };
+
+// Enhanced ButtonContent with smooth icon transition
+const ButtonContent = ({ icon, text }) => (
+  <>
+    {icon && (
+      <span
+        className="material-icons"
+        style={{
+          fontSize: "20px",
+          transition: "transform 0.2s ease",
+          transform: "translateX(0)",
+        }}
+      >
+        {icon}
+      </span>
+    )}
+    <span style={{ transition: "transform 0.2s ease" }}>{text}</span>
+  </>
+);
 
 // Custom styled buttons using the shared styles
 const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
@@ -167,7 +218,7 @@ const WidgetTemplate = ({
           {/* Install Button */}
           {showInstallButton && (
             <CustomInstallAppButton onClick={handleInstallClick}>
-              Download App
+              <ButtonContent icon="get_app" text="Download App" />{" "}
             </CustomInstallAppButton>
           )}
         </Box>

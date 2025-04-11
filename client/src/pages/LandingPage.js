@@ -20,48 +20,141 @@ import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { LoadingPage } from "../pages";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-// Shared button styles to reduce duplication
+// Enhanced shared button styles with modern interactions
 const sharedButtonStyles = {
-  padding: "8px 16px",
-  borderRadius: "4px",
+  padding: "12px 28px", // Slightly more padding for better touch targets
+  borderRadius: "24px", // Fully rounded for contemporary look
   textTransform: "none",
-  fontWeight: 600,
-  letterSpacing: "0.5px",
-  fontSize: "14px",
-  width: "100%",
-  transition: "all 0.2s ease",
+  fontWeight: 500,
+  letterSpacing: "0.3px",
+  fontSize: "15px", // Slightly larger for readability
+  width: "auto",
+  minWidth: "220px", // More generous minimum width
+  transition: `
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s ease
+  `, // Smooth, coordinated transitions
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "10px", // Slightly more spacing between icon and text
+  cursor: "pointer",
+  border: "1.5px solid transparent", // Thicker border for modern look
+  position: "relative",
+  overflow: "hidden", // For potential pseudo-elements
   "&:hover": {
-    transform: "translateY(-1px)",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)", // Subtle floating effect
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.98)", // Gentle press-down effect
+    transitionDuration: "0.1s", // Faster feedback on press
+  },
+  "&::before": {
+    // Modern background hover effect
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(255, 255, 255, 0.1)",
+    opacity: 0,
+    transition: "opacity 0.3s ease",
+  },
+  "&:hover::before": {
+    opacity: 1,
   },
 };
 
-// Custom styled buttons using the shared styles
+// Enhanced ButtonContent with smooth icon transition
+const ButtonContent = ({ icon, text }) => (
+  <>
+    {icon && (
+      <span
+        className="material-icons"
+        style={{
+          fontSize: "20px",
+          transition: "transform 0.2s ease",
+          transform: "translateX(0)",
+        }}
+      >
+        {icon}
+      </span>
+    )}
+    <span style={{ transition: "transform 0.2s ease" }}>{text}</span>
+  </>
+);
+
+// Modern Sign In Button with layered hover effects
 const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
   ...sharedButtonStyles,
-  backgroundColor: "rgba(0, 151, 167, 0.8)",
-  color: "white",
+  backgroundColor: "#ffffff",
+  color: "#3c4043",
+  borderColor: "#e0e0e0",
   "&:hover": {
-    backgroundColor: "rgba(0, 151, 167, 1)",
+    backgroundColor: "#f8f9fa",
+    borderColor: "#c4c4c4",
+    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+    "& span:first-of-type": {
+      // Icon animation
+      transform: "translateX(2px)",
+    },
+    "& span:last-of-type": {
+      // Text animation
+      transform: "translateX(1px)",
+    },
+  },
+  "&:active": {
+    backgroundColor: "#f1f3f4",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   },
 }));
 
+// Vibrant Sign Up Button with depth
 const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
   ...sharedButtonStyles,
-  backgroundColor: "rgba(0, 151, 167, 0.9)",
+  backgroundColor: "#0097A7",
   color: "white",
+  borderColor: "#00838F",
+  boxShadow: "0 2px 8px rgba(0, 151, 167, 0.3)", // Base shadow for depth
   "&:hover": {
-    backgroundColor: "rgba(0, 151, 167, 1)",
+    backgroundColor: "#00838F",
+    boxShadow: "0 6px 20px rgba(0, 151, 167, 0.4)",
+    "& span": {
+      transform: "scale(1.02)", // Gentle scale effect
+    },
+  },
+  "&:active": {
+    backgroundColor: "#006064",
+    boxShadow: "0 2px 6px rgba(0, 151, 167, 0.3)",
+  },
+  "&::before": {
+    background: "rgba(255, 255, 255, 0.15)", // Stronger overlay for colored buttons
   },
 }));
 
+// Install App Button with modern metallic sheen
 const CustomInstallAppButton = styled("button")(({ theme }) => ({
   ...sharedButtonStyles,
-  backgroundColor: "white", // Neon pink (DeepPink)
-  color: "black",
+  backgroundColor: "#ffffff",
+  color: "#3c4043",
+  borderColor: "#e0e0e0",
+  backgroundImage: "linear-gradient(to bottom, #ffffff, #f9f9f9)", // Subtle gradient
   "&:hover": {
-    backgroundColor: "white",
-    boxShadow: "0 0 12px rgba(255, 237, 237, 0.8)", // Enhanced glow on hover
+    backgroundColor: "#f8f9fa",
+    borderColor: "#c4c4c4",
+    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+    backgroundImage: "linear-gradient(to bottom, #f8f8f8, #f2f2f2)",
+    "& span:first-of-type": {
+      transform: "translateY(-1px) rotate(5deg)", // Playful icon animation
+    },
+  },
+  "&:active": {
+    backgroundImage: "linear-gradient(to bottom, #f1f1f1, #ebebeb)",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   },
 }));
 
@@ -98,9 +191,9 @@ const SignUpWidget = memo(({ isWidgetLoading }) => (
       "&:hover": {
         transform: "scale(1.05)",
       },
-      maxWidth: "225px", // Max width for better layout on medium screens
-      height: "225px",
-      width: "225px", // Max width for better layout on medium screens
+      maxWidth: "200px", // Max width for better layout on medium screens
+      height: "200px",
+      width: "200px", // Max width for better layout on medium screens
       marginBottom: "20px", // Ensure there's spacing between widgets
       opacity: isWidgetLoading ? 0.5 : 1, // Add opacity when loading
     }}
@@ -123,8 +216,8 @@ const SignUpWidget = memo(({ isWidgetLoading }) => (
         <LoadingSpinner size={40} thickness={4} color="secondary" />
       </Box>
     )}
-    <CardContent sx={{ textAlign: "center", color: "white" }}>
-      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+    <CardContent sx={{ textAlign: "center" }}>
+      <Typography variant="h7" color="white" sx={{ fontWeight: "bold" }}>
         Explore fun activities with The Linkup Platform
       </Typography>
     </CardContent>
@@ -145,9 +238,9 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
       "&:hover": {
         transform: "scale(1.05)",
       },
-      width: "225px", // Max width for better layout on medium screens
-      maxWidth: "225px", // Max width for better layout on medium screens
-      height: "225px",
+      width: "200px", // Max width for better layout on medium screens
+      maxWidth: "200px", // Max width for better layout on medium screens
+      height: "200px",
       opacity: isWidgetLoading ? 0.5 : 1, // Add opacity when loading
     }}
   >
@@ -170,25 +263,65 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
       </Box>
     )}
     <CardContent sx={{ textAlign: "center" }}>
-      <Typography variant="h6" color="white" sx={{ fontWeight: "bold" }}>
+      <Typography variant="h7" color="white" sx={{ fontWeight: "bold" }}>
         By signing up, you agree to the
       </Typography>
-      <Typography variant="body2" sx={{ mt: 2, color: "white" }}>
-        <a href="/terms-of-service" style={{ color: "white" }}>
-          Terms of Service
-        </a>
-        ,{" "}
-        <a href="/privacy-policy" style={{ color: "white" }}>
-          Privacy Policy
-        </a>{" "}
-        and{" "}
-      </Typography>
-      <Typography variant="body2" sx={{ color: "gray" }}>
-        <a href="/cookie-use" style={{ color: "white" }}>
-          Cookie Use
-        </a>
-        .
-      </Typography>
+      <Box sx={{ mt: 1.5 }}>
+        <Typography
+          variant="body2"
+          component="div"
+          sx={{
+            color: "white",
+            lineHeight: 1.6,
+          }}
+        >
+          <Box
+            component="a"
+            href="/terms-of-service"
+            sx={{
+              color: "white",
+              textDecoration: "none",
+              "&:hover": {
+                textDecoration: "underline",
+                textUnderlineOffset: "3px",
+              },
+            }}
+          >
+            Terms of Service
+          </Box>
+          {", "}
+          <Box
+            component="a"
+            href="/privacy-policy"
+            sx={{
+              color: "white",
+              textDecoration: "none",
+              "&:hover": {
+                textDecoration: "underline",
+                textUnderlineOffset: "3px",
+              },
+            }}
+          >
+            Privacy Policy
+          </Box>
+          {", and "}
+          <Box
+            component="a"
+            href="/cookie-use"
+            sx={{
+              color: "white",
+              textDecoration: "none",
+              "&:hover": {
+                textDecoration: "underline",
+                textUnderlineOffset: "3px",
+              },
+            }}
+          >
+            Cookie Policy
+          </Box>
+          {"."}
+        </Typography>
+      </Box>
     </CardContent>
   </Card>
 ));
@@ -345,7 +478,7 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
                 }}
               >
                 <CustomInstallAppButton onClick={handleInstallClick}>
-                  DOWNLOAD APP
+                  <ButtonContent icon="get_app" text="Download App" />
                 </CustomInstallAppButton>
               </Box>
             )}
@@ -355,35 +488,49 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
         // Large screen layout
         <Grid
           container
-          spacing={2}
+          spacing={0}
           justifyContent="center"
+          alignItems="flex-start"
           sx={{
             maxWidth: "1200px",
             paddingTop: "40px",
             paddingBottom: "40px",
-            [theme.breakpoints.down("sm")]: {
-              flexDirection: "column", // Stack columns on small screens
-              alignItems: "center", // Center the content for small screens
+            // Always maintain desktop layout (left + right widgets)
+            flexDirection: "row",
+            gap: "120px", // Consistent gap between left and right widgets
+            // Responsive adjustments
+            [theme.breakpoints.down("md")]: {
+              gap: "120px", // Smaller gap on medium screens
             },
-            [theme.breakpoints.between(900, 1220)]: {
-              flexDirection: "row", // Keep them side by side on medium screens
-              gap: "120px", // Add gap between the columns
+            [theme.breakpoints.down("sm")]: {
+              flexWrap: "nowrap", // Prevent wrapping
+              overflowX: "auto", // Enable horizontal scrolling if needed
+              paddingBottom: "20px", // Space for scrollbar
+              "&::-webkit-scrollbar": {
+                height: "6px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "rgba(255,255,255,0.3)",
+                borderRadius: "3px",
+              },
+              // Force minimum widths to prevent overlap
+              minWidth: "calc(200px + 200px + 40px)", // Widget widths + gap
             },
           }}
         >
           {/* WidgetTemplate - Left Side */}
           <Grid
             item
-            xs={12}
-            sm={6}
-            md={3}
             sx={{
               cursor: "pointer",
               transition: "transform 0.3s ease",
               "&:hover": {
                 transform: "scale(1.02)",
               },
-              marginBottom: "20px", // Ensure there's spacing on smaller screens
+              // Fixed width for all screen sizes
+              height: "450px",
+              width: "200px",
+              flexShrink: 0, // Prevent shrinking
             }}
           >
             <WidgetTemplate
@@ -399,15 +546,14 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
           {/* Right Side - Stacked Widgets */}
           <Grid
             item
-            xs={12}
-            sm={6}
-            md={3} // Updated to 3 for better balance on larger screens
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: 2, // Increase gap between widgets
-              alignItems: "center", // Center widgets on small screens
-              justifyContent: "flex-start", // Ensure widgets are aligned to the top
+              marginTop: "12px",
+              gap: "20px",
+              // Fixed width for all screen sizes
+              width: "200px",
+              flexShrink: 0, // Prevent shrinking
             }}
           >
             <TermsAndServiceWidget isWidgetLoading={isWidget2Loading} />

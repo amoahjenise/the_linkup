@@ -57,6 +57,8 @@ self.addEventListener("activate", (event) => {
 
 // FETCH
 self.addEventListener("fetch", (event) => {
+  if (isDevelopment) return; // Bypass completely in development
+
   const { request } = event;
 
   if (
