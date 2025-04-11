@@ -289,9 +289,9 @@ const MoreMenu = ({
         open={modalState.isDeleteModalOpen}
         onClose={() => closeModal("isDeleteModalOpen")}
         onConfirm={handleDeleteConfirm}
-        color="#fe9494"
+        color="red"
         modalTitle="Delete Linkup?"
-        modalContentText="Are you sure you want to delete your linkup? If you delete your linkup, you will permanently lose everything."
+        modalContentText="Are you sure you want to delete this Linkup? This action cannot be undone - all event details and participant connections will be permanently removed."
         primaryButtonText="Delete"
         secondaryButtonText="Cancel"
       />
