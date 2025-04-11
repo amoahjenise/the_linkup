@@ -216,8 +216,28 @@ const SignUpWidget = memo(({ isWidgetLoading }) => (
         <LoadingSpinner size={40} thickness={4} color="secondary" />
       </Box>
     )}
-    <CardContent sx={{ textAlign: "center" }}>
-      <Typography variant="h7" color="white" sx={{ fontWeight: "bold" }}>
+    <CardContent
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        textAlign: "center",
+        padding: "20px",
+      }}
+    >
+      <Typography
+        variant="h7"
+        color="white"
+        sx={{
+          fontWeight: 600,
+          letterSpacing: "0.5px",
+          lineHeight: 1.3,
+          textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          maxWidth: "90%", // Prevents text from touching edges
+        }}
+      >
         Explore fun activities with The Linkup Platform
       </Typography>
     </CardContent>
