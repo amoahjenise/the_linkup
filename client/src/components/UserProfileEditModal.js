@@ -299,9 +299,6 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
         </DialogContent>
 
         <ButtonGroup>
-          <StyledButton onClick={onClose} colorMode={colorMode} isCancel={true}>
-            Cancel
-          </StyledButton>
           <StyledButton
             onClick={handleSave}
             colorMode={colorMode}
@@ -309,6 +306,9 @@ const UserProfileEditModal = ({ isOpen, onClose, userData, onSave }) => {
             disabled={!editedName.trim()}
           >
             Save
+          </StyledButton>
+          <StyledButton onClick={onClose} colorMode={colorMode} isCancel={true}>
+            Cancel
           </StyledButton>
         </ButtonGroup>
       </StyledPaper>

@@ -119,9 +119,12 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
+  minWidth: 100,
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 9999,
+  fontWeight: 700,
   width: "140px",
   border: "none",
-  borderRadius: "4px",
   cursor: "pointer",
   transition: "background-color 0.3s ease",
   backgroundColor: "#0097A7",
@@ -129,19 +132,24 @@ const StyledButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "#007b86",
   },
+  textTransform: "none",
 }));
 
-const CancelButton = styled(Button)({
+const CancelButton = styled(Button)(({ theme, colorMode }) => ({
   width: "140px",
-  border: "none",
-  borderRadius: "4px",
-  backgroundColor: "#f5f5f5",
-  color: "#9e9e9e",
+  fontWeight: 700,
+  minWidth: 100,
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 9999,
+  textTransform: "none",
+  boxShadow: "none",
+  color: colorMode === "dark" ? "#E0E0E0" : "#333333",
+  backgroundColor: colorMode === "dark" ? "#333333" : "#F0F0F0",
   "&:hover": {
-    backgroundColor: "#e0e0e0",
-    color: "#000",
+    backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
   },
-});
+  transition: "background-color 0.3s ease",
+}));
 
 const ErrorText = styled("p")(({ theme }) => ({
   color: theme.palette.error.main,
@@ -360,9 +368,13 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
 
           <ButtonGroup>
             <StyledButton type="submit" variant="contained">
-              Save Changes
+              Save
             </StyledButton>
-            <CancelButton variant="outlined" onClick={handleCancelClick}>
+            <CancelButton
+              variant="contained"
+              colorMode={colorMode}
+              onClick={handleCancelClick}
+            >
               Cancel
             </CancelButton>
           </ButtonGroup>

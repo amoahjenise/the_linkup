@@ -56,7 +56,7 @@ const Title = styled("h3")(({ color }) => ({
 const Description = styled("p")(({ theme }) => ({
   paddingTop: theme.spacing(1),
   fontSize: "0.875rem",
-  color: "#9e9e9e",
+  color: "white",
 }));
 
 const ButtonContainer = styled("div")(({ theme }) => ({
@@ -65,19 +65,20 @@ const ButtonContainer = styled("div")(({ theme }) => ({
   gap: theme.spacing(2),
 }));
 
-const CancelButton = styled(Button)(({ theme }) => ({
+const CancelButton = styled(Button)(({ theme, colorMode }) => ({
   flex: "1",
   padding: theme.spacing(1.5),
   textAlign: "center",
-  backgroundColor: "#f5f5f5",
-  color: "#9e9e9e",
+  color: "white",
   fontWeight: "600",
   borderRadius: theme.shape.borderRadius,
+  backgroundColor: colorMode === "dark" ? "#333333" : "#F0F0F0",
   "&:hover": {
-    backgroundColor: "#e0e0e0",
-    color: "#000",
+    backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
   },
+  transition: "background-color 0.3s ease",
   marginRight: theme.spacing(1),
+  textTransform: "none",
 }));
 
 const PrimaryButton = styled(Button)(({ theme, color }) => ({
@@ -160,9 +161,6 @@ const LinkupActionModal = ({
             </ContentContainer>
           </ModalHeader>
           <ButtonContainer>
-            <CancelButton onClick={secondaryButtonFn || onClose}>
-              {secondaryButtonText}
-            </CancelButton>
             <PrimaryButton
               style={{ backgroundColor: isHovered ? hoverColor : color }}
               onMouseEnter={handleMouseEnter}
@@ -170,11 +168,17 @@ const LinkupActionModal = ({
             >
               <Button
                 onClick={primaryButtonFn || onConfirm}
-                style={{ color: "white" }}
+                style={{ color: "white", textTransform: "none" }}
               >
                 {primaryButtonText}
               </Button>
             </PrimaryButton>
+            <CancelButton
+              onClick={secondaryButtonFn || onClose}
+              colorMode={colorMode}
+            >
+              {secondaryButtonText}
+            </CancelButton>
           </ButtonContainer>
         </ModalContainer>
       </Screen>
