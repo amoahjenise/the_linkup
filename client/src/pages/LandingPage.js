@@ -165,9 +165,10 @@ const Footer = styled("footer")(({ theme }) => ({
   padding: theme.spacing(2),
   justifyContent: "center",
   alignItems: "center",
-  borderTop: "1px solid #e0e0e0",
+  // borderTop: "1px solid #e0e0e0",
   color: "#FFFFFF",
-  backgroundColor: "transparent",
+  // backgroundColor: "rgba(0, 0, 0, 0.4)", // Semi-transparent dark overlay
+  backdropFilter: "blur(3px)", // Frosted glass effect
   [theme.breakpoints.down("sm")]: {
     paddingBottom: theme.spacing(3),
     textAlign: "center",
@@ -216,8 +217,28 @@ const SignUpWidget = memo(({ isWidgetLoading }) => (
         <LoadingSpinner size={40} thickness={4} color="secondary" />
       </Box>
     )}
-    <CardContent sx={{ textAlign: "center" }}>
-      <Typography variant="h7" color="white" sx={{ fontWeight: "bold" }}>
+    <CardContent
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+        textAlign: "center",
+        padding: "20px",
+      }}
+    >
+      <Typography
+        variant="h7"
+        color="white"
+        sx={{
+          fontWeight: 600,
+          letterSpacing: "0.5px",
+          lineHeight: 1.3,
+          textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          maxWidth: "90%", // Prevents text from touching edges
+        }}
+      >
         Explore fun activities with The Linkup Platform
       </Typography>
     </CardContent>
@@ -454,21 +475,30 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
               interests.
             </Typography>
 
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              <a href="/terms-of-service" style={{ color: "white" }}>
-                Terms of Service
-              </a>{" "}
-              |{" "}
-              <a href="/privacy-policy" style={{ color: "white" }}>
-                Privacy Policy
-              </a>
-            </Typography>
-            <Typography variant="body2" sx={{ color: "gray" }}>
-              <a href="/cookie-use" style={{ color: "white" }}>
-                Cookie Use
-              </a>
-              .
-            </Typography>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2, // Increase gap between items
+                alignItems: "center", // Center items on small screens
+              }}
+            >
+              <Typography variant="body2" sx={{ mt: 2 }}>
+                <a href="/terms-of-service" style={{ color: "white" }}>
+                  Terms of Service
+                </a>{" "}
+                |{" "}
+                <a href="/privacy-policy" style={{ color: "white" }}>
+                  Privacy Policy
+                </a>
+              </Typography>
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                <a href="/cookie-use" style={{ color: "white" }}>
+                  Cookie Use
+                </a>
+                .
+              </Typography>
+            </div>
             {showInstallButton && (
               <Box
                 sx={{

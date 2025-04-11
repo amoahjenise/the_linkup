@@ -23,6 +23,13 @@ const LogoImage = styled("img")({
 });
 
 const Title = styled(Typography)(({ theme }) => ({
+  letterSpacing: "-0.5px", // Tighter letter spacing
+  lineHeight: 1.2,
+  background: "linear-gradient(90deg, #000, #333)", // Subtle gradient 's text
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  fontFamily:
+    "'TwitterChirp', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   fontWeight: "bold",
 }));
 
