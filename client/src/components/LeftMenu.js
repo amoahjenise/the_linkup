@@ -131,16 +131,14 @@ const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   height: footerHeight,
   display: "flex",
   justifyContent: "space-around",
-  alignItems: "center",
+  alignItems: "flex-start",
   padding: "0 5px",
-  backgroundColor: "rgba(0, 0, 0, 0)", // Fully transparent background
+  backgroundColor: "rgba(0, 0, 0, 0)",
   background: `
     linear-gradient(
       to top,
       ${
-        colorMode === "dark"
-          ? "rgba(18, 18, 18, 0.8)"
-          : "rgba(255, 255, 255, 0.8)"
+        colorMode === "dark" ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)"
       } 0%,
       transparent 100%
     )
