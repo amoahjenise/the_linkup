@@ -1,3 +1,17 @@
+@font-face {
+  font-family: "TwitterChirp";
+  src: url("https://abs.twimg.com/fonts/v2/chirp-regular-web.woff2")
+    format("woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "TwitterChirp";
+  src: url("https://abs.twimg.com/fonts/v2/chirp-bold-web.woff2")
+    format("woff2");
+  font-weight: 700;
+}
+
 @media (max-width: 600px) {
   .cardsContainer {
     grid-template-columns: repeat(
