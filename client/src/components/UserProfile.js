@@ -42,7 +42,7 @@ const MoreButtonWrapper = styled("div")({
 const UserProfileContainer = styled("div")(({ isMobile }) => ({
   position: "relative",
   width: "100%",
-  height: isMobile ? "calc(100dvh - 110px)" : "calc(100% - 64px)", // Changed to full viewport height
+  height: "calc(100dvh - 64px)",
   overflow: "auto",
   color: "#fff",
   display: "flex",
@@ -115,12 +115,13 @@ const IconButton = styled("button")({
 const BottomSection = styled("div")(({ isMobile }) => ({
   width: "100%",
   padding: isMobile ? "1rem" : "1.5rem",
+  marginBottom: 45,
   marginTop: "auto",
   position: "relative",
   "&::before": {
     content: '""',
     position: "absolute",
-    bottom: 0,
+    top: 40,
     left: 0,
     right: 0,
     height: "100%",
@@ -148,7 +149,7 @@ const Title = styled("h2")(({ isMobile }) => ({
 const Subtitle = styled("p")(({ isMobile }) => ({
   margin: "0.25rem 0",
   fontSize: isMobile ? "1.1rem" : "1.25rem",
-  color: "#ccc",
+  color: "#f5f5f5",
   wordBreak: "break-word",
 }));
 
@@ -314,7 +315,7 @@ const UserProfile = ({
         <BottomSection isMobile={isMobile}>
           <div>
             <Title isMobile={isMobile}>{userData?.bio}</Title>
-            <Box display="flex" flexDirection="column" gap="0.8rem">
+            <Box display="flex" flexDirection="column" gap="0.25rem">
               <Subtitle isMobile={isMobile}>
                 {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
                 {userLocation}
