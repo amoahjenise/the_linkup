@@ -39,6 +39,8 @@ import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
 import { useBadge } from "./utils/badgeUtils";
+import PullToRefresh from "react-pull-to-refresh";
+import { CircularProgress } from "@mui/material";
 
 const MOBILE_BREAKPOINT = "600px";
 
@@ -138,6 +140,7 @@ const App = () => {
   const { colorMode } = useColorMode();
   const [installPromptEvent, setInstallPromptEvent] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
+  const [isMobilePWA, setIsMobilePWA] = useState(false);
   const { updateBadge } = useBadge();
 
   const myColorSet = {
@@ -181,6 +184,26 @@ const App = () => {
     const userAgent = navigator.userAgent.toLowerCase();
     setIsIOS(/iphone|ipad|ipod/.test(userAgent));
     setIsAndroid(/android/.test(userAgent));
+  }, []);
+
+  useEffect(() => {
+    const checkMobilePWA = () => {
+      const isStandalone = window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches;
+      const isIOSStandalone = window.navigator.standalone;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      setIsMobilePWA((isStandalone || isIOSStandalone) && isMobile);
+    };
+
+    checkMobilePWA();
+
+    // Handle display mode changes (for Android)
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
+    mediaQuery.addEventListener("change", checkMobilePWA);
+
+    return () => mediaQuery.removeEventListener("change", checkMobilePWA);
   }, []);
 
   const handleInstallClick = () => {
@@ -389,6 +412,37 @@ const App = () => {
     isRegistering,
   ]);
 
+  // Create the main app content
+  const appContent = (
+    <AppWrapper isAuthenticated={isAuthenticated}>
+      {isAuthenticated && !isRegistering && <LeftMenu isMobile={isMobile} />}
+      {publicPages.includes(window.location.pathname) ? (
+        <RoutesComponent
+          isMobile={isMobile}
+          showInstallButton={!isAppInstalled}
+          handleInstallClick={handleInstallClick}
+        />
+      ) : (
+        <>
+          <SignedIn>
+            {authError ? (
+              <ErrorPage />
+            ) : (
+              <RoutesComponent
+                isMobile={isMobile}
+                showInstallButton={!isAppInstalled}
+                handleInstallClick={handleInstallClick}
+              />
+            )}
+          </SignedIn>
+          <SignedOut>
+            <RedirectToSignIn />
+          </SignedOut>
+        </>
+      )}
+    </AppWrapper>
+  );
+
   return (
     <ThemeProvider theme={theme}>
       <SendbirdProvider
@@ -410,35 +464,26 @@ const App = () => {
         }}
       >
         <BrowserRouter>
-          <AppWrapper isAuthenticated={isAuthenticated}>
-            {isAuthenticated && !isRegistering && (
-              <LeftMenu isMobile={isMobile} />
-            )}
-            {publicPages.includes(window.location.pathname) ? (
-              <RoutesComponent
-                isMobile={isMobile}
-                showInstallButton={!isAppInstalled} // Only show if not installed
-                handleInstallClick={handleInstallClick}
-              />
-            ) : (
-              <>
-                <SignedIn>
-                  {authError ? (
-                    <ErrorPage />
-                  ) : (
-                    <RoutesComponent
-                      isMobile={isMobile}
-                      showInstallButton={!isAppInstalled} // Only show if not installed
-                      handleInstallClick={handleInstallClick}
-                    />
-                  )}
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            )}
-          </AppWrapper>
+          {isMobilePWA ? (
+            <PullToRefresh
+              onRefresh={() => window.location.reload()}
+              loadingIndicator={
+                <div
+                  style={{
+                    padding: "20px 0",
+                    textAlign: "center",
+                    backgroundColor: "rgba(0, 151, 167, 0.1)",
+                  }}
+                >
+                  <CircularProgress color="primary" />
+                </div>
+              }
+            >
+              {appContent}
+            </PullToRefresh>
+          ) : (
+            appContent
+          )}
         </BrowserRouter>
       </SendbirdProvider>
     </ThemeProvider>
