@@ -318,7 +318,9 @@ const UserProfile = ({
             <Box display="flex" flexDirection="column" gap="0.25rem">
               <Subtitle isMobile={isMobile}>
                 {userData?.name}, {calculateAge(userData?.date_of_birth)} •{" "}
-                {userLocation}
+                {userData.city && userData.country
+                  ? `${userData.city}, ${userData.country}`
+                  : "Unknown Location"}
               </Subtitle>
               <Box
                 sx={{
