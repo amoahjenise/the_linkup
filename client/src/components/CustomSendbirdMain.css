@@ -154,6 +154,10 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     transition: background-color 0.2s ease, box-shadow 0.2s ease !important;
     overflow: hidden !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
   }
 
   .sendbird-channel-preview:hover {

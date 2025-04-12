@@ -13,18 +13,21 @@ const notificationReducer = (state = initialState, action) => {
     case UPDATE_UNREAD_NOTIFICATIONS_COUNT:
       return {
         ...state,
-        unreadCount: action.payload,
+        unreadCount: Math.max(0, Number(action.payload) || 0), // Double validation
       };
+
     case INCREMENT_UNREAD_NOTIFICATIONS_COUNT:
       return {
         ...state,
-        unreadCount: state.unreadCount + 1,
+        unreadCount: state.unreadCount + 1, // Increment can't make it negative
       };
+
     case DECREMENT_UNREAD_NOTIFICATIONS_COUNT:
       return {
         ...state,
-        unreadCount: state.unreadCount - 1,
+        unreadCount: Math.max(0, state.unreadCount - 1), // Prevent negative
       };
+
     default:
       return state;
   }

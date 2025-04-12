@@ -69,18 +69,18 @@ const Settings = ({
           >
             Account
           </SectionItem>
-          <SectionItem
+          {/* <SectionItem
             active={activeSection === "security"}
             onClick={() => handleSectionClick("security")}
           >
             Security
-          </SectionItem>
-          <SectionItem
+          </SectionItem> */}
+          {/* <SectionItem
             active={activeSection === "data"}
             onClick={() => handleSectionClick("data")}
           >
             Data
-          </SectionItem>
+          </SectionItem> */}
         </Sections>
         <Content>
           {activeSection === "account" && (

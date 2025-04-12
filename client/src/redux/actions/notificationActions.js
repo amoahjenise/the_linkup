@@ -14,18 +14,16 @@ export const fetchUnreadNotificationsCount = () => {
 export const updateUnreadNotificationsCount = (count) => {
   return {
     type: UPDATE_UNREAD_NOTIFICATIONS_COUNT,
-    payload: count,
+    payload: Math.max(0, Number(count) || 0), // Validate count
   };
 };
 
-// Action to increment the unread notifications count
 export const incrementUnreadNotificationsCount = () => {
   return {
     type: INCREMENT_UNREAD_NOTIFICATIONS_COUNT,
   };
 };
 
-// Action to decrement the unread notifications count
 export const decrementUnreadNotificationsCount = () => {
   return {
     type: DECREMENT_UNREAD_NOTIFICATIONS_COUNT,
