@@ -17,7 +17,7 @@ import { getLinkupStatus } from "../api/linkUpAPI";
 
 const SendRequestContainer = styled("div")({
   display: "flex",
-  height: "100dvh",
+  // height: "100dvh",
 });
 
 const MainSection = styled("div")(({ theme }) => ({
@@ -26,10 +26,7 @@ const MainSection = styled("div")(({ theme }) => ({
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  marginTop: theme.spacing(6),
-  [theme.breakpoints.down("md")]: {
-    marginTop: theme.spacing(10),
-  },
+  marginBottom: theme.spacing(4),
 }));
 
 const LinkUpInfo = styled("div")(({ theme }) => ({
