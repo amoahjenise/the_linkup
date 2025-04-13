@@ -92,14 +92,18 @@ CREATE TABLE IF NOT EXISTS user_settings (
     notification_enabled BOOLEAN DEFAULT TRUE,
     location_sharing_enabled BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_gender_preferences CHECK (
-        gender_preferences <@ ARRAY[
-            'Men', 'Women', 'Agender', 'Androgynous', 'Bigender', 
-            'Crossdresser', 'Demiboy', 'Demigirl', 'Gender Nonconforming',
-            'Gender questioning', 'Genderqueer', 'Genderfluid', 'Gender variant',
-            'Intersex', 'Neutrois', 'Non-binary', 'Pangender', 'Transfeminine',
-            'Transgender', 'Transmasculine', 'Third gender', 'Two-Spirit'
-        ]::TEXT[]
-    )
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: user_settings
+CREATE TABLE IF NOT EXISTS user_settings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+    distance_range INT[] DEFAULT ARRAY[0, 50],
+    age_range INT[] DEFAULT ARRAY[18, 99],
+    gender_preferences TEXT[] DEFAULT ARRAY['Men', 'Women'],
+    notification_enabled BOOLEAN DEFAULT TRUE,
+    location_sharing_enabled BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

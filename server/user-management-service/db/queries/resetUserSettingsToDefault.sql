@@ -3,6 +3,6 @@
 DELETE FROM 
     user_settings
 WHERE 
-    user_id = :userId
+    user_id = $1
 RETURNING 
     id;

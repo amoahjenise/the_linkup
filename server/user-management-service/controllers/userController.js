@@ -358,11 +358,14 @@ const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
 
   try {
+    // Read SQL files
     const queryPath = path.join(
       __dirname,
       "../db/queries/setUserStatusActive.sql"
     );
+
     const query = fs.readFileSync(queryPath, "utf8");
+
     const values = [userId];
 
     const { rows, rowCount } = await pool.query(query, values);
@@ -387,7 +390,7 @@ const setUserStatusActive = async (req, res) => {
 
 // Get available gender options
 const getGenderOptions = async () => {
-  const result = await db.query(
+  const result = await pool.query(
     fs.readFileSync("getGenderOptions.sql", "utf8")
   );
   return result.rows[0].gender_options;
@@ -398,50 +401,105 @@ const getUserSettings = async (req, res) => {
     const { userId } = req.params;
 
     // Read SQL files
-    const sqlDirectory = path.join(__dirname, "sql");
-    const getUserSettingsWithDefaultsQuery = fs.readFileSync(
-      path.join(sqlDirectory, "getUserSettingsWithDefaults.sql"),
-      "utf8"
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/getUserSettingsWithDefaults.sql"
     );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId];
+    const { rows } = await pool.query(query, values);
 
-    const result = await db.query(getUserSettingsWithDefaultsQuery, [userId]);
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found",
+      });
+    }
 
-    res.json(result.rows[0]);
+    const settings = rows[0];
+
+    // Transform to match frontend expectations
+    res.json({
+      success: true,
+      settings: {
+        distanceRange: settings.distance_range,
+        ageRange: settings.age_range,
+        genderPreferences: settings.gender_preferences || ["men", "women"],
+        showExactLocation: settings.location_sharing_enabled,
+        notificationEnabled: settings.notification_enabled,
+      },
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error fetching user settings:", err);
+    res.status(500).json({
+      success: false,
+      error: "Failed to retrieve user settings",
+    });
   }
 };
 
 const saveUserSettings = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const {
-      distanceRange,
-      ageRange,
-      genderPreferences,
-      notificationEnabled,
-      locationSharingEnabled,
-    } = req.body;
+  const { userId } = req.params;
+  const {
+    distanceRange,
+    ageRange,
+    genderPreferences,
+    notificationEnabled,
+    locationSharingEnabled,
+  } = req.body;
 
-    // Read SQL files
-    const sqlDirectory = path.join(__dirname, "sql");
-    const upsertUserSettingsQuery = fs.readFileSync(
-      path.join(sqlDirectory, "upsertUserSettings.sql"),
+  // Validate required fields
+  if (!distanceRange || !ageRange || !genderPreferences) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing required fields",
+    });
+  }
+
+  try {
+    const query = fs.readFileSync(
+      path.join(__dirname, "../db/queries/upsertUserSettings.sql"),
       "utf8"
     );
 
-    const result = await db.query(upsertUserSettingsQuery, {
+    const values = [
       userId,
       distanceRange,
       ageRange,
       genderPreferences,
       notificationEnabled,
       locationSharingEnabled,
-    });
+    ];
 
-    res.json(result.rows[0]);
+    console.log("Sending genderPreferences:", genderPreferences);
+
+    const { rows } = await pool.query(query, values);
+
+    if (!rows.length) {
+      return res.status(500).json({
+        success: false,
+        error: "Failed to save settings",
+      });
+    }
+
+    const settings = rows[0];
+
+    res.json({
+      success: true,
+      settings: {
+        distance_range: settings.distance_range,
+        age_range: settings.age_range,
+        gender_preferences: settings.gender_preferences,
+        location_sharing_enabled: settings.location_sharing_enabled,
+        notification_enabled: settings.notification_enabled,
+      },
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error saving user settings:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message || "Server error",
+    });
   }
 };
 
