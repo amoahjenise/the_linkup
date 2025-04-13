@@ -7,9 +7,11 @@ const NotificationsPageWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  // borderRight: "1px solid #D3D3D3",
   [theme.breakpoints.down("md")]: {
     width: "100%", // Set to 100% in mobile mode
+  },
+  "@media (max-width: 900px)": {
+    marginBottom: "65px", // Add padding for footer
   },
 }));
 

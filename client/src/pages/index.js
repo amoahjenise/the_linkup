@@ -6,7 +6,6 @@ export { default as SendRequestPage } from "./SendRequestPage";
 export { default as ConversationsPage } from "./ConversationsPage";
 export { default as LinkUpHistoryPage } from "./LinkUpHistoryPage";
 export { default as NotificationsPage } from "./NotificationsPage";
-export { default as AcceptDeclinePage } from "./AcceptDeclinePage";
 export { default as TermsOfServicePage } from "./TermsOfServicePage";
 export { default as SettingsPage } from "./SettingsPage";
 export { default as PrivacyPolicyPage } from "./PrivacyPolicyPage";

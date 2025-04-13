@@ -54,30 +54,37 @@ const deactivateUser = async (req, res) => {
   }
 };
 
-const deleteUser = async (id) => {
+const deleteUser = async (req, res) => {
+  const { id } = req.params; // Get ID from request params
+
   try {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [id];
 
-    console.log("id", id);
+    const { rowCount } = await pool.query(query, values);
 
-    const { rows, rowCount } = await pool.query(query, values);
-
-    console.log("rows", rows);
     if (rowCount > 0) {
-      return {
+      return res.status(200).json({
+        // Use res.json() for responses
         success: true,
         message: "User deleted successfully!",
-      };
+      });
     } else {
-      return {
+      return res.status(404).json({
+        // Handle case where user wasn't found
         success: false,
-        message: "User not found. Please contact support.",
-      };
+        message: "User not found",
+      });
     }
   } catch (error) {
-    throw new Error("Internal server error");
+    console.error("Error deleting user:", error);
+    return res.status(500).json({
+      // Make sure to return the response
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
@@ -378,6 +385,66 @@ const setUserStatusActive = async (req, res) => {
   }
 };
 
+// Get available gender options
+const getGenderOptions = async () => {
+  const result = await db.query(
+    fs.readFileSync("getGenderOptions.sql", "utf8")
+  );
+  return result.rows[0].gender_options;
+};
+
+const getUserSettings = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Read SQL files
+    const sqlDirectory = path.join(__dirname, "sql");
+    const getUserSettingsWithDefaultsQuery = fs.readFileSync(
+      path.join(sqlDirectory, "getUserSettingsWithDefaults.sql"),
+      "utf8"
+    );
+
+    const result = await db.query(getUserSettingsWithDefaultsQuery, [userId]);
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const saveUserSettings = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      distanceRange,
+      ageRange,
+      genderPreferences,
+      notificationEnabled,
+      locationSharingEnabled,
+    } = req.body;
+
+    // Read SQL files
+    const sqlDirectory = path.join(__dirname, "sql");
+    const upsertUserSettingsQuery = fs.readFileSync(
+      path.join(sqlDirectory, "upsertUserSettings.sql"),
+      "utf8"
+    );
+
+    const result = await db.query(upsertUserSettingsQuery, {
+      userId,
+      distanceRange,
+      ageRange,
+      genderPreferences,
+      notificationEnabled,
+      locationSharingEnabled,
+    });
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   deactivateUser,
   deleteUser,
@@ -391,4 +458,7 @@ module.exports = {
   updateUserSocialMedia,
   updateUserName,
   setUserStatusActive,
+  getGenderOptions,
+  getUserSettings,
+  saveUserSettings,
 };

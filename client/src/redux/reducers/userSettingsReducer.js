@@ -25,18 +25,42 @@ const userSettingsReducer = (state = initialState, action) => {
     case GET_USER_SETTINGS:
       return {
         ...state,
-        userSettings: action.payload || defaultSettings, // Fallback to defaults if null
+        userSettings: {
+          ...defaultSettings, // Default values as fallback
+          ...action.payload, // Override with actual values from DB
+          distanceRange:
+            action.payload.distance_range || defaultSettings.distanceRange,
+          ageRange: action.payload.age_range || defaultSettings.ageRange,
+          genderRange:
+            action.payload.gender_preferences || defaultSettings.genderRange,
+          notificationEnabled:
+            action.payload.notification_enabled !== undefined
+              ? action.payload.notification_enabled
+              : defaultSettings.notificationEnabled,
+          locationSharingEnabled:
+            action.payload.location_sharing_enabled !== undefined
+              ? action.payload.location_sharing_enabled
+              : defaultSettings.locationSharingEnabled,
+        },
+        loading: false,
+        error: null,
       };
+
     case SAVE_USER_SETTINGS:
       return {
         ...state,
         userSettings: action.payload,
+        successMessage: "Settings saved successfully",
+        error: null,
       };
+
     case SET_DEFAULT_SETTINGS:
       return {
         ...state,
         userSettings: defaultSettings,
+        error: null,
       };
+
     default:
       return state;
   }
