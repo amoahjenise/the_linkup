@@ -20,6 +20,7 @@ const refreshToken = async () => {
     return { success: false };
   }
 };
+
 export const handleError = async (error, errorMessage) => {
   console.error(errorMessage, error);
   if (error.response && error.response.status === 401) {
@@ -53,7 +54,10 @@ export const updateUserSocialMedia = async (userId, socialMediaLinks) => {
     return response.data; // Return the response data
   } catch (error) {
     try {
-      return await handleError(error, "Failed to update the user's social media links.");
+      return await handleError(
+        error,
+        "Failed to update the user's social media links."
+      );
     } catch (error) {
       // Handle other errors as needed
       console.error("Error:", error);
@@ -300,6 +304,110 @@ export const setUserStatusActive = async (userId) => {
         message: "An error occurred.",
         error: error.message,
       };
+    }
+  }
+};
+
+// User Settings API Functions
+
+/**
+ * Fetches available gender options from the server
+ * @returns {Promise<Object>} Response containing gender options array
+ */
+export const getGenderOptions = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/user/gender-options`);
+    return response.data;
+  } catch (error) {
+    try {
+      const errorResult = await handleError(
+        error,
+        "Failed to fetch gender options"
+      );
+      if (errorResult.unauthorizedError) {
+        return { unauthorizedError: true };
+      }
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "Failed to load gender options",
+        error: error.message,
+      };
+    } catch (error) {
+      console.error("Error in handleError:", error);
+      return {
+        success: false,
+        message: "An error occurred",
+        error: error.message,
+      };
+    }
+  }
+};
+
+/**
+ * Retrieves user settings for a specific user
+ * @param {string} userId - The ID of the user
+ * @returns {Promise<Object>} Response containing user settings
+ */
+export const getUserSettings = async (userId) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/user/${userId}/settings`);
+    return response.data;
+  } catch (error) {
+    try {
+      const errorResult = await handleError(
+        error,
+        "Failed to fetch user settings"
+      );
+      if (errorResult.unauthorizedError) {
+        return { unauthorizedError: true };
+      }
+      console.error("Error:", error);
+      return {
+        success: false,
+        message: "Failed to load user settings",
+        error: error.message,
+      };
+    } catch (error) {
+      console.error("Error in handleError:", error);
+      return {
+        success: false,
+        message: "An error occurred",
+        error: error.message,
+      };
+    }
+  }
+};
+
+/**
+ * Saves user settings to the server
+ * @param {string} userId - The ID of the user
+ * @param {Object} settings - The settings object to save
+ * @returns {Promise<Object>} Response indicating success or failure
+ */
+export const saveUserSettings = async (userId, settings) => {
+  console.log("[API] Saving settings for user:", userId, settings);
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/api/user/${userId}/settings`,
+      settings
+    );
+
+    if (!response.data.success) {
+      throw new Error(response.data.error || "Settings update failed");
+    }
+
+    return {
+      success: true,
+      settings: response.data.settings,
+    };
+  } catch (error) {
+    console.error("[API] Error:", error);
+    // Convert axios error to a more useful format
+    if (error.response) {
+      throw new Error(error.response.data.error || "Server error");
+    } else {
+      throw error;
     }
   }
 };

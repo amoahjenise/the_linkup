@@ -15,7 +15,6 @@ import {
   ConversationsPage,
   LinkUpHistoryPage,
   NotificationsPage,
-  AcceptDeclinePage,
   TermsOfServicePage,
   SettingsPage,
   PrivacyPolicyPage,
@@ -40,6 +39,9 @@ import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
 import { useBadge } from "./utils/badgeUtils";
 import PullToRefresh from "react-pull-to-refresh";
+
+import { saveUserSettings } from "./redux/actions/userSettingsActions";
+import { getUserSettings } from "./api/usersAPI";
 
 const MOBILE_BREAKPOINT = "600px";
 
@@ -115,7 +117,6 @@ const RoutesComponent = ({
       path="/messages"
       element={<ConversationsPage isMobile={isMobile} />}
     />
-    <Route path="/linkup-request/:id" element={<AcceptDeclinePage />} />
     <Route path="/settings" element={<SettingsPage />} />
     <Route path="/Error" element={<ErrorPage />} />
     <Route path="/pricing" element={<PricingPage isMobile={isMobile} />} />
@@ -386,6 +387,22 @@ const App = () => {
     isSigningOut,
     isRegistering,
   ]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!userState?.user?.id) return;
+      try {
+        const response = await getUserSettings(userState.user.id);
+        if (response.success) {
+          dispatch(saveUserSettings(response.settings));
+        }
+      } catch (err) {
+        console.error("Failed to fetch user settings", err);
+      }
+    };
+
+    fetchSettings();
+  }, [userState?.user?.id, dispatch]);
 
   return (
     <ThemeProvider theme={theme}>

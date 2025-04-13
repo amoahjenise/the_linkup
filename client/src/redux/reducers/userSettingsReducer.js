@@ -1,4 +1,3 @@
-// userSettingsReducer.js
 import {
   GET_USER_SETTINGS,
   SAVE_USER_SETTINGS,
@@ -6,37 +5,71 @@ import {
 } from "../actions/actionTypes";
 
 const initialState = {
-  userSettings: null, // Changed from {} to null to distinguish "not loaded" vs "empty"
+  userSettings: null,
   error: null,
-  successMessage: "",
   loading: false,
 };
 
 const defaultSettings = {
-  distanceRange: [0, 50], // 0-50km default
-  ageRange: [18, 99], // 18-99 age range
-  genderRange: ["Men", "Women"], // Default to both men and women
+  distanceRange: [0, 50],
+  ageRange: [18, 99],
+  genderPreferences: ["Men", "Women"],
   notificationEnabled: true,
   locationSharingEnabled: true,
 };
+
+// Helper function to normalize settings from backend
+const normalizeSettings = (payload) => ({
+  ...defaultSettings, // Default values as fallback
+  ...payload, // Override with any existing values
+  distanceRange:
+    payload.distance_range ||
+    payload.distanceRange ||
+    defaultSettings.distanceRange,
+  ageRange: payload.age_range || payload.ageRange || defaultSettings.ageRange,
+  genderPreferences:
+    payload.gender_preferences ||
+    payload.genderPreferences ||
+    defaultSettings.genderPreferences,
+  notificationEnabled:
+    payload.notification_enabled !== undefined
+      ? payload.notification_enabled
+      : payload.notificationEnabled !== undefined
+      ? payload.notificationEnabled
+      : defaultSettings.notificationEnabled,
+  locationSharingEnabled:
+    payload.location_sharing_enabled !== undefined
+      ? payload.location_sharing_enabled
+      : payload.locationSharingEnabled !== undefined
+      ? payload.locationSharingEnabled
+      : defaultSettings.locationSharingEnabled,
+});
 
 const userSettingsReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_USER_SETTINGS:
       return {
         ...state,
-        userSettings: action.payload || defaultSettings, // Fallback to defaults if null
+        userSettings: normalizeSettings(action.payload),
+        loading: false,
+        error: null,
       };
+
     case SAVE_USER_SETTINGS:
       return {
         ...state,
-        userSettings: action.payload,
+        userSettings: normalizeSettings(action.payload),
+        loading: false,
+        error: null,
       };
+
     case SET_DEFAULT_SETTINGS:
       return {
         ...state,
         userSettings: defaultSettings,
+        error: null,
       };
+
     default:
       return state;
   }

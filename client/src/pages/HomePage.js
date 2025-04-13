@@ -50,7 +50,6 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     display: "block",
     transition: "width 0.3s ease",
     borderLeftWidth: "1px",
-
     [theme.breakpoints.down("md")]: {
       flex: "2",
     },

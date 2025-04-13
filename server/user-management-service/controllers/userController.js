@@ -54,30 +54,37 @@ const deactivateUser = async (req, res) => {
   }
 };
 
-const deleteUser = async (id) => {
+const deleteUser = async (req, res) => {
+  const { id } = req.params; // Get ID from request params
+
   try {
     const queryPath = path.join(__dirname, "../db/queries/deleteUser.sql");
     const query = fs.readFileSync(queryPath, "utf8");
     const values = [id];
 
-    console.log("id", id);
+    const { rowCount } = await pool.query(query, values);
 
-    const { rows, rowCount } = await pool.query(query, values);
-
-    console.log("rows", rows);
     if (rowCount > 0) {
-      return {
+      return res.status(200).json({
+        // Use res.json() for responses
         success: true,
         message: "User deleted successfully!",
-      };
+      });
     } else {
-      return {
+      return res.status(404).json({
+        // Handle case where user wasn't found
         success: false,
-        message: "User not found. Please contact support.",
-      };
+        message: "User not found",
+      });
     }
   } catch (error) {
-    throw new Error("Internal server error");
+    console.error("Error deleting user:", error);
+    return res.status(500).json({
+      // Make sure to return the response
+      success: false,
+      message: "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
@@ -351,11 +358,14 @@ const setUserStatusActive = async (req, res) => {
   const userId = req.params.userId;
 
   try {
+    // Read SQL files
     const queryPath = path.join(
       __dirname,
       "../db/queries/setUserStatusActive.sql"
     );
+
     const query = fs.readFileSync(queryPath, "utf8");
+
     const values = [userId];
 
     const { rows, rowCount } = await pool.query(query, values);
@@ -378,6 +388,121 @@ const setUserStatusActive = async (req, res) => {
   }
 };
 
+// Get available gender options
+const getGenderOptions = async () => {
+  const result = await pool.query(
+    fs.readFileSync("getGenderOptions.sql", "utf8")
+  );
+  return result.rows[0].gender_options;
+};
+
+const getUserSettings = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Read SQL files
+    const queryPath = path.join(
+      __dirname,
+      "../db/queries/getUserSettingsWithDefaults.sql"
+    );
+    const query = fs.readFileSync(queryPath, "utf8");
+    const values = [userId];
+    const { rows } = await pool.query(query, values);
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found",
+      });
+    }
+
+    const settings = rows[0];
+
+    // Transform to match frontend expectations
+    res.json({
+      success: true,
+      settings: {
+        distanceRange: settings.distance_range,
+        ageRange: settings.age_range,
+        genderPreferences: settings.gender_preferences || ["men", "women"],
+        showExactLocation: settings.location_sharing_enabled,
+        notificationEnabled: settings.notification_enabled,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching user settings:", err);
+    res.status(500).json({
+      success: false,
+      error: "Failed to retrieve user settings",
+    });
+  }
+};
+
+const saveUserSettings = async (req, res) => {
+  const { userId } = req.params;
+  const {
+    distanceRange,
+    ageRange,
+    genderPreferences,
+    notificationEnabled,
+    locationSharingEnabled,
+  } = req.body;
+
+  // Validate required fields
+  if (!distanceRange || !ageRange || !genderPreferences) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing required fields",
+    });
+  }
+
+  try {
+    const query = fs.readFileSync(
+      path.join(__dirname, "../db/queries/upsertUserSettings.sql"),
+      "utf8"
+    );
+
+    const values = [
+      userId,
+      distanceRange,
+      ageRange,
+      genderPreferences,
+      notificationEnabled,
+      locationSharingEnabled,
+    ];
+
+    console.log("Sending genderPreferences:", genderPreferences);
+
+    const { rows } = await pool.query(query, values);
+
+    if (!rows.length) {
+      return res.status(500).json({
+        success: false,
+        error: "Failed to save settings",
+      });
+    }
+
+    const settings = rows[0];
+
+    res.json({
+      success: true,
+      settings: {
+        distance_range: settings.distance_range,
+        age_range: settings.age_range,
+        gender_preferences: settings.gender_preferences,
+        location_sharing_enabled: settings.location_sharing_enabled,
+        notification_enabled: settings.notification_enabled,
+      },
+    });
+  } catch (err) {
+    console.error("Error saving user settings:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message || "Server error",
+    });
+  }
+};
+
 module.exports = {
   deactivateUser,
   deleteUser,
@@ -391,4 +516,7 @@ module.exports = {
   updateUserSocialMedia,
   updateUserName,
   setUserStatusActive,
+  getGenderOptions,
+  getUserSettings,
+  saveUserSettings,
 };

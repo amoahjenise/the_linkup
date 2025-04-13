@@ -72,18 +72,22 @@ const StyledDiv = styled("div", {
   },
 }));
 
-const LinkupHistoryPageContainer = styled("div")(({ theme }) => ({
+const LinkupHistoryPageContainer = styled("div")(({ theme, isMobile }) => ({
   display: "flex",
-  width: "100%",
-  height: "100%",
+  position: "relative",
+  height: "100%", // Make container occupy full viewport height
+  width: "100%", // Ensure it takes up full width
 }));
 
-const HistorySection = styled("div")(({ theme }) => ({
+const HistorySection = styled("div")(({ theme, isMobile }) => ({
   display: "flex",
   flexDirection: "column",
   width: "auto",
   overflowY: "auto",
   flex: 1,
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 }));
 
 const FilterBarContainer = styled("div")(({ theme }) => ({
@@ -388,13 +392,11 @@ const LinkUpHistoryPage = ({ isMobile }) => {
   ]);
 
   return (
-    <LinkupHistoryPageContainer>
+    <LinkupHistoryPageContainer isMobile={isMobile}>
       {!isMobile ? (
         <>
           {/* Left section with TabBar */}
-          <HistorySection
-          // style={{ width: isMobile ? "100%" : "70%", overflowY: "auto" }}
-          >
+          <HistorySection isMobile={isMobile}>
             <TopBarContainer>
               <TopNavBar title="Linkups" />
             </TopBarContainer>
