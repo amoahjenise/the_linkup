@@ -52,9 +52,9 @@ export const SocketProvider = ({ children }) => {
       // Use default values if userSettings is missing or incomplete
       const ageRange = userSettings?.ageRange || [18, 99];
       const distanceRange = userSettings?.distanceRange || [0, 50];
-      const genderRange =
-        userSettings?.genderRange?.length > 0
-          ? userSettings.genderRange
+      const genderPreferences =
+        userSettings?.genderPreferences?.length > 0
+          ? userSettings.genderPreferences
           : [
               { key: "men", value: "Men" },
               { key: "women", value: "Women" },
@@ -83,8 +83,10 @@ export const SocketProvider = ({ children }) => {
 
       // Gender filter
       if (
-        genderRange.length > 0 &&
-        !genderRange.some((g) => g.value === linkup.creator_gender)
+        genderPreferences.length > 0 &&
+        !genderPreferences.some(
+          (g) => g.value === linkup.creator_gender.toLowerCase()
+        )
       ) {
         return false;
       }

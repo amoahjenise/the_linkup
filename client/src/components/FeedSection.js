@@ -129,7 +129,7 @@ const FeedSection = ({
 
   const distanceRange = userSettings?.distanceRange || [0, 1000];
   const ageRange = userSettings?.ageRange || [18, 99];
-  const genderRange = userSettings?.genderRange || [];
+  const genderPreferences = userSettings?.genderPreferences || [];
 
   // Apply filtering logic with loading state
   useEffect(() => {
@@ -157,8 +157,8 @@ const FeedSection = ({
           }
 
           if (
-            genderRange.length > 0 &&
-            !genderRange.includes(linkup.creator_gender)
+            genderPreferences.length > 0 &&
+            !genderPreferences.includes(linkup.creator_gender.toLowerCase())
           ) {
             return false;
           }
