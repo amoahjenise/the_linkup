@@ -10,7 +10,7 @@ const subtleBounce = keyframes`
 
 const FloatingButton = styled(Button)(({ colorMode, isloading }) => ({
   position: "sticky",
-  top: "5%", // Positioned just below the search bar
+  top: "5%",
   left: "50%",
   transform: "translateX(-50%)",
   zIndex: 1100,
@@ -18,15 +18,10 @@ const FloatingButton = styled(Button)(({ colorMode, isloading }) => ({
   width: "100px",
   height: "32px",
   borderRadius: "9999px",
-  backgroundColor:
-    colorMode === "dark" ? "rgba(29, 155, 240, 0.3)" : "rgba(15, 20, 25, 0.05)",
-  color:
-    colorMode === "dark" ? "rgba(239, 243, 244, 0.9)" : "rgba(15, 20, 25, 0.9)",
+  backgroundColor: "rgba(0, 151, 167, 0.3)",
+  color: "#FFFFFF",
   backdropFilter: "blur(4px)",
-  border:
-    colorMode === "dark"
-      ? "1px solid rgba(239, 243, 244, 0.1)"
-      : "1px solid rgba(15, 20, 25, 0.1)",
+  border: "1px solid rgba(0, 151, 167, 0.3)",
   padding: 0,
   transition: "all 0.15s ease-out",
   opacity: 0.9,
@@ -41,21 +36,12 @@ const FloatingButton = styled(Button)(({ colorMode, isloading }) => ({
   },
 
   "&:hover": {
-    backgroundColor:
-      colorMode === "dark"
-        ? "rgba(29, 155, 240, 0.2)"
-        : "rgba(29, 155, 240, 0.15)",
-    color: colorMode === "dark" ? "rgb(29, 155, 240)" : "rgb(29, 155, 240)",
-    borderColor:
-      colorMode === "dark"
-        ? "rgba(29, 155, 240, 0.3)"
-        : "rgba(29, 155, 240, 0.3)",
+    backgroundColor: "rgba(0, 151, 167, 0.5)",
+    color: "#FFFFFF",
+    borderColor: "rgba(0, 151, 167, 0.5)",
     opacity: 1,
     transform: "translateX(-50%) scale(1.08)",
-    boxShadow:
-      colorMode === "dark"
-        ? "0 2px 12px rgba(29, 155, 240, 0.2)"
-        : "0 2px 8px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 2px 8px rgba(0, 151, 167, 0.3)",
   },
 
   "&:active": {
