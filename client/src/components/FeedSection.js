@@ -1,22 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { styled } from "@mui/material/styles";
+import { Button, Skeleton } from "@mui/material";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { keyframes } from "@mui/system";
+import debounce from "lodash/debounce";
 import LinkupItem from "./LinkupItem";
 import TopNavBar from "./TopNavBar";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import LoadingSpinner from "./LoadingSpinner";
-import { styled } from "@mui/material/styles";
 import NewLinkupButton from "./NewLinkupButton";
 import SearchInput from "./SearchInputWidget";
 import { searchLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
-import debounce from "lodash/debounce";
-import Button from "@mui/material/Button";
-import { Skeleton } from "@mui/material";
-// import PullToRefresh from "react-pull-to-refresh";
-// import { CircularProgress } from "@mui/material";
-import { keyframes } from "@mui/system";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
+// Styled components remain at the top level
 const Root = styled("div")(({ theme, isMobile }) => ({
   position: "relative",
   display: "flex",
@@ -27,17 +31,15 @@ const Root = styled("div")(({ theme, isMobile }) => ({
   marginBottom: isMobile ? 64 : 15,
 }));
 
-// Animation for the arrow
 const rotate = keyframes`
   0% { transform: rotate(0deg); opacity: 0.5; }
   50% { transform: rotate(180deg); opacity: 1; }
   100% { transform: rotate(360deg); opacity: 0.5; }
 `;
 
-// Styled arrow component
 const RefreshArrow = styled(ArrowDownwardIcon)({
   animation: `${rotate} 1s infinite`,
-  color: "#0097A7", // Your brand color
+  color: "#0097A7",
   fontSize: "2rem",
   transition: "transform 0.3s ease",
 });
@@ -87,23 +89,6 @@ const SkeletonFeed = styled("div")({
   padding: "16px",
 });
 
-const calculateAge = (dob) => {
-  const birthDate = new Date(dob);
-  const currentDate = new Date();
-  const age = currentDate.getFullYear() - birthDate.getFullYear();
-  const month = currentDate.getMonth();
-  const day = currentDate.getDate();
-
-  if (
-    month < birthDate.getMonth() ||
-    (month === birthDate.getMonth() && day < birthDate.getDate())
-  ) {
-    return age - 1;
-  }
-
-  return age;
-};
-
 const FeedSection = ({
   linkupList,
   isLoading,
@@ -117,90 +102,109 @@ const FeedSection = ({
   isMobile,
 }) => {
   const dispatch = useDispatch();
+
+  // Memoized selectors
   const userSentRequests = useSelector((state) => state.userSentRequests);
   const showNewLinkupButton = useSelector(
     (state) => state.linkups.showNewLinkupButton
   );
   const { userSettings } = useSelector((state) => state.userSettings);
+
+  // State
   const [isFiltering, setIsFiltering] = useState(false);
   const [filteredLinkups, setFilteredLinkups] = useState([]);
   const [showScrollToTopButton, setShowScrollToTopButton] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  const distanceRange = userSettings?.distanceRange || [0, 1000];
-  const ageRange = userSettings?.ageRange || [18, 99];
-  const genderPreferences = userSettings?.genderPreferences || [];
+  // Moved calculateAge inside the component
+  const calculateAge = useCallback((dob) => {
+    const birthDate = new Date(dob);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const month = currentDate.getMonth();
+    const day = currentDate.getDate();
 
-  // Apply filtering logic with loading state
-  useEffect(() => {
-    if (!linkupList || linkupList.length === 0) {
-      setFilteredLinkups([]);
-      return;
+    if (
+      month < birthDate.getMonth() ||
+      (month === birthDate.getMonth() && day < birthDate.getDate())
+    ) {
+      age--;
     }
-
-    const filterLinkups = () => {
-      setIsFiltering(true);
-      try {
-        return linkupList.filter((linkup) => {
-          if (linkup.creator_id === userId) {
-            return true;
-          }
-
-          const distance = linkup.distance || 0;
-          if (distance < distanceRange[0] || distance > distanceRange[1]) {
-            return false;
-          }
-
-          const age = calculateAge(linkup.date_of_birth) || 0;
-          if (age < ageRange[0] || age > ageRange[1]) {
-            return false;
-          }
-
-          if (
-            genderPreferences.length > 0 &&
-            !genderPreferences.includes(linkup.creator_gender.toLowerCase())
-          ) {
-            return false;
-          }
-
-          return true;
-        });
-      } finally {
-        setIsFiltering(false);
-      }
-    };
-
-    const filtered = filterLinkups();
-    setFilteredLinkups(filtered);
-  }, [linkupList, userSettings, userId]);
-
-  const scrollToTop = () => {
-    if (feedRef.current) {
-      feedRef.current.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const handleScroll = () => {
-    if (feedRef.current) {
-      setShowScrollToTopButton(feedRef.current.scrollTop > 200);
-    }
-  };
-
-  useEffect(() => {
-    const currentRef = feedRef.current;
-    if (currentRef) {
-      currentRef.addEventListener("scroll", handleScroll);
-    }
-    return () => {
-      if (currentRef) {
-        currentRef.removeEventListener("scroll", handleScroll);
-      }
-    };
+    return age;
   }, []);
 
+  // Memoized derived values
+  const { distanceRange, ageRange, genderPreferences } = useMemo(
+    () => ({
+      distanceRange: userSettings?.distanceRange || [0, 1000],
+      ageRange: userSettings?.ageRange || [18, 99],
+      genderPreferences: userSettings?.genderPreferences || [],
+    }),
+    [userSettings]
+  );
+
+  // Filter linkups with memoization
+  const filterLinkups = useCallback(() => {
+    if (!linkupList || linkupList.length === 0) return [];
+
+    return linkupList.filter((linkup) => {
+      if (linkup.creator_id === userId) return true;
+
+      const distance = linkup.distance || 0;
+      if (distance < distanceRange[0] || distance > distanceRange[1])
+        return false;
+
+      const age = calculateAge(linkup.date_of_birth) || 0;
+      if (age < ageRange[0] || age > ageRange[1]) return false;
+
+      if (
+        genderPreferences.length > 0 &&
+        !genderPreferences.includes(linkup.creator_gender.toLowerCase())
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [
+    linkupList,
+    userId,
+    distanceRange,
+    ageRange,
+    genderPreferences,
+    calculateAge,
+  ]);
+
+  // Apply filtering with loading state
+  useEffect(() => {
+    setIsFiltering(true);
+    const timer = setTimeout(() => {
+      setFilteredLinkups(filterLinkups());
+      setIsFiltering(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [filterLinkups]);
+
+  // Scroll handlers
+  const scrollToTop = useCallback(() => {
+    feedRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [feedRef]);
+
+  const handleScroll = useCallback(() => {
+    setShowScrollToTopButton(feedRef.current?.scrollTop > 200);
+  }, [feedRef]);
+
+  // Scroll event listener
+  useEffect(() => {
+    const currentRef = feedRef.current;
+    if (!currentRef) return;
+
+    currentRef.addEventListener("scroll", handleScroll);
+    return () => currentRef.removeEventListener("scroll", handleScroll);
+  }, [feedRef, handleScroll]);
+
+  // Debounced search
   const debounceSearchRef = useRef(
     debounce(async (value) => {
       try {
@@ -220,105 +224,47 @@ const FeedSection = ({
         setSearchLoading(false);
       }
     }, 300)
+  ).current;
+
+  const handleInputChange = useCallback(
+    (event) => {
+      setSearchLoading(true);
+      debounceSearchRef(event.target.value);
+    },
+    [debounceSearchRef]
   );
 
-  const handleInputChange = (event) => {
-    setSearchLoading(true);
-    debounceSearchRef.current(event.target.value);
-  };
-
-  // // Combined loading states
+  // Combined loading states
   const showLoading = isLoading || isFiltering || searchLoading;
   const showContent = !isLoading && !isFiltering && !searchLoading;
 
-  // const PullToRefreshContainer = ({ onRefresh, children }) => {
-  //   const [pulling, setPulling] = useState(false);
-  //   const [refreshing, setRefreshing] = useState(false);
-
-  //   return (
-  //     <div
-  //       style={{ position: "relative" }}
-  //       onTouchStart={(e) => {
-  //         if (window.scrollY === 0) {
-  //           setPulling(true);
-  //         }
-  //       }}
-  //       onTouchMove={(e) => {
-  //         if (pulling && window.scrollY === 0) {
-  //           const pullDistance = e.touches[0].clientY;
-  //           if (pullDistance > 80) {
-  //             // 80px threshold
-  //             setRefreshing(true);
-
-  //             Promise.all([
-  //               new Promise((resolve) => setTimeout(resolve, 500)), // Minimum 1 second display
-  //             ]).finally(() => {
-  //               onRefresh();
-  //               setRefreshing(false);
-  //             });
-  //           }
-  //         }
-  //       }}
-  //       onTouchEnd={() => {
-  //         setPulling(false);
-  //         if (!refreshing) {
-  //           setRefreshing(false);
-  //         }
-  //       }}
-  //     >
-  //       {(pulling || refreshing) && (
-  //         <div
-  //           style={{
-  //             position: "absolute",
-  //             top: 0,
-  //             left: 0,
-  //             right: 0,
-  //             display: "flex",
-  //             justifyContent: "center",
-  //             padding: "16px 0",
-  //             height: "60px",
-  //             alignItems: "center",
-  //           }}
-  //         >
-  //           {/* {refreshing ? (
-  //             <CircularProgress color="primary" />
-  //           ) : ( */}
-  //           <ArrowDownwardIcon
-  //             style={{
-  //               animation: refreshing ? `${rotate} 1s infinite` : "none",
-  //               color: "#0097A7",
-  //               fontSize: "1.5rem",
-  //               transform: `rotate(${refreshing ? 180 : 0}deg)`,
-  //               transition: "transform 0.3s ease",
-  //               opacity: 0.6,
-  //             }}
-  //           />
-  //           {/* )} */}
-  //         </div>
-  //       )}
-  //       <div
-  //         style={{
-  //           transform: refreshing ? "translateY(60px)" : "none",
-  //           transition: "transform 0.3s ease",
-  //         }}
-  //       >
-  //         {children}
-  //       </div>
-  //     </div>
-  //   );
-  // };
+  // Memoized linkup items
+  const renderedLinkups = useMemo(
+    () =>
+      filteredLinkups.map((linkup) => (
+        <LinkupItem
+          key={linkup.id}
+          linkupItem={linkup}
+          setShouldFetchLinkups={setShouldFetchLinkups}
+          disableRequest={userSentRequests.some(
+            (request) => request.linkup_id === linkup.id
+          )}
+        />
+      )),
+    [filteredLinkups, setShouldFetchLinkups, userSentRequests]
+  );
 
   return (
     <Root isMobile={isMobile}>
       <TopNavBar title="Home" />
-      {/* <PullToRefreshContainer onRefresh={onRefreshClick}> */}
       <SearchInputContainer>
         <SearchInput
           handleInputChange={handleInputChange}
           loading={searchLoading}
         />
       </SearchInputContainer>
-      {showLoading && (
+
+      {showLoading ? (
         <LoadingContainer>
           {isLoading ? (
             <LoadingSpinner />
@@ -330,34 +276,27 @@ const FeedSection = ({
             </SkeletonFeed>
           )}
         </LoadingContainer>
+      ) : (
+        showContent && (
+          <>
+            {linkupList.length === 0 ? (
+              <EmptyFeedPlaceholder />
+            ) : (
+              renderedLinkups
+            )}
+            {showNewLinkupButton && (
+              <NewLinkupButton onClick={onRefreshClick} />
+            )}
+            {showScrollToTopButton && (
+              <StyledButton variant="contained" onClick={scrollToTop}>
+                Scroll to Top
+              </StyledButton>
+            )}
+          </>
+        )
       )}
-      {showContent && (
-        <>
-          {linkupList.length === 0 ? (
-            <EmptyFeedPlaceholder />
-          ) : (
-            filteredLinkups.map((linkup) => (
-              <LinkupItem
-                key={linkup.id}
-                linkupItem={linkup}
-                setShouldFetchLinkups={setShouldFetchLinkups}
-                disableRequest={userSentRequests.some(
-                  (request) => request.linkup_id === linkup.id
-                )}
-              />
-            ))
-          )}
-          {showNewLinkupButton && <NewLinkupButton onClick={onRefreshClick} />}
-          {showScrollToTopButton && (
-            <StyledButton variant="contained" onClick={scrollToTop}>
-              Scroll to Top
-            </StyledButton>
-          )}
-        </>
-      )}
-      {/* </PullToRefreshContainer> */}
     </Root>
   );
 };
 
-export default FeedSection;
+export default React.memo(FeedSection);

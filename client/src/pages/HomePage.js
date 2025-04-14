@@ -1,58 +1,48 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
+import { IconButton } from "@mui/material";
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
+import { useColorMode } from "@chakra-ui/react";
+import { debounce } from "lodash";
 import FeedSection from "../components/FeedSection";
 import WidgetSection from "../components/WidgetSection";
 import { mergeLinkupsSuccess } from "../redux/actions/linkupActions";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkups } from "../api/linkUpAPI";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-import { IconButton } from "@mui/material";
-import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
-import { useColorMode } from "@chakra-ui/react";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useLocationUpdate from "../hooks/useLocationUpdate";
-import { debounce } from "lodash";
 
-const PREFIX = "HomePage";
-const classes = {
-  homePage: `${PREFIX}-homePage`,
-  feedSection: `${PREFIX}-feedSection`,
-  widgetSection: `${PREFIX}-widgetSection`,
-  widgetButton: `${PREFIX}-widgetButton`,
-  widgetCloseButton: `${PREFIX}-widgetCloseButton`,
-  loadingContainer: `${PREFIX}-loadingContainer`,
-  slideIn: `${PREFIX}-slideIn`,
-  slideOut: `${PREFIX}-slideOut`,
-};
+const PAGE_SIZE = 20;
 
 const StyledDiv = styled("div")(({ theme, colorMode }) => ({
-  [`&.${classes.homePage}`]: {
+  [`&.homePage`]: {
     display: "flex",
     width: "100%",
     position: "relative",
   },
-  [`&.${classes.feedSection}`]: {
+  [`&.feedSection`]: {
     flex: "2.5",
     overflowY: "auto",
     borderRightColor: colorMode === "dark" ? "#2D3748" : "#D3D3D3",
-    [theme.breakpoints.down("md")]: {
-      flex: "2",
-    },
-    [theme.breakpoints.down("sm")]: {
-      flex: "1",
-    },
+    [theme.breakpoints.down("md")]: { flex: "2" },
+    [theme.breakpoints.down("sm")]: { flex: "1" },
   },
-  [`&.${classes.widgetSection}`]: {
+  [`&.widgetSection`]: {
     flex: "1.5",
     overflowY: "auto",
     display: "block",
     transition: "width 0.3s ease",
     borderLeftWidth: "1px",
-    [theme.breakpoints.down("md")]: {
-      flex: "2",
-    },
+    [theme.breakpoints.down("md")]: { flex: "2" },
     [theme.breakpoints.down("sm")]: {
       flex: "2",
       position: "fixed",
@@ -70,91 +60,81 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
       overflowY: "auto",
     },
   },
-  [`&.${classes.widgetButton}`]: {
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
-    zIndex: 1100,
-    borderRadius: "50%",
-    backgroundColor: theme.palette.mode === "dark" ? "#2D3748" : "#D3D3D3",
-    [theme.breakpoints.up("sm")]: {
-      display: "none",
-    },
-  },
-  [`&.${classes.widgetCloseButton}`]: {
-    position: "absolute",
-    top: "10px",
-    left: "10px",
-    zIndex: 1100,
-  },
-  [`&.${classes.slideIn}`]: {
-    transform: "translateX(0)",
-  },
-  [`&.${classes.slideOut}`]: {
-    transform: "translateX(100%)",
-  },
-  [`&.${classes.loadingContainer}`]: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "100dvh",
-  },
+  [`&.slideIn`]: { transform: "translateX(0)" },
+  [`&.slideOut`]: { transform: "translateX(100%)" },
 }));
-
-const PAGE_SIZE = 20;
 
 const HomePage = ({ isMobile }) => {
   const dispatch = useDispatch();
-  const feedSectionRef = useRef(null);
-  const linkupList = useSelector((state) => state.linkups.linkupList);
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const userId = loggedUser.user.id;
-  const gender = loggedUser.user.gender;
-  const latitude = loggedUser.user.latitude;
-  const longitude = loggedUser.user.longitude;
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
-  const [shouldFetchLinkups, setShouldFetchLinkups] = useState(true);
-  const [fetchedLinkupIds, setFetchedLinkupIds] = useState([]);
-  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const totalPages = Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE);
   const { colorMode } = useColorMode();
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
+  const feedSectionRef = useRef(null);
   const wasManuallyToggled = useRef(false);
+
+  // Memoized selectors
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const linkupList = useSelector((state) => state.linkups.linkupList);
+  const userId = loggedUser.user.id;
+  const userData = useMemo(
+    () => ({
+      gender: loggedUser.user.gender,
+      latitude: loggedUser.user.latitude,
+      longitude: loggedUser.user.longitude,
+    }),
+    [
+      loggedUser.user.gender,
+      loggedUser.user.latitude,
+      loggedUser.user.longitude,
+    ]
+  );
+
+  // State
+  const [state, setState] = useState({
+    currentPage: 1,
+    isFetchingNextPage: false,
+    shouldFetchLinkups: true,
+    fetchedLinkupIds: [],
+    isWidgetVisible: !(window.innerWidth <= 600),
+    isLoading: true,
+    isMobileView: window.innerWidth <= 600,
+  });
+
+  // Derived values
+  const totalPages = useMemo(
+    () => Math.ceil(linkupList[0]?.total_active_linkups / PAGE_SIZE),
+    [linkupList]
+  );
 
   useLocationUpdate();
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
+  // Corrected calculateDistance function
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
-      0.5 -
-      Math.cos(dLat) / 2 +
-      (Math.cos(lat1 * (Math.PI / 180)) *
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
         Math.cos(lat2 * (Math.PI / 180)) *
-        (1 - Math.cos(dLon))) /
-        2;
-    return R * 2 * Math.asin(Math.sqrt(a));
-  };
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
 
   const fetchLinkupsAndPoll = useCallback(
     async (page) => {
-      setIsFetchingNextPage(true);
+      setState((prev) => ({ ...prev, isFetchingNextPage: true }));
       try {
-        if (!userId || page < 1 || PAGE_SIZE < 1) return;
-
         const adjustedPage = page - 1;
         const sqlOffset = adjustedPage * PAGE_SIZE;
 
         const response = await getLinkups(
           userId,
-          gender,
+          userData.gender,
           0,
           sqlOffset + PAGE_SIZE,
-          latitude,
-          longitude
+          userData.latitude,
+          userData.longitude
         );
 
         if (response.success) {
@@ -167,8 +147,8 @@ const HomePage = ({ isMobile }) => {
             isUserCreated: linkup.creator_id === userId,
             createdAtTimestamp: linkup.created_at,
             distance: calculateDistance(
-              latitude,
-              longitude,
+              userData.latitude,
+              userData.longitude,
               linkup.latitude,
               linkup.longitude
             ),
@@ -177,77 +157,76 @@ const HomePage = ({ isMobile }) => {
           updatedLinkupList.sort((a, b) => {
             const createdAtComparison =
               new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
-            if (createdAtComparison !== 0) return createdAtComparison;
-            return a.distance - b.distance;
+            return createdAtComparison !== 0
+              ? createdAtComparison
+              : a.distance - b.distance;
           });
 
-          // Use merge action instead of replace/append
           dispatch(mergeLinkupsSuccess(updatedLinkupList, page === 1));
 
-          setCurrentPage(page);
-          const newFetchedLinkupIds = updatedLinkupList.map(
-            (linkup) => linkup.id
-          );
-          setFetchedLinkupIds((prev) => [
-            ...new Set([...prev, ...newFetchedLinkupIds]),
-          ]);
-        } else {
-          console.error("Error fetching linkups:", response.message);
+          setState((prev) => ({
+            ...prev,
+            currentPage: page,
+            fetchedLinkupIds: [
+              ...new Set([
+                ...prev.fetchedLinkupIds,
+                ...updatedLinkupList.map((linkup) => linkup.id),
+              ]),
+            ],
+          }));
         }
-      } catch (error) {
-        console.error("Error fetching linkups:", error);
       } finally {
-        setIsFetchingNextPage(false);
-        setIsLoading(false);
+        setState((prev) => ({
+          ...prev,
+          isFetchingNextPage: false,
+          isLoading: false,
+        }));
       }
     },
-    [dispatch, gender, latitude, longitude, userId]
+    [userId, userData, calculateDistance, dispatch]
   );
 
   const handleScroll = useCallback(() => {
-    const threshold = `20`;
-    if (
-      feedSectionRef.current &&
-      feedSectionRef.current.scrollHeight - feedSectionRef.current.scrollTop <=
-        feedSectionRef.current.clientHeight + threshold
-    ) {
-      if (currentPage < totalPages && !isFetchingNextPage) {
-        // Save current scroll position
-        const scrollTop = feedSectionRef.current.scrollTop;
-        const scrollHeight = feedSectionRef.current.scrollHeight;
+    const threshold = 20;
+    const { scrollHeight, scrollTop, clientHeight } =
+      feedSectionRef.current || {};
 
-        fetchLinkupsAndPoll(currentPage + 1).then(() => {
-          // Restore scroll position after update
+    if (scrollHeight - scrollTop <= clientHeight + threshold) {
+      if (state.currentPage < totalPages && !state.isFetchingNextPage) {
+        const scrollData = {
+          top: scrollTop,
+          height: scrollHeight,
+        };
+
+        fetchLinkupsAndPoll(state.currentPage + 1).then(() => {
           if (feedSectionRef.current) {
             const newScrollHeight = feedSectionRef.current.scrollHeight;
             feedSectionRef.current.scrollTop =
-              scrollTop + (newScrollHeight - scrollHeight);
+              scrollData.top + (newScrollHeight - scrollData.height);
           }
         });
       }
     }
-  }, [currentPage, fetchLinkupsAndPoll, isFetchingNextPage, totalPages]);
+  }, [
+    state.currentPage,
+    state.isFetchingNextPage,
+    totalPages,
+    fetchLinkupsAndPoll,
+  ]);
 
+  // Effects
   useEffect(() => {
-    if (loggedUser.user.id) {
-      setShouldFetchLinkups(true);
-    }
-  }, [loggedUser]);
-
-  useEffect(() => {
-    if (userId && shouldFetchLinkups) {
+    if (userId && state.shouldFetchLinkups) {
       fetchLinkupsAndPoll(1);
-      setShouldFetchLinkups(false);
+      setState((prev) => ({ ...prev, shouldFetchLinkups: false }));
     }
-  }, [fetchLinkupsAndPoll, shouldFetchLinkups, userId]);
+  }, [userId, state.shouldFetchLinkups, fetchLinkupsAndPoll]);
 
   useEffect(() => {
     const scrollContainer = feedSectionRef.current;
     if (scrollContainer) {
       scrollContainer.addEventListener("scroll", handleScroll);
-      return () => {
-        scrollContainer.removeEventListener("scroll", handleScroll);
-      };
+      return () => scrollContainer.removeEventListener("scroll", handleScroll);
     }
   }, [handleScroll]);
 
@@ -270,119 +249,118 @@ const HomePage = ({ isMobile }) => {
 
   const refreshLinkups = useCallback(() => {
     return new Promise((resolve) => {
-      // Only show loading spinner if we're not already loading
-      if (!isLoading && !isFetchingNextPage) {
-        setIsLoading(true);
+      if (!state.isLoading && !state.isFetchingNextPage) {
+        setState((prev) => ({ ...prev, isLoading: true }));
       }
 
       dispatch(showNewLinkupButton(false));
 
-      // Use a timeout to ensure the UI has time to update before fetching
       setTimeout(() => {
         fetchLinkupsAndPoll(1).finally(() => {
-          setIsLoading(false);
+          setState((prev) => ({ ...prev, isLoading: false }));
           scrollToTop();
-          resolve(); // Resolve the promise when done
+          resolve();
         });
       }, 100);
     });
-  }, [dispatch, fetchLinkupsAndPoll, isLoading, isFetchingNextPage]);
+  }, [
+    state.isLoading,
+    state.isFetchingNextPage,
+    dispatch,
+    fetchLinkupsAndPoll,
+  ]);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     if (feedSectionRef.current) {
       feedSectionRef.current.scrollTop = 0;
     }
-  };
+  }, []);
 
   const toggleWidget = useCallback(() => {
     wasManuallyToggled.current = true;
-    setIsWidgetVisible((prev) => !prev);
+    setState((prev) => ({ ...prev, isWidgetVisible: !prev.isWidgetVisible }));
   }, []);
 
   const handleResize = useCallback(() => {
     const newIsMobile = window.innerWidth <= 600;
-    setIsMobileView(newIsMobile);
-
-    if (!wasManuallyToggled.current) {
-      setIsWidgetVisible(!newIsMobile);
+    if (state.isMobileView !== newIsMobile) {
+      setState((prev) => ({
+        ...prev,
+        isMobileView: newIsMobile,
+        isWidgetVisible: wasManuallyToggled.current
+          ? prev.isWidgetVisible
+          : !newIsMobile,
+      }));
     }
-  }, []);
+  }, [state.isMobileView]);
 
   useEffect(() => {
-    const initialIsMobile = window.innerWidth <= 600;
-    setIsMobileView(initialIsMobile);
-    setIsWidgetVisible(!initialIsMobile);
-
-    const debouncedHandleResize = debounce(() => {
-      const currentIsMobile = window.innerWidth <= 600;
-      if (isMobileView !== currentIsMobile) {
-        handleResize();
-      }
-    }, 100);
-
+    const debouncedHandleResize = debounce(handleResize, 100);
     window.addEventListener("resize", debouncedHandleResize);
-    return () => {
-      window.removeEventListener("resize", debouncedHandleResize);
-    };
-  }, [handleResize, isMobileView]);
+    return () => window.removeEventListener("resize", debouncedHandleResize);
+  }, [handleResize]);
 
-  useEffect(() => {
-    wasManuallyToggled.current = false;
-  }, [isMobileView]);
-
-  if (isLoading) {
+  if (state.isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <StyledDiv className={classes.homePage} colorMode={colorMode}>
-      <StyledDiv className={classes.feedSection} ref={feedSectionRef}>
+    <StyledDiv className="homePage" colorMode={colorMode}>
+      <StyledDiv className="feedSection" ref={feedSectionRef}>
         {userId && (
           <FeedSection
             linkupList={linkupList}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            setShouldFetchLinkups={setShouldFetchLinkups}
+            isLoading={state.isLoading}
+            setIsLoading={(loading) =>
+              setState((prev) => ({ ...prev, isLoading: loading }))
+            }
+            setShouldFetchLinkups={(fetch) =>
+              setState((prev) => ({ ...prev, shouldFetchLinkups: fetch }))
+            }
             onRefreshClick={refreshLinkups}
             userId={userId}
-            gender={gender}
+            gender={userData.gender}
             feedRef={feedSectionRef}
             colorMode={colorMode}
             isMobile={isMobile}
           />
         )}
       </StyledDiv>
+
       <StyledDiv
-        className={`${classes.widgetSection} ${
-          isWidgetVisible ? classes.slideIn : classes.slideOut
+        className={`widgetSection ${
+          state.isWidgetVisible ? "slideIn" : "slideOut"
         }`}
         colorMode={colorMode}
       >
-        {isMobileView && (
+        {state.isMobileView && (
           <IconButton
-            className={classes.widgetCloseButton}
+            sx={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              zIndex: 1100,
+            }}
             onClick={toggleWidget}
-            onTouchStart={(e) => e.preventDefault()}
           >
             <CloseIcon
-              style={{ color: colorMode === "dark" ? "white" : "black" }}
+              sx={{ color: colorMode === "dark" ? "white" : "black" }}
             />
           </IconButton>
         )}
         <WidgetSection
           toggleWidget={toggleWidget}
-          setShouldFetchLinkups={setShouldFetchLinkups}
+          setShouldFetchLinkups={(fetch) =>
+            setState((prev) => ({ ...prev, shouldFetchLinkups: fetch }))
+          }
           scrollToTopCallback={scrollToTop}
-          isMobile={isMobileView}
+          isMobile={state.isMobileView}
         />
       </StyledDiv>
 
-      {isMobileView && !isWidgetVisible && (
+      {state.isMobileView && !state.isWidgetVisible && (
         <IconButton
-          className={classes.widgetButton}
-          onClick={toggleWidget}
-          onTouchStart={(e) => e.preventDefault()}
-          style={{
+          sx={{
             position: "fixed",
             bottom: "100px",
             right: "32px",
@@ -393,6 +371,7 @@ const HomePage = ({ isMobile }) => {
             borderRadius: "50%",
             padding: "12px",
           }}
+          onClick={toggleWidget}
         >
           <AddIcon />
         </IconButton>

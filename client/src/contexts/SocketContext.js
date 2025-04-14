@@ -8,8 +8,8 @@ import {
   showNotification,
 } from "../utils/notificationUtils";
 import { showNewLinkupButton } from "../redux/actions/linkupActions";
-import { calculateDistance, calculateAge } from "../utils/utils"; // Utility functions for distance and age
-import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
+import { calculateDistance, calculateAge } from "../utils/utils";
+import { customGenderOptions } from "../utils/customGenderOptions";
 
 const SocketContext = createContext();
 
@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
   const loggedUser = useSelector((state) => state.loggedUser);
   const userId = loggedUser?.user?.id;
   const userGender = loggedUser?.user?.gender;
-  const userSettings = useSelector((state) => state.userSettings.userSettings); // Get user settings from Redux store
+  const userSettings = useSelector((state) => state.userSettings.userSettings);
 
   const BASE_URL = process.env.REACT_APP_BACKEND_URL;
   const LINKUP_MANAGEMENT_SOCKET_NAMESPACE =
@@ -33,6 +33,10 @@ export const SocketProvider = ({ children }) => {
     () =>
       io(`${BASE_URL}${LINKUP_MANAGEMENT_SOCKET_NAMESPACE}`, {
         query: { userId },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
       }),
     [BASE_URL, LINKUP_MANAGEMENT_SOCKET_NAMESPACE, userId]
   );
@@ -41,6 +45,10 @@ export const SocketProvider = ({ children }) => {
     () =>
       io(`${BASE_URL}${LINKUP_REQUEST_SOCKET_NAMESPACE}`, {
         query: { userId },
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
       }),
     [BASE_URL, LINKUP_REQUEST_SOCKET_NAMESPACE, userId]
   );
@@ -49,20 +57,15 @@ export const SocketProvider = ({ children }) => {
     const isLinkupWithinUserSettings = (linkup) => {
       if (!loggedUser) return false;
 
-      // Use default values if userSettings is missing or incomplete
-      const ageRange = userSettings?.ageRange || [18, 99];
-      const distanceRange = userSettings?.distanceRange || [0, 50];
-      const genderPreferences =
-        userSettings?.genderPreferences?.length > 0
-          ? userSettings.genderPreferences
-          : [
-              { key: "men", value: "Men" },
-              { key: "women", value: "Women" },
-              ...customGenderOptions.map((gender) => ({
-                key: gender.toLowerCase(),
-                value: gender,
-              })),
-            ];
+      // Get current settings from Redux store directly
+      const currentSettings = userSettings || {};
+      const ageRange = currentSettings.ageRange || [18, 99];
+      const distanceRange = currentSettings.distanceRange || [0, 50];
+      const genderPreferences = currentSettings.genderPreferences || [
+        "men",
+        "women",
+        ...customGenderOptions.map((g) => g.toLowerCase()),
+      ];
 
       // Distance filter
       const distance = calculateDistance(
@@ -84,9 +87,7 @@ export const SocketProvider = ({ children }) => {
       // Gender filter
       if (
         genderPreferences.length > 0 &&
-        !genderPreferences.some(
-          (g) => g.value === linkup.creator_gender.toLowerCase()
-        )
+        !genderPreferences.includes(linkup.creator_gender?.toLowerCase())
       ) {
         return false;
       }
@@ -94,69 +95,99 @@ export const SocketProvider = ({ children }) => {
       return true;
     };
 
-    requestNotificationPermission(); // Request notification permission on mount
-
-    linkupManagementSocket.on("linkupCreated", (data) => {
-      // Check if the linkup matches the user's settings
+    const handleLinkupCreated = (data) => {
       if (
-        data.linkup.creator_id === userId || // Skip if the user created the linkup
-        !data.linkup.gender_preference.includes(userGender) || // Skip if gender preference doesn't match
-        !isLinkupWithinUserSettings(data.linkup) // Skip if linkup doesn't match user settings
+        data.linkup.creator_id === userId ||
+        !data.linkup.gender_preference.includes(userGender) ||
+        !isLinkupWithinUserSettings(data.linkup)
       ) {
         return;
       }
+      dispatch(showNewLinkupButton(true));
+    };
 
-      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
-    });
+    const handleLinkupUpdated = (data) => {
+      if (data.linkup.creator_id === userId || !isLinkupWithinUserSettings(data.linkup)) {
+        return;
+      }
+      dispatch(showNewLinkupButton(true));
+    };
 
-    linkupManagementSocket.on("linkupUpdated", (data) => {
-      if (data.linkup.creator_id === userId) return; // Skip if the user updated the linkup
-      if (!isLinkupWithinUserSettings(data.linkup)) return; // Skip if linkup doesn't match user settings
-
-      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
-    });
-
-    linkupManagementSocket.on("linkupDeleted", (data) => {
+    const handleLinkupDeleted = (data) => {
       if (
-        data.linkup.creator_id === userId || // Skip if the user deleted the linkup
-        !data.linkup.gender_preference.includes(userGender) || // Skip if gender preference doesn't match
-        !isLinkupWithinUserSettings(data.linkup) // Skip if linkup doesn't match user settings
+        data.linkup.creator_id === userId ||
+        !data.linkup.gender_preference.includes(userGender) ||
+        !isLinkupWithinUserSettings(data.linkup)
       ) {
         return;
       }
+      dispatch(showNewLinkupButton(true));
+    };
 
-      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
-    });
-
-    linkupManagementSocket.on("linkupExpired", (data) => {
+    const handleLinkupExpired = (data) => {
       addSnackbar(data.message, { timeout: 7000 });
       showNotification("Linkup Expired", data.message);
-      dispatch(showNewLinkupButton(true)); // Dispatch action to show the NewLinkupButton
-    });
+      dispatch(showNewLinkupButton(true));
+    };
 
-    linkupRequestSocket.on("new-linkup-request", (notification) => {
+    const handleNewLinkupRequest = (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
       showNotification("New Linkup Request", notification.content);
-    });
+    };
 
-    linkupRequestSocket.on("request-accepted", (notification) => {
+    const handleRequestAccepted = (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
       showNotification("Request Accepted", notification.content);
-    });
+    };
 
-    linkupRequestSocket.on("request-declined", (notification) => {
+    const handleRequestDeclined = (notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
       showNotification("Request Declined", notification.content);
-    });
+    };
+
+    // Request notification permission only if not already granted
+    if (Notification.permission === "default") {
+      requestNotificationPermission();
+    }
+
+    // Add debug listeners
+    if (process.env.NODE_ENV === "development") {
+      linkupManagementSocket.on("connect", () => console.log("Management socket connected"));
+      linkupManagementSocket.on("disconnect", () => console.log("Management socket disconnected"));
+      linkupRequestSocket.on("connect", () => console.log("Request socket connected"));
+      linkupRequestSocket.on("disconnect", () => console.log("Request socket disconnected"));
+    }
+
+    // Set up event listeners
+    linkupManagementSocket.on("linkupCreated", handleLinkupCreated);
+    linkupManagementSocket.on("linkupUpdated", handleLinkupUpdated);
+    linkupManagementSocket.on("linkupDeleted", handleLinkupDeleted);
+    linkupManagementSocket.on("linkupExpired", handleLinkupExpired);
+
+    linkupRequestSocket.on("new-linkup-request", handleNewLinkupRequest);
+    linkupRequestSocket.on("request-accepted", handleRequestAccepted);
+    linkupRequestSocket.on("request-declined", handleRequestDeclined);
 
     return () => {
-      linkupManagementSocket.disconnect();
-      linkupRequestSocket.disconnect();
+      // Clean up event listeners
+      linkupManagementSocket.off("linkupCreated", handleLinkupCreated);
+      linkupManagementSocket.off("linkupUpdated", handleLinkupUpdated);
+      linkupManagementSocket.off("linkupDeleted", handleLinkupDeleted);
+      linkupManagementSocket.off("linkupExpired", handleLinkupExpired);
+
+      linkupRequestSocket.off("new-linkup-request", handleNewLinkupRequest);
+      linkupRequestSocket.off("request-accepted", handleRequestAccepted);
+      linkupRequestSocket.off("request-declined", handleRequestDeclined);
+
+      // Remove debug listeners
       if (process.env.NODE_ENV === "development") {
-        console.log("Client side disconnected from sockets.");
+        linkupManagementSocket.off("connect");
+        linkupManagementSocket.off("disconnect");
+        linkupRequestSocket.off("connect");
+        linkupRequestSocket.off("disconnect");
       }
     };
   }, [
@@ -164,9 +195,9 @@ export const SocketProvider = ({ children }) => {
     dispatch,
     userId,
     userGender,
-    userSettings,
     linkupManagementSocket,
     linkupRequestSocket,
+    loggedUser, // Only needed for initial check
   ]);
 
   const sockets = useMemo(
@@ -180,4 +211,12 @@ export const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={sockets}>{children}</SocketContext.Provider>
   );
+};
+
+export const useSockets = () => {
+  const context = React.useContext(SocketContext);
+  if (context === undefined) {
+    throw new Error("useSockets must be used within a SocketProvider");
+  }
+  return context;
 };
