@@ -8,6 +8,7 @@ import React, {
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Button, Skeleton } from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { keyframes } from "@mui/system";
 import debounce from "lodash/debounce";
@@ -22,13 +23,14 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 
 // Styled components remain at the top level
 const Root = styled("div")(({ theme, isMobile }) => ({
-  position: "relative",
+  position: "relative", // This is already present
   display: "flex",
   flexDirection: "column",
   borderRadius: "8px",
   maxWidth: "100vw",
   minHeight: "100dvh",
   marginBottom: isMobile ? 64 : 15,
+  width: "100%",
 }));
 
 const rotate = keyframes`
@@ -59,26 +61,58 @@ const SearchInputContainer = styled("div")(({ theme }) => ({
   zIndex: theme.zIndex.appBar,
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  position: "fixed",
+const ScrollToTopButton = styled(Button)(({ theme, colorMode, isMobile }) => ({
+  position: "sticky",
   left: "50%",
   transform: "translateX(-50%)",
+  bottom: "80px",
   zIndex: 1100,
-  padding: "5px 10px",
-  fontSize: "12px",
-  borderRadius: "20px",
-  background:
-    "linear-gradient(120deg, rgba(0, 121, 107, 0.25), rgba(150, 190, 220, 0.25))",
-  color: "#fff",
-  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-  transition: "transform 0.3s ease, background 0.3s ease",
-  "&:hover": {
-    background: "linear-gradient(120deg, #004D40, rgba(120, 160, 190, 1))",
-    transform: "translateX(-50%) translateY(-5px)",
+  minWidth: "auto",
+  width: "100px",
+  height: "32px",
+  borderRadius: "9999px",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(29, 155, 240, 0.3)" : "rgba(15, 20, 25, 0.05)",
+  color:
+    colorMode === "dark" ? "rgba(239, 243, 244, 0.9)" : "rgba(15, 20, 25, 0.9)",
+  backdropFilter: "blur(4px)",
+  border:
+    colorMode === "dark"
+      ? "1px solid rgba(239, 243, 244, 0.1)"
+      : "1px solid rgba(15, 20, 25, 0.1)",
+  padding: 0,
+  transition: "all 0.15s ease-out",
+  opacity: 0.9,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "4px",
+
+  "& svg": {
+    fontSize: "16px",
+    transition: "all 0.2s ease",
   },
-  bottom: "10%",
-  [theme.breakpoints.down("sm")]: {
-    bottom: "70px",
+
+  "&:hover": {
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(29, 155, 240, 0.2)"
+        : "rgba(29, 155, 240, 0.15)",
+    color: colorMode === "dark" ? "rgb(29, 155, 240)" : "rgb(29, 155, 240)",
+    borderColor:
+      colorMode === "dark"
+        ? "rgba(29, 155, 240, 0.3)"
+        : "rgba(29, 155, 240, 0.3)",
+    opacity: 1,
+    transform: "translateX(-50%) scale(1.08)",
+    boxShadow:
+      colorMode === "dark"
+        ? "0 2px 12px rgba(29, 155, 240, 0.2)"
+        : "0 2px 8px rgba(0, 0, 0, 0.1)",
+  },
+
+  "&:active": {
+    transform: "translateX(-50%) scale(0.95)",
   },
 }));
 
@@ -263,7 +297,9 @@ const FeedSection = ({
           loading={searchLoading}
         />
       </SearchInputContainer>
-
+      {showNewLinkupButton && (
+        <NewLinkupButton onClick={onRefreshClick} colorMode={colorMode} />
+      )}
       {showLoading ? (
         <LoadingContainer>
           {isLoading ? (
@@ -284,13 +320,16 @@ const FeedSection = ({
             ) : (
               renderedLinkups
             )}
-            {showNewLinkupButton && (
-              <NewLinkupButton onClick={onRefreshClick} />
-            )}
             {showScrollToTopButton && (
-              <StyledButton variant="contained" onClick={scrollToTop}>
-                Scroll to Top
-              </StyledButton>
+              <ScrollToTopButton
+                onClick={scrollToTop}
+                aria-label="Scroll to top"
+                disableRipple
+                colorMode={colorMode}
+              >
+                <ArrowUpwardIcon sx={{ fontSize: "16px" }} />
+                Top
+              </ScrollToTopButton>
             )}
           </>
         )
