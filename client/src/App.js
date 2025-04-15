@@ -324,7 +324,10 @@ const App = () => {
           path="/messages"
           element={<ConversationsPage isMobile={isMobile} />}
         />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route
+          path="/settings"
+          element={<SettingsPage isMobile={isMobile} />}
+        />
         <Route path="/Error" element={<ErrorPage />} />
         <Route path="/pricing" element={<PricingPage isMobile={isMobile} />} />
       </Routes>
