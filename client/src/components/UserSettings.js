@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import {
@@ -12,38 +12,33 @@ import {
   Divider,
   Box,
   Collapse,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Switch,
-  FormControlLabel,
   Slider,
   useTheme,
 } from "@mui/material";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { ContentCopy, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { saveUserSettings as saveSettingsToRedux } from "../redux/actions/userSettingsActions";
 import { saveUserSettings as saveSettingsToDB } from "../api/usersAPI";
 import { customGenderOptions } from "../utils/customGenderOptions";
 
-// Styled Components with proper colorMode integration
+// Constants
+const MAX_DISTANCE = 1000;
+const MIN_AGE = 18;
+const MAX_AGE = 80;
+
+// Styled components with proper dark mode support
 const Container = styled(Card)(({ theme, colormode }) => ({
   maxWidth: 600,
   margin: "auto",
   borderRadius: theme.shape.borderRadius * 3,
   boxShadow: theme.shadows[6],
   transition: "all 0.3s ease",
-  "&:hover": {
-    boxShadow: theme.shadows[8],
-  },
   backgroundColor:
     colormode === "dark"
       ? theme.palette.grey[900]
       : theme.palette.background.paper,
+  "&:hover": { boxShadow: theme.shadows[8] },
 }));
 
 const SectionTitle = styled(Typography)(({ theme, colormode }) => ({
@@ -62,31 +57,6 @@ const SectionTitle = styled(Typography)(({ theme, colormode }) => ({
   padding: "8px 0",
   "&:hover": {
     color: theme.palette.primary.main,
-  },
-}));
-
-const StyledButton = styled(Button)(({ theme, colormode }) => ({
-  marginTop: 24,
-  padding: "12px 32px",
-  fontSize: "1rem",
-  borderRadius: 12,
-  fontWeight: 600,
-  textTransform: "none",
-  letterSpacing: 0.5,
-  transition: "all 0.2s ease",
-  boxShadow: "none",
-  backgroundColor:
-    colormode === "dark"
-      ? theme.palette.primary.dark
-      : theme.palette.primary.main,
-  color: theme.palette.common.white,
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: theme.shadows[2],
-    backgroundColor:
-      colormode === "dark"
-        ? theme.palette.primary.main
-        : theme.palette.primary.dark,
   },
 }));
 
@@ -130,9 +100,9 @@ const RangeInput = styled(TextField)(({ theme, colormode }) => ({
     color: colormode === "dark" ? theme.palette.common.white : undefined,
   },
   "& input[type=number]": {
-    "-moz-appearance": "textfield", // Firefox
+    "-moz-appearance": "textfield",
     "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
-      "-webkit-appearance": "none", // Safari and Chrome
+      "-webkit-appearance": "none",
       margin: 0,
     },
   },
@@ -161,7 +131,7 @@ const GenderChip = styled(Chip)(({ theme, selected, colormode }) => ({
   },
 }));
 
-const UserSettings = () => {
+const UserSettings = ({ onClose, isMobile }) => {
   const dispatch = useDispatch();
   const { addSnackbar } = useSnackbar();
   const { user } = useSelector((state) => state.loggedUser);
@@ -169,143 +139,148 @@ const UserSettings = () => {
   const { colorMode } = useColorMode();
   const theme = useTheme();
 
-  // State for expanded sections
   const [expandedSections, setExpandedSections] = useState({
     profile: true,
-    discovery: true,
-    privacy: false,
+    feed: true,
   });
-
-  // User settings state - initialized from Redux store
   const [distanceRange, setDistanceRange] = useState(50);
-  const [ageRange, setAgeRange] = useState([18, 99]);
+  const [ageRange, setAgeRange] = useState([MIN_AGE, MAX_AGE]);
   const [genderPreference, setGenderPreference] = useState([]);
-  const [showExactLocation, setShowExactLocation] = useState(false);
 
-  // Initialize state with user settings from Redux
+  // Memoized values
+  const profileUrl = useMemo(
+    () => `${window.location.origin}/profile/${user.id}`,
+    [user.id]
+  );
+
+  const textColor = useMemo(
+    () => (colorMode === "dark" ? theme.palette.common.white : "inherit"),
+    [colorMode, theme]
+  );
+
+  const genderOptions = useMemo(
+    () => [
+      { key: "men", value: "Men" },
+      { key: "women", value: "Women" },
+      ...customGenderOptions.map((gender) => ({
+        key: gender.toLowerCase(),
+        value: gender,
+      })),
+    ],
+    []
+  );
+
   useEffect(() => {
     if (userSettings) {
-      setDistanceRange(
-        userSettings.distanceRange ? userSettings.distanceRange[1] : 50
-      );
-      setAgeRange(userSettings.ageRange || [18, 99]);
-      // Convert stored genders to lowercase for consistent comparison
+      setDistanceRange(userSettings.distanceRange?.[1] ?? 50);
+      setAgeRange(userSettings.ageRange ?? [MIN_AGE, MAX_AGE]);
       setGenderPreference(
         (userSettings.genderPreferences || []).map((g) =>
           typeof g === "string" ? g.toLowerCase() : g
         )
       );
-      setShowExactLocation(userSettings.showExactLocation || false);
     }
   }, [userSettings]);
 
-  const genderOptions = [
-    { key: "men", value: "Men" },
-    { key: "women", value: "Women" },
-    ...customGenderOptions.map((gender) => ({
-      key: gender.toLowerCase(),
-      value: gender,
-    })),
-  ];
+  const toggleSection = useCallback((section) => {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  }, []);
 
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
+  // Distance handlers - matches old version behavior
+  const handleDistanceChange = useCallback((e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+    const finalValue = numericValue === "" ? 0 : parseInt(numericValue, 10);
+    setDistanceRange(Math.min(MAX_DISTANCE, Math.max(0, finalValue)));
+  }, []);
 
-  const handleGenderSelect = (gender) => {
+  // Age handlers - matches old version behavior
+  const handleAgeMinChange = useCallback((e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+    const finalValue =
+      numericValue === "" ? MIN_AGE : parseInt(numericValue, 10);
+    setAgeRange((prev) => [
+      Math.min(prev[1] - 1, Math.max(MIN_AGE, finalValue)),
+      prev[1],
+    ]);
+  }, []);
+
+  const handleAgeMaxChange = useCallback((e) => {
+    const value = e.target.value;
+    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
+    const finalValue =
+      numericValue === "" ? MAX_AGE : parseInt(numericValue, 10);
+    setAgeRange((prev) => [
+      prev[0],
+      Math.min(MAX_AGE, Math.max(prev[0] + 1, finalValue)),
+    ]);
+  }, []);
+
+  const handleGenderSelect = useCallback((gender) => {
     setGenderPreference((prev) =>
       prev.includes(gender)
         ? prev.filter((g) => g !== gender)
         : [...prev, gender]
     );
-  };
+  }, []);
 
-  // Fixed distance input handler to remove leading zeros
-  const handleDistanceChange = (e) => {
-    const value = e.target.value;
-    // Remove any non-numeric characters and leading zeros
-    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
-    // Set to 0 if empty, otherwise parse the number
-    const finalValue = numericValue === "" ? 0 : parseInt(numericValue, 10);
-    // Apply min/max constraints
-    setDistanceRange(Math.min(1000, Math.max(0, finalValue)));
-  };
-
-  // Improved age range handlers for manual input
-  const handleAgeMinChange = (e) => {
-    const value = e.target.value;
-    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
-    const finalValue = numericValue === "" ? 18 : parseInt(numericValue, 10);
-    const constrainedValue = Math.min(
-      ageRange[1] - 1,
-      Math.max(18, finalValue)
+  const handleSelectAllGenders = useCallback(() => {
+    setGenderPreference((prev) =>
+      prev.length === genderOptions.length
+        ? []
+        : genderOptions.map((g) => g.key)
     );
-    setAgeRange([constrainedValue, ageRange[1]]);
-  };
+  }, [genderOptions]);
 
-  const handleAgeMaxChange = (e) => {
-    const value = e.target.value;
-    const numericValue = value.replace(/[^0-9]/g, "").replace(/^0+/, "");
-    const finalValue = numericValue === "" ? 99 : parseInt(numericValue, 10);
-    const constrainedValue = Math.min(
-      80,
-      Math.max(ageRange[0] + 1, finalValue)
-    );
-    setAgeRange([ageRange[0], constrainedValue]);
-  };
+  const handleCopyProfileUrl = useCallback(() => {
+    navigator.clipboard
+      .writeText(profileUrl)
+      .then(() => addSnackbar("Profile URL copied to clipboard", "success"))
+      .catch(() => addSnackbar("Failed to copy URL", "error"));
+  }, [profileUrl, addSnackbar]);
 
-  const handleSaveSettings = async () => {
-    console.log("[DEBUG] Save function started");
-
+  const handleSaveSettings = useCallback(async () => {
     try {
       const updatedSettings = {
         distanceRange: [0, distanceRange],
         ageRange,
         genderPreferences: genderPreference.map((g) => g.toLowerCase()),
-        showExactLocation,
-        notificationEnabled: true, // Add if your backend expects this
       };
 
       const response = await saveSettingsToDB(user.id, updatedSettings);
+      if (!response.success) throw new Error(response.message || "Save failed");
 
-      if (!response.success) {
-        throw new Error(response.message || "Failed to save settings");
-      }
-
-      // Dispatch the actual settings data from response
       dispatch(saveSettingsToRedux(response.settings));
-
-      addSnackbar("Settings saved successfully", "success", {
-        autoHideDuration: 2000,
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-      });
+      addSnackbar("Settings saved successfully", "success");
+      // Only close if in mobile mode
+      if (isMobile) {
+        onClose?.();
+      }
     } catch (error) {
       addSnackbar(error.message || "Failed to save settings", "error");
     }
-  };
-
-  const profileUrl = `${window.location.origin}/profile/${user.id}`;
-
-  const handleCopyProfileUrl = () => {
-    navigator.clipboard
-      .writeText(profileUrl)
-      .then(() => addSnackbar("Profile URL copied to clipboard", "success"))
-      .catch(() => addSnackbar("Failed to copy URL", "error"));
-  };
+  }, [
+    distanceRange,
+    ageRange,
+    genderPreference,
+    user.id,
+    dispatch,
+    addSnackbar,
+    onClose,
+    isMobile,
+  ]);
 
   return (
     <Container colormode={colorMode} sx={{ p: { xs: 2, sm: 3 } }}>
       <CardContent>
-        {/* Profile Section */}
+        {/* Profile Sharing Section */}
         <SectionTitle
           colormode={colorMode}
           onClick={() => toggleSection("profile")}
         >
           Profile Sharing
-          {expandedSections.profile ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          {expandedSections.profile ? <ExpandLess /> : <ExpandMore />}
         </SectionTitle>
 
         <Collapse in={expandedSections.profile}>
@@ -354,23 +329,12 @@ const UserSettings = () => {
                         : undefined,
                   },
                 },
-                endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{
-                      color:
-                        colorMode === "dark"
-                          ? theme.palette.common.white
-                          : undefined,
-                    }}
-                  ></InputAdornment>
-                ),
               }}
             />
             <Button
               variant="contained"
               onClick={handleCopyProfileUrl}
-              startIcon={<ContentCopyIcon />}
+              startIcon={<ContentCopy />}
               sx={{
                 borderRadius: 2,
                 minWidth: 120,
@@ -391,24 +355,6 @@ const UserSettings = () => {
               Copy
             </Button>
           </Box>
-
-          {/* <FormControlLabel
-            control={
-              <Switch
-                checked={showExactLocation}
-                onChange={(e) => setShowExactLocation(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Show exact location on profile"
-            sx={{
-              mb: 2,
-              color:
-                colorMode === "dark"
-                  ? theme.palette.common.white
-                  : "text.primary",
-            }}
-          /> */}
         </Collapse>
 
         <Divider
@@ -419,16 +365,16 @@ const UserSettings = () => {
           }}
         />
 
-        {/* Feed Preferences */}
+        {/* Feed Preferences Section */}
         <SectionTitle
           colormode={colorMode}
-          onClick={() => toggleSection("discovery")}
+          onClick={() => toggleSection("feed")}
         >
           Feed Preferences
-          {expandedSections.discovery ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          {expandedSections.feed ? <ExpandLess /> : <ExpandMore />}
         </SectionTitle>
 
-        <Collapse in={expandedSections.discovery}>
+        <Collapse in={expandedSections.feed}>
           {/* Distance Preference */}
           <Typography
             variant="subtitle2"
@@ -449,22 +395,17 @@ const UserSettings = () => {
               onChange={handleDistanceChange}
               InputProps={{
                 endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{
-                      "& .MuiTypography-root": {
+                  <InputAdornment position="end">
+                    <Typography
+                      sx={{
                         color:
                           colorMode === "dark"
                             ? theme.palette.common.white
-                            : undefined,
-                      },
-                      color:
-                        colorMode === "dark"
-                          ? theme.palette.common.white
-                          : undefined,
-                    }}
-                  >
-                    km
+                            : "text.primary",
+                      }}
+                    >
+                      km
+                    </Typography>
                   </InputAdornment>
                 ),
               }}
@@ -473,7 +414,7 @@ const UserSettings = () => {
               value={distanceRange}
               onChange={(e, newValue) => setDistanceRange(newValue)}
               min={0}
-              max={1000}
+              max={MAX_DISTANCE}
               step={10}
               sx={{
                 flex: 1,
@@ -512,12 +453,15 @@ const UserSettings = () => {
                       : undefined,
                 },
               }}
+              InputProps={{
+                readOnly: true,
+              }}
             />
             <Slider
               value={ageRange}
               onChange={(e, newValue) => setAgeRange(newValue)}
-              min={18}
-              max={80}
+              min={MIN_AGE}
+              max={MAX_AGE}
               sx={{
                 flex: 1,
                 color:
@@ -540,6 +484,9 @@ const UserSettings = () => {
                       ? theme.palette.common.white
                       : undefined,
                 },
+              }}
+              InputProps={{
+                readOnly: true,
               }}
             />
           </RangeInputContainer>
@@ -570,111 +517,50 @@ const UserSettings = () => {
               />
             ))}
           </Box>
-        </Collapse>
-
-        <Divider
-          sx={{
-            my: 3,
-            borderColor:
-              colorMode === "dark" ? theme.palette.grey[700] : "divider",
-          }}
-        />
-
-        {/* Privacy Settings (Collapsed by default) */}
-        {/* <SectionTitle
-          colormode={colorMode}
-          onClick={() => toggleSection("privacy")}
-        >
-          Privacy Settings
-          {expandedSections.privacy ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </SectionTitle>
-
-        <Collapse in={expandedSections.privacy}>
-          <Typography
-            variant="body2"
+          <Button
+            onClick={handleSelectAllGenders}
+            variant="outlined"
             sx={{
               color:
-                colorMode === "dark"
-                  ? "rgba(255, 255, 255, 0.7)"
-                  : "text.secondary",
-              mb: 2,
+                colorMode === "dark" ? theme.palette.common.white : "inherit",
+              borderColor:
+                colorMode === "dark" ? theme.palette.grey[700] : undefined,
+              "&:hover": {
+                borderColor: theme.palette.primary.main,
+                backgroundColor:
+                  colorMode === "dark"
+                    ? theme.palette.grey[800]
+                    : theme.palette.grey[100],
+              },
             }}
           >
-            Control who can see your activity and profile
-          </Typography>
-
-          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-            <InputLabel
-              sx={{
-                color:
-                  colorMode === "dark"
-                    ? theme.palette.common.white
-                    : "text.primary",
-              }}
-            >
-              Profile Visibility
-            </InputLabel>
-            <Select
-              value="public"
-              label="Profile Visibility"
-              sx={{
-                borderRadius: 2,
-                color:
-                  colorMode === "dark"
-                    ? theme.palette.common.white
-                    : "text.primary",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor:
-                    colorMode === "dark" ? theme.palette.grey[700] : undefined,
-                },
-              }}
-            >
-              <MenuItem value="public">Public</MenuItem>
-              <MenuItem value="friends">Friends Only</MenuItem>
-              <MenuItem value="private">Private</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControlLabel
-            control={<Switch color="primary" />}
-            label="Allow profile to appear in search results"
-            sx={{
-              mb: 1,
-              color:
-                colorMode === "dark"
-                  ? theme.palette.common.white
-                  : "text.primary",
-            }}
-          />
-
-          <FormControlLabel
-            control={<Switch color="primary" />}
-            label="Show online status"
-            sx={{
-              color:
-                colorMode === "dark"
-                  ? theme.palette.common.white
-                  : "text.primary",
-            }}
-          />
-        </Collapse> */}
+            Select All
+          </Button>
+        </Collapse>
 
         {/* Save Button */}
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
-          <StyledButton
-            colormode={colorMode}
+          <Button
             variant="contained"
             onClick={handleSaveSettings}
             sx={{
+              padding: "12px 32px",
+              borderRadius: 12,
+              fontWeight: 600,
+              textTransform: "none",
               background:
                 colorMode === "dark"
                   ? "linear-gradient(45deg, #0d47a1 30%, #1565c0 90%)"
                   : "linear-gradient(45deg, #1976d2 30%, #2196f3 90%)",
               color: "white",
+              "&:hover": {
+                transform: "translateY(-2px)",
+                boxShadow: theme.shadows[2],
+              },
             }}
           >
             Save Changes
-          </StyledButton>
+          </Button>
         </Box>
       </CardContent>
     </Container>

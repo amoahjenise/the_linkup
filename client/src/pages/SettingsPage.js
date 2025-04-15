@@ -62,7 +62,7 @@ const CloseButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1100,
 }));
 
-const SettingsPage = () => {
+const SettingsPage = ({ isMobile }) => {
   const { colorMode } = useColorMode();
   const [activeSubSection, setActiveSubSection] = useState("userSettings");
   const [showSlidingSection, setShowSlidingSection] = useState(false);
@@ -76,6 +76,7 @@ const SettingsPage = () => {
 
   const closeSlidingSection = () => {
     setShowSlidingSection(false); // Close sliding section
+    setActiveSubSection(null); // Reset the active subsection
   };
 
   return (
@@ -98,7 +99,9 @@ const SettingsPage = () => {
         {activeSubSection === "dataDeletionInstructions" && (
           <UserDataDeletionPage />
         )}
-        {activeSubSection === "userSettings" && <UserSettings />}
+        {activeSubSection === "userSettings" && (
+          <UserSettings onClose={closeSlidingSection} isMobile={isMobile} />
+        )}
         {activeSubSection === "dataAndPermissions" && (
           <DataAndPermissionsPage />
         )}
@@ -121,7 +124,9 @@ const SettingsPage = () => {
         {activeSubSection === "dataDeletionInstructions" && (
           <UserDataDeletionPage />
         )}
-        {activeSubSection === "userSettings" && <UserSettings />}
+        {activeSubSection === "userSettings" && (
+          <UserSettings onClose={closeSlidingSection} isMobile={isMobile} />
+        )}
       </SlidingSection>
     </SettingsPageContainer>
   );
