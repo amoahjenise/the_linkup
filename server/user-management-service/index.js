@@ -20,6 +20,127 @@ console.log("Webhook Secret:", process.env.CLERK_UPDATE_WEBHOOK_SECRET_KEY);
 
 const router = express.Router(); // Create a router instance
 
+const handleClerkUserUpdate = async (clerkEvent) => {
+  console.log("[handleClerkUserUpdate] Starting user update process...");
+  console.log(
+    "[handleClerkUserUpdate] Received Clerk event:",
+    JSON.stringify(clerkEvent, null, 2)
+  );
+
+  try {
+    const clerkUserId = clerkEvent.data.id;
+    const firstName = clerkEvent.data.first_name;
+    const lastName = clerkEvent.data.last_name;
+    const fullName = `${firstName} ${lastName}`.trim();
+    const profileImageUrl = clerkEvent.data.image_url;
+
+    console.log(
+      `[handleClerkUserUpdate] Processing update for Clerk user: ${clerkUserId}`
+    );
+    console.log(`[handleClerkUserUpdate] New name: ${fullName}`);
+    console.log(
+      `[handleClerkUserUpdate] New profile image URL: ${profileImageUrl}`
+    );
+
+    // 1. Update PostgreSQL database
+    console.log("[handleClerkUserUpdate] Starting database update...");
+    const updateQueryPath = path.join(
+      __dirname,
+      "../db/queries/updateUserFromClerk.sql"
+    );
+    console.log(`[handleClerkUserUpdate] Using query from: ${updateQueryPath}`);
+
+    const updateQuery = fs.readFileSync(updateQueryPath, "utf8");
+    const updateValues = [clerkUserId, fullName, profileImageUrl];
+    console.log("[handleClerkUserUpdate] Query values:", updateValues);
+
+    const dbResult = await pool.query(updateQuery, updateValues);
+    const updatedUser = dbResult.rows[0];
+    console.log(
+      "[handleClerkUserUpdate] Database update result:",
+      dbResult.rowCount > 0 ? "Success" : "No rows affected"
+    );
+
+    if (!updatedUser) {
+      console.error(
+        "[handleClerkUserUpdate] ERROR: User not found in database"
+      );
+      throw new Error("User not found in database");
+    }
+
+    console.log(
+      "[handleClerkUserUpdate] Database updated successfully. Updated user:",
+      updatedUser
+    );
+
+    // 2. Update Sendbird user
+    console.log("[handleClerkUserUpdate] Starting Sendbird update...");
+    console.log(
+      `[handleClerkUserUpdate] Updating Sendbird user ID: ${updatedUser.id}`
+    );
+
+    const sendbirdPayload = {
+      nickname: fullName,
+      profile_url: profileImageUrl,
+    };
+    console.log("[handleClerkUserUpdate] Sendbird payload:", sendbirdPayload);
+
+    const sendbirdResponse = await axios.put(
+      `https://api-${APP_ID}.sendbird.com/v3/users/${updatedUser.id}`,
+      sendbirdPayload,
+      {
+        headers: {
+          "Api-Token": API_TOKEN,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log(
+      "[handleClerkUserUpdate] Sendbird response status:",
+      sendbirdResponse.status
+    );
+    console.log(
+      "[handleClerkUserUpdate] Sendbird response data:",
+      sendbirdResponse.data
+    );
+
+    const result = {
+      success: true,
+      message: "User updated successfully in both database and Sendbird",
+      user: updatedUser,
+      sendbirdResponse: sendbirdResponse.data,
+    };
+
+    console.log(
+      "[handleClerkUserUpdate] Update completed successfully:",
+      result
+    );
+    return result;
+  } catch (error) {
+    console.error("[handleClerkUserUpdate] ERROR:", error);
+
+    if (error.response) {
+      // Axios error (Sendbird API error)
+      console.error("[handleClerkUserUpdate] Sendbird API error details:", {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers,
+      });
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error(
+        "[handleClerkUserUpdate] No response received from Sendbird"
+      );
+    }
+
+    throw {
+      ...error,
+      _logged: true, // Flag to indicate we've already logged this error
+    };
+  }
+};
+
 const updateSendbirdUserImage = async (userId, imageUrl) => {
   const sendbirdApiUrl = `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${userId}`;
   console.log("SENDBIRD_API_TOKEN", process.env.SENDBIRD_API_TOKEN); // Fix the reference
@@ -171,18 +292,8 @@ router.post(
         try {
           console.log("Reached user.updated.");
 
-          const sendbirdUpdateResponse = await updateSendbirdUserImage(
-            userExists.user.id,
-            image_url
-          );
-
-          console.log("sendbirdUpdateResponse", sendbirdUpdateResponse);
-
-          return res.status(200).json({
-            success: true,
-            message: "Sendbird user image updated.",
-            data: sendbirdUpdateResponse,
-          });
+          const result = await handleClerkUserUpdate(req.body);
+          return res.status(200).json(result);
         } catch (error) {
           return res.status(500).json({
             success: false,
