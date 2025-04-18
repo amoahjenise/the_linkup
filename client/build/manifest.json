@@ -38,6 +38,13 @@
   "orientation": "portrait-primary",
   "categories": ["social", "lifestyle", "events"],
   "shortcuts": [],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://www.thelinkup.ca/manifest.json"
+    }
+  ],
+  "prefer_related_applications": true,
   "share_target": {
     "action": "/share",
     "method": "POST",

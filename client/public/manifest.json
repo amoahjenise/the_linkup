@@ -1,7 +1,7 @@
 {
   "short_name": "Linkup",
   "name": "The Linkup",
-  "id": "/",
+  "id": "thelinkup-pwa",
   "description": "Connect with new people and organize meetups around your interests.",
   "icons": [
     {
@@ -40,8 +40,9 @@
   "shortcuts": [],
   "related_applications": [
     {
+      "id": "thelinkup-pwa",
       "platform": "webapp",
-      "url": "https://www.thelinkup.ca/manifest.json"
+      "url": "/manifest.json"
     }
   ],
   "prefer_related_applications": true,
@@ -64,12 +65,14 @@
   "screenshots": [
     {
       "src": "/screenshots/homepage.png",
+      "description": "Linkup homepage on mobile",
       "sizes": "372x812",
       "type": "image/png",
       "form_factor": "narrow"
     },
     {
       "src": "/screenshots/homepage-wide.png",
+      "description": "Linkup homepage on desktop",
       "sizes": "1918x927",
       "type": "image/png",
       "form_factor": "wide"
