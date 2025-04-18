@@ -116,7 +116,7 @@ self.addEventListener("push", async (event) => {
 
     await self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "/icon-192x192.png",
+      icon: "/apple-touch-icon.png",
       badge: "/badge-icon.png",
       data: { url: data.url },
     });
