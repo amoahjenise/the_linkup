@@ -1,10 +1,11 @@
 {
-  "short_name": "The Linkup",
+  "short_name": "Linkup",
   "name": "The Linkup",
+  "id": "/",
   "description": "Connect with new people and organize meetups around your interests.",
   "icons": [
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/logo-no-bg-white.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
@@ -13,56 +14,58 @@
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/web-app-manifest-512x512.png",
+      "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": "/?source=pwa",
+  "start_url": "/?source=pwa&homescreen=1",
   "scope": "/",
+  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "orientation": "portrait-primary",
   "categories": ["social", "lifestyle", "events"],
-  "shortcuts": [
-    {
-      "name": "Find Linkups",
-      "short_name": "Linkups",
-      "description": "Browse linkups",
-      "url": "/home"
-    },
-    {
-      "name": "My Profile",
-      "short_name": "Profile",
-      "description": "View your profile",
-      "url": "/profile"
-    }
-  ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=ca.thelinkup.app",
-      "id": "ca.thelinkup.app"
-    },
-    {
-      "platform": "itunes",
-      "url": "https://apps.apple.com/ca/app/the-linkup/id1234567890"
-    }
-  ],
-  "prefer_related_applications": false,
-  "iarc_rating_id": "e84b072d",
+  "shortcuts": [],
   "share_target": {
     "action": "/share",
-    "method": "GET",
+    "method": "POST",
+    "enctype": "multipart/form-data",
     "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link"
+      "title": "title",
+      "text": "text",
+      "url": "url"
     }
-  }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+thelinkup",
+      "url": "/?url=%s"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/homepage.png",
+      "sizes": "372x812",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/homepage-wide.png",
+      "sizes": "1918x927",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
 }

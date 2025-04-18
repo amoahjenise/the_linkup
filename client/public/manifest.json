@@ -31,7 +31,7 @@
   ],
   "start_url": "/?source=pwa&homescreen=1",
   "scope": "/",
-  "display_override": ["window-controls-overlay"],
+  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000",
