@@ -121,6 +121,33 @@ const App = () => {
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
 
+  const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  if ("windowControlsOverlay" in navigator) {
+    navigator.windowControlsOverlay.addEventListener(
+      "geometrychange",
+      debounce((e) => {
+        const isOverlayVisible = navigator.windowControlsOverlay.visible;
+        const titleBarRect = e.titlebarAreaRect;
+        console.log(
+          `The overlay is ${
+            isOverlayVisible ? "visible" : "hidden"
+          }, the title bar width is ${titleBarRect.width}px`
+        );
+      }, 200)
+    );
+  }
+
   // Device detection
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
