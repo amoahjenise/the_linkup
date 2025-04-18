@@ -129,23 +129,41 @@ const App = () => {
   }, []);
 
   // PWA installation handling
-  const handleInstallClick = useCallback(() => {
-    if (isIOS) {
-      alert(`To install this app:
-  1. Tap the Share icon (📤)
-  2. Select "Add to Home Screen"
-  3. Tap "Add" in the top right`);
+  const handleInstallClick = useCallback(async () => {
+    const isInStandaloneMode =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+
+    // Try Chrome-specific installed app detection
+    const isInstalledViaRelatedApps = await (async () => {
+      if ("getInstalledRelatedApps" in navigator) {
+        const relatedApps = await navigator.getInstalledRelatedApps();
+        return relatedApps.length > 0;
+      }
+      return false;
+    })();
+
+    if (isInStandaloneMode || isInstalledViaRelatedApps) {
+      alert("This app is already installed on your device.");
       return;
     }
 
-    // Handle macOS Safari PWA installation
+    if (isIOS) {
+      alert(`To install this app:
+    1. Tap the Share icon (📤)
+    2. Select "Add to Home Screen"
+    3. Tap "Add" in the top right`);
+      return;
+    }
+
     const isSafari =
       /safari/i.test(navigator.userAgent) &&
       !/chrome/i.test(navigator.userAgent);
     if (isSafari) {
-      alert(
-        "To install this app on macOS Safari:\n1. Open the app in a new tab.\n2. Click the Share icon in the toolbar.\n3. Choose 'Add to Home Screen'."
-      );
+      alert(`To install this app:
+        1. Tap the Share icon (📤)
+        2. Select "Add to Home Screen"
+        3. Tap "Add" in the top right`);
       return;
     }
 
