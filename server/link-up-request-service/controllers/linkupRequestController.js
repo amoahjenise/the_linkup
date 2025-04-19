@@ -28,17 +28,33 @@ const sendRequest = async (req, res) => {
     conversation_id,
   } = req.body;
 
-  const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
-  const query = fs.readFileSync(queryPath, "utf8");
-  const queryValues = [requesterId, creator_id, linkupId, content];
+  const checkQueryPath = path.join(
+    __dirname,
+    "../db/queries/getRequestByLinkupidAndSenderid.sql"
+  );
+  const checkQuery = fs.readFileSync(checkQueryPath, "utf8");
+  const checkValues = [linkupId, requesterId];
 
   try {
+    // Check if a request already exists
+    const existing = await pool.query(checkQuery, checkValues);
+
+    if (existing.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already sent a request for this linkup.",
+      });
+    }
+
+    const queryPath = path.join(__dirname, "../db/queries/sendRequest.sql");
+    const query = fs.readFileSync(queryPath, "utf8");
+    const queryValues = [requesterId, creator_id, linkupId, content];
+
     // Post Linkup Request
     const { rows } = await pool.query(query, queryValues);
 
     if (rows.length > 0) {
       // Save new conversation in db
-
       const conversationData = {
         sender_id: requesterId,
         receiver_id: creator_id,
