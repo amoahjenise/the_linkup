@@ -19,7 +19,10 @@ import { useSnackbar } from "../contexts/SnackbarContext";
 import { ContentCopy, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { saveUserSettings as saveSettingsToRedux } from "../redux/actions/userSettingsActions";
-import { saveUserSettings as saveSettingsToDB } from "../api/usersAPI";
+import {
+  saveUserSettings as saveSettingsToDB,
+  getUserSettings,
+} from "../api/usersAPI";
 import { customGenderOptions } from "../utils/customGenderOptions";
 
 // Constants
@@ -169,6 +172,23 @@ const UserSettings = ({ onClose, isMobile }) => {
     ],
     []
   );
+
+  const isAllGendersSelected = genderPreference.length === genderOptions.length;
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await getUserSettings(user.id);
+        if (response?.settings) {
+          dispatch(saveSettingsToRedux(response.settings));
+        }
+      } catch (error) {
+        addSnackbar("Failed to fetch settings", "error");
+      }
+    };
+
+    fetchSettings();
+  }, [user.id, dispatch, addSnackbar]);
 
   useEffect(() => {
     if (userSettings) {
@@ -534,7 +554,7 @@ const UserSettings = ({ onClose, isMobile }) => {
               },
             }}
           >
-            Select All
+            {isAllGendersSelected ? "Deselect All" : "Select All"}
           </Button>
         </Collapse>
 

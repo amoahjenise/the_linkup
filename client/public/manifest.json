@@ -20,24 +20,28 @@
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "start_url": "/?source=pwa&homescreen=1",
   "scope": "/",
+  "badge": "/badge-icon.png",
   "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000",
   "orientation": "portrait-primary",
   "categories": ["social", "lifestyle", "events"],
-  "shortcuts": [],
+  "shortcuts": [
+    {
+      "name": "My Linkups",
+      "short_name": "My Linkups",
+      "description": "A list of my created linkups.",
+      "url": "/history",
+      "icons": [{ "src": "/favicon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "lang": "en",
   "related_applications": [
     {
       "id": "thelinkup-pwa",
