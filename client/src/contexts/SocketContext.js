@@ -119,18 +119,24 @@ export const SocketProvider = ({ children }) => {
 
     const handleLinkupExpired = ({ message }) => {
       addSnackbar(message, { timeout: 7000 });
-      showNotification("Linkup Expired", message);
+      if (typeof window !== "undefined" && "Notification" in window) {
+        showNotification("Linkup Expired", message);
+      }
       dispatch(showNewLinkupButton(true));
     };
 
     const handleNotification = (type, notification) => {
       addSnackbar(notification.content, { timeout: 7000 });
       dispatch(incrementUnreadNotificationsCount());
-      showNotification(type, notification.content);
+      if (typeof window !== "undefined" && "Notification" in window) {
+        showNotification(type, notification.content);
+      }
     };
 
-    if (Notification.permission === "default") {
-      requestNotificationPermission();
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        requestNotificationPermission();
+      }
     }
 
     if (process.env.NODE_ENV === "development") {
@@ -148,7 +154,6 @@ export const SocketProvider = ({ children }) => {
       );
     }
 
-    // Attach listeners
     linkupManagementSocket.on("linkupCreated", handleLinkupCreated);
     linkupManagementSocket.on("linkupUpdated", handleLinkupUpdated);
     linkupManagementSocket.on("linkupDeleted", handleLinkupDeleted);
