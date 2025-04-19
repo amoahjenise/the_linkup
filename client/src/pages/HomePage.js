@@ -131,8 +131,8 @@ const HomePage = ({ isMobile }) => {
         const response = await getLinkups(
           userId,
           userData.gender,
-          0,
-          sqlOffset + PAGE_SIZE,
+          sqlOffset,
+          PAGE_SIZE,
           userData.latitude,
           userData.longitude
         );
@@ -142,17 +142,19 @@ const HomePage = ({ isMobile }) => {
             (linkup) => linkup.status === "active"
           );
 
-          const updatedLinkupList = activeLinkups.map((linkup) => ({
-            ...linkup,
-            isUserCreated: linkup.creator_id === userId,
-            createdAtTimestamp: linkup.created_at,
-            distance: calculateDistance(
-              userData.latitude,
-              userData.longitude,
-              linkup.latitude,
-              linkup.longitude
-            ),
-          }));
+          const updatedLinkupList = activeLinkups
+            .filter((linkup) => !state.fetchedLinkupIds.includes(linkup.id)) // NEW
+            .map((linkup) => ({
+              ...linkup,
+              isUserCreated: linkup.creator_id === userId,
+              createdAtTimestamp: linkup.created_at,
+              distance: calculateDistance(
+                userData.latitude,
+                userData.longitude,
+                linkup.latitude,
+                linkup.longitude
+              ),
+            }));
 
           updatedLinkupList.sort((a, b) => {
             const createdAtComparison =

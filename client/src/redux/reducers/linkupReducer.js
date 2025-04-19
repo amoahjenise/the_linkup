@@ -45,23 +45,29 @@ const linkupsReducer = (state = initialState, action) => {
       const { newLinkups, isInitialLoad } = action.payload;
 
       if (isInitialLoad) {
+        // Fresh load, sort if needed
         return { ...state, linkupList: newLinkups };
       }
 
-      const updatedLinkups = [...state.linkupList];
+      // Use a map to merge and preserve order
+      const linkupMap = new Map();
 
-      newLinkups.forEach((newLinkup) => {
-        const existingIndex = updatedLinkups.findIndex(
-          (l) => l.id === newLinkup.id
-        );
-        if (existingIndex >= 0) {
-          updatedLinkups[existingIndex] = newLinkup;
-        } else {
-          updatedLinkups.push(newLinkup);
-        }
-      });
+      // Insert existing ones first to preserve sort
+      for (const linkup of state.linkupList) {
+        linkupMap.set(linkup.id, linkup);
+      }
 
-      return { ...state, linkupList: updatedLinkups };
+      // Merge new ones (overwriting existing or adding new)
+      for (const linkup of newLinkups) {
+        linkupMap.set(linkup.id, linkup);
+      }
+
+      return {
+        ...state,
+        linkupList: Array.from(linkupMap.values()).sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        ),
+      };
     }
     case SHOW_NEW_LINKUP_BUTTON:
       return {

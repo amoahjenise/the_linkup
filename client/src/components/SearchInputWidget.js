@@ -67,7 +67,7 @@ const SearchInput = ({ handleInputChange }) => {
 
   const backgroundColor = colorMode === "dark" ? "rgba(17, 17, 17)" : "#fff";
   const borderColor =
-    colorMode === "dark" ? "rgba(255,255,255, 0.025)" : "#ccc";
+    colorMode === "dark" ? "rgba(255,255,255, 0.075)" : "#ccc";
 
   const handleClick = () => {
     inputRef.current.focus();

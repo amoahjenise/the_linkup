@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
-  Button,
   Grid,
   Typography,
   Card,
@@ -19,6 +18,7 @@ import { useTheme } from "@mui/material/styles";
 import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { LoadingPage } from "../pages";
 import LoadingSpinner from "../components/LoadingSpinner";
+import TypingText from "../components/TypingText";
 
 // Enhanced shared button styles with modern interactions
 const sharedButtonStyles = {
@@ -593,9 +593,18 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
       )}
 
       <Footer>
-        <Typography variant="body2">
+        {/* <Typography variant="body2">         
           &copy; {new Date().getFullYear()} The Linkup. All rights reserved.
-        </Typography>
+        </Typography> */}
+
+        <TypingText
+          text={`© ${new Date().getFullYear()} The Linkup. All rights reserved.`}
+          speed={50}
+          delay={500}
+          variant="body2"
+          color="white"
+          // sx={{ mt: 3, textAlign: "center" }}
+        />
       </Footer>
     </Box>
   );
