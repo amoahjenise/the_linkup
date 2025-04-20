@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
@@ -99,8 +99,8 @@ const DistanceInfo = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   color: "#718096",
-  marginTop: "0.25rem",
-  marginLeft: "4px",
+  marginBottom: "1rem",
+  // marginLeft: "2rem",
   fontSize: "0.8rem",
   fontFamily:
     'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -189,7 +189,7 @@ const capitalizeLocation = (location) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
+const LinkupItem = forwardRef(({ linkupId, linkupItem, userId, refreshFeed, disableRequest, scrollToTop }, ref) => {
   const { colorMode } = useColorMode(); // Use useColorMode hook
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -323,7 +323,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
     }
 
     if (!disableRequest) {
-      setShouldFetchLinkups(true);
+      refreshFeed();
       addSnackbar(message, { timeout: 7000 });
     }
   };
@@ -398,12 +398,7 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
   };
 
   return (
-    <div
-    // style={{
-    //   paddingLeft: "24px",
-    //   paddingRight: "24px",
-    // }}
-    >
+    <div id={`item-${linkupId}`} ref={ref}>
       <Container>
         <CardContainer
           isHovered={isHovered}
@@ -473,9 +468,10 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
                     showCheckInLinkup={false}
                     showAcceptLinkupRequest={false}
                     linkupItem={linkupItem}
-                    setShouldFetchLinkups={setShouldFetchLinkups}
+                    refreshFeed={refreshFeed}
                     menuAnchor={menuAnchor}
                     setMenuAnchor={setMenuAnchor}
+                    scrollToTop={scrollToTop}
                   />
                 ) : (
                   <DistanceInfo>
@@ -519,6 +515,6 @@ const LinkupItem = ({ linkupItem, setShouldFetchLinkups, disableRequest }) => {
       </Container>
     </div>
   );
-};
+});
 
 export default LinkupItem;

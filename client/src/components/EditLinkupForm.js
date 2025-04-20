@@ -157,7 +157,7 @@ const ErrorText = styled("p")(({ theme }) => ({
   margin: "8px 0 0",
 }));
 
-const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
+const EditLinkupForm = ({ onClose, refreshFeed }) => {
   const dispatch = useDispatch();
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
@@ -240,7 +240,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       try {
         const response = await updateLinkup(id, updatedLinkup);
         if (response.success) {
-          setShouldFetchLinkups(true);
+          refreshFeed();
           dispatch(updateLinkupSuccess(response.linkup));
           onClose();
           dispatch(clearEditingLinkup());
@@ -261,7 +261,7 @@ const EditLinkupForm = ({ onClose, setShouldFetchLinkups }) => {
       dispatch,
       addSnackbar,
       id,
-      setShouldFetchLinkups,
+      refreshFeed,
     ]
   );
 

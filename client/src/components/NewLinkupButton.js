@@ -1,6 +1,8 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { Button, styled, Tooltip, keyframes } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { showNewLinkupButton } from "../redux/actions/linkupActions";
 
 const subtleBounce = keyframes`
   0% { transform: translateY(0); }
@@ -8,7 +10,7 @@ const subtleBounce = keyframes`
   100% { transform: translateY(0); }
 `;
 
-const FloatingButton = styled(Button)(({ colorMode, isloading }) => ({
+const FloatingButton = styled(Button)(({ isloading }) => ({
   position: "sticky",
   top: "5%",
   left: "50%",
@@ -49,7 +51,9 @@ const FloatingButton = styled(Button)(({ colorMode, isloading }) => ({
   },
 }));
 
-const NewLinkupButton = ({ onClick, colorMode, isLoading = false }) => {
+const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
+  const dispatch = useDispatch();
+
   return (
     <Tooltip
       title="Show new updates"
@@ -78,7 +82,10 @@ const NewLinkupButton = ({ onClick, colorMode, isLoading = false }) => {
       }}
     >
       <FloatingButton
-        onClick={onClick}
+        onClick={() => {
+          refreshFeed();
+          dispatch(showNewLinkupButton(false));
+        }}
         aria-label="Show new updates"
         isloading={isLoading ? 1 : 0}
         disableRipple

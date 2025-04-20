@@ -17,10 +17,11 @@ const Widget = styled("div")(({ theme }) => ({
 
 const WidgetSection = ({
   toggleWidget,
-  setShouldFetchLinkups,
-  scrollToTopCallback,
-  isMobile
+  isMobile,
+  refreshFeed,
+  handleScrollToTop
 }) => {
+
   const handleFilterChange = (selectedCategories) => {
     console.log("Selected Categories:", selectedCategories);
     // Apply filter logic to the feed based on selectedCategories
@@ -32,9 +33,9 @@ const WidgetSection = ({
       <Widget>
         <CreateLinkupForm
           toggleWidget={toggleWidget}
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          scrollToTopCallback={scrollToTopCallback}
           isMobile={isMobile}
+          refreshFeed={refreshFeed}
+          handleScrollToTop={handleScrollToTop}
         />
       </Widget>
 
