@@ -30,7 +30,7 @@ const StyledModalContent = styled("div")(({ theme }) => ({
   },
 }));
 
-const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
+const EditLinkupModal = ({ isOpen, onClose, refreshFeed }) => {
   const { colorMode } = useColorMode();
 
   const handleModalClose = () => {
@@ -56,10 +56,7 @@ const EditLinkupModal = ({ isOpen, onClose, setShouldFetchLinkups }) => {
               : lightModeBackgroundColor,
         }}
       >
-        <EditLinkupForm
-          setShouldFetchLinkups={setShouldFetchLinkups}
-          onClose={handleModalClose}
-        />
+        <EditLinkupForm onClose={handleModalClose} refreshFeed={refreshFeed} />
       </StyledModalContent>
     </Modal>
   );

@@ -30,9 +30,9 @@ const MoreMenu = ({
   showAcceptLinkupRequest,
   showDeclineLinkupRequest,
   linkupItem,
+  refreshFeed,
   menuAnchor,
   setMenuAnchor,
-  setShouldFetchLinkups,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const MoreMenu = ({
         type: "UPDATE_REQUEST_STATUS",
         payload: { id: linkupItem.request_id, status: "accepted" },
       });
-      setShouldFetchLinkups(true);
+      refreshFeed();
       addSnackbar("Linkup request accepted.");
     } catch (error) {
       addSnackbar(error.message);
@@ -79,7 +79,7 @@ const MoreMenu = ({
         type: "UPDATE_REQUEST_STATUS",
         payload: { id: linkupItem.request_id, status: "declined" },
       });
-      setShouldFetchLinkups(true);
+      refreshFeed();
       addSnackbar("Linkup request declined.");
     } catch (error) {
       addSnackbar(error.message);
@@ -110,7 +110,7 @@ const MoreMenu = ({
         ? "Linkup closed successfully!"
         : `Error closing the linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
-      setShouldFetchLinkups(true);
+      refreshFeed();
     } catch (error) {
       console.error("An error occurred:", error);
       addSnackbar("An error occurred while closing the linkup", {
@@ -128,7 +128,7 @@ const MoreMenu = ({
         ? "Linkup deleted successfully!"
         : `Error deleting linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
-      setShouldFetchLinkups(true);
+      refreshFeed();
     } catch (error) {
       console.error("An error occurred:", error);
       addSnackbar("An error occurred while deleting the linkup", {
@@ -298,7 +298,7 @@ const MoreMenu = ({
       <EditLinkupModal
         isOpen={modalState.isEditModalOpen}
         onClose={() => closeModal("isEditModalOpen")}
-        setShouldFetchLinkups={setShouldFetchLinkups}
+        refreshFeed={refreshFeed}
       />
       <LinkupActionModal
         open={modalState.isCloseConfirmationOpen}

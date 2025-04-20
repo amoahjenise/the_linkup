@@ -121,6 +121,13 @@ const App = () => {
 
   const REACT_APP_SENDBIRD_APP_ID = process.env.REACT_APP_SENDBIRD_APP_ID;
 
+  // Disable browser's automatic scroll restoration
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
   // Device detection
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();

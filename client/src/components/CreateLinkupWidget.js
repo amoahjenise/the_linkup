@@ -158,8 +158,9 @@ const ErrorText = styled("p")(({ theme }) => ({
 
 const CreateLinkupWidget = ({
   toggleWidget,
-  setShouldFetchLinkups,
-  scrollToTopCallback,
+  isMobile,
+  refreshFeed,
+  handleScrollToTop,
 }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [genderPreference, setGenderPreference] = useState([]);
@@ -274,8 +275,8 @@ const CreateLinkupWidget = ({
         if (window.innerWidth <= 600) {
           toggleWidget();
         }
-        setShouldFetchLinkups(true);
-        scrollToTopCallback();
+        refreshFeed(); // Trigger feed refresh
+        handleScrollToTop();
       } else {
         addSnackbar("An error occurred. Please try again.");
       }
