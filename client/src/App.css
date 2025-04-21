@@ -1,3 +1,9 @@
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 #title-bar {
   position: fixed;
   left: env(titlebar-area-x, 0);

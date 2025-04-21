@@ -21,11 +21,11 @@ const NotificationSection = styled("div")({
   overflowY: "auto",
 });
 
-const NotificationsPage = () => {
+const NotificationsPage = ({ isMobile }) => {
   return (
     <NotificationsPageWrapper>
       <NotificationSection>
-        <Notifications />
+        <Notifications isMobile={isMobile} />
       </NotificationSection>
     </NotificationsPageWrapper>
   );

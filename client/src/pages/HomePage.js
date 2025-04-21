@@ -17,17 +17,18 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     display: "flex",
     width: "100%",
     position: "relative",
+    overflow: "hidden",
   },
   [`&.feedSection`]: {
     flex: "2.5",
     overflowY: "auto",
-    borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
+
+    // borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
     [theme.breakpoints.down("md")]: {
       flex: "2",
-      borderRight:
-        window.innerWidth > 600
-          ? `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`
-          : "none",
+      borderRight: theme.breakpoints.up("sm") // More reliable than window.innerWidth
+        ? `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`
+        : "none",
     },
     [theme.breakpoints.down("sm")]: {
       flex: "1",
@@ -37,26 +38,27 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   [`&.widgetSection`]: {
     flex: "1.5",
     overflowY: "auto",
-    borderLeft: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
+    borderLeftWidth: "1px",
+    paddingBottom: "60px", // Space for bottom menu
     [theme.breakpoints.down("md")]: {
       flex: "2",
-      borderLeft:
-        window.innerWidth > 600
-          ? `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`
-          : "none",
+      borderLeft: theme.breakpoints.up("sm")
+        ? `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`
+        : "none",
     },
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
       right: 0,
       width: "100%",
-      height: "100vh",
+      height: "calc(100vh - env(safe-area-inset-bottom))", // Account for bottom menu
       backgroundColor: colorMode === "dark" ? "black" : "white",
       boxShadow: "-2px 0 5px rgba(0, 0, 0, 0.1)",
       transform: "translateX(100%)",
       transition: "transform 0.3s ease",
       zIndex: 2000,
       borderLeft: "none",
+      paddingBottom: "env(safe-area-inset-bottom, 60px)",
     },
   },
   [`&.widgetSection.slideIn`]: {
@@ -146,6 +148,7 @@ const HomePage = ({ isMobile }) => {
             }}
             refreshFeed={refreshFeed}
             colorMode={colorMode}
+            isMobile={isMobile}
           />
         )}
       </StyledDiv>

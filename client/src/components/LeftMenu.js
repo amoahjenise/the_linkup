@@ -133,6 +133,7 @@ const FooterContainer = styled("div")(({ theme, colorMode }) => ({
   justifyContent: "space-around",
   alignItems: "flex-start",
   padding: "0 5px",
+  paddingBottom: 'env(safe-area-inset-bottom)',
   backgroundColor: "rgba(0, 0, 0, 0)",
   background: `
     linear-gradient(
