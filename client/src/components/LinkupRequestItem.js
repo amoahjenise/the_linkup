@@ -61,10 +61,6 @@ const StatusChip = styled(Chip)(({ theme, status }) => {
       backgroundColor = "rgba(115, 255, 174, 0.1)"; // Green with transparency
       color = "#73ffae";
       break;
-    case "inactive":
-      backgroundColor = "rgba(128, 128, 128, 0.1)"; // Gray with transparency
-      color = "#a0a0a0"; // Soft gray
-      break;
     default:
       backgroundColor = "rgba(255, 182, 193, 0.1)"; // Pink with transparency
       color = "#ffb6c1";
@@ -188,8 +184,6 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         return (
           <CancelOutlined CancelOutlined fontSize="small" color="#ffb6c1" />
         );
-      case "inactive":
-        return <CancelOutlined fontSize="small" style={{ color: "#a0a0a0" }} />;
       default:
         return null;
     }
@@ -205,8 +199,6 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
         return "Declined";
       case "expired":
         return "Expired";
-      case "inactive":
-        return "Deleted";
       default:
         return null;
     }
