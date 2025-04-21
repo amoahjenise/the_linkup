@@ -16,5 +16,6 @@ FROM
 WHERE
   link_up_requests.receiver_id = $1::uuid
   AND link_up_requests.hidden <> true
+  AND link_up_requests.status <> 'inactive'
   ORDER BY
   link_up_requests.created_at DESC; 
