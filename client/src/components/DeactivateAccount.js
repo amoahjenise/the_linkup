@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { Button, TextField } from "@mui/material";
 import { useSnackbar } from "../contexts/SnackbarContext";
-import { useNavigate } from "react-router-dom";
 import { useClerk } from "@clerk/clerk-react";
 import { deactivateUser } from "../api/usersAPI";
 
@@ -75,7 +74,6 @@ const DeactivateAccount = ({ colorMode }) => {
   const { addSnackbar } = useSnackbar();
   const loggedUser = useSelector((state) => state.loggedUser);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { signOut } = useClerk();
   const inputTextColor = colorMode === "dark" ? "white" : "black";
 
@@ -86,7 +84,7 @@ const DeactivateAccount = ({ colorMode }) => {
         if (response.data.success) {
           await signOut();
           dispatch({ type: "LOGOUT" });
-          navigate("/");
+          window.location.href = "/";
         }
         addSnackbar(response.data.message);
       } catch (error) {
