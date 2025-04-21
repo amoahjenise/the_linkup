@@ -10,7 +10,7 @@ const NotificationItemWrapper = styled("div", {
 })(({ theme, isUnread, colorMode }) => ({
   display: "flex",
   alignItems: "center",
-  padding: "16px 16px",
+  padding: theme.spacing(2),
   cursor: "pointer",
   border: "1px solid rgba(63, 75, 91, 0.25)",
   backgroundColor: isUnread
@@ -25,6 +25,8 @@ const NotificationItemWrapper = styled("div", {
       : "0 2px 8px rgba(0, 0, 0, 0.05)",
   transition: "background-color 0.2s ease, box-shadow 0.2s ease",
   height: "100px",
+  width: "100%",
+  maxWidth: "100%",
   overflow: "hidden",
   "&:hover": {
     borderRadius: "8px",
@@ -34,8 +36,15 @@ const NotificationItemWrapper = styled("div", {
       ? "rgba(200, 200, 200, 0.1)"
       : "rgba(210, 210, 210, 0.2)",
   },
-  "&:last-child": {
-    marginBottom: "0",
+  [theme.breakpoints.up("sm")]: {
+    padding: theme.spacing(3),
+  },
+  [theme.breakpoints.up("lg")]: {
+    height: "120px",
+  },
+  [theme.breakpoints.up("xl")]: {
+    height: "140px",
+    padding: theme.spacing(4),
   },
 }));
 
@@ -43,6 +52,13 @@ const NotificationContent = styled("div")(({ theme }) => ({
   flexGrow: 1,
   display: "flex",
   flexDirection: "column",
+  marginLeft: theme.spacing(2),
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(3),
+  },
+  [theme.breakpoints.up("xl")]: {
+    marginLeft: theme.spacing(4),
+  },
 }));
 
 const NotificationTitle = styled(Typography, {
@@ -50,8 +66,17 @@ const NotificationTitle = styled(Typography, {
 })(({ theme, colorMode }) => ({
   fontWeight: 400,
   fontSize: "0.825rem",
-  lineHeight: "1",
+  lineHeight: "1.2",
   color: colorMode === "light" ? theme.palette.text.primary : "#FFFFFF",
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "0.875rem",
+  },
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "0.9375rem",
+  },
+  [theme.breakpoints.up("xl")]: {
+    fontSize: "1rem",
+  },
 }));
 
 const NotificationMessage = styled(Typography, {
@@ -59,16 +84,25 @@ const NotificationMessage = styled(Typography, {
 })(({ theme, colorMode }) => ({
   fontSize: "0.8rem",
   color: colorMode === "light" ? theme.palette.text.secondary : "#B0B0B0",
-  marginTop: theme.spacing(0.5),
+  marginTop: theme.spacing(1),
   overflow: "hidden",
   whiteSpace: "nowrap",
   textOverflow: "ellipsis",
-  lineHeight: "1",
-  "@media (max-width: 600px)": {
-    maxWidth: "20ch",
+  lineHeight: "1.2",
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "0.85rem",
+    maxWidth: "40ch",
   },
-  "@media (min-width: 601px)": {
-    maxWidth: "50ch",
+  [theme.breakpoints.up("md")]: {
+    maxWidth: "60ch",
+  },
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "0.9rem",
+    maxWidth: "80ch",
+  },
+  [theme.breakpoints.up("xl")]: {
+    fontSize: "0.95rem",
+    maxWidth: "100ch",
   },
 }));
 
@@ -76,8 +110,17 @@ const NotificationTime = styled(Typography, {
   shouldForwardProp: (prop) => prop !== "colorMode",
 })(({ theme, colorMode }) => ({
   fontSize: "0.75rem",
-  marginTop: theme.spacing(0.5),
+  marginTop: theme.spacing(1),
   color: colorMode === "light" ? theme.palette.text.secondary : "#B0B0B0",
+  [theme.breakpoints.up("sm")]: {
+    fontSize: "0.8rem",
+  },
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "0.85rem",
+  },
+  [theme.breakpoints.up("xl")]: {
+    fontSize: "0.9rem",
+  },
 }));
 
 const NotificationItem = ({ notification, onClick }) => {

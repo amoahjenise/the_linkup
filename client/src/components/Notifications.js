@@ -48,6 +48,13 @@ const LoadingContainer = styled("div")(({ theme }) => ({
   position: "relative",
 }));
 
+const NotificationWrapper = styled("div")(({ theme }) => ({
+  marginBottom: "8px",
+  [theme.breakpoints.up("xl")]: {
+    marginBottom: "16px",
+  },
+}));
+
 const MemoizedNotificationItem = memo(NotificationItem);
 
 const Notifications = ({ isMobile, colorMode }) => {
@@ -143,17 +150,12 @@ const Notifications = ({ isMobile, colorMode }) => {
         >
           <NotificationsList>
             {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                style={{
-                  marginBottom: 8,
-                }}
-              >
+              <NotificationWrapper key={notification.id}>
                 <MemoizedNotificationItem
                   notification={notification}
                   onClick={() => handleNotificationClick(notification)}
                 />
-              </div>
+              </NotificationWrapper>
             ))}
           </NotificationsList>
         </div>
