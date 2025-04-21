@@ -19,6 +19,33 @@ import debounce from "lodash/debounce";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import NewLinkupButton from "./NewLinkupButton";
 
+// Add these styles for the pull-to-refresh indicator
+const PullToRefreshContainer = styled("div")(({ theme, refreshing }) => ({
+  position: "relative",
+  height: refreshing ? "60px" : "0",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  overflow: "hidden",
+  transition: "height 0.3s ease",
+}));
+
+const RefreshSpinner = styled("div")(({ theme, pullDistance }) => ({
+  width: "40px",
+  height: "40px",
+  borderRadius: "50%",
+  border: `3px solid ${theme.palette.primary.main}`,
+  borderTopColor: "transparent",
+  animation: "spin 1s linear infinite",
+  opacity: Math.min(1, pullDistance / 100),
+  transform: `rotate(${Math.min(360, pullDistance * 2)}deg)`,
+  transition: "transform 0.2s ease, opacity 0.2s ease",
+  "@keyframes spin": {
+    "0%": { transform: "rotate(0deg)" },
+    "100%": { transform: "rotate(360deg)" },
+  },
+}));
+
 const SearchInputContainer = styled("div")(({ theme }) => ({
   padding: 8,
   width: "100%",
@@ -82,6 +109,42 @@ const LinkupFeed = forwardRef(
     const scrollPosRef = useRef(0);
     const linkupCache = useRef({});
     const pageSize = 20;
+
+    const [pullStartY, setPullStartY] = useState(null);
+    const [pullDistance, setPullDistance] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Add these handlers for touch events
+    const handleTouchStart = (e) => {
+      if (feedRef.current?.scrollTop === 0 && !isRefreshing) {
+        setPullStartY(e.touches[0].pageY);
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (pullStartY === null) return;
+
+      const y = e.touches[0].pageY;
+      const pullDistance = y - pullStartY;
+
+      if (pullDistance > 0) {
+        e.preventDefault();
+        setPullDistance(pullDistance);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (pullDistance > 100) {
+        setIsRefreshing(true);
+        refreshFeed().finally(() => {
+          setIsRefreshing(false);
+          setPullDistance(0);
+        });
+      } else {
+        setPullDistance(0);
+      }
+      setPullStartY(null);
+    };
 
     const calculateAge = useCallback((dob) => {
       const birthDate = new Date(dob);
@@ -402,9 +465,23 @@ const LinkupFeed = forwardRef(
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
           paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
+          touchAction: "pan-y", // Add this for better touch control
         }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
+        {/* Pull-to-refresh indicator must be FIRST child */}
+        <PullToRefreshContainer refreshing={isRefreshing}>
+          {isRefreshing ? (
+            <LoadingSpinner />
+          ) : (
+            <RefreshSpinner pullDistance={pullDistance} />
+          )}
+        </PullToRefreshContainer>
+
         <TopNavBar title={"Home"} />
+
         <SearchInputContainer>
           <SearchInput
             handleInputChange={handleSearchChange}

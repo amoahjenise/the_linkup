@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import { updateUnreadNotificationsCount } from "./redux/actions/notificationActions";
 import { setUnreadMessagesCount } from "./redux/actions/messageActions";
@@ -313,12 +313,11 @@ const App = () => {
   }, [fetchUnreadCounts]);
 
   // Routes component
-  const RoutesComponent = useMemo(
-    () => (
+  const RoutesComponent = useMemo(() => {
+    const publicRoutes = (
       <Routes>
         <Route
           path="/"
-          exact
           element={
             <LandingPage
               showInstallButton={!isAppInstalled}
@@ -334,6 +333,13 @@ const App = () => {
           path="/data-deletion-instructions"
           element={<UserDataDeletionPage />}
         />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+
+    // Private routes (require authentication)
+    const privateRoutes = (
+      <Routes>
         <Route path="/home" element={<HomePage isMobile={isMobile} />} />
         <Route
           path="/notifications"
@@ -368,12 +374,13 @@ const App = () => {
           path="/settings"
           element={<SettingsPage isMobile={isMobile} />}
         />
-        <Route path="*" element={<ErrorPage />} />
         <Route path="/pricing" element={<PricingPage isMobile={isMobile} />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
-    ),
-    [isMobile, isAppInstalled, handleInstallClick]
-  );
+    );
+
+    return isAuthenticated ? privateRoutes : publicRoutes;
+  }, [isMobile, isAppInstalled, handleInstallClick, isAuthenticated]);
 
   return (
     <ThemeProvider theme={theme}>
