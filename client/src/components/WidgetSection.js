@@ -6,7 +6,7 @@ import CategoryWidget from "./CategoryWidget";
 const WidgetSectionContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
+  alignItems: "start",
   padding: theme.spacing(4),
 }));
 

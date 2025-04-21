@@ -14,30 +14,11 @@ import EmptyNotificationsPlaceholder from "./EmptyNotificationsPlaceholder";
 import { useBadge } from "../utils/badgeUtils"; // Updated import to use the hook
 
 // Styled components (unchanged)
-const MainContainer = styled("div")(({ theme }) => ({
+const MainContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   flexDirection: "column",
   overflowY: "hidden",
   width: "100%",
-  borderRightWidth: "1px",
-
-  // Responsive widths for larger screens
-  [theme.breakpoints.up("md")]: {
-    // ≥900px
-    width: "100%",
-  },
-  [theme.breakpoints.up("lg")]: {
-    // ≥1200px
-    width: "100%",
-  },
-  [theme.breakpoints.up("xl")]: {
-    // ≥1536px
-    width: "100%",
-  },
-  [theme.breakpoints.up(1800)]: {
-    // Custom breakpoint ≥1800px
-    width: "60%",
-  },
 }));
 
 const NotificationsList = styled("ul")(({ theme }) => ({
@@ -60,7 +41,7 @@ const NoNotificationsContainer = styled("div")(({ theme }) => ({
 
 const MemoizedNotificationItem = memo(NotificationItem);
 
-const Notifications = ({ isMobile }) => {
+const Notifications = ({ isMobile, colorMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const unreadNotificationsCount = useSelector(
@@ -133,7 +114,7 @@ const Notifications = ({ isMobile }) => {
   };
 
   return (
-    <MainContainer>
+    <MainContainer colorMode={colorMode}>
       <TopNavBar title="Notifications" />
       {isLoading ? (
         <LoadingSpinner />
@@ -151,7 +132,12 @@ const Notifications = ({ isMobile }) => {
         >
           <NotificationsList>
             {notifications.map((notification) => (
-              <div key={notification.id} style={{ marginBottom: 8 }}>
+              <div
+                key={notification.id}
+                style={{
+                  marginBottom: 8,
+                }}
+              >
                 <MemoizedNotificationItem
                   notification={notification}
                   onClick={() => handleNotificationClick(notification)}
