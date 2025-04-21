@@ -49,8 +49,9 @@ const handleClerkUserUpdate = async (clerkEvent) => {
     console.log("[handleClerkUserUpdate] Starting database update...");
     const updateQueryPath = path.join(
       __dirname,
-      "../db/queries/updateUserFromClerk.sql"
+      "db/queries/updateUserFromClerk.sql"
     );
+
     console.log(`[handleClerkUserUpdate] Using query from: ${updateQueryPath}`);
 
     const updateQuery = fs.readFileSync(updateQueryPath, "utf8");

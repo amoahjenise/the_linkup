@@ -148,6 +148,7 @@ const UserProfilePage = ({ isMobile }) => {
         let changesMade = false;
         const { userData } = state;
         const updates = {};
+        let avatarUploadError = null;
 
         // Helper function to update fields
         const updateField = async (field, newValue, updateFn) => {
@@ -156,8 +157,10 @@ const UserProfilePage = ({ isMobile }) => {
             if (response?.data?.success !== false) {
               changesMade = true;
               updates[field] = newValue;
+              return true;
             }
           }
+          return false;
         };
 
         // Convert base64 to File if needed
@@ -180,25 +183,62 @@ const UserProfilePage = ({ isMobile }) => {
           return;
         }
 
-        // Process text updates
-        await Promise.all([
+        // Process text updates first
+        const updateResults = await Promise.allSettled([
           hasBioChanges && updateField("bio", editedBio, updateUserBio),
           hasNameChanges && updateField("name", editedName, updateUserName),
         ]);
 
-        // Handle avatar upload
+        // Check for text update errors
+        const textUpdateErrors = updateResults
+          .filter((result) => result.status === "rejected")
+          .map((result) => result.reason);
+
+        if (textUpdateErrors.length > 0) {
+          throw new Error(
+            textUpdateErrors[0].message ||
+              "Failed to update profile text fields"
+          );
+        }
+
+        // Handle avatar upload if needed
         if (hasAvatarChanges && clerk.user) {
           try {
-            await clerk.user.setProfileImage({ file: avatarFile });
+            const response = await clerk.user.setProfileImage({
+              file: avatarFile,
+            });
+
+            // Verify the image was actually updated
+            if (response && response.errors && response.errors.length > 0) {
+              avatarUploadError = new Error(
+                response.errors[0].message || "Failed to update profile image"
+              );
+              throw avatarUploadError;
+            }
+
+            // Check if the image URL actually changed
             const newAvatarUrl = clerk.user.imageUrl;
-            if (newAvatarUrl !== userData?.avatar) {
-              // await updateSendbirdUser(userId, newAvatarUrl);
-              // await updateField("avatar", newAvatarUrl, updateUserAvatar);
+            if (newAvatarUrl && newAvatarUrl !== userData?.avatar) {
               changesMade = true;
+              updates.avatar = newAvatarUrl;
             }
           } catch (error) {
-            console.error("Error uploading profile image:", error.errors);
-            throw new Error("Failed to upload image");
+            console.error("Clerk profile image upload error:", {
+              error: error.errors || error.message,
+              traceId: error.meta?.clerk_trace_id,
+            });
+
+            // Only throw if there were no other changes made
+            if (!changesMade) {
+              throw new Error(
+                error.errors?.[0]?.message ||
+                  error.message ||
+                  "Failed to update profile image"
+              );
+            }
+
+            // If other changes succeeded, show specific error for avatar
+            avatarUploadError = error;
           }
         }
 
@@ -208,13 +248,33 @@ const UserProfilePage = ({ isMobile }) => {
             ...prev,
             userData: { ...prev.userData, ...updates },
           }));
-          addSnackbar("Profile updated successfully!", "success");
+
+          let successMessage = "Profile updated successfully!";
+          if (avatarUploadError) {
+            successMessage += " (but image update failed)";
+          }
+
+          addSnackbar(successMessage, "success");
         }
 
         setState((prev) => ({ ...prev, isEditModalOpen: false }));
+
+        // Show avatar-specific error if applicable
+        if (avatarUploadError && changesMade) {
+          addSnackbar(
+            `Profile updated but image failed: ${avatarUploadError.message}`,
+            "warning"
+          );
+        }
       } catch (error) {
-        console.error("Error saving changes:", error);
-        addSnackbar("Failed to update profile.", "error");
+        console.error("Profile update error:", {
+          error: error.message,
+          stack: error.stack,
+          ...(error.errors && { clerkErrors: error.errors }),
+          ...(error.meta && { clerkTraceId: error.meta.clerk_trace_id }),
+        });
+
+        addSnackbar(error.message || "Failed to update profile", "error");
       }
     },
     [state.userData, userId, clerk.user, addSnackbar]
