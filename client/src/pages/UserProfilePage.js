@@ -217,7 +217,7 @@ const UserProfilePage = ({ isMobile }) => {
             }
 
             // Check if the image URL actually changed
-            const newAvatarUrl = clerk.user.imageUrl;
+            const newAvatarUrl = response.publicUrl;
             if (newAvatarUrl && newAvatarUrl !== userData?.avatar) {
               changesMade = true;
               updates.avatar = newAvatarUrl;
