@@ -154,9 +154,11 @@ const SendbirdChat = () => {
 
   // Container styles
   const containerStyle = {
-    height: isMobile
-      ? `calc(${windowHeight}px - ${BOTTOM_MENU_HEIGHT}px)`
-      : "100vh",
+    // height: isMobile
+    //   ? `calc(${windowHeight}px - ${BOTTOM_MENU_HEIGHT}px)`
+    //   : "100vh",
+    height: "100%",
+
     width: "100%",
     display: isMobile ? "block" : "flex",
     position: "relative",
