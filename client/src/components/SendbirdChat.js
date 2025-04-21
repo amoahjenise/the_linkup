@@ -79,6 +79,10 @@ const SendbirdChat = () => {
           ),
         ]);
 
+        if (!linkupResponse.success) {
+          return;
+        }
+
         setLinkup(linkupResponse.linkup);
 
         const operator = channel?.members.find(
