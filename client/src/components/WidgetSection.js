@@ -19,9 +19,8 @@ const WidgetSection = ({
   toggleWidget,
   isMobile,
   refreshFeed,
-  handleScrollToTop
+  handleScrollToTop,
 }) => {
-
   const handleFilterChange = (selectedCategories) => {
     console.log("Selected Categories:", selectedCategories);
     // Apply filter logic to the feed based on selectedCategories

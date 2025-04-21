@@ -334,7 +334,10 @@ const App = () => {
           element={<UserDataDeletionPage />}
         />
         <Route path="/home" element={<HomePage isMobile={isMobile} />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route
+          path="/notifications"
+          element={<NotificationsPage isMobile={isMobile} />}
+        />
         <Route
           path="/profile/:id"
           element={<UserProfilePage isMobile={isMobile} />}

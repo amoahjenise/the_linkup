@@ -29,28 +29,47 @@ const Container = styled("div")(({ theme }) => ({
 }));
 
 // Card-like container with refined hover effects
-const CardContainer = styled("div")(({ theme, isHovered, colorMode }) => ({
-  border: `1px solid ${
-    colorMode === "light"
-      ? "rgba(229, 235, 243, 1)"
-      : "rgba(255, 255, 255, 0.1)"
-  }`,
-  padding: "1rem",
-  borderRadius: "1rem",
+const CardContainer = styled("div")(({ theme, colorMode }) => ({
+  // Base styles (mobile-first)
   width: "100%",
   minHeight: "175px",
-  backgroundColor: colorMode === "dark" ? "rgb(10, 70, 87, 0.35)" : "#FFFFFF",
+  padding: "1rem",
+  borderRadius: "1rem",
 
+  // Color and effects
+  backgroundColor: colorMode === "dark" ? "hsl(210, 28%, 18%)" : "#FFFFFF",
+  border:
+    colorMode === "dark" ? "1px solid hsl(210, 25%, 25%)" : "1px solid #e5e7eb",
   boxShadow:
-    colorMode === "light"
-      ? isHovered
-        ? "0 4px 12px rgba(0, 0, 0, 0.15)"
-        : "0 2px 6px rgba(0, 0, 0, 0.05)"
-      : isHovered
-      ? "0 4px 12px rgba(0, 0, 0, 0.3)"
+    colorMode === "dark"
+      ? "0 4px 20px hsla(210, 100%, 50%, 0.12)"
+      : "0 2px 8px rgba(0, 0, 0, 0.08)",
+  backdropFilter: colorMode === "dark" ? "blur(12px)" : "none",
+  backgroundImage:
+    colorMode === "dark"
+      ? "linear-gradient(to bottom, hsla(210, 28%, 18%, 0.9), hsla(210, 30%, 15%, 0.95))"
       : "none",
-  transition: "transform 0.2s ease, box-shadow 0.2s ease",
 
+  // Responsive widths for larger screens
+  [theme.breakpoints.up("md")]: {
+    // ≥900px
+    width: "100%",
+  },
+  [theme.breakpoints.up("lg")]: {
+    // ≥1200px
+    width: "100%",
+  },
+  [theme.breakpoints.up("xl")]: {
+    // ≥1536px
+    width: "100%",
+  },
+  [theme.breakpoints.up(1800)]: {
+    // Custom breakpoint ≥1800px
+    width: "60%",
+  },
+
+  // Hover effects
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   "&:hover": {
     transform: "translateY(-3px)",
     boxShadow:
@@ -189,332 +208,343 @@ const capitalizeLocation = (location) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-const LinkupItem = forwardRef(({ linkupId, linkupItem, userId, refreshFeed, disableRequest, scrollToTop }, ref) => {
-  const { colorMode } = useColorMode(); // Use useColorMode hook
-  const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const {
-    id,
-    creator_id,
-    creator_name,
-    activity,
-    created_at,
-    date,
-    avatar,
-    latitude,
-    longitude,
-    location,
-  } = linkupItem;
-  const [menuAnchor, setMenuAnchor] = useState(null);
-  const { addSnackbar } = useSnackbar();
+const LinkupItem = forwardRef(
+  (
+    { linkupId, linkupItem, userId, refreshFeed, disableRequest, scrollToTop },
+    ref
+  ) => {
+    const { colorMode } = useColorMode(); // Use useColorMode hook
+    const navigate = useNavigate();
+    const [isHovered, setIsHovered] = useState(false);
+    const loggedUser = useSelector((state) => state.loggedUser);
+    const {
+      id,
+      creator_id,
+      creator_name,
+      activity,
+      created_at,
+      date,
+      avatar,
+      latitude,
+      longitude,
+      location,
+    } = linkupItem;
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const { addSnackbar } = useSnackbar();
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = degreesToRadians(lat2 - lat1);
-    const dLon = degreesToRadians(lon2 - lon1);
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Earth's radius in kilometers
+      const dLat = degreesToRadians(lat2 - lat1);
+      const dLon = degreesToRadians(lon2 - lon1);
 
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(degreesToRadians(lat1)) *
-        Math.cos(degreesToRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degreesToRadians(lat1)) *
+          Math.cos(degreesToRadians(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c; // Distance in kilometers
-  };
+      return R * c; // Distance in kilometers
+    };
 
-  const degreesToRadians = (degrees) => degrees * (Math.PI / 180);
-  // Ensure the logged user has valid latitude/longitude values
-  const useDistance = (latitude, longitude) => {
-    const [distance, setDistance] = useState(null);
+    const degreesToRadians = (degrees) => degrees * (Math.PI / 180);
+    // Ensure the logged user has valid latitude/longitude values
+    const useDistance = (latitude, longitude) => {
+      const [distance, setDistance] = useState(null);
 
-    useEffect(() => {
-      if (loggedUser?.user?.latitude && loggedUser?.user?.longitude) {
-        const userLat = loggedUser.user.latitude;
-        const userLon = loggedUser.user.longitude;
+      useEffect(() => {
+        if (loggedUser?.user?.latitude && loggedUser?.user?.longitude) {
+          const userLat = loggedUser.user.latitude;
+          const userLon = loggedUser.user.longitude;
 
-        if (latitude && longitude) {
-          const dist = calculateDistance(userLat, userLon, latitude, longitude);
-          setDistance(dist.toFixed(0)); // Set distance with 0 decimal places
-        } else {
-          setDistance(null); // Handle cases where distance can't be calculated
+          if (latitude && longitude) {
+            const dist = calculateDistance(
+              userLat,
+              userLon,
+              latitude,
+              longitude
+            );
+            setDistance(dist.toFixed(0)); // Set distance with 0 decimal places
+          } else {
+            setDistance(null); // Handle cases where distance can't be calculated
+          }
         }
-      }
-    }, [latitude, longitude]);
+      }, [latitude, longitude]);
 
-    return distance;
-  };
+      return distance;
+    };
 
-  const distanceInKm = useDistance(latitude, longitude); // Use the distance hook
+    const distanceInKm = useDistance(latitude, longitude); // Use the distance hook
 
-  const renderPaymentOptionIcon = () => {
-    switch (linkupItem.payment_option) {
-      case "split":
-        return (
-          <Tooltip title="Lets split the bill!">
-            <span
-              role="img"
-              aria-label="split the bill"
-              style={{
-                fontSize: "30px",
-                fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
-              }}
-            >
-              <PaymentOptionIcon>
-                <IoReceipt />
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>
-          </Tooltip>
-        );
-      case "iWillPay":
-        return (
-          <Tooltip title="I'll pay!">
-            <span
-              role="img"
-              aria-label="i'll pay"
-              style={{
-                fontSize: "30px",
-                fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
-              }}
-            >
-              <PaymentOptionIcon>
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>{" "}
-          </Tooltip>
-        );
-      case "pleasePay":
-        return (
-          <PaymentOptionIconContainer>
-            <EmojiTooltip />
-          </PaymentOptionIconContainer>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const handleRequestLinkup = async () => {
-    const response = await getLinkupStatus(id);
-    let message = "";
-
-    switch (response.linkupStatus) {
-      case "expired":
-        message = "This linkup has expired.";
-        break;
-      case "closed":
-        message = "This linkup was closed and can no longer receive requests.";
-        break;
-      case "inactive":
-        message = "This linkup was deleted.";
-        break;
-      default:
-        const destination = disableRequest
-          ? `/history/requests-sent`
-          : `/send-request/${id}`;
-        navigate(destination);
-        return;
-    }
-
-    if (!disableRequest) {
-      refreshFeed();
-      addSnackbar(message, { timeout: 7000 });
-    }
-  };
-
-  const renderLinkupItemText = () => {
-    // Parse the activity using NLP
-    const doc = compromise(activity);
-
-    // Detect verbs and nouns
-    const verbs = doc.verbs();
-    const nouns = doc.nouns();
-
-    // Check if any of the nouns are plural
-    const isPlural = nouns.some((noun) => noun.tag() === "Plural");
-
-    // Default activity formatted string
-    let activityFormatted = "";
-
-    // If it's a gerund (e.g., "Hiking", "Running"), treat it as a noun phrase
-    const isGerund = activity.match(/\w+ing$/);
-
-    if (isGerund) {
-      activityFormatted = `for ${activity}`;
-    } else {
-      // If it's plural or contains more nouns, use "for" (e.g., "hikes", "soccer games")
-      const isNounHeavy = nouns.length >= verbs.length || isPlural;
-      activityFormatted = isNounHeavy ? `for ${activity}` : `to ${activity}`;
-    }
-
-    return (
-      <p>
-        <Link
-          style={{ fontWeight: 500 }}
-          to={`/profile/${creator_id}`}
-          className={UserName}
-        >
-          {creator_name}
-        </Link>{" "}
-        is trying to link up{" "}
-        <span style={{ fontWeight: 500 }}>{activityFormatted}</span> on{" "}
-        <span style={{ fontWeight: 500 }}>{formatDate(date)}</span>.
-      </p>
-    );
-  };
-
-  const getTimeAgo = (createdAt) => {
-    const now = moment();
-    const created = moment(createdAt);
-    const duration = moment.duration(now.diff(created));
-    const days = duration.asDays();
-
-    if (days < 1) {
-      const hours = duration.asHours();
-      const minutes = duration.asMinutes();
-
-      if (hours >= 1) {
-        return `${Math.floor(hours)} hour${
-          Math.floor(hours) !== 1 ? "s" : ""
-        } ago`;
-      } else if (minutes >= 1) {
-        return `${Math.floor(minutes)} minute${
-          Math.floor(minutes) !== 1 ? "s" : ""
-        } ago`;
-      } else {
-        return "Just now";
-      }
-    } else if (days < 2) {
-      return "Yesterday";
-    } else {
-      return `${Math.floor(days)} days ago`;
-    }
-  };
-
-  return (
-    <div id={`item-${linkupId}`} ref={ref}>
-      <Container>
-        <CardContainer
-          isHovered={isHovered}
-          colorMode={colorMode}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <div style={{ display: "flex", width: "100%" }}>
-            {/* Left Side */}
-            <div style={{ flex: 2, marginRight: "1rem" }}>
-              <UserInfo>
-                <Name>
-                  <UserName>
-                    <Link to={`/profile/${creator_id}`} className={UserName}>
-                      {creator_name}
-                    </Link>
-                  </UserName>
-                  <Tooltip
-                    title={linkupItem.is_online ? "Online" : "Offline"}
-                    arrow
-                  >
-                    <OnlineIndicator isOnline={linkupItem.is_online} />
-                  </Tooltip>
-                </Name>
-              </UserInfo>
-              <PostInfo>
-                <span>{getTimeAgo(created_at)}</span>
-              </PostInfo>
-              <PostContent colorMode={colorMode}>
-                {/* <div>{formatDate(date)}</div> */}
-                {renderLinkupItemText()}
-                <div>Location: {capitalizeLocation(location)}</div>
-              </PostContent>
-              <PostActionsContainer>
-                {loggedUser.user.id !== linkupItem.creator_id && (
-                  <div>
-                    <div>
-                      <PostActions
-                        paymentOption={linkupItem.payment_option}
-                        onRequestClick={handleRequestLinkup}
-                        disableRequest={disableRequest}
-                      />
-                    </div>
-                  </div>
-                )}
-                <span>{renderPaymentOptionIcon()}</span>
-              </PostActionsContainer>
-            </div>
-
-            {/* Right Side */}
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                justifyContent: "center",
-              }}
-            >
-              <MoreMenuContainer>
-                {loggedUser.user.id === linkupItem.creator_id ? (
-                  <MoreMenu
-                    showGoToItem={true}
-                    showEditItem={true}
-                    showDeleteItem={true}
-                    showCloseItem={true}
-                    showCheckInLinkup={false}
-                    showAcceptLinkupRequest={false}
-                    linkupItem={linkupItem}
-                    refreshFeed={refreshFeed}
-                    menuAnchor={menuAnchor}
-                    setMenuAnchor={setMenuAnchor}
-                    scrollToTop={scrollToTop}
-                  />
-                ) : (
-                  <DistanceInfo>
-                    <span>
-                      {distanceInKm ? (
-                        distanceInKm < 0.5 ? (
-                          "< 500m away"
-                        ) : distanceInKm < 1 ? (
-                          "< 1 km away"
-                        ) : (
-                          `${distanceInKm} km away`
-                        )
-                      ) : (
-                        <CircularProgress size={24} />
-                      )}
-                    </span>
-                  </DistanceInfo>
-                )}
-              </MoreMenuContainer>
-              <div
+    const renderPaymentOptionIcon = () => {
+      switch (linkupItem.payment_option) {
+        case "split":
+          return (
+            <Tooltip title="Lets split the bill!">
+              <span
+                role="img"
+                aria-label="split the bill"
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
+                  fontSize: "30px",
+                  fontFamily:
+                    "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
                 }}
               >
-                <UserAvatar
-                  userData={{
-                    id: creator_id,
-                    name: creator_name,
-                    avatar: avatar,
+                <PaymentOptionIcon>
+                  <IoReceipt />
+                  <IoReceipt />
+                </PaymentOptionIcon>
+              </span>
+            </Tooltip>
+          );
+        case "iWillPay":
+          return (
+            <Tooltip title="I'll pay!">
+              <span
+                role="img"
+                aria-label="i'll pay"
+                style={{
+                  fontSize: "30px",
+                  fontFamily:
+                    "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+                }}
+              >
+                <PaymentOptionIcon>
+                  <IoReceipt />
+                </PaymentOptionIcon>
+              </span>{" "}
+            </Tooltip>
+          );
+        case "pleasePay":
+          return (
+            <PaymentOptionIconContainer>
+              <EmojiTooltip />
+            </PaymentOptionIconContainer>
+          );
+        default:
+          return null;
+      }
+    };
+
+    const handleRequestLinkup = async () => {
+      const response = await getLinkupStatus(id);
+      let message = "";
+
+      switch (response.linkupStatus) {
+        case "expired":
+          message = "This linkup has expired.";
+          break;
+        case "closed":
+          message =
+            "This linkup was closed and can no longer receive requests.";
+          break;
+        case "inactive":
+          message = "This linkup was deleted.";
+          break;
+        default:
+          const destination = disableRequest
+            ? `/history/requests-sent`
+            : `/send-request/${id}`;
+          navigate(destination);
+          return;
+      }
+
+      if (!disableRequest) {
+        refreshFeed();
+        addSnackbar(message, { timeout: 7000 });
+      }
+    };
+
+    const renderLinkupItemText = () => {
+      // Parse the activity using NLP
+      const doc = compromise(activity);
+
+      // Detect verbs and nouns
+      const verbs = doc.verbs();
+      const nouns = doc.nouns();
+
+      // Check if any of the nouns are plural
+      const isPlural = nouns.some((noun) => noun.tag() === "Plural");
+
+      // Default activity formatted string
+      let activityFormatted = "";
+
+      // If it's a gerund (e.g., "Hiking", "Running"), treat it as a noun phrase
+      const isGerund = activity.match(/\w+ing$/);
+
+      if (isGerund) {
+        activityFormatted = `for ${activity}`;
+      } else {
+        // If it's plural or contains more nouns, use "for" (e.g., "hikes", "soccer games")
+        const isNounHeavy = nouns.length >= verbs.length || isPlural;
+        activityFormatted = isNounHeavy ? `for ${activity}` : `to ${activity}`;
+      }
+
+      return (
+        <p>
+          <Link
+            style={{ fontWeight: 500 }}
+            to={`/profile/${creator_id}`}
+            className={UserName}
+          >
+            {creator_name}
+          </Link>{" "}
+          is trying to link up{" "}
+          <span style={{ fontWeight: 500 }}>{activityFormatted}</span> on{" "}
+          <span style={{ fontWeight: 500 }}>{formatDate(date)}</span>.
+        </p>
+      );
+    };
+
+    const getTimeAgo = (createdAt) => {
+      const now = moment();
+      const created = moment(createdAt);
+      const duration = moment.duration(now.diff(created));
+      const days = duration.asDays();
+
+      if (days < 1) {
+        const hours = duration.asHours();
+        const minutes = duration.asMinutes();
+
+        if (hours >= 1) {
+          return `${Math.floor(hours)} hour${
+            Math.floor(hours) !== 1 ? "s" : ""
+          } ago`;
+        } else if (minutes >= 1) {
+          return `${Math.floor(minutes)} minute${
+            Math.floor(minutes) !== 1 ? "s" : ""
+          } ago`;
+        } else {
+          return "Just now";
+        }
+      } else if (days < 2) {
+        return "Yesterday";
+      } else {
+        return `${Math.floor(days)} days ago`;
+      }
+    };
+
+    return (
+      <div id={`item-${linkupId}`} ref={ref}>
+        <Container>
+          <CardContainer
+            isHovered={isHovered}
+            colorMode={colorMode}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <div style={{ display: "flex", width: "100%" }}>
+              {/* Left Side */}
+              <div style={{ flex: 2, marginRight: "1rem" }}>
+                <UserInfo>
+                  <Name>
+                    <UserName>
+                      <Link to={`/profile/${creator_id}`} className={UserName}>
+                        {creator_name}
+                      </Link>
+                    </UserName>
+                    <Tooltip
+                      title={linkupItem.is_online ? "Online" : "Offline"}
+                      arrow
+                    >
+                      <OnlineIndicator isOnline={linkupItem.is_online} />
+                    </Tooltip>
+                  </Name>
+                </UserInfo>
+                <PostInfo>
+                  <span>{getTimeAgo(created_at)}</span>
+                </PostInfo>
+                <PostContent colorMode={colorMode}>
+                  {/* <div>{formatDate(date)}</div> */}
+                  {renderLinkupItemText()}
+                  <div>Location: {capitalizeLocation(location)}</div>
+                </PostContent>
+                <PostActionsContainer>
+                  {loggedUser.user.id !== linkupItem.creator_id && (
+                    <div>
+                      <div>
+                        <PostActions
+                          paymentOption={linkupItem.payment_option}
+                          onRequestClick={handleRequestLinkup}
+                          disableRequest={disableRequest}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <span>{renderPaymentOptionIcon()}</span>
+                </PostActionsContainer>
+              </div>
+
+              {/* Right Side */}
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  justifyContent: "center",
+                }}
+              >
+                <MoreMenuContainer>
+                  {loggedUser.user.id === linkupItem.creator_id ? (
+                    <MoreMenu
+                      showGoToItem={true}
+                      showEditItem={true}
+                      showDeleteItem={true}
+                      showCloseItem={true}
+                      showCheckInLinkup={false}
+                      showAcceptLinkupRequest={false}
+                      linkupItem={linkupItem}
+                      refreshFeed={refreshFeed}
+                      menuAnchor={menuAnchor}
+                      setMenuAnchor={setMenuAnchor}
+                      scrollToTop={scrollToTop}
+                    />
+                  ) : (
+                    <DistanceInfo>
+                      <span>
+                        {distanceInKm ? (
+                          distanceInKm < 0.5 ? (
+                            "< 500m away"
+                          ) : distanceInKm < 1 ? (
+                            "< 1 km away"
+                          ) : (
+                            `${distanceInKm} km away`
+                          )
+                        ) : (
+                          <CircularProgress size={24} />
+                        )}
+                      </span>
+                    </DistanceInfo>
+                  )}
+                </MoreMenuContainer>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
                   }}
-                  width="100px"
-                  height="100px"
-                />
+                >
+                  <UserAvatar
+                    userData={{
+                      id: creator_id,
+                      name: creator_name,
+                      avatar: avatar,
+                    }}
+                    width="100px"
+                    height="100px"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </CardContainer>
-      </Container>
-    </div>
-  );
-});
+          </CardContainer>
+        </Container>
+      </div>
+    );
+  }
+);
 
 export default LinkupItem;

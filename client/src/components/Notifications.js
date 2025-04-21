@@ -19,7 +19,25 @@ const MainContainer = styled("div")(({ theme }) => ({
   flexDirection: "column",
   overflowY: "hidden",
   width: "100%",
-  height: "100dvh",
+  borderRightWidth: "1px",
+
+  // Responsive widths for larger screens
+  [theme.breakpoints.up("md")]: {
+    // ≥900px
+    width: "100%",
+  },
+  [theme.breakpoints.up("lg")]: {
+    // ≥1200px
+    width: "100%",
+  },
+  [theme.breakpoints.up("xl")]: {
+    // ≥1536px
+    width: "100%",
+  },
+  [theme.breakpoints.up(1800)]: {
+    // Custom breakpoint ≥1800px
+    width: "60%",
+  },
 }));
 
 const NotificationsList = styled("ul")(({ theme }) => ({
@@ -42,7 +60,7 @@ const NoNotificationsContainer = styled("div")(({ theme }) => ({
 
 const MemoizedNotificationItem = memo(NotificationItem);
 
-const Notifications = () => {
+const Notifications = ({ isMobile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const unreadNotificationsCount = useSelector(
@@ -124,16 +142,24 @@ const Notifications = () => {
           <EmptyNotificationsPlaceholder />
         </NoNotificationsContainer>
       ) : (
-        <NotificationsList>
-          {notifications.map((notification) => (
-            <div key={notification.id} style={{ marginBottom: 8 }}>
-              <MemoizedNotificationItem
-                notification={notification}
-                onClick={() => handleNotificationClick(notification)}
-              />
-            </div>
-          ))}
-        </NotificationsList>
+        <div
+          style={{
+            height: "100%",
+            overflowY: "auto",
+            paddingBottom: isMobile ? "65px" : 0, // Secondary fallback
+          }}
+        >
+          <NotificationsList>
+            {notifications.map((notification) => (
+              <div key={notification.id} style={{ marginBottom: 8 }}>
+                <MemoizedNotificationItem
+                  notification={notification}
+                  onClick={() => handleNotificationClick(notification)}
+                />
+              </div>
+            ))}
+          </NotificationsList>
+        </div>
       )}
     </MainContainer>
   );

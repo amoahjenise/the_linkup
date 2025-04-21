@@ -27,7 +27,7 @@ const ModalContainer = styled("div")({
   justifyContent: "center",
   position: "sticky",
   top: 0,
-  maxWidth: "600px", // Desktop
+  maxWidth: "350px", // Desktop
   margin: "0 auto",
   height: "100%",
   maxHeight: "90vh", // Limit modal height
@@ -86,13 +86,48 @@ const ModalInput = styled("input")(({ theme, colorMode }) => ({
   marginBottom: theme.spacing(1.5),
 }));
 
+// ButtonGroup with improved button sizing
 const ButtonGroup = styled("div")(({ theme }) => ({
-  marginTop: theme.spacing(2),
   display: "flex",
-  justifyContent: "center",
-  height: "40px",
-  flexDirection: "row", // Stack buttons horizontally
-  gap: theme.spacing(2), // Add space between buttons
+  justifyContent: "flex-end",
+  marginTop: theme.spacing(4),
+  width: "100%",
+  gap: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    position: "sticky",
+    bottom: 0,
+    padding: theme.spacing(2, 0),
+    backgroundColor: "inherit",
+    zIndex: 1,
+  },
+}));
+
+// StyledButton with better visual hierarchy
+const StyledButton = styled(Button)(({ theme, colorMode, isCancel }) => ({
+  minWidth: 100,
+  padding: theme.spacing(1.5, 2),
+  borderRadius: 9999,
+  fontWeight: 700,
+  textTransform: "none",
+  boxShadow: "none",
+  "&:hover": {
+    boxShadow: "none",
+  },
+  ...(isCancel
+    ? {
+        color: colorMode === "dark" ? "#E0E0E0" : "#333333",
+        backgroundColor: colorMode === "dark" ? "#333333" : "#F0F0F0",
+        "&:hover": {
+          backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
+        },
+      }
+    : {
+        backgroundColor: colorMode === "dark" ? "#0097A7" : "#1DA1F2",
+        color: "#FFFFFF",
+        "&:hover": {
+          backgroundColor: colorMode === "dark" ? "#007b86" : "#1991DB",
+        },
+      }),
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
@@ -116,39 +151,6 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
     borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
   },
   cursor: "pointer",
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  minWidth: 100,
-  padding: theme.spacing(1.5, 2),
-  borderRadius: 9999,
-  fontWeight: 700,
-  width: "140px",
-  border: "none",
-  cursor: "pointer",
-  transition: "background-color 0.3s ease",
-  backgroundColor: "#0097A7",
-  color: "white",
-  "&:hover": {
-    backgroundColor: "#007b86",
-  },
-  textTransform: "none",
-}));
-
-const CancelButton = styled(Button)(({ theme, colorMode }) => ({
-  width: "140px",
-  fontWeight: 700,
-  minWidth: 100,
-  padding: theme.spacing(1.5, 2),
-  borderRadius: 9999,
-  textTransform: "none",
-  boxShadow: "none",
-  color: colorMode === "dark" ? "#E0E0E0" : "#333333",
-  backgroundColor: colorMode === "dark" ? "#333333" : "#F0F0F0",
-  "&:hover": {
-    backgroundColor: colorMode === "dark" ? "#424242" : "#E0E0E0",
-  },
-  transition: "background-color 0.3s ease",
 }));
 
 const ErrorText = styled("p")(({ theme }) => ({
@@ -367,16 +369,21 @@ const EditLinkupForm = ({ onClose, refreshFeed }) => {
           />
 
           <ButtonGroup>
-            <StyledButton type="submit" variant="contained">
+            <StyledButton
+              type="submit"
+              variant="contained"
+              colorMode={colorMode}
+            >
               Save
             </StyledButton>
-            <CancelButton
+            <StyledButton
               variant="contained"
               colorMode={colorMode}
               onClick={handleCancelClick}
+              isCancel={true}
             >
               Cancel
-            </CancelButton>
+            </StyledButton>
           </ButtonGroup>
         </ModalForm>
       </ModalContainer>

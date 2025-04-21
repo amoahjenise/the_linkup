@@ -32,7 +32,12 @@ const ScrollToTopButton = styled(Button)(({ theme }) => ({
   position: "sticky",
   left: "50%",
   transform: "translateX(-50%)",
-  bottom: "80px",
+  bottom: "30px",
+  // Responsive widths for larger screens
+  [theme.breakpoints.up("md")]: {
+    // ≥900px
+    bottom: 0,
+  },
   zIndex: 1100,
   width: "100px",
   height: "32px",
@@ -54,7 +59,7 @@ const ScrollToTopButton = styled(Button)(({ theme }) => ({
 }));
 
 const LinkupFeed = forwardRef(
-  ({ userId, gender, location, refreshFeed, colorMode }, ref) => {
+  ({ userId, gender, location, refreshFeed, colorMode, isMobile }, ref) => {
     // Data state
     const { userSettings } = useSelector((state) => state.userSettings);
     const userSentRequests = useSelector((state) => state.userSentRequests);
@@ -348,6 +353,7 @@ const LinkupFeed = forwardRef(
           overflowY: "auto",
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
+          paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
         }}
       >
         <TopNavBar title={"Home"} />
@@ -376,6 +382,7 @@ const LinkupFeed = forwardRef(
                 disableRequest={userSentRequests.some(
                   (req) => req.linkup_id === linkup.id
                 )}
+                isMobile={isMobile}
               />
             ))
           ) : (
