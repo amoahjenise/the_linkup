@@ -5,6 +5,8 @@ import Checkbox from "@mui/material/Checkbox";
 
 const DropdownContainer = styled("div")(({ theme, colorMode, hasError }) => ({
   width: "100%",
+  minWidth: "200px", // Set a minimum width
+  maxWidth: "100%", // Add this to constrain growth
   marginBottom: theme.spacing(1.5),
   borderRadius: "8px",
   border: `1px solid ${
@@ -44,6 +46,7 @@ const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
   padding: "12px 16px",
   fontSize: "0.9375rem",
   color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
+  minHeight: "20px", // Ensure consistent height
 }));
 
 const DropdownList = styled("ul")(({ theme, colorMode }) => ({
@@ -61,6 +64,7 @@ const DropdownList = styled("ul")(({ theme, colorMode }) => ({
   padding: "4px 0",
   margin: 0,
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  minWidth: "100%", // Ensure dropdown matches input width
 }));
 
 const DropdownItem = styled("li")(({ theme, colorMode, selected }) => ({
@@ -78,6 +82,9 @@ const DropdownItem = styled("li")(({ theme, colorMode, selected }) => ({
   "&:hover": {
     backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
   },
+  whiteSpace: "nowrap", // Prevent text wrapping
+  overflow: "hidden", // Hide overflow
+  textOverflow: "ellipsis", // Add ellipsis for long text
 }));
 
 const SelectedChips = styled("div")(({ theme }) => ({
@@ -88,20 +95,30 @@ const SelectedChips = styled("div")(({ theme }) => ({
   whiteSpace: "nowrap",
   alignItems: "center",
   gap: "4px",
+  flex: 1,
+  maxWidth: "100%",
 }));
 
-const Chip = styled("div")(({ theme, colorMode }) => ({
+const Chip = styled("div")(({ theme, colorMode, isMobile }) => ({
   backgroundColor: colorMode === "dark" ? "#2F3336" : "#EFF3F4",
   color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
   padding: "4px 8px",
   borderRadius: "12px",
   fontSize: "0.8125rem",
   flexShrink: 0,
+  maxWidth: isMobile ? "60px" : "70px", // Approx. 8 characters wide
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 }));
 
 const OptionLabel = styled("span")({
   marginLeft: "8px",
   fontSize: "0.9375rem",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  flex: 1, // Take remaining space
 });
 
 const PlaceholderText = styled("span")(({ colorMode }) => ({
@@ -116,6 +133,7 @@ const CustomMultiSelect = ({
   placeholder = "Select...",
   placeholderStyle,
   hasError = false,
+  isMobile,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -165,7 +183,8 @@ const CustomMultiSelect = ({
     return (
       <>
         {selectedLabels.map((val) => (
-          <Chip key={val} colorMode={colorMode}>
+          <Chip key={val} colorMode={colorMode} isMobile={isMobile}>
+            {" "}
             {val}
           </Chip>
         ))}
@@ -196,6 +215,7 @@ const CustomMultiSelect = ({
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
             color: colorMode === "dark" ? "#71767B" : "#8B98A5",
             fontSize: "20px",
+            flexShrink: 0, // Prevent icon from being squeezed
           }}
         />
       </DropdownHeader>
