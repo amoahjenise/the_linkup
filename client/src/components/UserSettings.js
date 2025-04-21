@@ -260,7 +260,29 @@ const UserSettings = ({ onClose, isMobile }) => {
       .catch(() => addSnackbar("Failed to copy URL", "error"));
   }, [profileUrl, addSnackbar]);
 
+  const hasUnsavedChanges = useMemo(() => {
+    const currentGender = genderPreference.map((g) => g.toLowerCase()).sort();
+    const savedGender = (userSettings?.genderPreferences || [])
+      .map((g) => g.toLowerCase())
+      .sort();
+
+    const genderChanged =
+      JSON.stringify(currentGender) !== JSON.stringify(savedGender);
+    const distanceChanged =
+      JSON.stringify([0, distanceRange]) !==
+      JSON.stringify(userSettings?.distanceRange);
+    const ageChanged =
+      JSON.stringify(ageRange) !== JSON.stringify(userSettings?.ageRange);
+
+    return genderChanged || distanceChanged || ageChanged;
+  }, [distanceRange, ageRange, genderPreference, userSettings]);
+
   const handleSaveSettings = useCallback(async () => {
+    if (!hasUnsavedChanges) {
+      addSnackbar("No changes to save", "info");
+      return;
+    }
+
     try {
       const updatedSettings = {
         distanceRange: [0, distanceRange],
@@ -273,7 +295,7 @@ const UserSettings = ({ onClose, isMobile }) => {
 
       dispatch(saveSettingsToRedux(response.settings));
       addSnackbar("Settings saved successfully", "success");
-      // Only close if in mobile mode
+
       if (isMobile) {
         onClose?.();
       }
@@ -281,6 +303,7 @@ const UserSettings = ({ onClose, isMobile }) => {
       addSnackbar(error.message || "Failed to save settings", "error");
     }
   }, [
+    hasUnsavedChanges,
     distanceRange,
     ageRange,
     genderPreference,
