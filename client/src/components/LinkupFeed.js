@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getLinkups, searchLinkups } from "../api/linkUpAPI";
 import LinkupItem from "./LinkupItem";
 import { Button, styled } from "@mui/material";
@@ -60,6 +60,7 @@ const ScrollToTopButton = styled(Button)(({ theme }) => ({
 
 const LinkupFeed = forwardRef(
   ({ userId, gender, location, refreshFeed, colorMode, isMobile }, ref) => {
+    const dispatch = useDispatch();
     // Data state
     const { userSettings } = useSelector((state) => state.userSettings);
     const userSentRequests = useSelector((state) => state.userSentRequests);
@@ -133,6 +134,20 @@ const LinkupFeed = forwardRef(
     ]);
 
     const filteredLinkups = useMemo(() => filterLinkups(), [filterLinkups]);
+
+    const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Earth's radius in km
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) *
+          Math.cos(lat2 * (Math.PI / 180)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }, []);
 
     // Scroll to top function
     const scrollToTop = () => {
@@ -227,16 +242,22 @@ const LinkupFeed = forwardRef(
       };
     }, [debouncedSearch]);
 
-    // Load data with scroll anchoring and caching
     const loadData = async (reset = false) => {
       if (loading) return;
 
-      // Check cache first for initial load
       if (reset && linkupCache.current[userId]) {
         const cachedData = linkupCache.current[userId];
         setLinkups(cachedData.linkups);
         setOffset(cachedData.offset);
         setHasMore(cachedData.hasMore);
+
+        dispatch({
+          type: "MERGE_LINKUPS_SUCCESS",
+          payload: {
+            newLinkups: cachedData.linkups,
+            isInitialLoad: true,
+          },
+        });
 
         requestAnimationFrame(() => {
           if (feedRef.current) {
@@ -262,26 +283,53 @@ const LinkupFeed = forwardRef(
         );
 
         if (response?.linkupList) {
+          const enrichedLinkups = response.linkupList.map((linkup) => ({
+            ...linkup,
+            isUserCreated: linkup.creator_id === userId,
+            createdAtTimestamp: linkup.created_at,
+            distance: calculateDistance(
+              location.latitude,
+              location.longitude,
+              linkup.latitude,
+              linkup.longitude
+            ),
+          }));
+
+          enrichedLinkups.sort((a, b) => {
+            const createdAtComparison =
+              new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
+            return createdAtComparison !== 0
+              ? createdAtComparison
+              : a.distance - b.distance;
+          });
+
           const newLinkups = reset
-            ? response.linkupList
-            : [...linkups, ...response.linkupList];
+            ? enrichedLinkups
+            : [...linkups, ...enrichedLinkups];
 
           if (reset) {
             linkupCache.current[userId] = {
-              linkups: response.linkupList,
-              offset: response.linkupList.length,
-              hasMore: response.linkupList.length === pageSize,
+              linkups: enrichedLinkups,
+              offset: enrichedLinkups.length,
+              hasMore: enrichedLinkups.length === pageSize,
               timestamp: Date.now(),
             };
           }
 
+          // Redux dispatch here
+          dispatch({
+            type: "MERGE_LINKUPS_SUCCESS",
+            payload: {
+              newLinkups: enrichedLinkups,
+              isInitialLoad: reset,
+            },
+          });
+
           setLinkups(newLinkups);
           setOffset(
-            reset
-              ? response.linkupList.length
-              : offset + response.linkupList.length
+            reset ? enrichedLinkups.length : offset + enrichedLinkups.length
           );
-          setHasMore(response.linkupList.length === pageSize);
+          setHasMore(enrichedLinkups.length === pageSize);
 
           requestAnimationFrame(() => {
             if (feedRef.current) {
