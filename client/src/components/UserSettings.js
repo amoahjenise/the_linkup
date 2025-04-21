@@ -34,21 +34,23 @@ const MAX_AGE = 80;
 const Container = styled(Card)(({ theme, colormode }) => ({
   maxWidth: 600,
   margin: "auto",
-  borderRadius: theme.shape.borderRadius * 3,
-  boxShadow: theme.shadows[6],
-  transition: "all 0.3s ease",
+  borderRadius: 16,
+  boxShadow: "none",
+  border: `1px solid ${
+    colormode === "dark" ? theme.palette.grey[800] : theme.palette.grey[200]
+  }`,
   backgroundColor:
     colormode === "dark"
       ? theme.palette.grey[900]
       : theme.palette.background.paper,
-  "&:hover": { boxShadow: theme.shadows[8] },
 }));
 
-const SectionTitle = styled(Typography)(({ theme, colormode }) => ({
-  fontSize: "1.1rem",
+const SectionTitle = styled(Typography)(({ theme, colormode, isMobile }) => ({
+  fontSize: "1rem",
   fontWeight: 600,
-  marginTop: 30,
+  marginTop: isMobile ? 30 : 0,
   marginBottom: 8,
+  padding: "12px 0",
   color:
     colormode === "dark"
       ? theme.palette.common.white
@@ -57,7 +59,6 @@ const SectionTitle = styled(Typography)(({ theme, colormode }) => ({
   alignItems: "center",
   justifyContent: "space-between",
   cursor: "pointer",
-  padding: "8px 0",
   "&:hover": {
     color: theme.palette.primary.main,
   },
@@ -113,7 +114,7 @@ const RangeInput = styled(TextField)(({ theme, colormode }) => ({
 
 const GenderChip = styled(Chip)(({ theme, selected, colormode }) => ({
   margin: 4,
-  borderRadius: 6,
+  borderRadius: 8,
   fontWeight: selected ? 600 : 400,
   transition: "all 0.2s ease",
   backgroundColor: selected ? theme.palette.primary.main : "transparent",
@@ -321,6 +322,7 @@ const UserSettings = ({ onClose, isMobile }) => {
         <SectionTitle
           colormode={colorMode}
           onClick={() => toggleSection("profile")}
+          isMobile={isMobile}
         >
           Profile Sharing
           {expandedSections.profile ? <ExpandLess /> : <ExpandMore />}
@@ -587,18 +589,15 @@ const UserSettings = ({ onClose, isMobile }) => {
             variant="contained"
             onClick={handleSaveSettings}
             sx={{
-              padding: "12px 32px",
+              padding: "12px 24px",
               borderRadius: 12,
               fontWeight: 600,
               textTransform: "none",
-              background:
-                colorMode === "dark"
-                  ? "linear-gradient(45deg, #0d47a1 30%, #1565c0 90%)"
-                  : "linear-gradient(45deg, #1976d2 30%, #2196f3 90%)",
-              color: "white",
+              fontSize: "0.9375rem",
+              boxShadow: "none",
               "&:hover": {
-                transform: "translateY(-2px)",
-                boxShadow: theme.shadows[2],
+                transform: "translateY(-1px)",
+                boxShadow: theme.shadows[1],
               },
             }}
           >
