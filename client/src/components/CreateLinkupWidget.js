@@ -400,6 +400,7 @@ const CreateLinkupWidget = ({
           placeholder="Visible to Whom?"
           placeholderStyle={placeholderStyle}
           hasError={!!formErrors.genderPreference}
+          isMobile={isMobile}
         />
         {formErrors.genderPreference && (
           <ErrorText>{formErrors.genderPreference}</ErrorText>
