@@ -192,8 +192,8 @@ const UserProfilePage = ({ isMobile }) => {
             await clerk.user.setProfileImage({ file: avatarFile });
             const newAvatarUrl = clerk.user.imageUrl;
             if (newAvatarUrl !== userData?.avatar) {
-              await updateSendbirdUser(userId, newAvatarUrl);
-              await updateField("avatar", newAvatarUrl, updateUserAvatar);
+              // await updateSendbirdUser(userId, newAvatarUrl);
+              // await updateField("avatar", newAvatarUrl, updateUserAvatar);
               changesMade = true;
             }
           } catch (error) {
