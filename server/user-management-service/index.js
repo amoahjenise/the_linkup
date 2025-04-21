@@ -9,6 +9,9 @@ const {
   deleteUser,
 } = require("./controllers/userController");
 const axios = require("axios");
+const path = require("path"); // Add this
+const fs = require("fs"); // Add this
+const pool = require("./db"); // Make sure this is properly required
 
 const ALLOWED_ORIGINS = [
   process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
@@ -73,7 +76,7 @@ const handleClerkUserUpdate = async (clerkEvent) => {
       updatedUser
     );
 
-    // 2. Update Sendbird user
+    // 2. Update Sendbird user - FIXED: Use process.env variables
     console.log("[handleClerkUserUpdate] Starting Sendbird update...");
     console.log(
       `[handleClerkUserUpdate] Updating Sendbird user ID: ${updatedUser.id}`
@@ -86,11 +89,11 @@ const handleClerkUserUpdate = async (clerkEvent) => {
     console.log("[handleClerkUserUpdate] Sendbird payload:", sendbirdPayload);
 
     const sendbirdResponse = await axios.put(
-      `https://api-${APP_ID}.sendbird.com/v3/users/${updatedUser.id}`,
+      `https://api-${process.env.SENDBIRD_APP_ID}.sendbird.com/v3/users/${updatedUser.id}`,
       sendbirdPayload,
       {
         headers: {
-          "Api-Token": API_TOKEN,
+          "Api-Token": process.env.SENDBIRD_API_TOKEN,
           "Content-Type": "application/json",
         },
       }
@@ -121,14 +124,12 @@ const handleClerkUserUpdate = async (clerkEvent) => {
     console.error("[handleClerkUserUpdate] ERROR:", error);
 
     if (error.response) {
-      // Axios error (Sendbird API error)
       console.error("[handleClerkUserUpdate] Sendbird API error details:", {
         status: error.response.status,
         data: error.response.data,
         headers: error.response.headers,
       });
     } else if (error.request) {
-      // Request was made but no response received
       console.error(
         "[handleClerkUserUpdate] No response received from Sendbird"
       );
@@ -136,7 +137,7 @@ const handleClerkUserUpdate = async (clerkEvent) => {
 
     throw {
       ...error,
-      _logged: true, // Flag to indicate we've already logged this error
+      _logged: true,
     };
   }
 };
