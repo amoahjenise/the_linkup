@@ -79,6 +79,7 @@ const statusColors = {
   accepted: { background: "#28a745", color: "#fff" },
   declined: { background: "#dc3545", color: "#fff" },
   expired: { background: "#6c757d", color: "#fff" },
+  inactive: { background: "#495057", color: "#fff" }, // darker gray
 };
 
 const CustomChannelHeader = ({
@@ -183,7 +184,7 @@ const CustomChannelHeader = ({
 
   const statusColor = statusColors[linkupRequestStatus] || {};
 
-  return (
+  return channel ? (
     <Header>
       {isMobile && (
         <BackButton
@@ -206,7 +207,9 @@ const CustomChannelHeader = ({
                 background={statusColor.background}
                 color={statusColor.color}
               >
-                {linkupRequestStatus}
+                {linkupRequestStatus === "inactive"
+                  ? "Deleted"
+                  : linkupRequestStatus}
               </StatusWrapper>
             )}
           </Nickname>
@@ -225,7 +228,7 @@ const CustomChannelHeader = ({
         />
       )}
     </Header>
-  );
+  ) : null;
 };
 
 export default CustomChannelHeader;

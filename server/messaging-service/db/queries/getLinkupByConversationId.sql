@@ -21,6 +21,6 @@ INNER JOIN
 WHERE 
   conversations.conversation_id = $1  
   AND link_ups.hidden <> true
-  AND link_ups.status <> 'inactive'
+  -- AND link_ups.status <> 'inactive'
 ORDER BY 
   link_ups.created_at DESC;

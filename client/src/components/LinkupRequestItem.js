@@ -206,7 +206,7 @@ const LinkupRequestItem = ({ post, setShouldFetchLinkups }) => {
       case "expired":
         return "Expired";
       case "inactive":
-        return "inactive";
+        return "Deleted";
       default:
         return null;
     }
