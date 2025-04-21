@@ -146,6 +146,16 @@ const LinkupActionModal = ({
       onClose={onClose}
       aria-labelledby="delete-modal-title"
       aria-describedby="delete-modal-description"
+      sx={{
+        backdropFilter: "blur(4px)",
+        // For better browser support:
+        "@supports not (backdrop-filter: blur(4px))": {
+          backgroundColor:
+            colorMode === "dark"
+              ? "rgba(0, 0, 0, 0.8)"
+              : "rgba(255, 255, 255, 0.8)",
+        },
+      }}
     >
       <Screen>
         <ModalContainer modalBackgroundColor={modalBackgroundColor}>
