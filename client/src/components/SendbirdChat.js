@@ -63,21 +63,8 @@ const SendbirdChat = () => {
     setCurrentChannel(channel);
   }, []);
 
-  // Business logic
-  const checkMessageInputState = useCallback(
-    (linkupResponse, response) => {
-      return (
-        linkupResponse.linkup.request_status === "declined" ||
-        (!isOperator &&
-          response.messages.length === 1 &&
-          linkupResponse.linkup.request_status !== "accepted") ||
-        linkupResponse.linkup.requester_status === "inactive"
-      );
-    },
-    [isOperator]
-  );
-
   // Fetch channel data
+
   useEffect(() => {
     const fetchChannelData = async () => {
       if (!currentChannel?._url) return;
@@ -85,7 +72,7 @@ const SendbirdChat = () => {
       try {
         const [linkupResponse, channel, response] = await Promise.all([
           getLinkupByConversation(currentChannel._url),
-          getGroupChannel()(currentChannel._url),
+          getGroupChannel(currentChannel._url),
           getChannelFirstTwoMessages(
             currentChannel._url,
             currentChannel.createdAt
@@ -93,20 +80,27 @@ const SendbirdChat = () => {
         ]);
 
         setLinkup(linkupResponse.linkup);
+
         const operator = channel?.members.find(
           (member) => member.role === "operator"
         );
-        setIsOperator(operator?.userId === userId);
-        setMessageInputDisabled(
-          checkMessageInputState(linkupResponse, response)
-        );
+        const isUserOperator = operator?.userId === userId;
+        setIsOperator(isUserOperator);
+
+        const shouldDisable =
+          linkupResponse.linkup.request_status === "declined" ||
+          (!isUserOperator &&
+            response.messages.length === 1 &&
+            linkupResponse.linkup.request_status !== "accepted") ||
+          linkupResponse.linkup.requester_status === "inactive";
+        setMessageInputDisabled(shouldDisable);
       } catch (error) {
         console.error("Error fetching channel data:", error);
       }
     };
 
     fetchChannelData();
-  }, [currentChannel?._url, userId, getGroupChannel, checkMessageInputState]);
+  }, [currentChannel?._url, userId]);
 
   // Component rendering
   const renderChannelList = useMemo(
