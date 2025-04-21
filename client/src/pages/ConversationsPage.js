@@ -8,10 +8,9 @@ const ConversationsPageContainer = styled("div")({
   alignItems: "center",
   width: "100%",
   height: "100%",
-  // paddingBottom: "5px", // Add padding for footer
-  // "@media (max-width: 900px)": {
-  //   paddingBottom: "65px", // Add padding for footer
-  // },
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 });
 
 const Container = styled("div")({
