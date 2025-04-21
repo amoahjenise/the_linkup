@@ -11,7 +11,7 @@ import CustomChannelHeader from "./CustomChannelHeader";
 import { getChannelFirstTwoMessages } from "../api/sendbirdAPI";
 import { getLinkupByConversation } from "../api/messagingAPI";
 import { useMediaQuery } from "@mui/material";
-import "./CustomSendbirdMain.css";
+import "../styles/CustomSendbirdMain.css";
 
 const BOTTOM_MENU_HEIGHT = 60;
 

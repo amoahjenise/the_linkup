@@ -38,6 +38,7 @@ import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { TypingIndicatorType } from "@sendbird/uikit-react";
 import { useColorMode } from "@chakra-ui/react";
 import { useBadge } from "./utils/badgeUtils";
+import "./styles/datepicker.css";
 
 const MOBILE_BREAKPOINT = "600px";
 

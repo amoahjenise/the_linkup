@@ -1,6 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import Notifications from "../components/Notifications";
+import { useColorMode } from "@chakra-ui/react";
 
 // Define styled components
 const NotificationsPageWrapper = styled("div")(({ theme }) => ({
@@ -22,10 +23,12 @@ const NotificationSection = styled("div")({
 });
 
 const NotificationsPage = ({ isMobile }) => {
+  const { colorMode } = useColorMode(); // Add this line if using Chakra UI
+
   return (
     <NotificationsPageWrapper>
       <NotificationSection>
-        <Notifications isMobile={isMobile} />
+        <Notifications isMobile={isMobile} colorMode={colorMode} />
       </NotificationSection>
     </NotificationsPageWrapper>
   );
