@@ -11,7 +11,7 @@ const {
 const axios = require("axios");
 const path = require("path"); // Add this
 const fs = require("fs"); // Add this
-const pool = require("./db"); // Make sure this is properly required
+const { pool } = require("./db");
 
 const ALLOWED_ORIGINS = [
   process.env.ALLOWED_ORIGIN || "https://c279-76-65-81-166.ngrok-free.app",
