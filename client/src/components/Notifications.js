@@ -39,6 +39,15 @@ const NoNotificationsContainer = styled("div")(({ theme }) => ({
   boxShadow: theme.shadows[1],
 }));
 
+const LoadingContainer = styled("div")(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "calc(100vh - 64px)", // Subtract navbar height
+  width: "100%",
+  position: "relative",
+}));
+
 const MemoizedNotificationItem = memo(NotificationItem);
 
 const Notifications = ({ isMobile, colorMode }) => {
@@ -117,7 +126,9 @@ const Notifications = ({ isMobile, colorMode }) => {
     <MainContainer colorMode={colorMode}>
       <TopNavBar title="Notifications" />
       {isLoading ? (
-        <LoadingSpinner />
+        <LoadingContainer>
+          <LoadingSpinner />
+        </LoadingContainer>
       ) : notifications.length === 0 ? (
         <NoNotificationsContainer>
           <EmptyNotificationsPlaceholder />

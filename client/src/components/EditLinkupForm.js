@@ -98,7 +98,6 @@ const ButtonGroup = styled("div")(({ theme }) => ({
     bottom: 0,
     padding: theme.spacing(2, 0),
     backgroundColor: "inherit",
-    zIndex: 1,
   },
 }));
 
