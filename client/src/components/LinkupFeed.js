@@ -464,7 +464,7 @@ const LinkupFeed = forwardRef(
           overflowY: "auto",
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
-          paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
+          paddingBottom: "calc(65px + env(safe-area-inset-bottom))",
           touchAction: "pan-y", // Add this for better touch control
         }}
         onTouchStart={handleTouchStart}

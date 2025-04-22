@@ -18,9 +18,6 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     width: "100%",
     position: "relative",
     overflow: "hidden",
-    "@media (max-width: 900px)": {
-      paddingBottom: "65px", // Add padding for footer
-    },
   },
   [`&.feedSection`]: {
     flex: "2.5",
