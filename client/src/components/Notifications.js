@@ -26,7 +26,7 @@ const NotificationsList = styled("ul")(({ theme }) => ({
   listStyle: "none",
   margin: 0,
   flexGrow: 1,
-  padding: theme.spacing(1.2),
+  padding: theme.spacing(1),
 }));
 
 const NoNotificationsContainer = styled("div")(({ theme }) => ({
@@ -50,9 +50,6 @@ const LoadingContainer = styled("div")(({ theme }) => ({
 
 const NotificationWrapper = styled("div")(({ theme }) => ({
   marginBottom: "8px",
-  [theme.breakpoints.up("xl")]: {
-    marginBottom: "16px",
-  },
 }));
 
 const MemoizedNotificationItem = memo(NotificationItem);
