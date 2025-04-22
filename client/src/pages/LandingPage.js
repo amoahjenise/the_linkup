@@ -69,22 +69,6 @@ const sharedButtonStyles = {
   },
 };
 
-const GlassBox = styled("div")(({ theme }) => ({
-  // backgroundColor: "rgba(0, 0, 0, 0.1)", // darken to help white text
-  backdropFilter: "blur(2px)",
-  WebkitBackdropFilter: "blur(2px)", // for Safari
-  borderRadius: "12px",
-  padding: theme.spacing(2),
-  color: "white",
-  textShadow: "0 1px 2px rgba(0,0,0,0.6)", // extra contrast
-  [theme.breakpoints.up("md")]: {
-    backgroundColor: "transparent",
-    backdropFilter: "none",
-    WebkitBackdropFilter: "none",
-    textShadow: "none",
-  },
-}));
-
 // Enhanced ButtonContent with smooth icon transition
 const ButtonContent = ({ icon, text }) => (
   <>
@@ -107,25 +91,23 @@ const ButtonContent = ({ icon, text }) => (
 // Modern Sign In Button with layered hover effects
 const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
   ...sharedButtonStyles,
-  backgroundColor: "#ffffff",
-  color: "#3c4043",
-  borderColor: "#e0e0e0",
+  backgroundColor: "#0097A7",
+  color: "white",
+  borderColor: "#00838F",
+  boxShadow: "0 2px 8px rgba(0, 151, 167, 0.3)", // Base shadow for depth
   "&:hover": {
-    backgroundColor: "#f8f9fa",
-    borderColor: "#c4c4c4",
-    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
-    "& span:first-of-type": {
-      // Icon animation
-      transform: "translateX(2px)",
-    },
-    "& span:last-of-type": {
-      // Text animation
-      transform: "translateX(1px)",
+    backgroundColor: "#00838F",
+    boxShadow: "0 6px 20px rgba(0, 151, 167, 0.4)",
+    "& span": {
+      transform: "scale(1.02)", // Gentle scale effect
     },
   },
   "&:active": {
-    backgroundColor: "#f1f3f4",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+    backgroundColor: "#006064",
+    boxShadow: "0 2px 6px rgba(0, 151, 167, 0.3)",
+  },
+  "&::before": {
+    background: "rgba(255, 255, 255, 0.15)", // Stronger overlay for colored buttons
   },
 }));
 
@@ -155,21 +137,34 @@ const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
 // Install App Button with modern metallic sheen
 const CustomInstallAppButton = styled("button")(({ theme }) => ({
   ...sharedButtonStyles,
-  backgroundColor: "#ffffff",
-  color: "#3c4043",
-  borderColor: "#e0e0e0",
-  backgroundImage: "linear-gradient(to bottom, #ffffff, #f9f9f9)", // Subtle gradient
+  backgroundColor: "rgba(255, 216, 20, 0.9)", // Neon pink (DeepPink)
+  color: "white",
+  border: "none",
+  cursor: "pointer",
+  width: "100%",
+  marginTop: 8,
+  boxShadow: "0 0 8px rgba(255, 216, 20, 0.6)", // Adds glow effect
   "&:hover": {
-    backgroundColor: "#f8f9fa",
-    borderColor: "#c4c4c4",
-    boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
-    backgroundImage: "linear-gradient(to bottom, #f8f8f8, #f2f2f2)",
+    backgroundColor: "rgba(255, 216, 20, 1)",
+    boxShadow: "0 0 12px rgba(255, 216, 20, 0.8)", // Enhanced glow on hover
     "& span:first-of-type": {
       transform: "translateY(-1px) rotate(5deg)", // Playful icon animation
     },
   },
+  borderColor: "#e0e0e0",
+  // backgroundImage: "linear-gradient(to bottom, #ffffff, #f9f9f9)", // Subtle gradient
+  // "&:hover": {
+  //   backgroundColor: "#f8f9fa",
+  //   borderColor: "#c4c4c4",
+  //   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+  //   backgroundImage: "linear-gradient(to bottom, #f8f8f8, #f2f2f2)",
+  //   "& span:first-of-type": {
+  //     transform: "translateY(-1px) rotate(5deg)", // Playful icon animation
+  //   },
+  // },
   "&:active": {
-    backgroundImage: "linear-gradient(to bottom, #f1f1f1, #ebebeb)",
+    backgroundImage:
+      "linear-gradient(to bottom, rgba(255, 20, 147, 0.7), rgba(255, 20, 147, 1))",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   },
 }));
@@ -184,7 +179,7 @@ const Footer = styled("footer")(({ theme }) => ({
   // borderTop: "1px solid #e0e0e0",
   color: "#FFFFFF",
   // backgroundColor: "rgba(0, 0, 0, 0.4)", // Semi-transparent dark overlay
-  // backdropFilter: "blur(3px)", // Frosted glass effect
+  backdropFilter: "blur(3px)", // Frosted glass effect
   [theme.breakpoints.down("sm")]: {
     paddingBottom: theme.spacing(3),
     textAlign: "center",
@@ -429,7 +424,7 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
         alignItems: "center",
         color: "white",
         background: isSmallScreen
-          ? `url(${Wallpaper}) no-repeat center center fixed` // Corrected the syntax
+          ? "black" //`url(${Wallpaper2}) no-repeat center center fixed`
           : `linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))`, // Default background for large screens
         backgroundSize: "cover",
       }}
@@ -486,39 +481,35 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
             </CustomSignInButton>
 
             {/* Add the description text here */}
-            <GlassBox>
-              <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
-                Connect with new people and organize meetups around your
-                interests.
-              </Typography>
-            </GlassBox>
-            <GlassBox>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2, // Increase gap between items
-                  alignItems: "center", // Center items on small screens
-                }}
-              >
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  <a href="/terms-of-service" style={{ color: "white" }}>
-                    Terms of Service
-                  </a>{" "}
-                  |{" "}
-                  <a href="/privacy-policy" style={{ color: "white" }}>
-                    Privacy Policy
-                  </a>
-                </Typography>
-                <Typography variant="body2" sx={{ color: "gray" }}>
-                  <a href="/cookie-use" style={{ color: "white" }}>
-                    Cookie Use
-                  </a>
-                  .
-                </Typography>
-              </div>
-            </GlassBox>
+            <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
+              Connect with new people and organize meetups around your
+              interests.
+            </Typography>
 
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2, // Increase gap between items
+                alignItems: "center", // Center items on small screens
+              }}
+            >
+              <Typography variant="body2" sx={{ mt: 2 }}>
+                <a href="/terms-of-service" style={{ color: "white" }}>
+                  Terms of Service
+                </a>{" "}
+                |{" "}
+                <a href="/privacy-policy" style={{ color: "white" }}>
+                  Privacy Policy
+                </a>
+              </Typography>
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                <a href="/cookie-use" style={{ color: "white" }}>
+                  Cookie Use
+                </a>
+                .
+              </Typography>
+            </div>
             {showInstallButton && (
               <Box
                 sx={{
