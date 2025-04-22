@@ -7,6 +7,7 @@ import { setUnreadMessagesCount } from "./redux/actions/messageActions";
 import { getUnreadNotificationsCount } from "./api/notificationAPI";
 import { getUnreadMessagesCount } from "./api/sendbirdAPI";
 import {
+  AboutPage,
   LandingPage,
   SignupPage,
   HomePage,
@@ -46,6 +47,9 @@ const publicPages = [
   "/",
   "/sign-in",
   "/sign-up",
+  "/about",
+  "/accessibility",
+  "/help-centre",
   "/terms-of-service",
   "/privacy-policy",
   "/cookie-use",
@@ -330,6 +334,7 @@ const App = () => {
             <LandingPage
               showInstallButton={!isAppInstalled}
               handleInstallClick={handleInstallClick}
+              isMobile={isMobile}
             />
           }
         />
@@ -341,6 +346,7 @@ const App = () => {
           path="/data-deletion-instructions"
           element={<UserDataDeletionPage />}
         />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );

@@ -4,7 +4,10 @@ import { Container, Typography, Box } from "@mui/material";
 
 // Define styled components
 const RootContainer = styled(Container)(({ theme }) => ({
+  backgroundColor: "#000",
+  color: "#fff",
   padding: theme.spacing(3),
+  minHeight: "100vh",
 }));
 
 const Section = styled("div")(({ theme }) => ({
@@ -13,15 +16,18 @@ const Section = styled("div")(({ theme }) => ({
 
 const Title = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
+  fontWeight: 700,
 }));
 
 const Subtitle = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(2),
   marginBottom: theme.spacing(1),
+  fontWeight: 600,
 }));
 
 const Text = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(1),
+  color: "#aaa",
 }));
 
 const TermsOfServicePage = () => {
@@ -212,7 +218,7 @@ const TermsOfServicePage = () => {
           >
             info@thelinkup.ca
           </a>
-        </Typography>{" "}
+        </Typography>
       </Section>
     </RootContainer>
   );

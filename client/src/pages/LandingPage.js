@@ -19,6 +19,8 @@ import { SignInButton, SignUpButton } from "@clerk/clerk-react";
 import { LoadingPage } from "../pages";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TypingText from "../components/TypingText";
+import FooterLinksSection from "../components/FooterLinksSection";
+import { motion } from "framer-motion";
 
 // Enhanced shared button styles with modern interactions
 const sharedButtonStyles = {
@@ -349,7 +351,7 @@ const TermsAndServiceWidget = memo(({ isWidgetLoading }) => (
 ));
 
 // Main LandingPage component
-const LandingPage = ({ showInstallButton, handleInstallClick }) => {
+const LandingPage = ({ showInstallButton, handleInstallClick, isMobile }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen is small
   const navigate = useNavigate();
@@ -419,8 +421,13 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
         backgroundSize: "cover",
       }}
     >
-      <LogoHeader forcedColorMode="dark" />
-
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+      >
+        <LogoHeader forcedColorMode="dark" isMobile={isMobile} />
+      </motion.div>
       {/* Small screen layout */}
       {isSmallScreen ? (
         <Grid
@@ -606,6 +613,7 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
           color="white"
           // sx={{ mt: 3, textAlign: "center" }}
         />
+        <FooterLinksSection />
       </Footer>
     </Box>
   );

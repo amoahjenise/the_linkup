@@ -18,9 +18,9 @@ const LogoContainer = styled("div")(({ theme }) => ({
   },
 }));
 
-const LogoImage = styled("img")({
-  height: "40px",
-});
+const LogoImage = styled("img")(({ theme, isMobile }) => ({
+  height: isMobile ? "40px" : "80px",
+}));
 
 const Title = styled(Typography)(({ theme }) => ({
   letterSpacing: "-0.5px", // Tighter letter spacing
@@ -33,7 +33,7 @@ const Title = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
 }));
 
-const LogoHeader = ({ forcedColorMode }) => {
+const LogoHeader = ({ forcedColorMode, isMobile }) => {
   const { colorMode } = useColorMode();
   // Use the passed prop or default to the current color mode
   const mode = forcedColorMode || colorMode;
@@ -47,10 +47,11 @@ const LogoHeader = ({ forcedColorMode }) => {
           style={{
             filter: mode === "dark" ? "invert(1)" : "none", // Invert only in dark mode
           }}
+          isMobile={isMobile}
         />
       </LogoContainer>
       <Title
-        variant="h4"
+        variant={isMobile ? "h4" : "h2"}
         component="h1"
         color={mode === "dark" ? "white" : "black"}
       >
