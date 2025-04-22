@@ -37,34 +37,32 @@ const CardContainer = styled("div")(({ theme, colorMode }) => ({
   borderRadius: "1rem",
 
   // Color and effects
-  backgroundColor: colorMode === "dark" ? "hsl(210, 28%, 18%)" : "#FFFFFF",
+  backgroundColor: colorMode === "dark" ? "hsl(210, 15%, 13%)" : "#FFFFFF", // Dark blue for trust and calm
   border:
-    colorMode === "dark" ? "1px solid hsl(210, 25%, 25%)" : "1px solid #e5e7eb",
+    colorMode === "dark"
+      ? "1px solid hsl(210, 18%, 20%)" // Muted, deep blue for subtle sophistication
+      : "1px solid #e5e7eb", // Light border for contrast in light mode
   boxShadow:
     colorMode === "dark"
-      ? "0 4px 20px hsla(210, 100%, 50%, 0.12)"
-      : "0 2px 8px rgba(0, 0, 0, 0.08)",
+      ? "0 4px 20px hsla(210, 100%, 50%, 0.12)" // Soft shadow with a hint of blue for professionalism
+      : "0 2px 8px rgba(0, 0, 0, 0.08)", // Lighter shadow in light mode
   backdropFilter: colorMode === "dark" ? "blur(12px)" : "none",
   backgroundImage:
     colorMode === "dark"
-      ? "linear-gradient(to bottom, hsla(210, 28%, 18%, 0.9), hsla(210, 30%, 15%, 0.95))"
+      ? "linear-gradient(to bottom, hsla(210, 18%, 13%, 0.9), hsla(210, 20%, 15%, 0.95))"
       : "none",
 
   // Responsive widths for larger screens
   [theme.breakpoints.up("md")]: {
-    // ≥900px
     width: "100%",
   },
   [theme.breakpoints.up("lg")]: {
-    // ≥1200px
     width: "100%",
   },
   [theme.breakpoints.up("xl")]: {
-    // ≥1536px
     width: "100%",
   },
   [theme.breakpoints.up(1800)]: {
-    // Custom breakpoint ≥1800px
     width: "60%",
   },
 
@@ -75,9 +73,23 @@ const CardContainer = styled("div")(({ theme, colorMode }) => ({
     boxShadow:
       colorMode === "light"
         ? "0 6px 18px rgba(0, 0, 0, 0.1)"
-        : "0 6px 18px rgba(255, 255, 255, 0.15)",
+        : "0 6px 18px rgba(255, 255, 255, 0.15)", // Lighter hover effect
   },
   cursor: "pointer",
+
+  // Additional highlights for engaging interactions
+  "& .cta-button": {
+    backgroundColor:
+      colorMode === "dark" ? "hsl(340, 70%, 50%)" : "hsl(45, 100%, 50%)", // Red for urgency in dark, yellow for energy in light mode
+    color: "#FFFFFF",
+    borderRadius: "0.5rem",
+    padding: "0.8rem 1.5rem",
+    transition: "background-color 0.3s ease",
+    "&:hover": {
+      backgroundColor:
+        colorMode === "dark" ? "hsl(340, 70%, 55%)" : "hsl(45, 100%, 60%)", // Slightly lighter for hover
+    },
+  },
 }));
 
 // Menu container for additional options
