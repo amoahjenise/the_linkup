@@ -69,6 +69,22 @@ const sharedButtonStyles = {
   },
 };
 
+const GlassBox = styled("div")(({ theme }) => ({
+  // backgroundColor: "rgba(0, 0, 0, 0.1)", // darken to help white text
+  backdropFilter: "blur(2px)",
+  WebkitBackdropFilter: "blur(2px)", // for Safari
+  borderRadius: "12px",
+  padding: theme.spacing(2),
+  color: "white",
+  textShadow: "0 1px 2px rgba(0,0,0,0.6)", // extra contrast
+  [theme.breakpoints.up("md")]: {
+    backgroundColor: "transparent",
+    backdropFilter: "none",
+    WebkitBackdropFilter: "none",
+    textShadow: "none",
+  },
+}));
+
 // Enhanced ButtonContent with smooth icon transition
 const ButtonContent = ({ icon, text }) => (
   <>
@@ -168,7 +184,7 @@ const Footer = styled("footer")(({ theme }) => ({
   // borderTop: "1px solid #e0e0e0",
   color: "#FFFFFF",
   // backgroundColor: "rgba(0, 0, 0, 0.4)", // Semi-transparent dark overlay
-  backdropFilter: "blur(3px)", // Frosted glass effect
+  // backdropFilter: "blur(3px)", // Frosted glass effect
   [theme.breakpoints.down("sm")]: {
     paddingBottom: theme.spacing(3),
     textAlign: "center",
@@ -413,7 +429,7 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
         alignItems: "center",
         color: "white",
         background: isSmallScreen
-          ? `url(${Wallpaper2}) no-repeat center center fixed` // Corrected the syntax
+          ? `url(${Wallpaper}) no-repeat center center fixed` // Corrected the syntax
           : `linear-gradient(135deg, rgb(0, 0, 0), rgb(15, 0, 38))`, // Default background for large screens
         backgroundSize: "cover",
       }}
@@ -470,35 +486,39 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
             </CustomSignInButton>
 
             {/* Add the description text here */}
-            <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
-              Connect with new people and organize meetups around your
-              interests.
-            </Typography>
+            <GlassBox>
+              <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
+                Connect with new people and organize meetups around your
+                interests.
+              </Typography>
+            </GlassBox>
+            <GlassBox>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2, // Increase gap between items
+                  alignItems: "center", // Center items on small screens
+                }}
+              >
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  <a href="/terms-of-service" style={{ color: "white" }}>
+                    Terms of Service
+                  </a>{" "}
+                  |{" "}
+                  <a href="/privacy-policy" style={{ color: "white" }}>
+                    Privacy Policy
+                  </a>
+                </Typography>
+                <Typography variant="body2" sx={{ color: "gray" }}>
+                  <a href="/cookie-use" style={{ color: "white" }}>
+                    Cookie Use
+                  </a>
+                  .
+                </Typography>
+              </div>
+            </GlassBox>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2, // Increase gap between items
-                alignItems: "center", // Center items on small screens
-              }}
-            >
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                <a href="/terms-of-service" style={{ color: "white" }}>
-                  Terms of Service
-                </a>{" "}
-                |{" "}
-                <a href="/privacy-policy" style={{ color: "white" }}>
-                  Privacy Policy
-                </a>
-              </Typography>
-              <Typography variant="body2" sx={{ color: "gray" }}>
-                <a href="/cookie-use" style={{ color: "white" }}>
-                  Cookie Use
-                </a>
-                .
-              </Typography>
-            </div>
             {showInstallButton && (
               <Box
                 sx={{
