@@ -14,6 +14,9 @@ const NotificationsPageWrapper = styled("div")(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
     width: "100%",
   },
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 }));
 
 const NotificationSection = styled("div")(({ theme }) => ({
