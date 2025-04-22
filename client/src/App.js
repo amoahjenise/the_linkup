@@ -144,9 +144,17 @@ const App = () => {
 
     // Try Chrome-specific installed app detection
     const isInstalledViaRelatedApps = await (async () => {
-      if ("getInstalledRelatedApps" in navigator) {
-        const relatedApps = await navigator.getInstalledRelatedApps();
-        return relatedApps.length > 0;
+      if (
+        "getInstalledRelatedApps" in navigator &&
+        window.top === window.self
+      ) {
+        try {
+          const relatedApps = await navigator.getInstalledRelatedApps();
+          return relatedApps.length > 0;
+        } catch (err) {
+          console.error("getInstalledRelatedApps failed:", err);
+          return false;
+        }
       }
       return false;
     })();
