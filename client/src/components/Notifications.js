@@ -26,7 +26,7 @@ const NotificationsList = styled("ul")(({ theme }) => ({
   listStyle: "none",
   margin: 0,
   flexGrow: 1,
-  padding: theme.spacing(2),
+  padding: theme.spacing(1.2),
 }));
 
 const NoNotificationsContainer = styled("div")(({ theme }) => ({
