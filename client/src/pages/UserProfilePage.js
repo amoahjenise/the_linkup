@@ -17,15 +17,19 @@ import {
 } from "../api/usersAPI";
 import { useSnackbar } from "../contexts/SnackbarContext";
 
-// Styled components (moved outside component for better performance)
+// Styled components
 const Container = styled(Box)(({ theme }) => ({
   overflow: "hidden",
   height: "100%",
   width: "100%",
-  paddingBottom: "5px",
+  paddingBottom: theme.spacing(1),
   "@media (max-width: 900px)": {
-    paddingBottom: "65px",
+    paddingBottom: theme.spacing(8), // Adjusted for mobile view
   },
+}));
+
+const StyledBox = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(4),
 }));
 
 // Memoize calculateAge since it's a pure function
@@ -38,7 +42,6 @@ const calculateAge = (dateOfBirth) => {
 };
 
 const UserProfilePage = ({ isMobile }) => {
-  // State management
   const [state, setState] = useState({
     userData: null,
     isLoading: true,
@@ -47,7 +50,6 @@ const UserProfilePage = ({ isMobile }) => {
     isLinkupsModalOpen: false,
   });
 
-  // Hooks and context
   const { id: userIdParam } = useParams();
   const clerk = useClerk();
   const dispatch = useDispatch();
@@ -65,7 +67,7 @@ const UserProfilePage = ({ isMobile }) => {
       ? `${locationState.city}, ${locationState.country}`
       : "Unknown Location";
 
-  // Data fetching - O(n) where n is the number of API calls (currently 1)
+  // Data fetching
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -90,7 +92,7 @@ const UserProfilePage = ({ isMobile }) => {
     fetchData();
   }, [dispatch, navigate, userId]);
 
-  // Memoized handlers to prevent unnecessary re-renders
+  // Memoized handlers
   const toggleEditModal = useCallback(() => {
     setState((prev) => ({ ...prev, isEditModalOpen: !prev.isEditModalOpen }));
   }, []);
@@ -109,7 +111,7 @@ const UserProfilePage = ({ isMobile }) => {
     }));
   }, []);
 
-  // O(1) for each comparison, O(n) for API calls where n is number of changed fields
+  // Save Social Media Links
   const handleSaveSocialMediaLinks = useCallback(
     async (links) => {
       const { instagram_url, facebook_url, twitter_url } = links;
@@ -141,7 +143,7 @@ const UserProfilePage = ({ isMobile }) => {
     [state.userData, userId, addSnackbar]
   );
 
-  // O(n) where n is number of fields being updated (worst case 4 API calls)
+  // Save Changes
   const handleSaveChanges = useCallback(
     async (editedBio, editedAvatar, editedName) => {
       try {
@@ -150,7 +152,6 @@ const UserProfilePage = ({ isMobile }) => {
         const updates = {};
         let avatarUploadError = null;
 
-        // Helper function to update fields
         const updateField = async (field, newValue, updateFn) => {
           if (userData?.[field] !== newValue && newValue !== undefined) {
             const response = await updateFn(userData?.id, newValue);
@@ -163,33 +164,28 @@ const UserProfilePage = ({ isMobile }) => {
           return false;
         };
 
-        // Convert base64 to File if needed
         let avatarFile = null;
         if (editedAvatar && editedAvatar.startsWith("data:image")) {
           avatarFile = await base64ToFile(editedAvatar, "avatar.jpg");
         }
 
-        // Check for changes
         const hasBioChanges =
           editedBio !== undefined && editedBio !== userData?.bio;
         const hasNameChanges =
           editedName !== undefined && editedName !== userData?.name;
         const hasAvatarChanges = avatarFile !== null;
 
-        // Early return if no changes
         if (!hasBioChanges && !hasNameChanges && !hasAvatarChanges) {
           addSnackbar("No changes detected.", "info");
           setState((prev) => ({ ...prev, isEditModalOpen: false }));
           return;
         }
 
-        // Process text updates first
         const updateResults = await Promise.allSettled([
           hasBioChanges && updateField("bio", editedBio, updateUserBio),
           hasNameChanges && updateField("name", editedName, updateUserName),
         ]);
 
-        // Check for text update errors
         const textUpdateErrors = updateResults
           .filter((result) => result.status === "rejected")
           .map((result) => result.reason);
@@ -201,14 +197,12 @@ const UserProfilePage = ({ isMobile }) => {
           );
         }
 
-        // Handle avatar upload if needed
         if (hasAvatarChanges && clerk.user) {
           try {
             const response = await clerk.user.setProfileImage({
               file: avatarFile,
             });
 
-            // Verify the image was actually updated
             if (response && response.errors && response.errors.length > 0) {
               avatarUploadError = new Error(
                 response.errors[0].message || "Failed to update profile image"
@@ -216,7 +210,6 @@ const UserProfilePage = ({ isMobile }) => {
               throw avatarUploadError;
             }
 
-            // Check if the image URL actually changed
             const newAvatarUrl = response.publicUrl;
             if (newAvatarUrl && newAvatarUrl !== userData?.avatar) {
               changesMade = true;
@@ -225,10 +218,8 @@ const UserProfilePage = ({ isMobile }) => {
           } catch (error) {
             console.error("Clerk profile image upload error:", {
               error: error.errors || error.message,
-              traceId: error.meta?.clerk_trace_id,
             });
 
-            // Only throw if there were no other changes made
             if (!changesMade) {
               throw new Error(
                 error.errors?.[0]?.message ||
@@ -236,13 +227,10 @@ const UserProfilePage = ({ isMobile }) => {
                   "Failed to update profile image"
               );
             }
-
-            // If other changes succeeded, show specific error for avatar
             avatarUploadError = error;
           }
         }
 
-        // Update state if changes were made
         if (changesMade) {
           setState((prev) => ({
             ...prev,
@@ -259,7 +247,6 @@ const UserProfilePage = ({ isMobile }) => {
 
         setState((prev) => ({ ...prev, isEditModalOpen: false }));
 
-        // Show avatar-specific error if applicable
         if (avatarUploadError && changesMade) {
           addSnackbar(
             `Profile updated but image failed: ${avatarUploadError.message}`,
@@ -270,17 +257,13 @@ const UserProfilePage = ({ isMobile }) => {
         console.error("Profile update error:", {
           error: error.message,
           stack: error.stack,
-          ...(error.errors && { clerkErrors: error.errors }),
-          ...(error.meta && { clerkTraceId: error.meta.clerk_trace_id }),
         });
-
         addSnackbar(error.message || "Failed to update profile", "error");
       }
     },
     [state.userData, userId, clerk.user, addSnackbar]
   );
 
-  // Helper function to convert base64 to File
   const base64ToFile = (base64, filename) => {
     const arr = base64.split(",");
     const mime = arr[0].match(/:(.*?);/)[1];

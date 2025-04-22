@@ -317,7 +317,7 @@ const CreateLinkupWidget = ({
                         color: grey; 
                     }`}
       </style>
-      <Header>
+      <Header colorMode={colorMode}>
         <span>Create Linkup</span>
       </Header>
       <Form onSubmit={handleCreateLinkUp}>
