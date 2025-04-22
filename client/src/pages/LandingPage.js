@@ -152,16 +152,6 @@ const CustomInstallAppButton = styled("button")(({ theme }) => ({
     },
   },
   borderColor: "#e0e0e0",
-  // backgroundImage: "linear-gradient(to bottom, #ffffff, #f9f9f9)", // Subtle gradient
-  // "&:hover": {
-  //   backgroundColor: "#f8f9fa",
-  //   borderColor: "#c4c4c4",
-  //   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
-  //   backgroundImage: "linear-gradient(to bottom, #f8f8f8, #f2f2f2)",
-  //   "& span:first-of-type": {
-  //     transform: "translateY(-1px) rotate(5deg)", // Playful icon animation
-  //   },
-  // },
   "&:active": {
     backgroundImage:
       "linear-gradient(to bottom, rgba(255, 216, 20, 0.7), rgba(255, 216, 20, 1))",
@@ -454,31 +444,19 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
               alignItems: "center", // Center items on small screens
             }}
           >
-            {/* Custom Sign Up Button */}
-            <CustomSignUpButton
-              sx={{
-                width: "200px",
-              }}
-              variant="contained"
-              forceRedirectUrl="/registration"
-              fallbackRedirectUrl="/registration"
-              mode="modal"
-            >
-              SIGN UP
-            </CustomSignUpButton>
-            {/* Custom Sign In Button */}
-            <CustomSignInButton
-              sx={{
-                width: "200px",
-                marginBottom: "16px", // Space between buttons
-              }}
-              variant="contained"
-              forceRedirectUrl="/home"
-              fallbackRedirectUrl="/home"
-              mode="modal"
-            >
-              SIGN IN
-            </CustomSignInButton>
+            {showInstallButton && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                }}
+              >
+                <CustomInstallAppButton onClick={handleInstallClick}>
+                  <ButtonContent icon="get_app" text="Download App" />
+                </CustomInstallAppButton>
+              </Box>
+            )}
 
             {/* Add the description text here */}
             <Typography variant="h6" sx={{ mt: 3, textAlign: "center" }}>
@@ -510,19 +488,31 @@ const LandingPage = ({ showInstallButton, handleInstallClick }) => {
                 .
               </Typography>
             </div>
-            {showInstallButton && (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                }}
-              >
-                <CustomInstallAppButton onClick={handleInstallClick}>
-                  <ButtonContent icon="get_app" text="Download App" />
-                </CustomInstallAppButton>
-              </Box>
-            )}
+            {/* Custom Sign Up Button */}
+            <CustomSignUpButton
+              sx={{
+                width: "200px",
+              }}
+              variant="contained"
+              forceRedirectUrl="/registration"
+              fallbackRedirectUrl="/registration"
+              mode="modal"
+            >
+              SIGN UP
+            </CustomSignUpButton>
+            {/* Custom Sign In Button */}
+            <CustomSignInButton
+              sx={{
+                width: "200px",
+                marginBottom: "16px", // Space between buttons
+              }}
+              variant="contained"
+              forceRedirectUrl="/home"
+              fallbackRedirectUrl="/home"
+              mode="modal"
+            >
+              SIGN IN
+            </CustomSignInButton>
           </Grid>
         </Grid>
       ) : (
