@@ -164,7 +164,7 @@ const CustomInstallAppButton = styled("button")(({ theme }) => ({
   // },
   "&:active": {
     backgroundImage:
-      "linear-gradient(to bottom, rgba(255, 20, 147, 0.7), rgba(255, 20, 147, 1))",
+      "linear-gradient(to bottom, rgba(255, 216, 20, 0.7), rgba(255, 216, 20, 1))",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   },
 }));
