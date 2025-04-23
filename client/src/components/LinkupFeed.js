@@ -500,9 +500,16 @@ const LinkupFeed = forwardRef(
         style={{
           height: "100vh",
           overflowY: "auto",
+          position: "relative", // This is already present
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "8px",
+          maxWidth: "100vw",
+          minHeight: "100dvh",
+          marginBottom: isMobile ? 64 : 15,
+          width: "100%",
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
-          paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
           touchAction: "pan-y",
         }}
         onTouchStart={handleTouchStart}

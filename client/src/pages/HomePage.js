@@ -20,7 +20,7 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
   },
   [`&.feedSection`]: {
     flex: "2.5",
-    overflowY: "auto",
+    overflowY: "hidden",
     [theme.breakpoints.down("md")]: {
       flex: "2",
       borderRight: theme.breakpoints.up("sm")
