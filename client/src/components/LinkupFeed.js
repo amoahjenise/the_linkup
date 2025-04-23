@@ -8,6 +8,7 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import throttle from "lodash/throttle";
 import { getLinkups, searchLinkups } from "../api/linkUpAPI";
 import LinkupItem from "./LinkupItem";
 import { Button, styled } from "@mui/material";
@@ -19,7 +20,6 @@ import debounce from "lodash/debounce";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
 import NewLinkupButton from "./NewLinkupButton";
 
-// Add these styles for the pull-to-refresh indicator
 const PullToRefreshContainer = styled("div")(({ theme, refreshing }) => ({
   position: "relative",
   height: refreshing ? "60px" : "0",
@@ -61,11 +61,6 @@ const ScrollToTopButton = styled(Button)(({ theme }) => ({
   left: "50%",
   transform: "translateX(-50%)",
   bottom: "30px",
-  // Responsive widths for larger screens
-  [theme.breakpoints.up("md")]: {
-    // ≥900px
-    bottom: 0,
-  },
   zIndex: 1100,
   width: "100px",
   height: "32px",
@@ -89,12 +84,12 @@ const ScrollToTopButton = styled(Button)(({ theme }) => ({
 const LinkupFeed = forwardRef(
   ({ userId, gender, location, refreshFeed, colorMode, isMobile }, ref) => {
     const dispatch = useDispatch();
-    // Data state
     const { userSettings } = useSelector((state) => state.userSettings);
     const userSentRequests = useSelector((state) => state.userSentRequests);
     const showNewLinkupButton = useSelector(
       (state) => state.linkups.showNewLinkupButton
     );
+
     const [linkups, setLinkups] = useState([]);
     const [loading, setLoading] = useState(false);
     const [offset, setOffset] = useState(0);
@@ -105,7 +100,7 @@ const LinkupFeed = forwardRef(
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const feedRef = useRef(null);
+    const scrollContainerRef = useRef(null);
     const anchorItemRef = useRef(null);
     const scrollPosRef = useRef(0);
     const linkupCache = useRef({});
@@ -115,9 +110,212 @@ const LinkupFeed = forwardRef(
     const [pullDistance, setPullDistance] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
-    // Add these handlers for touch events
+    const setRefs = useCallback(
+      (node) => {
+        scrollContainerRef.current = node;
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      },
+      [ref]
+    );
+
+    const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) *
+          Math.cos(lat2 * (Math.PI / 180)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }, []);
+
+    const loadData = useCallback(
+      async (reset = false) => {
+        if (loading) return;
+        const cacheKey = `${userId}_${gender}_${location.latitude}_${location.longitude}`;
+
+        // Handle cached data
+        if (reset && linkupCache.current[cacheKey]) {
+          const cachedData = linkupCache.current[cacheKey];
+          setLinkups(cachedData.linkups);
+          setOffset(cachedData.offset);
+          setHasMore(cachedData.hasMore);
+
+          dispatch({
+            type: "MERGE_LINKUPS_SUCCESS",
+            payload: {
+              newLinkups: cachedData.linkups,
+              isInitialLoad: true,
+            },
+          });
+
+          // Use setTimeout instead of requestAnimationFrame for more reliable execution
+          setTimeout(() => {
+            if (scrollContainerRef.current) {
+              const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
+              if (savedPos) {
+                scrollContainerRef.current.scrollTop = parseInt(savedPos, 10);
+              }
+            }
+          }, 0);
+          return;
+        }
+
+        setLoading(true);
+        try {
+          const anchorIndex = reset
+            ? 0
+            : Math.floor(scrollPosRef.current / 300);
+          const anchorId = linkups[anchorIndex]?.id;
+
+          const response = await getLinkups(
+            userId,
+            gender,
+            reset ? 0 : offset,
+            pageSize,
+            location.latitude,
+            location.longitude
+          );
+
+          if (response?.linkupList) {
+            const enrichedLinkups = response.linkupList.map((linkup) => ({
+              ...linkup,
+              isUserCreated: linkup.creator_id === userId,
+              createdAtTimestamp: linkup.created_at,
+              distance: calculateDistance(
+                location.latitude,
+                location.longitude,
+                linkup.latitude,
+                linkup.longitude
+              ),
+            }));
+
+            enrichedLinkups.sort((a, b) => {
+              const createdAtComparison =
+                new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
+              return createdAtComparison !== 0
+                ? createdAtComparison
+                : a.distance - b.distance;
+            });
+
+            const newLinkups = reset
+              ? enrichedLinkups
+              : [...linkups, ...enrichedLinkups];
+
+            if (reset) {
+              linkupCache.current[cacheKey] = {
+                linkups: enrichedLinkups,
+                offset: enrichedLinkups.length,
+                hasMore: enrichedLinkups.length === pageSize,
+                timestamp: Date.now(),
+              };
+            }
+
+            // Update state first
+            setLinkups(newLinkups);
+            setOffset(
+              reset ? enrichedLinkups.length : offset + enrichedLinkups.length
+            );
+            setHasMore(enrichedLinkups.length === pageSize);
+
+            dispatch({
+              type: "MERGE_LINKUPS_SUCCESS",
+              payload: {
+                newLinkups: enrichedLinkups,
+                isInitialLoad: reset,
+              },
+            });
+
+            // Then handle scroll position after state updates
+            setTimeout(() => {
+              if (!scrollContainerRef.current) return;
+
+              if (reset) {
+                const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
+                scrollContainerRef.current.scrollTop = savedPos
+                  ? parseInt(savedPos, 10)
+                  : 0;
+              } else if (anchorId) {
+                const anchorIndex = newLinkups.findIndex(
+                  (item) => item.id === anchorId
+                );
+                if (anchorIndex >= 0) {
+                  const anchorItem = document.getElementById(
+                    `item-${anchorId}`
+                  );
+                  if (anchorItem && scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTo({
+                      top: anchorItem.offsetTop - (scrollPosRef.current % 300),
+                      behavior: "auto",
+                    });
+                  }
+                }
+              }
+            }, 0);
+          }
+        } catch (error) {
+          console.error("Error loading data:", error);
+        } finally {
+          setLoading(false);
+        }
+      },
+      [
+        userId,
+        gender,
+        location.latitude,
+        location.longitude,
+        loading,
+        offset,
+        dispatch,
+        calculateDistance,
+        linkups,
+      ]
+    );
+
+    const throttledSaveScroll = useMemo(
+      () =>
+        throttle((pos) => {
+          sessionStorage.setItem(`feedScroll_${userId}`, pos.toString());
+        }, 500),
+      [userId]
+    );
+
+    const handleScroll = useCallback(() => {
+      if (!scrollContainerRef.current) return;
+
+      const { scrollTop, scrollHeight, clientHeight } =
+        scrollContainerRef.current;
+      throttledSaveScroll(scrollTop);
+      scrollPosRef.current = scrollTop;
+      setShowScrollButton(scrollTop > 300);
+
+      if (
+        scrollHeight - scrollTop - clientHeight < 800 &&
+        hasMore &&
+        !loading &&
+        !isSearching
+      ) {
+        loadData();
+      }
+    }, [hasMore, loading, isSearching, throttledSaveScroll, loadData]);
+
+    useEffect(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }, [handleScroll]);
+
     const handleTouchStart = (e) => {
-      if (feedRef.current?.scrollTop === 0 && !isRefreshing) {
+      if (scrollContainerRef.current?.scrollTop === 0 && !isRefreshing) {
         setPullStartY(e.touches[0].pageY);
       }
     };
@@ -146,6 +344,36 @@ const LinkupFeed = forwardRef(
       }
       setPullStartY(null);
     };
+
+    useEffect(() => {
+      const now = Date.now();
+      for (const key in linkupCache.current) {
+        if (now - linkupCache.current[key].timestamp > 300000) {
+          delete linkupCache.current[key];
+        }
+      }
+
+      loadData(true);
+    }, [userId, gender, location]);
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        if (scrollContainerRef.current) {
+          const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
+          if (savedPos) {
+            scrollContainerRef.current.scrollTop = parseInt(savedPos, 10);
+          }
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }, [userId]);
+
+    useEffect(() => {
+      return () => {
+        throttledSaveScroll.flush();
+      };
+    }, [throttledSaveScroll]);
 
     const calculateAge = useCallback((dob) => {
       const birthDate = new Date(dob);
@@ -199,70 +427,6 @@ const LinkupFeed = forwardRef(
 
     const filteredLinkups = useMemo(() => filterLinkups(), [filterLinkups]);
 
-    const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-      const R = 6371; // Earth's radius in km
-      const dLat = (lat2 - lat1) * (Math.PI / 180);
-      const dLon = (lon2 - lon1) * (Math.PI / 180);
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * (Math.PI / 180)) *
-          Math.cos(lat2 * (Math.PI / 180)) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    }, []);
-
-    // Scroll to top function
-    const scrollToTop = () => {
-      if (feedRef.current) {
-        feedRef.current.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      }
-    };
-
-    // Expose scrollToTop to parent via ref
-    useImperativeHandle(ref, () => ({
-      scrollToTop,
-    }));
-
-    // Check scroll position to show/hide button
-    useEffect(() => {
-      const feed = feedRef.current;
-      if (!feed) return;
-
-      const handleScroll = () => {
-        if (feed.scrollTop > 300) {
-          setShowScrollButton(true);
-        } else {
-          setShowScrollButton(false);
-        }
-        scrollPosRef.current = feed.scrollTop;
-        sessionStorage.setItem(`feedScroll_${userId}`, feed.scrollTop);
-      };
-
-      feed.addEventListener("scroll", handleScroll);
-      return () => feed.removeEventListener("scroll", handleScroll);
-    }, [userId]);
-
-    // Store scroll position before unloading
-    useEffect(() => {
-      const handleBeforeUnload = () => {
-        if (feedRef.current) {
-          sessionStorage.setItem(
-            `feedScroll_${userId}`,
-            feedRef.current.scrollTop
-          );
-        }
-      };
-      window.addEventListener("beforeunload", handleBeforeUnload);
-      return () =>
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-    }, [userId]);
-
-    // Search function with debounce
     const debouncedSearch = useMemo(
       () =>
         debounce(async (query) => {
@@ -299,185 +463,52 @@ const LinkupFeed = forwardRef(
       debouncedSearch(query);
     };
 
-    // Cleanup debounce on unmount
     useEffect(() => {
-      return () => {
-        debouncedSearch.cancel();
-      };
+      return () => debouncedSearch.cancel();
     }, [debouncedSearch]);
 
-    const loadData = async (reset = false) => {
-      if (loading) return;
-
-      if (reset && linkupCache.current[userId]) {
-        const cachedData = linkupCache.current[userId];
-        setLinkups(cachedData.linkups);
-        setOffset(cachedData.offset);
-        setHasMore(cachedData.hasMore);
-
-        dispatch({
-          type: "MERGE_LINKUPS_SUCCESS",
-          payload: {
-            newLinkups: cachedData.linkups,
-            isInitialLoad: true,
-          },
+    const scrollToTop = () => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: 0,
+          behavior: "smooth",
         });
-
-        requestAnimationFrame(() => {
-          if (feedRef.current) {
-            const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
-            feedRef.current.scrollTop = savedPos ? parseInt(savedPos, 10) : 0;
-          }
-        });
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const anchorIndex = reset ? 0 : Math.floor(scrollPosRef.current / 300);
-        const anchorId = linkups[anchorIndex]?.id;
-
-        const response = await getLinkups(
-          userId,
-          gender,
-          reset ? 0 : offset,
-          pageSize,
-          location.latitude,
-          location.longitude
-        );
-
-        if (response?.linkupList) {
-          const enrichedLinkups = response.linkupList.map((linkup) => ({
-            ...linkup,
-            isUserCreated: linkup.creator_id === userId,
-            createdAtTimestamp: linkup.created_at,
-            distance: calculateDistance(
-              location.latitude,
-              location.longitude,
-              linkup.latitude,
-              linkup.longitude
-            ),
-          }));
-
-          enrichedLinkups.sort((a, b) => {
-            const createdAtComparison =
-              new Date(b.createdAtTimestamp) - new Date(a.createdAtTimestamp);
-            return createdAtComparison !== 0
-              ? createdAtComparison
-              : a.distance - b.distance;
-          });
-
-          const newLinkups = reset
-            ? enrichedLinkups
-            : [...linkups, ...enrichedLinkups];
-
-          if (reset) {
-            linkupCache.current[userId] = {
-              linkups: enrichedLinkups,
-              offset: enrichedLinkups.length,
-              hasMore: enrichedLinkups.length === pageSize,
-              timestamp: Date.now(),
-            };
-          }
-
-          // Redux dispatch here
-          dispatch({
-            type: "MERGE_LINKUPS_SUCCESS",
-            payload: {
-              newLinkups: enrichedLinkups,
-              isInitialLoad: reset,
-            },
-          });
-
-          setLinkups(newLinkups);
-          setOffset(
-            reset ? enrichedLinkups.length : offset + enrichedLinkups.length
-          );
-          setHasMore(enrichedLinkups.length === pageSize);
-
-          requestAnimationFrame(() => {
-            if (feedRef.current) {
-              if (reset) {
-                const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
-                feedRef.current.scrollTop = savedPos
-                  ? parseInt(savedPos, 10)
-                  : 0;
-              } else if (anchorId) {
-                const anchorIndex = newLinkups.findIndex(
-                  (item) => item.id === anchorId
-                );
-                if (anchorIndex >= 0) {
-                  const anchorItem = document.getElementById(
-                    `item-${anchorId}`
-                  );
-                  if (anchorItem) {
-                    feedRef.current.scrollTop =
-                      anchorItem.offsetTop - (scrollPosRef.current % 300);
-                  }
-                }
-              }
-            }
-          });
-        }
-      } finally {
-        setLoading(false);
       }
     };
 
-    // Initial load with cache check
+    useImperativeHandle(ref, () => ({
+      scrollToTop,
+    }));
+
     useEffect(() => {
-      const now = Date.now();
-      for (const key in linkupCache.current) {
-        if (now - linkupCache.current[key].timestamp > 300000) {
-          delete linkupCache.current[key];
-        }
-      }
-
-      loadData(true);
-    }, [userId, gender, location]);
-
-    // Scroll handler for infinite loading
-    useEffect(() => {
-      const feed = feedRef.current;
-      if (!feed) return;
-
-      const handleScroll = () => {
-        const { scrollTop, scrollHeight, clientHeight } = feed;
-        if (
-          scrollHeight - scrollTop - clientHeight < 800 &&
-          hasMore &&
-          !loading &&
-          !isSearching
-        ) {
-          loadData();
+      const handleBeforeUnload = () => {
+        if (scrollContainerRef.current) {
+          sessionStorage.setItem(
+            `feedScroll_${userId}`,
+            scrollContainerRef.current.scrollTop.toString()
+          );
         }
       };
-
-      feed.addEventListener("scroll", handleScroll, { passive: true });
-      return () => feed.removeEventListener("scroll", handleScroll);
-    }, [hasMore, loading, isSearching]);
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      return () =>
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, [userId]);
 
     return (
       <div
-        ref={feedRef}
+        ref={setRefs}
         style={{
-          position: "relative", // This is already present
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "8px",
-          maxWidth: "100vw",
-          minHeight: "100dvh",
-          marginBottom: isMobile ? 64 : 15,
-          width: "100%",
+          height: "100vh",
+          overflowY: "auto",
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
-          touchAction: "pan-y", // Add this for better touch control
+          paddingBottom: "calc(40px + env(safe-area-inset-bottom))",
+          touchAction: "pan-y",
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Pull-to-refresh indicator must be FIRST child */}
         <PullToRefreshContainer refreshing={isRefreshing}>
           {isRefreshing ? (
             <LoadingSpinner />
@@ -495,9 +526,11 @@ const LinkupFeed = forwardRef(
             value={searchQuery}
           />
         </SearchInputContainer>
+
         {showNewLinkupButton && (
           <NewLinkupButton refreshFeed={refreshFeed} colorMode={colorMode} />
         )}
+
         {loading ? (
           <LoadingSpinner />
         ) : isSearching ? (
