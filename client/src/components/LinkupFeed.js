@@ -36,6 +36,7 @@ const RefreshSpinner = styled("div")(({ theme, pullDistance }) => ({
   borderRadius: "50%",
   border: `3px solid ${theme.palette.primary.main}`,
   borderTopColor: "transparent",
+  color: "white",
   animation: "spin 1s linear infinite",
   opacity: Math.min(1, pullDistance / 100),
   transform: `rotate(${Math.min(360, pullDistance * 2)}deg)`,
@@ -460,11 +461,16 @@ const LinkupFeed = forwardRef(
       <div
         ref={feedRef}
         style={{
-          height: "100vh",
-          overflowY: "auto",
+          position: "relative", // This is already present
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: "8px",
+          maxWidth: "100vw",
+          minHeight: "100dvh",
+          marginBottom: isMobile ? 64 : 15,
+          width: "100%",
           overscrollBehavior: "contain",
           scrollBehavior: "auto",
-          paddingBottom: "calc(65px + env(safe-area-inset-bottom))",
           touchAction: "pan-y", // Add this for better touch control
         }}
         onTouchStart={handleTouchStart}

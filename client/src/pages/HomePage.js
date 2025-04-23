@@ -17,7 +17,6 @@ const StyledDiv = styled("div")(({ theme, colorMode }) => ({
     display: "flex",
     width: "100%",
     position: "relative",
-    overflow: "hidden",
   },
   [`&.feedSection`]: {
     flex: "2.5",
