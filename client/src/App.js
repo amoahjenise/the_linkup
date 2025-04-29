@@ -10,7 +10,7 @@ import {
   AboutPage,
   LandingPage,
   SignupPage,
-  HomePage,
+  FeedPage,
   UserProfilePage,
   SendRequestPage,
   ConversationsPage,
@@ -354,7 +354,7 @@ const App = () => {
     // Private routes (require authentication)
     const privateRoutes = (
       <Routes>
-        <Route path="/home" element={<HomePage isMobile={isMobile} />} />
+        <Route path="/home" element={<FeedPage isMobile={isMobile} />} />
         <Route
           path="/notifications"
           element={<NotificationsPage isMobile={isMobile} />}

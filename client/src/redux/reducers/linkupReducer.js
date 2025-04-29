@@ -1,79 +1,73 @@
-//Manages the linkups state, handling actions related to fetching, deleting, and updating linkups.
-
 import {
-  FETCH_LINKUPS_SUCCESS,
+  ADD_LINKUP,
+  REMOVE_LINKUP,
+  UPDATE_LINKUP,
   SET_IS_LOADING,
-  UPDATE_LINKUP_LIST,
-  MARK_LINKUPS_AS_EXPIRED_SUCCESS,
-  SHOW_NEW_LINKUP_BUTTON,
-  MERGE_LINKUPS_SUCCESS,
+  FETCH_LINKUPS_SUCCESS,
+  FETCH_LINKUPS_FAILURE,
+  SHOW_UPDATE_FEED_BUTTON,
 } from "../actions/actionTypes";
 
 const initialState = {
   linkupList: [],
-  isLoading: false,
-  showNewLinkupButton: false,
-  successMessage: "",
-  error: "",
+  isLoading: false, // To track loading state
+  showUpdateFeedButton: false, // To control the visibility of the new linkup button
+  successMessage: "", // For success messages
+  error: "", // For error messages
 };
 
 const linkupsReducer = (state = initialState, action) => {
   switch (action.type) {
-    case FETCH_LINKUPS_SUCCESS:
-      return {
-        ...state,
-        linkupList: action.payload, // Change 'linkups' to 'linkupList'
-        successMessage: "Link Up list fetched!",
-      };
     case SET_IS_LOADING:
       return {
         ...state,
-        isLoading: action.payload,
+        isLoading: action.payload, // Update the loading state
       };
-    case UPDATE_LINKUP_LIST:
+
+    case FETCH_LINKUPS_SUCCESS:
       return {
         ...state,
-        linkupList: [action.payload, ...state.linkupList],
+        linkupList: action.payload, // Set fetched linkups
+        successMessage: "Linkups successfully fetched!", // Success message
       };
-    case MARK_LINKUPS_AS_EXPIRED_SUCCESS:
+
+    case FETCH_LINKUPS_FAILURE:
       return {
         ...state,
-        linkupList: action.payload, // Update the link-up list with the new data
-        successMessage: "Linkups marked as expired!",
+        error: action.payload, // Set the error message in case of failure
+        successMessage: "", // Clear success message on failure
       };
-    case MERGE_LINKUPS_SUCCESS: {
-      const { newLinkups, isInitialLoad } = action.payload;
 
-      if (isInitialLoad) {
-        // Fresh load, sort if needed
-        return { ...state, linkupList: newLinkups };
-      }
-
-      // Use a map to merge and preserve order
-      const linkupMap = new Map();
-
-      // Insert existing ones first to preserve sort
-      for (const linkup of state.linkupList) {
-        linkupMap.set(linkup.id, linkup);
-      }
-
-      // Merge new ones (overwriting existing or adding new)
-      for (const linkup of newLinkups) {
-        linkupMap.set(linkup.id, linkup);
-      }
-
+    case ADD_LINKUP:
       return {
         ...state,
-        linkupList: Array.from(linkupMap.values()).sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        ),
+        linkupList: [action.payload, ...state.linkupList], // Add the new linkup to the top
       };
-    }
-    case SHOW_NEW_LINKUP_BUTTON:
+
+    case REMOVE_LINKUP:
       return {
         ...state,
-        showNewLinkupButton: action.payload,
+        linkupList: state.linkupList.filter(
+          (linkup) => linkup.id !== action.payload
+        ), // Remove the linkup by ID
       };
+
+    case UPDATE_LINKUP:
+      return {
+        ...state,
+        linkupList: state.linkupList.map((linkup) =>
+          linkup.id === action.payload.id
+            ? { ...linkup, ...action.payload }
+            : linkup
+        ), // Update the specific linkup
+      };
+
+    case SHOW_UPDATE_FEED_BUTTON:
+      return {
+        ...state,
+        showUpdateFeedButton: action.payload, // Toggle the update feed button visibility
+      };
+
     default:
       return state;
   }

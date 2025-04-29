@@ -30,7 +30,7 @@ const StyledPaper = styled(Paper)(({ theme, colorMode, fullScreen }) => ({
   },
 }));
 
-const EditLinkupModal = ({ isOpen, onClose, refreshFeed }) => {
+const EditLinkupModal = ({ isOpen, onClose, updateLinkup }) => {
   const { colorMode } = useColorMode();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
@@ -51,7 +51,7 @@ const EditLinkupModal = ({ isOpen, onClose, refreshFeed }) => {
       disableScrollLock={false}
     >
       <StyledPaper colorMode={colorMode} fullScreen={isMobile}>
-        <EditLinkupForm onClose={handleModalClose} refreshFeed={refreshFeed} />
+        <EditLinkupForm onClose={handleModalClose} updateLinkup={updateLinkup} />
       </StyledPaper>
     </Modal>
   );

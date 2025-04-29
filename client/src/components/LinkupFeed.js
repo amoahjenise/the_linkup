@@ -86,8 +86,8 @@ const LinkupFeed = forwardRef(
     const dispatch = useDispatch();
     const { userSettings } = useSelector((state) => state.userSettings);
     const userSentRequests = useSelector((state) => state.userSentRequests);
-    const showNewLinkupButton = useSelector(
-      (state) => state.linkups.showNewLinkupButton
+    const showUpdateFeedButton = useSelector(
+      (state) => state.linkups.showUpdateFeedButton
     );
 
     const [linkups, setLinkups] = useState([]);
@@ -109,6 +109,11 @@ const LinkupFeed = forwardRef(
     const [pullStartY, setPullStartY] = useState(null);
     const [pullDistance, setPullDistance] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const [internalRefreshTrigger, setInternalRefreshTrigger] = useState(0);
+
+    // Add this state
+    const [pendingUpdates, setPendingUpdates] = useState([]);
 
     const setRefs = useCallback(
       (node) => {
@@ -136,12 +141,66 @@ const LinkupFeed = forwardRef(
       return R * c;
     }, []);
 
+    // Handle pending updates
+    useEffect(() => {
+      if (pendingUpdates.length > 0) {
+        setLinkups((prevLinkups) => {
+          let updatedLinkups = [...prevLinkups];
+
+          pendingUpdates.forEach((update) => {
+            if (update._deleted) {
+              // Handle deletion
+              updatedLinkups = updatedLinkups.filter((l) => l.id !== update.id);
+            } else {
+              // Handle update or creation
+              const index = updatedLinkups.findIndex((l) => l.id === update.id);
+              if (index >= 0) {
+                // Update existing - preserve all calculated fields while updating others
+                updatedLinkups[index] = {
+                  ...updatedLinkups[index], // Keep existing fields
+                  ...update, // Apply updates
+                  // Explicitly preserve these critical fields
+                  distance: updatedLinkups[index].distance,
+                  isUserCreated: updatedLinkups[index].isUserCreated,
+                  createdAtTimestamp: updatedLinkups[index].createdAtTimestamp,
+                  // Preserve any other calculated fields your component uses
+                };
+              } else {
+                // Add new at the top - include all required fields
+                updatedLinkups.unshift({
+                  ...update,
+                  distance: calculateDistance(
+                    location.latitude,
+                    location.longitude,
+                    update.latitude || location.latitude, // Fallback to user's location if missing
+                    update.longitude || location.longitude
+                  ),
+                  createdAtTimestamp:
+                    update.created_at || new Date().toISOString(),
+                  isUserCreated: update.creator_id === userId,
+                  // Include any other fields your LinkupItem component expects
+                });
+              }
+            }
+          });
+
+          return updatedLinkups;
+        });
+
+        setPendingUpdates([]);
+      }
+    }, [pendingUpdates, location, userId, calculateDistance]);
+
+    // Modified loadData function
     const loadData = useCallback(
       async (reset = false) => {
         if (loading) return;
         const cacheKey = `${userId}_${gender}_${location.latitude}_${location.longitude}`;
 
-        // Handle cached data
+        // Save current scroll position
+        const currentScrollPos = scrollContainerRef.current?.scrollTop || 0;
+        const currentAnchorId = linkups[Math.floor(currentScrollPos / 300)]?.id;
+
         if (reset && linkupCache.current[cacheKey]) {
           const cachedData = linkupCache.current[cacheKey];
           setLinkups(cachedData.linkups);
@@ -156,13 +215,9 @@ const LinkupFeed = forwardRef(
             },
           });
 
-          // Use setTimeout instead of requestAnimationFrame for more reliable execution
           setTimeout(() => {
             if (scrollContainerRef.current) {
-              const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
-              if (savedPos) {
-                scrollContainerRef.current.scrollTop = parseInt(savedPos, 10);
-              }
+              scrollContainerRef.current.scrollTop = currentScrollPos;
             }
           }, 0);
           return;
@@ -170,11 +225,6 @@ const LinkupFeed = forwardRef(
 
         setLoading(true);
         try {
-          const anchorIndex = reset
-            ? 0
-            : Math.floor(scrollPosRef.current / 300);
-          const anchorId = linkups[anchorIndex]?.id;
-
           const response = await getLinkups(
             userId,
             gender,
@@ -218,7 +268,6 @@ const LinkupFeed = forwardRef(
               };
             }
 
-            // Update state first
             setLinkups(newLinkups);
             setOffset(
               reset ? enrichedLinkups.length : offset + enrichedLinkups.length
@@ -233,31 +282,27 @@ const LinkupFeed = forwardRef(
               },
             });
 
-            // Then handle scroll position after state updates
             setTimeout(() => {
               if (!scrollContainerRef.current) return;
 
-              if (reset) {
-                const savedPos = sessionStorage.getItem(`feedScroll_${userId}`);
-                scrollContainerRef.current.scrollTop = savedPos
-                  ? parseInt(savedPos, 10)
-                  : 0;
-              } else if (anchorId) {
+              if (currentAnchorId) {
                 const anchorIndex = newLinkups.findIndex(
-                  (item) => item.id === anchorId
+                  (item) => item.id === currentAnchorId
                 );
                 if (anchorIndex >= 0) {
                   const anchorItem = document.getElementById(
-                    `item-${anchorId}`
+                    `item-${currentAnchorId}`
                   );
-                  if (anchorItem && scrollContainerRef.current) {
+                  if (anchorItem) {
                     scrollContainerRef.current.scrollTo({
-                      top: anchorItem.offsetTop - (scrollPosRef.current % 300),
+                      top: anchorItem.offsetTop - (currentScrollPos % 300),
                       behavior: "auto",
                     });
+                    return;
                   }
                 }
               }
+              scrollContainerRef.current.scrollTop = currentScrollPos;
             }, 0);
           }
         } catch (error) {
@@ -267,11 +312,10 @@ const LinkupFeed = forwardRef(
         }
       },
       [
+        loading,
         userId,
         gender,
-        location.latitude,
-        location.longitude,
-        loading,
+        location,
         offset,
         dispatch,
         calculateDistance,
@@ -476,7 +520,15 @@ const LinkupFeed = forwardRef(
       }
     };
 
+    // Expose functions to parent
     useImperativeHandle(ref, () => ({
+      handleNewLinkup: (newLinkup) => {
+        if (newLinkup) {
+          setPendingUpdates((prev) => [...prev, newLinkup]);
+        } else {
+          setInternalRefreshTrigger((prev) => prev + 1);
+        }
+      },
       scrollToTop,
     }));
 
@@ -534,7 +586,7 @@ const LinkupFeed = forwardRef(
           />
         </SearchInputContainer>
 
-        {showNewLinkupButton && (
+        {showUpdateFeedButton && (
           <NewLinkupButton refreshFeed={refreshFeed} colorMode={colorMode} />
         )}
 

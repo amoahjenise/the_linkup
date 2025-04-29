@@ -224,9 +224,12 @@ const LinkupHistoryItem = ({ linkup, setShouldFetchLinkups }) => {
             showCheckInLinkup={false}
             showAcceptLinkupRequest={false}
             linkupItem={linkup}
-            setShouldFetchLinkups={setShouldFetchLinkups}
+            addLinkup={() => {}}
+            updateLinkup={() => {}}
+            removeLinkup={() => {}}
             menuAnchor={menuAnchor}
             setMenuAnchor={setMenuAnchor}
+            scrollToTop={() => {}}
           />
         )}
       </ItemHeader>

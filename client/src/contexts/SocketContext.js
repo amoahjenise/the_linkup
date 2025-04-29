@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import io from "socket.io-client";
 import { useSnackbar } from "./SnackbarContext";
 import { incrementUnreadNotificationsCount } from "../redux/actions/notificationActions";
-import { showNewLinkupButton } from "../redux/actions/linkupActions";
+import { showUpdateFeedButton } from "../redux/actions/linkupActions";
 import {
   requestNotificationPermission,
   showNotification,
@@ -96,14 +96,14 @@ export const SocketProvider = ({ children }) => {
       ) {
         return;
       }
-      dispatch(showNewLinkupButton(true));
+      dispatch(showUpdateFeedButton(true));
     };
 
     const handleLinkupUpdated = ({ linkup }) => {
       if (linkup.creator_id === userId || !isLinkupWithinUserSettings(linkup)) {
         return;
       }
-      dispatch(showNewLinkupButton(true));
+      dispatch(showUpdateFeedButton(true));
     };
 
     const handleLinkupDeleted = ({ linkup }) => {
@@ -114,7 +114,7 @@ export const SocketProvider = ({ children }) => {
       ) {
         return;
       }
-      dispatch(showNewLinkupButton(true));
+      dispatch(showUpdateFeedButton(true));
     };
 
     const handleLinkupExpired = ({ message }) => {
@@ -122,7 +122,7 @@ export const SocketProvider = ({ children }) => {
       if (typeof window !== "undefined" && "Notification" in window) {
         showNotification("Linkup Expired", message);
       }
-      dispatch(showNewLinkupButton(true));
+      dispatch(showUpdateFeedButton(true));
     };
 
     const handleNotification = (type, notification) => {

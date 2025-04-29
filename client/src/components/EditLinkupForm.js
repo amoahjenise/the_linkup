@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import { Button } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { updateLinkup } from "../api/linkUpAPI";
+import { updateLinkup as updateLinkupDB } from "../api/linkUpAPI";
 import { updateLinkupSuccess } from "../redux/actions/linkupActions";
 import { clearEditingLinkup } from "../redux/actions/editingLinkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
@@ -158,8 +158,10 @@ const ErrorText = styled("p")(({ theme }) => ({
   margin: "8px 0 0",
 }));
 
-const EditLinkupForm = ({ onClose, refreshFeed }) => {
+const EditLinkupForm = ({ onClose, updateLinkup }) => {
   const dispatch = useDispatch();
+  const loggedUser = useSelector((state) => state.loggedUser);
+  const userId = loggedUser?.user?.id || {};
   const editingLinkup = useSelector((state) => state.editingLinkup);
   const id = editingLinkup?.linkup?.id;
   const { colorMode } = useColorMode();
@@ -203,6 +205,21 @@ const EditLinkupForm = ({ onClose, refreshFeed }) => {
       : minTimeDefault
     : currentDate;
 
+  // Create hook for this function
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
+
   const handleUpdateLinkup = useCallback(
     async (e) => {
       e.preventDefault();
@@ -231,18 +248,42 @@ const EditLinkupForm = ({ onClose, refreshFeed }) => {
       }
 
       const updatedLinkup = {
+        id, // Make sure to include the ID
         location,
         activity,
         date: selectedDate,
         gender_preference: genderPreference,
         payment_option: paymentOption,
+        creator_id: editingLinkup.linkup.creator_id, // Include creator_id
+        created_at: editingLinkup.linkup.created_at, // Include original creation date
+        latitude: editingLinkup.linkup.latitude, // Include location data
+        longitude: editingLinkup.linkup.longitude,
       };
 
       try {
-        const response = await updateLinkup(id, updatedLinkup);
+        const response = await updateLinkupDB(id, updatedLinkup);
         if (response.success) {
-          refreshFeed();
+          // Dispatch the update to Redux first
           dispatch(updateLinkupSuccess(response.linkup));
+
+          // Prepare the complete linkup object for the feed
+          const feedLinkup = {
+            ...response.linkup,
+            // Include all fields needed by the feed
+            isUserCreated: response.linkup.creator_id === userId,
+            createdAtTimestamp: response.linkup.created_at,
+            distance: calculateDistance(
+              location.latitude,
+              location.longitude,
+              response.linkup.latitude,
+              response.linkup.longitude
+            ),
+            // Include any other fields your LinkupItem component expects
+          };
+
+          // Then trigger the update feed with the complete updated linkup
+          updateLinkup(feedLinkup);
+
           onClose();
           dispatch(clearEditingLinkup());
           addSnackbar("Updated successfully!");
@@ -262,7 +303,8 @@ const EditLinkupForm = ({ onClose, refreshFeed }) => {
       dispatch,
       addSnackbar,
       id,
-      refreshFeed,
+      updateLinkup,
+      editingLinkup.linkup, // Add this to dependencies
     ]
   );
 

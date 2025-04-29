@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
 import { createLinkup } from "../api/linkUpAPI";
-import { updateLinkupList } from "../redux/actions/linkupActions";
+import { updateLinkup } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { Tooltip, IconButton, Button, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
@@ -158,7 +158,7 @@ const ErrorText = styled("p")(({ theme }) => ({
 const CreateLinkupWidget = ({
   toggleWidget,
   isMobile,
-  refreshFeed,
+  addLinkup,
   handleScrollToTop,
 }) => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -264,18 +264,26 @@ const CreateLinkupWidget = ({
       });
 
       if (response.success) {
-        updateLinkupList(response.newLinkup);
-        addSnackbar("Linkup created successfully!");
+        addSnackbar("Linkup created successfully!", "success");
+
+        // Reset the form
         e.target.reset();
         setSelectedDate(null);
         setGenderPreference([]);
         setPaymentOption(null);
-        // Only toggle the widget in mobile view
+
+        // First update the list
+        addLinkup(response.newLinkup);
+
+        // Then scroll to top *after DOM update*
+        setTimeout(() => {
+          handleScrollToTop();
+        }, 0);
+
+        // Toggle widget in mobile view
         if (window.innerWidth <= 600) {
           toggleWidget();
         }
-        refreshFeed(); // Trigger feed refresh
-        handleScrollToTop();
       } else {
         addSnackbar("An error occurred. Please try again.");
       }
