@@ -1,6 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useSelector } from "react-redux";
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+  useMemo,
+} from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { searchLinkups } from "../api/linkUpAPI";
 import { useFeed } from "../hooks/useFeed";
+import useFilteredFeed from "../hooks/useFilteredFeed";
+import { useSentRequests } from "../hooks/useSentRequests";
 import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
 import WidgetSection from "../components/WidgetSection";
@@ -10,6 +19,12 @@ import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { Suspense, lazy } from "react";
 import { useResponsiveWidget } from "../hooks/useResponsiveWidget";
+import UpdateFeedButton from "../components/UpdateFeedButton";
+import SearchInput from "../components/SearchInputWidget";
+import debounce from "lodash/debounce";
+import FeedItem from "../components/FeedItem";
+import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
+import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
 
 // Dynamically import Feed component
 const Feed = lazy(() => import("../components/Feed")); // Lazy load Feed
@@ -27,6 +42,15 @@ const FeedSection = styled("div")(({ theme, colorMode }) => ({
   borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
   [theme.breakpoints.down("md")]: { flex: "2" },
   [theme.breakpoints.down("sm")]: { flex: "1", borderRight: "none" },
+}));
+
+const SearchInputContainer = styled("div")(({ theme }) => ({
+  padding: 8,
+  width: "100%",
+  position: "sticky",
+  top: 0,
+  zIndex: theme.zIndex.appBar,
+  backgroundColor: "background.paper",
 }));
 
 const WidgetSectionContainer = styled("div")(
@@ -87,11 +111,23 @@ const FloatingButton = ({ onClick, isClose, colorMode }) => (
 const FeedPage = () => {
   const { colorMode } = useColorMode();
   const loggedUser = useSelector((state) => state.loggedUser?.user || {});
+  const userSettings = useSelector(
+    (state) => state.userSettings?.userSettings || {}
+  );
+
+  const dispatch = useDispatch();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const { id, gender, latitude, longitude } = loggedUser;
 
+  const { distanceRange, ageRange, genderPreferences } = userSettings;
+
   const {
-    feed,
+    rawFeed,
     hasMore,
     loading,
     setPage,
@@ -99,25 +135,76 @@ const FeedPage = () => {
     updateLinkup,
     removeLinkup,
     useDistance,
+    reload,
   } = useFeed(id, gender, {
     latitude,
     longitude,
   });
 
+  const filteredFeed = useFilteredFeed(rawFeed, id);
+
+  const { sentRequests, loading: requestLoading } = useSentRequests(id);
+
   const { isMobileView, isWidgetVisible, toggleWidget } = useResponsiveWidget();
+
+  const isUpdateFeedButtonVisible = useSelector(
+    (state) => state.linkups.showUpdateFeedButton
+  );
 
   const feedRef = useRef(null);
   const observer = useRef();
 
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (query) => {
+        if (!query.trim()) {
+          setSearchResults([]);
+          setIsSearching(false);
+          return;
+        }
+
+        try {
+          setSearchLoading(true);
+          const response = await searchLinkups(query, id, gender);
+
+          const rawResults = response.linkupList || [];
+          const filteredResults = filterLinkupsByUserPreferences(
+            rawResults,
+            id,
+            userSettings
+          );
+
+          setSearchResults(filteredResults);
+          setIsSearching(true);
+        } catch (error) {
+          console.error("Search error:", error);
+          setSearchResults([]);
+        } finally {
+          setSearchLoading(false);
+        }
+      }, 300),
+    [id, gender, userSettings]
+  );
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  useEffect(() => {
+    return () => debouncedSearch.cancel();
+  }, [debouncedSearch]);
+
   // Store and restore the scroll position
   useEffect(() => {
-    if (!loading && feed.length > 0 && feedRef.current) {
+    if (!loading && filteredFeed.length > 0 && feedRef.current) {
       const savedScroll = sessionStorage.getItem("feedScrollPosition");
       if (savedScroll !== null) {
         feedRef.current.scrollTop = parseInt(savedScroll, 10);
       }
     }
-  }, [loading, feed]);
+  }, [loading, filteredFeed]);
 
   // Save the scroll position on scroll
   const handleScroll = () => {
@@ -125,6 +212,20 @@ const FeedPage = () => {
       sessionStorage.setItem("feedScrollPosition", feedRef.current.scrollTop);
     }
   };
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (feedRef.current) {
+        sessionStorage.setItem("feedScrollPosition", 0);
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   // Set up the intersection observer for the last item
   const lastItemRef = useCallback(
@@ -150,28 +251,74 @@ const FeedPage = () => {
     }
   };
 
+  const handleUpdateFeed = () => {
+    reload();
+    handleScrollToTop();
+  };
+
   if (loading) return <LoadingSpinner />;
 
   return (
     <FeedPageContainer>
       <FeedSection ref={feedRef} onScroll={handleScroll} colorMode={colorMode}>
         <TopNavBar title="Home" />
-        <Suspense fallback={<LoadingSpinner />}>
-          <Feed
-            linkups={feed}
-            loading={loading}
-            hasMore={hasMore}
-            setPage={setPage}
-            colorMode={colorMode}
-            lastItemRef={lastItemRef}
-            addLinkup={addLinkup}
-            updateLinkup={updateLinkup}
-            removeLinkup={removeLinkup}
-            useDistance={useDistance}
-            handleScrollToTop={handleScrollToTop}
-            loggedUser={loggedUser}
+
+        <SearchInputContainer>
+          <SearchInput
+            handleInputChange={handleSearchChange}
+            loading={searchLoading}
+            value={searchQuery}
           />
-        </Suspense>
+        </SearchInputContainer>
+
+        {isUpdateFeedButtonVisible && (
+          <UpdateFeedButton
+            refreshFeed={handleUpdateFeed}
+            colorMode={colorMode}
+          />
+        )}
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : isSearching ? (
+          searchResults.length > 0 ? (
+            searchResults.map((linkup) => (
+              <FeedItem
+                linkup={linkup}
+                colorMode={colorMode}
+                addLinkup={addLinkup}
+                updateLinkup={updateLinkup}
+                removeLinkup={removeLinkup}
+                useDistance={useDistance}
+                handleScrollToTop={handleScrollToTop}
+                loggedUser={loggedUser}
+                sentRequests={sentRequests}
+              />
+            ))
+          ) : (
+            <EmptyFeedPlaceholder message="No matching linkups found" />
+          )
+        ) : filteredFeed.length === 0 ? (
+          <LoadingSpinner />
+        ) : (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Feed
+              linkups={filteredFeed}
+              loading={loading}
+              hasMore={hasMore}
+              setPage={setPage}
+              colorMode={colorMode}
+              lastItemRef={lastItemRef}
+              addLinkup={addLinkup}
+              updateLinkup={updateLinkup}
+              removeLinkup={removeLinkup}
+              useDistance={useDistance}
+              handleScrollToTop={handleScrollToTop}
+              loggedUser={loggedUser}
+              sentRequests={sentRequests}
+            />
+          </Suspense>
+        )}
       </FeedSection>
 
       <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>

@@ -9,6 +9,7 @@ WHERE id = $6
 RETURNING 
     link_ups.id,
     link_ups.creator_id,
+    link_ups.creator_name,
     link_ups.location,
     link_ups.activity,
     link_ups.date,

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import useFeedItemUtils from "../hooks/useFeedItemUtils"; // Adjust the path accordingly
 import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
@@ -9,7 +10,8 @@ import { CircularProgress } from "@mui/material";
 import EmojiTooltip from "./EmojiTooltip";
 import { Tooltip } from "@mui/material";
 import { IoReceipt } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { useSnackbar } from "../contexts/SnackbarContext";
+import { getLinkupStatus } from "../api/linkUpAPI";
 
 // Container wrapper
 const Container = styled("div")(({ theme }) => ({
@@ -53,7 +55,7 @@ const CardContainer = styled("div")(({ theme, colorMode }) => ({
   // Responsive widths for smaller screens
 
   [theme.breakpoints.down("sm")]: {
-    padding: "0.75rem 0.6rem",
+    padding: "1rem 1.25rem",
     borderRadius: "0.75rem",
   },
 
@@ -129,17 +131,10 @@ const UserInfo = styled("div")(({ theme }) => ({
   },
 }));
 
-const PostActionsContainer = styled("div")(({ theme }) => ({
+const PostActionsContainer = styled("div")(() => ({
   display: "flex",
   alignItems: "center",
   marginTop: "0.5rem",
-  gap: "0.5rem",
-  flexWrap: "wrap",
-  [theme.breakpoints.down("sm")]: {
-    justifyContent: "space-between",
-    width: "100%",
-    gap: "1rem",
-  },
 }));
 
 // Distance and meta information
@@ -248,17 +243,20 @@ const PaymentOptionIconContainer = styled("div")({
 
 const FeedItem = ({
   linkup,
-  isDisabled = false, // Placeholder
-  onRequest = () => {}, // Placeholder
   addLinkup,
   updateLinkup,
   removeLinkup,
   handleScrollToTop,
   loggedUser,
+  sentRequests,
 }) => {
   const { colorMode } = useColorMode();
 
   const [menuAnchor, setMenuAnchor] = useState(null);
+
+  const navigate = useNavigate();
+
+  const { addSnackbar } = useSnackbar();
 
   const {
     id,
@@ -285,7 +283,34 @@ const FeedItem = ({
 
   const distanceInKm = useDistance(loggedUser, latitude, longitude); // Use the distance hook
 
-  const handleRequestLinkup = async () => {};
+  const disableRequest = sentRequests.has(linkup.id);
+
+  const handleRequestLinkup = async (linkupId) => {
+    const response = await getLinkupStatus(linkupId);
+    let message = "";
+
+    switch (response.linkupStatus) {
+      case "expired":
+        message = "This linkup has expired.";
+        break;
+      case "closed":
+        message = "This linkup was closed and can no longer receive requests.";
+        break;
+      case "inactive":
+        message = "This linkup was deleted.";
+        break;
+      default:
+        const destination = disableRequest
+          ? `/history/requests-sent`
+          : `/send-request/${linkupId}`;
+        navigate(destination);
+        return;
+    }
+
+    if (!disableRequest) {
+      addSnackbar(message, { timeout: 7000 });
+    }
+  };
 
   const renderPaymentOptionIcon = () => {
     switch (linkup.payment_option) {
@@ -383,8 +408,8 @@ const FeedItem = ({
                   <div>
                     <PostActions
                       paymentOption={linkup.payment_option}
-                      onRequestClick={handleRequestLinkup}
-                      disableRequest={false}
+                      onRequestClick={() => handleRequestLinkup(linkup.id)}
+                      disableRequest={disableRequest}
                     />
                   </div>
                 </div>

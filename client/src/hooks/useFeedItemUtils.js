@@ -11,11 +11,10 @@ const useFeedItemUtils = () => {
     const created = moment(createdAt);
     const duration = moment.duration(now.diff(created));
     const days = duration.asDays();
+    const hours = duration.asHours();
+    const minutes = duration.asMinutes();
 
     if (days < 1) {
-      const hours = duration.asHours();
-      const minutes = duration.asMinutes();
-
       if (hours >= 1) {
         return `${Math.floor(hours)} hour${
           Math.floor(hours) !== 1 ? "s" : ""
@@ -27,10 +26,19 @@ const useFeedItemUtils = () => {
       } else {
         return "Just now";
       }
-    } else if (days < 2) {
+    } else if (days >= 1 && days < 2) {
       return "Yesterday";
+    } else if (days < 7) {
+      return `${Math.floor(days)} day${Math.floor(days) !== 1 ? "s" : ""} ago`;
+    } else if (days < 30) {
+      const weeks = Math.floor(days / 7);
+      return `${weeks} week${weeks !== 1 ? "s" : ""} ago`;
+    } else if (days < 365) {
+      const months = Math.floor(days / 30);
+      return `${months} month${months !== 1 ? "s" : ""} ago`;
     } else {
-      return `${Math.floor(days)} days ago`;
+      const years = Math.floor(days / 365);
+      return `${years} year${years !== 1 ? "s" : ""} ago`;
     }
   }, []);
 

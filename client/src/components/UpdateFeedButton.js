@@ -51,7 +51,7 @@ const FloatingButton = styled(Button)(({ isloading }) => ({
   },
 }));
 
-const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
+const UpdateFeedButton = ({ refreshFeed, colorMode, isLoading = false }) => {
   const dispatch = useDispatch();
 
   const handleRefresh = () => {
@@ -107,4 +107,4 @@ const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
   );
 };
 
-export default NewLinkupButton;
+export default UpdateFeedButton;

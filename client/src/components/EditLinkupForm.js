@@ -248,7 +248,7 @@ const EditLinkupForm = ({ onClose, updateLinkup }) => {
       }
 
       const updatedLinkup = {
-        id, // Make sure to include the ID
+        id,
         location,
         activity,
         date: selectedDate,
@@ -258,6 +258,12 @@ const EditLinkupForm = ({ onClose, updateLinkup }) => {
         created_at: editingLinkup.linkup.created_at, // Include original creation date
         latitude: editingLinkup.linkup.latitude, // Include location data
         longitude: editingLinkup.linkup.longitude,
+        distance: calculateDistance(
+          loggedUser.user.latitude,
+          loggedUser.user.longitude,
+          editingLinkup.linkup.latitude,
+          editingLinkup.linkup.longitude
+        ),
       };
 
       try {

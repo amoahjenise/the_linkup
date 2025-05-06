@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { getLinkups } from "../api/linkUpAPI";
+import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 
 // useFeed.js - Handles fetching and managing the feed data
 export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
+  const dispatch = useDispatch();
+
   const [feed, setFeed] = useState([]); // Stores the feed data
   const [page, setPage] = useState(0); // Tracks the current page for pagination
   const [hasMore, setHasMore] = useState(true); // Indicates whether more feed items exist
@@ -24,12 +28,18 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
         userLocation.latitude,
         userLocation.longitude
       );
+
       if (response.success && Array.isArray(response.linkupList)) {
         const newItems = response.linkupList.filter(
           (item) => !loadedIds.current.has(item.id)
         );
         newItems.forEach((item) => loadedIds.current.add(item.id));
-        setFeed((prev) => [...prev, ...newItems]);
+
+        setFeed((prev) => {
+          const updatedFeed = [...prev, ...newItems];
+          dispatch(fetchLinkupsSuccess(updatedFeed)); // ✅ send entire list to Redux
+          return updatedFeed;
+        });
 
         if (response.linkupList.length < pageSize) {
           setHasMore(false);
@@ -43,7 +53,16 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
     } finally {
       setLoading(false);
     }
-  }, [loading, userId, gender, userLocation, pageSize]); // <-- No page, no hasMore
+  }, [
+    loading,
+    userId,
+    gender,
+    userLocation,
+    pageSize,
+    hasMore,
+    page,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (!hasLoadedOnce) {
@@ -74,13 +93,51 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
     setFeed((prev) => prev.filter((item) => item.id !== linkupId));
   };
 
+  const refreshFeed = useCallback(async () => {
+    if (!userId || !userLocation) return;
+
+    setLoading(true);
+    setPage(0); // Reset pagination
+    loadedIds.current.clear(); // Reset duplicate tracker
+
+    try {
+      const response = await getLinkups(
+        userId,
+        gender,
+        0,
+        pageSize,
+        userLocation.latitude,
+        userLocation.longitude
+      );
+
+      if (response.success && Array.isArray(response.linkupList)) {
+        const newItems = response.linkupList;
+        newItems.forEach((item) => loadedIds.current.add(item.id));
+
+        setFeed(newItems);
+        dispatch(fetchLinkupsSuccess(newItems)); // replace in Redux
+
+        setHasMore(response.linkupList.length === pageSize);
+      } else {
+        setFeed([]);
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("Failed to refresh feed:", err);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, gender, userLocation, pageSize, dispatch]);
+
   return {
-    feed,
+    rawFeed: feed,
     hasMore,
     loading,
     setPage,
     addLinkup,
     updateLinkup,
     removeLinkup,
+    reload: refreshFeed,
   };
 };

@@ -9,6 +9,9 @@ const FeedWrapper = styled(Box)(({ theme }) => ({
   display: "grid",
   gap: theme.spacing(2),
   padding: theme.spacing(2),
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 }));
 
 const Feed = ({
@@ -22,6 +25,7 @@ const Feed = ({
   useDistance,
   handleScrollToTop,
   loggedUser,
+  sentRequests,
 }) => {
   return (
     <FeedWrapper>
@@ -30,6 +34,7 @@ const Feed = ({
         return (
           <div key={linkup.id} ref={isLastItem ? lastItemRef : null}>
             <FeedItem
+              key={linkup.id}
               linkup={linkup}
               colorMode={colorMode}
               addLinkup={addLinkup}
@@ -38,6 +43,7 @@ const Feed = ({
               useDistance={useDistance}
               handleScrollToTop={handleScrollToTop}
               loggedUser={loggedUser}
+              sentRequests={sentRequests}
             />
           </div>
         );

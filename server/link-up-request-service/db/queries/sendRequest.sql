@@ -1,5 +1,6 @@
 INSERT INTO link_up_requests (requester_id, receiver_id, linkup_id, status, message)
 VALUES ($1, $2, $3, 'pending', $4)
+ON CONFLICT (requester_id, linkup_id) DO NOTHING
 RETURNING
     id,
     linkup_id,

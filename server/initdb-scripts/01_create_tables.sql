@@ -54,7 +54,8 @@ CREATE TABLE IF NOT EXISTS link_up_requests (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     message TEXT,
     requester_id UUID REFERENCES users(id),
-    hidden BOOLEAN DEFAULT FALSE
+    hidden BOOLEAN DEFAULT FALSE,
+    CONSTRAINT unique_user_linkup_request UNIQUE (requester_id, linkup_id)  -- ✅ Enforce single request per user per linkup
 );
 
 -- Table: conversations
@@ -80,19 +81,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     link_up_id UUID REFERENCES link_ups(id),
     hidden BOOLEAN DEFAULT FALSE,
     notification_type VARCHAR(255)
-);
-
--- Table: user_settings
-CREATE TABLE IF NOT EXISTS user_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE NOT NULL,
-    distance_range INT[] DEFAULT ARRAY[0, 50],
-    age_range INT[] DEFAULT ARRAY[18, 99],
-    gender_preferences TEXT[] DEFAULT ARRAY['Men', 'Women'],
-    notification_enabled BOOLEAN DEFAULT TRUE,
-    location_sharing_enabled BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: user_settings

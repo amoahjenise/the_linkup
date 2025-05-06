@@ -18,7 +18,7 @@ import TopNavBar from "../components/TopNavBar";
 import SearchInput from "./SearchInputWidget";
 import debounce from "lodash/debounce";
 import EmptyFeedPlaceholder from "./EmptyFeedPlaceholder";
-import NewLinkupButton from "./NewLinkupButton";
+import UpdateFeedButton from "./UpdateFeedButton";
 
 const PullToRefreshContainer = styled("div")(({ theme, refreshing }) => ({
   position: "relative",
@@ -587,7 +587,7 @@ const LinkupFeed = forwardRef(
         </SearchInputContainer>
 
         {showUpdateFeedButton && (
-          <NewLinkupButton refreshFeed={refreshFeed} colorMode={colorMode} />
+          <UpdateFeedButton refreshFeed={refreshFeed} colorMode={colorMode} />
         )}
 
         {loading ? (
