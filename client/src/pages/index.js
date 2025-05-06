@@ -1,6 +1,5 @@
 export { default as LandingPage } from "./LandingPage";
 export { default as SignupPage } from "./SignupPage";
-export { default as HomePage } from "./HomePage";
 export { default as UserProfilePage } from "./UserProfilePage";
 export { default as FeedPage } from "./FeedPage";
 export { default as SendRequestPage } from "./SendRequestPage";
