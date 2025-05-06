@@ -84,8 +84,8 @@ const FloatingButton = ({ onClick, isClose, colorMode }) => (
     onClick={onClick}
     sx={{
       position: "fixed",
-      width: "64px", // Set width
-      height: "64px", // Set height
+      width: isClose ? "50px" : "64px", // Smaller width for close
+      height: isClose ? "50px" : "64px", // Smaller height for close
       ...(isClose
         ? { top: "16px", right: "16px" }
         : { bottom: "85px", right: "22px" }),
@@ -104,10 +104,10 @@ const FloatingButton = ({ onClick, isClose, colorMode }) => (
           : "#008394",
       },
       borderRadius: "50%",
-      p: 1.5,
+      p: isClose ? 1 : 1.5, // Slightly smaller padding for the close button
     }}
   >
-    {isClose ? <CloseIcon /> : <AddIcon />}
+    {isClose ? <CloseIcon fontSize="small" /> : <AddIcon />}
   </IconButton>
 );
 
