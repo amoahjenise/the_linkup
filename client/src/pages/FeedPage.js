@@ -5,7 +5,7 @@ import React, {
   useState,
   useMemo,
 } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { searchLinkups } from "../api/linkUpAPI";
 import { useFeed } from "../hooks/useFeed";
 import useFilteredFeed from "../hooks/useFilteredFeed";
@@ -25,6 +25,7 @@ import debounce from "lodash/debounce";
 import FeedItem from "../components/FeedItem";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
+import { ArrowUpward } from "@mui/icons-material";
 
 // Dynamically import Feed component
 const Feed = lazy(() => import("../components/Feed")); // Lazy load Feed
@@ -78,14 +79,18 @@ const WidgetSectionContainer = styled("div")(
   })
 );
 
-const FloatingButton = ({ onClick, isClose, colorMode }) => (
+const FloatingButton = ({ onClick, isClose, colorMode, opacity = 1 }) => (
   <IconButton
     onClick={onClick}
     sx={{
       position: "fixed",
+      width: "64px",
+      height: "64px",
+      opacity,
+      transition: "opacity 0.3s ease",
       ...(isClose
         ? { top: "16px", right: "16px" }
-        : { bottom: "100px", right: "32px" }),
+        : { bottom: "80px", right: "22px" }),
       zIndex: 2100,
       color: colorMode === "dark" ? "white" : "black",
       backgroundColor: isClose
@@ -115,16 +120,14 @@ const FeedPage = () => {
     (state) => state.userSettings?.userSettings || {}
   );
 
-  const dispatch = useDispatch();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [scrollOpacity, setScrollOpacity] = useState(1);
 
   const { id, gender, latitude, longitude } = loggedUser;
-
-  const { distanceRange, ageRange, genderPreferences } = userSettings;
 
   const {
     rawFeed,
@@ -207,11 +210,41 @@ const FeedPage = () => {
   }, [loading, filteredFeed]);
 
   // Save the scroll position on scroll
+
   const handleScroll = () => {
     if (feedRef.current) {
-      sessionStorage.setItem("feedScrollPosition", feedRef.current.scrollTop);
+      const scrollTop = feedRef.current.scrollTop;
+      const maxScroll =
+        feedRef.current.scrollHeight - feedRef.current.clientHeight;
+      const opacity = 1 - Math.min(scrollTop / 600, 0.5); // fade out to 50% max
+      setScrollOpacity(opacity);
+      sessionStorage.setItem("feedScrollPosition", scrollTop);
+      setShowScrollTop(scrollTop > 300);
     }
   };
+
+  const ScrollToTopButton = ({ onClick, colorMode }) => (
+    <IconButton
+      onClick={onClick}
+      sx={{
+        position: "sticky",
+        top: "85%",
+        left: "50%",
+        zIndex: 2000,
+        color: colorMode === "dark" ? "white" : "black",
+        backgroundColor:
+          colorMode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+        "&:hover": {
+          backgroundColor:
+            colorMode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
+        },
+        borderRadius: "50%",
+        p: 1.5,
+      }}
+    >
+      <ArrowUpward />
+    </IconButton>
+  );
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -278,6 +311,13 @@ const FeedPage = () => {
           />
         )}
 
+        {showScrollTop && (
+          <ScrollToTopButton
+            onClick={handleScrollToTop}
+            colorMode={colorMode}
+          />
+        )}
+
         {loading ? (
           <LoadingSpinner />
         ) : isSearching ? (
@@ -327,6 +367,7 @@ const FeedPage = () => {
             onClick={toggleWidget}
             isClose
             colorMode={colorMode}
+            opacity={scrollOpacity}
           />
         )}
         <WidgetSection

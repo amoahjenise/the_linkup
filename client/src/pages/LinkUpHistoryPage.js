@@ -259,7 +259,7 @@ const LinkUpHistoryPage = ({ isMobile }) => {
       }, 300);
     }
   }, [userId]);
-  
+
   useEffect(() => {
     switch (location.pathname) {
       case "/history":

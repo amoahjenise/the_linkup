@@ -21,4 +21,5 @@ RETURNING
     (SELECT latitude FROM users WHERE users.id = link_ups.creator_id) AS latitude,
     (SELECT longitude FROM users WHERE users.id = link_ups.creator_id) AS longitude,
     (SELECT date_of_birth FROM users WHERE users.id = link_ups.creator_id) AS date_of_birth,
-    (SELECT gender FROM users WHERE users.id = link_ups.creator_id) AS creator_gender;
+    (SELECT gender FROM users WHERE users.id = link_ups.creator_id) AS creator_gender,
+    (SELECT avatar FROM users WHERE users.id = link_ups.creator_id) AS avatar;

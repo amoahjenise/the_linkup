@@ -7,8 +7,8 @@ import { Box } from "@mui/material";
 // Styled Wrapper
 const FeedWrapper = styled(Box)(({ theme }) => ({
   display: "grid",
-  gap: theme.spacing(2),
-  padding: theme.spacing(2),
+  // gap: theme.spacing(2),
+  // padding: theme.spacing(2),
   "@media (max-width: 900px)": {
     paddingBottom: "65px", // Add padding for footer
   },
