@@ -128,6 +128,7 @@ const RegistrationProcess = () => {
             dispatch(setIsRegistering(true));
           }
         } catch (error) {
+          navigate("/home");
           console.log(`Error fetching user data: ${error.message}`);
         }
       }
