@@ -18,7 +18,7 @@ const Widget = styled("div")(({ theme }) => ({
 const WidgetSection = ({
   toggleWidget,
   isMobile,
-  refreshFeed,
+  addLinkup,
   handleScrollToTop,
 }) => {
   const handleFilterChange = (selectedCategories) => {
@@ -33,7 +33,7 @@ const WidgetSection = ({
         <CreateLinkupForm
           toggleWidget={toggleWidget}
           isMobile={isMobile}
-          refreshFeed={refreshFeed}
+          addLinkup={addLinkup}
           handleScrollToTop={handleScrollToTop}
         />
       </Widget>

@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { Button, styled, Tooltip, keyframes } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { showNewLinkupButton } from "../redux/actions/linkupActions";
+import { showUpdateFeedButton } from "../redux/actions/linkupActions";
 
 const subtleBounce = keyframes`
   0% { transform: translateY(0); }
@@ -12,7 +12,7 @@ const subtleBounce = keyframes`
 
 const FloatingButton = styled(Button)(({ isloading }) => ({
   position: "sticky",
-  top: "5%",
+  top: "7.5%",
   left: "50%",
   transform: "translateX(-50%)",
   zIndex: 1100,
@@ -51,8 +51,16 @@ const FloatingButton = styled(Button)(({ isloading }) => ({
   },
 }));
 
-const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
+const UpdateFeedButton = ({ refreshFeed, colorMode, isLoading = false }) => {
   const dispatch = useDispatch();
+
+  const handleRefresh = () => {
+    // Hide the button immediately
+    dispatch(showUpdateFeedButton(false));
+
+    // Trigger refresh with forceReload flag if your refreshFeed supports it
+    refreshFeed();
+  };
 
   return (
     <Tooltip
@@ -82,10 +90,7 @@ const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
       }}
     >
       <FloatingButton
-        onClick={() => {
-          refreshFeed();
-          dispatch(showNewLinkupButton(false));
-        }}
+        onClick={handleRefresh}
         aria-label="Show new updates"
         isloading={isLoading ? 1 : 0}
         disableRipple
@@ -102,4 +107,4 @@ const NewLinkupButton = ({ refreshFeed, colorMode, isLoading = false }) => {
   );
 };
 
-export default NewLinkupButton;
+export default UpdateFeedButton;

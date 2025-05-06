@@ -30,7 +30,8 @@ const MoreMenu = ({
   showAcceptLinkupRequest,
   showDeclineLinkupRequest,
   linkupItem,
-  refreshFeed,
+  updateLinkup,
+  removeLinkup,
   menuAnchor,
   setMenuAnchor,
 }) => {
@@ -64,7 +65,9 @@ const MoreMenu = ({
         type: "UPDATE_REQUEST_STATUS",
         payload: { id: linkupItem.request_id, status: "accepted" },
       });
-      refreshFeed();
+      updateLinkup({
+        linkupItem,
+      });
       addSnackbar("Linkup request accepted.");
     } catch (error) {
       addSnackbar(error.message);
@@ -79,7 +82,7 @@ const MoreMenu = ({
         type: "UPDATE_REQUEST_STATUS",
         payload: { id: linkupItem.request_id, status: "declined" },
       });
-      refreshFeed();
+      updateLinkup(linkupItem);
       addSnackbar("Linkup request declined.");
     } catch (error) {
       addSnackbar(error.message);
@@ -110,7 +113,7 @@ const MoreMenu = ({
         ? "Linkup closed successfully!"
         : `Error closing the linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
-      refreshFeed();
+      removeLinkup(linkupItem.id);
     } catch (error) {
       console.error("An error occurred:", error);
       addSnackbar("An error occurred while closing the linkup", {
@@ -128,7 +131,7 @@ const MoreMenu = ({
         ? "Linkup deleted successfully!"
         : `Error deleting linkup: ${response.message}`;
       addSnackbar(message, { variant: response.success ? "success" : "error" });
-      refreshFeed();
+      removeLinkup(linkupItem.id);
     } catch (error) {
       console.error("An error occurred:", error);
       addSnackbar("An error occurred while deleting the linkup", {
@@ -298,7 +301,7 @@ const MoreMenu = ({
       <EditLinkupModal
         isOpen={modalState.isEditModalOpen}
         onClose={() => closeModal("isEditModalOpen")}
-        refreshFeed={refreshFeed}
+        updateLinkup={updateLinkup}
       />
       <LinkupActionModal
         open={modalState.isCloseConfirmationOpen}

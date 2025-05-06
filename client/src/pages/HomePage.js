@@ -8,7 +8,7 @@ import { debounce } from "lodash";
 import WidgetSection from "../components/WidgetSection";
 import { fetchLinkupRequestsSuccess } from "../redux/actions/userSentRequestsActions";
 import { getLinkupRequests } from "../api/linkupRequestAPI";
-import { showNewLinkupButton } from "../redux/actions/linkupActions";
+import { showUpdateFeedButton } from "../redux/actions/linkupActions";
 import useLocationUpdate from "../hooks/useLocationUpdate";
 import LinkupFeed from "../components/LinkupFeed";
 
@@ -79,17 +79,13 @@ const HomePage = ({ isMobile }) => {
     isMobileView: window.innerWidth <= 600,
   });
 
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const refreshFeed = () => {};
 
   useLocationUpdate();
 
-  const refreshFeed = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
-
   const fetchLinkupRequests = useCallback(async () => {
     try {
-      dispatch(showNewLinkupButton(false));
+      dispatch(showUpdateFeedButton(false));
       if (!userId) return;
       const response = await getLinkupRequests(userId);
       if (response.success) {
@@ -149,7 +145,7 @@ const HomePage = ({ isMobile }) => {
         {userId && (
           <LinkupFeed
             ref={feedRef}
-            key={refreshTrigger}
+            // key={refreshTrigger}
             userId={userId}
             gender={loggedUser.user.gender}
             location={{

@@ -222,9 +222,11 @@ const CustomChannelHeader = ({
           showGoToItem
           showGoToRequest
           linkupItem={linkup}
+          addLinkup={() => {}}
+          updateLinkup={() => {}}
+          removeLinkup={() => {}}
           menuAnchor={menuAnchor}
           setMenuAnchor={setMenuAnchor}
-          setShouldFetchLinkups={setShouldFetchLinkups}
         />
       )}
     </Header>
