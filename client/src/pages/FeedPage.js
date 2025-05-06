@@ -79,18 +79,16 @@ const WidgetSectionContainer = styled("div")(
   })
 );
 
-const FloatingButton = ({ onClick, isClose, colorMode, opacity = 1 }) => (
+const FloatingButton = ({ onClick, isClose, colorMode }) => (
   <IconButton
     onClick={onClick}
     sx={{
       position: "fixed",
-      width: "64px",
-      height: "64px",
-      opacity,
-      transition: "opacity 0.3s ease",
+      width: "64px", // Set width
+      height: "64px", // Set height
       ...(isClose
         ? { top: "16px", right: "16px" }
-        : { bottom: "80px", right: "22px" }),
+        : { bottom: "85px", right: "22px" }),
       zIndex: 2100,
       color: colorMode === "dark" ? "white" : "black",
       backgroundColor: isClose
@@ -125,7 +123,6 @@ const FeedPage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [scrollOpacity, setScrollOpacity] = useState(1);
 
   const { id, gender, latitude, longitude } = loggedUser;
 
@@ -210,16 +207,11 @@ const FeedPage = () => {
   }, [loading, filteredFeed]);
 
   // Save the scroll position on scroll
-
   const handleScroll = () => {
     if (feedRef.current) {
       const scrollTop = feedRef.current.scrollTop;
-      const maxScroll =
-        feedRef.current.scrollHeight - feedRef.current.clientHeight;
-      const opacity = 1 - Math.min(scrollTop / 600, 0.5); // fade out to 50% max
-      setScrollOpacity(opacity);
       sessionStorage.setItem("feedScrollPosition", scrollTop);
-      setShowScrollTop(scrollTop > 300);
+      setShowScrollTop(scrollTop > 300); // Show button after 300px
     }
   };
 
@@ -228,7 +220,7 @@ const FeedPage = () => {
       onClick={onClick}
       sx={{
         position: "sticky",
-        top: "85%",
+        top: "80%",
         left: "50%",
         zIndex: 2000,
         color: colorMode === "dark" ? "white" : "black",
@@ -367,7 +359,6 @@ const FeedPage = () => {
             onClick={toggleWidget}
             isClose
             colorMode={colorMode}
-            opacity={scrollOpacity}
           />
         )}
         <WidgetSection
