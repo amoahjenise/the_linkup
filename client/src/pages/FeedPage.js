@@ -26,6 +26,7 @@ import FeedItem from "../components/FeedItem";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
 import { ArrowUpward } from "@mui/icons-material";
+import ScrollToTopButton from "../components/ScrollToTopButton";
 
 // Dynamically import Feed component
 const Feed = lazy(() => import("../components/Feed")); // Lazy load Feed
@@ -79,17 +80,17 @@ const WidgetSectionContainer = styled("div")(
   })
 );
 
-const FloatingButton = ({ onClick, isClose, colorMode }) => (
+const CreateLinkupFloatingButton = ({ onClick, isClose, colorMode }) => (
   <IconButton
     onClick={onClick}
     sx={{
       position: "fixed",
       width: isClose ? "50px" : "64px", // Smaller width for close
       height: isClose ? "50px" : "64px", // Smaller height for close
+      zIndex: 1000,
       ...(isClose
         ? { top: "16px", right: "16px" }
         : { bottom: "85px", right: "22px" }),
-      zIndex: 2100,
       color: colorMode === "dark" ? "white" : "black",
       backgroundColor: isClose
         ? colorMode === "dark"
@@ -111,17 +112,27 @@ const FloatingButton = ({ onClick, isClose, colorMode }) => (
   </IconButton>
 );
 
-const FeedPage = () => {
+const FeedPage = ({ isMobile }) => {
   const { colorMode } = useColorMode();
   const loggedUser = useSelector((state) => state.loggedUser?.user || {});
   const userSettings = useSelector(
     (state) => state.userSettings?.userSettings || {}
   );
 
+  // Create linkup states
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [genderPreference, setGenderPreference] = useState([]);
+  const [paymentOption, setPaymentOption] = useState("");
+  const [formErrors, setFormErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Search query states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Scroll to top state
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   const { id, gender, latitude, longitude } = loggedUser;
@@ -214,29 +225,6 @@ const FeedPage = () => {
       setShowScrollTop(scrollTop > 300); // Show button after 300px
     }
   };
-
-  const ScrollToTopButton = ({ onClick, colorMode }) => (
-    <IconButton
-      onClick={onClick}
-      sx={{
-        position: "sticky",
-        top: "80%",
-        left: "50%",
-        zIndex: 2000,
-        color: colorMode === "dark" ? "white" : "black",
-        backgroundColor:
-          colorMode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-        "&:hover": {
-          backgroundColor:
-            colorMode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
-        },
-        borderRadius: "50%",
-        p: 1.5,
-      }}
-    >
-      <ArrowUpward />
-    </IconButton>
-  );
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -355,7 +343,7 @@ const FeedPage = () => {
 
       <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>
         {isMobileView && (
-          <FloatingButton
+          <CreateLinkupFloatingButton
             onClick={toggleWidget}
             isClose
             colorMode={colorMode}
@@ -370,7 +358,7 @@ const FeedPage = () => {
       </WidgetSectionContainer>
 
       {isMobileView && !isWidgetVisible && (
-        <FloatingButton
+        <CreateLinkupFloatingButton
           onClick={toggleWidget}
           isClose={false}
           colorMode={colorMode}
