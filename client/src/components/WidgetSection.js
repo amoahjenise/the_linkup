@@ -20,6 +20,8 @@ const WidgetSection = ({
   isMobile,
   addLinkup,
   handleScrollToTop,
+  linkupFormData,
+  updateLinkupForm,
 }) => {
   const handleFilterChange = (selectedCategories) => {
     console.log("Selected Categories:", selectedCategories);
@@ -35,6 +37,8 @@ const WidgetSection = ({
           isMobile={isMobile}
           addLinkup={addLinkup}
           handleScrollToTop={handleScrollToTop}
+          formData={linkupFormData}
+          onFormChange={updateLinkupForm}
         />
       </Widget>
 

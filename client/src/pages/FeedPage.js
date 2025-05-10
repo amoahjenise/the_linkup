@@ -119,12 +119,26 @@ const FeedPage = ({ isMobile }) => {
     (state) => state.userSettings?.userSettings || {}
   );
 
-  // Create linkup states
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [genderPreference, setGenderPreference] = useState([]);
-  const [paymentOption, setPaymentOption] = useState("");
-  const [formErrors, setFormErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  // Initialize form data from sessionStorage or default values
+const [linkupFormData, setLinkupFormData] = useState(() => {
+  const savedFormData = sessionStorage.getItem("linkupFormData");
+  return savedFormData
+    ? JSON.parse(savedFormData)
+    : {
+        activity: "",
+        location: "",
+        selectedDate: null,
+        genderPreference: [],
+        paymentOption: null,
+        formErrors: {},
+        isLoading: false,
+      };
+});
+
+  // Save form data to sessionStorage whenever it changes
+  useEffect(() => {
+    sessionStorage.setItem("linkupFormData", JSON.stringify(linkupFormData));
+  }, [linkupFormData]);
 
   // Search query states
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,19 +151,20 @@ const FeedPage = ({ isMobile }) => {
 
   const { id, gender, latitude, longitude } = loggedUser;
 
+  // Other feed and search related hooks
   const {
     rawFeed,
     hasMore,
     loading,
     setPage,
+    useDistance,
     addLinkup,
     updateLinkup,
     removeLinkup,
-    useDistance,
     reload,
-  } = useFeed(id, gender, {
-    latitude,
-    longitude,
+  } = useFeed(loggedUser.id, loggedUser.gender, {
+    latitude: loggedUser.latitude,
+    longitude: loggedUser.longitude,
   });
 
   const filteredFeed = useFilteredFeed(rawFeed, id);
@@ -164,6 +179,13 @@ const FeedPage = ({ isMobile }) => {
 
   const feedRef = useRef(null);
   const observer = useRef();
+
+  const updateLinkupForm = (field, value) => {
+    setLinkupFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const debouncedSearch = useMemo(
     () =>
@@ -351,9 +373,11 @@ const FeedPage = ({ isMobile }) => {
         )}
         <WidgetSection
           toggleWidget={toggleWidget}
-          isMobile={isMobileView}
+          isMobile={isMobile}
           addLinkup={addLinkup}
           handleScrollToTop={handleScrollToTop}
+          linkupFormData={linkupFormData}
+          updateLinkupForm={updateLinkupForm}
         />
       </WidgetSectionContainer>
 

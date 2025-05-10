@@ -3,12 +3,11 @@ import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import DatePicker from "react-datepicker";
 import { createLinkup } from "../api/linkUpAPI";
-import { updateLinkup } from "../redux/actions/linkupActions";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { Tooltip, IconButton, Button, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useColorMode } from "@chakra-ui/react";
-import { customGenderOptions } from "../utils/customGenderOptions"; // Import the reusable gender options
+import { customGenderOptions } from "../utils/customGenderOptions";
 import { PrimeReactContext } from "primereact/api";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
@@ -22,7 +21,7 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   flexDirection: "column",
   padding: theme.spacing(2),
   width: "100%",
-  maxWidth: "380px", // Optimal width for form inputs
+  maxWidth: "380px",
   borderRadius: "12px",
   border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
   backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
@@ -160,21 +159,28 @@ const CreateLinkupWidget = ({
   isMobile,
   addLinkup,
   handleScrollToTop,
+  formData,
+  onFormChange,
 }) => {
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [genderPreference, setGenderPreference] = useState([]);
-  const [paymentOption, setPaymentOption] = useState(null);
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const { id, name } = loggedUser?.user || {};
+  const {
+    activity: formActivity,
+    location: formLocation,
+    selectedDate,
+    genderPreference,
+    paymentOption,
+    formErrors,
+    isLoading,
+  } = formData;
+  const loggedUser = useSelector((state) => state.loggedUser?.user || {});
+  const { id, name } = loggedUser;
   const { addSnackbar } = useSnackbar();
-  const { colorMode } = useColorMode(); // Use Chakra UI's color mode
+  const { colorMode } = useColorMode();
   const { changeTheme } = useContext(PrimeReactContext);
-  const [currentTheme, setCurrentTheme] = useState(""); // Initialize as an empty string
-  const [formErrors, setFormErrors] = useState({}); // Track form errors
-  const [isLoading, setIsLoading] = useState(false); // Initialize as false (boolean)
+  const [currentTheme, setCurrentTheme] = useState("");
+  const [isLoadingState, setIsLoading] = useState(false); // Initialize as false (boolean)
 
   const paymentOptions = [
-    { label: "No Payment Option", value: "" },
+    { label: "No Payment Option", value: null },
     { label: "Split The Bill", value: "split" },
     { label: "I Will Pay", value: "iWillPay" },
     { label: "Please Pay", value: "pleasePay" },
@@ -233,10 +239,19 @@ const CreateLinkupWidget = ({
     e.preventDefault();
 
     // Reset form errors
-    setFormErrors({});
+    onFormChange("formErrors", {});
+    onFormChange("isLoading", true);
 
     // Custom validation
     const errors = {};
+
+    if (!formActivity.trim()) {
+      errors.activity = "Please enter an activity";
+    }
+
+    if (!formLocation.trim()) {
+      errors.location = "Please enter a location";
+    }
 
     if (!selectedDate) {
       errors.date = "Please select a date and time";
@@ -247,17 +262,16 @@ const CreateLinkupWidget = ({
     }
 
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
+      onFormChange("formErrors", errors);
       return;
     }
 
-    // If valid, proceed with submission
     try {
       const response = await createLinkup({
         creator_id: id,
         creator_name: name,
-        location: e.target.location.value,
-        activity: e.target.activity.value,
+        location: formLocation,
+        activity: formActivity,
         date: selectedDate,
         gender_preference: genderPreference,
         payment_option: paymentOption,
@@ -266,19 +280,17 @@ const CreateLinkupWidget = ({
       if (response.success) {
         addSnackbar("Linkup created successfully!", "success");
 
-        // Reset the form
-        e.target.reset();
-        setSelectedDate(null);
-        setGenderPreference([]);
-        setPaymentOption(null);
+        // Reset the form through parent component
+        onFormChange("activity", "");
+        onFormChange("location", "");
+        onFormChange("selectedDate", null);
+        onFormChange("genderPreference", []);
+        onFormChange("paymentOption", null);
+        onFormChange("isLoading", false);
 
-        // First update the list
+        // Update the list and scroll to top
         addLinkup(response.newLinkup);
-
-        // Then scroll to top *after DOM update*
-        setTimeout(() => {
-          handleScrollToTop();
-        }, 0);
+        setTimeout(() => handleScrollToTop(), 0);
 
         // Toggle widget in mobile view
         if (window.innerWidth <= 600) {
@@ -293,8 +305,8 @@ const CreateLinkupWidget = ({
   };
 
   const handleFocus = (e) => {
-    e.target.readOnly = true; // Make the input field read-only
-    e.target.blur(); // Blur the input field to prevent the keyboard from opening
+    e.target.readOnly = true;
+    e.target.blur();
   };
 
   const placeholderStyle = {
@@ -315,15 +327,15 @@ const CreateLinkupWidget = ({
 
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  return isLoading ? (
+  return isLoadingState ? (
     <LoadingSpinner />
   ) : (
     <WidgetContainer colorMode={colorMode}>
       <style>
         {` 
-                    ::placeholder { 
-                        color: grey; 
-                    }`}
+          ::placeholder { 
+            color: grey; 
+          }`}
       </style>
       <Header colorMode={colorMode}>
         <span>Create Linkup</span>
@@ -333,19 +345,26 @@ const CreateLinkupWidget = ({
           type="text"
           placeholder="Activity"
           name="activity"
-          autoComplete="off" // Disable autocomplete
+          value={formActivity}
+          onChange={(e) => onFormChange("activity", e.target.value)}
+          autoComplete="off"
           required
           colorMode={colorMode}
         />
+        {formErrors.activity && <ErrorText>{formErrors.activity}</ErrorText>}
+
         <InputWithIcon>
           <InputField
             type="text"
             placeholder="Location"
             name="location"
-            autoComplete="off" // Disable autocomplete
+            value={formLocation}
+            onChange={(e) => onFormChange("location", e.target.value)}
+            autoComplete="off"
             required
             colorMode={colorMode}
           />
+          {formErrors.location && <ErrorText>{formErrors.location}</ErrorText>}
           <Tooltip
             title={
               <Typography fontSize={16}>
@@ -359,8 +378,8 @@ const CreateLinkupWidget = ({
             open={tooltipOpen}
             onMouseEnter={() => setTooltipOpen(true)}
             onMouseLeave={() => setTooltipOpen(false)}
-            onTouchStart={() => setTooltipOpen(true)} // Open on touch
-            onClick={() => setTooltipOpen((prev) => !prev)} // Toggle on click
+            onTouchStart={() => setTooltipOpen(true)}
+            onClick={() => setTooltipOpen((prev) => !prev)}
             arrow
             componentsProps={{
               tooltip: {
@@ -384,7 +403,7 @@ const CreateLinkupWidget = ({
         </InputWithIcon>
         <DatePickerStyled
           selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
+          onChange={(date) => onFormChange("selectedDate", date)}
           showTimeSelect
           timeFormat="HH:mm"
           timeIntervals={15}
@@ -398,13 +417,14 @@ const CreateLinkupWidget = ({
           colorMode={colorMode}
           onFocus={handleFocus}
         />
-        {formErrors.date && <ErrorText>{formErrors.date}</ErrorText>}{" "}
-        {/* MultiSelect for gender preference */}
+        {formErrors.date && <ErrorText>{formErrors.date}</ErrorText>}
         <CustomMultiSelect
           colorMode={colorMode}
           options={genderOptions}
           selectedValues={genderPreference}
-          setSelectedValues={setGenderPreference}
+          setSelectedValues={(values) =>
+            onFormChange("genderPreference", values)
+          }
           placeholder="Visible to Whom?"
           placeholderStyle={placeholderStyle}
           hasError={!!formErrors.genderPreference}
@@ -415,8 +435,8 @@ const CreateLinkupWidget = ({
         )}
         <CustomDropdown
           options={paymentOptions}
-          value={paymentOption} // a string like "host"
-          onChange={(val) => setPaymentOption(val)} // gets the value string
+          value={paymentOption}
+          onChange={(val) => onFormChange("paymentOption", val)}
           placeholder="Who's Paying?"
           placeholderStyle={placeholderStyle}
           colorMode={colorMode}
