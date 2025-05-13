@@ -36,6 +36,7 @@ const FeedPageContainer = styled("div")({
   display: "flex",
   width: "100%",
   position: "relative",
+  overflow: "hidden",
 });
 
 const FeedSection = styled("div")(({ theme, colorMode }) => ({
@@ -286,10 +287,13 @@ const FeedPage = ({ isMobile }) => {
     if (!loading && filteredFeed.length > 0 && feedRef.current) {
       const savedScroll = sessionStorage.getItem("feedScrollPosition");
       if (savedScroll !== null) {
-        feedRef.current.scrollTop = parseInt(savedScroll, 10);
+        // Delay scroll restore until DOM is updated
+        requestAnimationFrame(() => {
+          feedRef.current.scrollTop = parseInt(savedScroll, 10);
+        });
       }
     }
-  }, [loading, filteredFeed]);
+  }, [loading, filteredFeed.length]); // track length instead of full array
 
   // Save the scroll position on scroll
   const handleScroll = () => {
@@ -351,26 +355,18 @@ const FeedPage = ({ isMobile }) => {
   };
 
   return (
-    <PullToRefresh
-      onRefresh={reload}
-      style={{ height: "100%", overflow: "auto" }}
-    >
-      <FeedPageContainer>
-        <FeedSection
-          ref={feedRef}
-          onScroll={handleScroll}
-          colorMode={colorMode}
-        >
-          <TopNavBar title="Home" />
+    <FeedPageContainer>
+      <FeedSection ref={feedRef} onScroll={handleScroll} colorMode={colorMode}>
+        <TopNavBar title="Home" />
+        <SearchInputContainer>
+          <SearchInput
+            handleInputChange={handleSearchChange}
+            loading={searchLoading}
+            value={searchQuery}
+          />
+        </SearchInputContainer>
 
-          <SearchInputContainer>
-            <SearchInput
-              handleInputChange={handleSearchChange}
-              loading={searchLoading}
-              value={searchQuery}
-            />
-          </SearchInputContainer>
-
+        <PullToRefresh onRefresh={reload} style={{ height: "100%" }}>
           {isUpdateFeedButtonVisible && (
             <UpdateFeedButton
               refreshFeed={handleUpdateFeed}
@@ -428,40 +424,37 @@ const FeedPage = ({ isMobile }) => {
               />
             </Suspense>
           )}
-        </FeedSection>
+        </PullToRefresh>
+      </FeedSection>
 
-        <WidgetSectionContainer
-          colorMode={colorMode}
-          isVisible={isWidgetVisible}
-        >
-          {isMobileView && (
-            <CreateLinkupFloatingButton
-              onClick={toggleWidget}
-              isClose
-              colorMode={colorMode}
-              opacity={buttonOpacity}
-            />
-          )}
-          <WidgetSection
-            toggleWidget={toggleWidget}
-            isMobile={isMobile}
-            addLinkup={addLinkup}
-            handleScrollToTop={handleScrollToTop}
-            linkupFormData={linkupFormData}
-            updateLinkupForm={updateLinkupForm}
-          />
-        </WidgetSectionContainer>
-
-        {isMobileView && !isWidgetVisible && (
+      <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>
+        {isMobileView && (
           <CreateLinkupFloatingButton
             onClick={toggleWidget}
-            isClose={false}
+            isClose
             colorMode={colorMode}
             opacity={buttonOpacity}
           />
         )}
-      </FeedPageContainer>
-    </PullToRefresh>
+        <WidgetSection
+          toggleWidget={toggleWidget}
+          isMobile={isMobile}
+          addLinkup={addLinkup}
+          handleScrollToTop={handleScrollToTop}
+          linkupFormData={linkupFormData}
+          updateLinkupForm={updateLinkupForm}
+        />
+      </WidgetSectionContainer>
+
+      {isMobileView && !isWidgetVisible && (
+        <CreateLinkupFloatingButton
+          onClick={toggleWidget}
+          isClose={false}
+          colorMode={colorMode}
+          opacity={buttonOpacity}
+        />
+      )}
+    </FeedPageContainer>
   );
 };
 
