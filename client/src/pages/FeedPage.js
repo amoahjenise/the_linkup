@@ -301,7 +301,7 @@ const FeedPage = ({ isMobile }) => {
 
       // Fade out the button between 0px and 200px scroll
       const maxScroll = 200;
-      const newOpacity = Math.max(0.2, 1 - scrollTop / maxScroll);
+      const newOpacity = Math.max(0.4, 1 - scrollTop / maxScroll);
       setButtonOpacity(newOpacity);
     }
   };
