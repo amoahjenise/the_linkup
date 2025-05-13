@@ -79,14 +79,21 @@ const WidgetSectionContainer = styled("div")(
   })
 );
 
-const CreateLinkupFloatingButton = ({ onClick, isClose, colorMode }) => (
+const CreateLinkupFloatingButton = ({
+  onClick,
+  isClose,
+  colorMode,
+  opacity = 1,
+}) => (
   <IconButton
     onClick={onClick}
     sx={{
       position: "fixed",
-      width: isClose ? "50px" : "64px", // Smaller width for close
-      height: isClose ? "50px" : "64px", // Smaller height for close
+      width: isClose ? "50px" : "64px",
+      height: isClose ? "50px" : "64px",
       zIndex: 1000,
+      opacity,
+      transition: "all 0.3s ease-in-out",
       ...(isClose
         ? { top: "16px", right: "16px" }
         : { bottom: "85px", right: "22px" }),
@@ -96,15 +103,23 @@ const CreateLinkupFloatingButton = ({ onClick, isClose, colorMode }) => (
           ? "rgba(255,255,255,0.1)"
           : "rgba(0,0,0,0.1)"
         : "#0097A7",
+      borderRadius: "50%",
+      p: isClose ? 1 : 1.5,
+      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // adds depth by default
       "&:hover": {
         backgroundColor: isClose
           ? colorMode === "dark"
             ? "rgba(255,255,255,0.2)"
             : "rgba(0,0,0,0.2)"
           : "#008394",
+        opacity: 1, // make it fully visible
+        transform: "scale(1.05)", // slight grow effect
+        boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)", // stronger shadow on hover
       },
-      borderRadius: "50%",
-      p: isClose ? 1 : 1.5, // Slightly smaller padding for the close button
+      "&:active": {
+        transform: "scale(0.95)", // subtle press-down effect
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)", // pressed shadow
+      },
     }}
   >
     {isClose ? <CloseIcon fontSize="small" /> : <AddIcon />}
@@ -169,6 +184,8 @@ const FeedPage = ({ isMobile }) => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [buttonOpacity, setButtonOpacity] = useState(1);
 
   // Scroll to top state
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -277,8 +294,15 @@ const FeedPage = ({ isMobile }) => {
   const handleScroll = () => {
     if (feedRef.current) {
       const scrollTop = feedRef.current.scrollTop;
+
+      // Store scroll position
       sessionStorage.setItem("feedScrollPosition", scrollTop);
-      setShowScrollTop(scrollTop > 300); // Show button after 300px
+      setShowScrollTop(scrollTop > 300);
+
+      // Fade out the button between 0px and 200px scroll
+      const maxScroll = 200;
+      const newOpacity = Math.max(0.2, 1 - scrollTop / maxScroll);
+      setButtonOpacity(newOpacity);
     }
   };
 
@@ -405,6 +429,7 @@ const FeedPage = ({ isMobile }) => {
             onClick={toggleWidget}
             isClose
             colorMode={colorMode}
+            opacity={buttonOpacity}
           />
         )}
         <WidgetSection
@@ -422,6 +447,7 @@ const FeedPage = ({ isMobile }) => {
           onClick={toggleWidget}
           isClose={false}
           colorMode={colorMode}
+          opacity={buttonOpacity}
         />
       )}
     </FeedPageContainer>
