@@ -37,7 +37,10 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
 
         setFeed((prev) => {
           const updatedFeed = [...prev, ...newItems];
-          dispatch(fetchLinkupsSuccess(updatedFeed)); // ✅ send entire list to Redux
+          // ⚠️ Avoid replacing the array in Redux unless required.
+          if (newItems.length > 0) {
+            dispatch(fetchLinkupsSuccess([...prev, ...newItems]));
+          }
           return updatedFeed;
         });
 

@@ -4,34 +4,63 @@ import React, {
   useCallback,
   useState,
   useMemo,
+  Suspense,
+  lazy,
 } from "react";
 import { useSelector } from "react-redux";
-import { searchLinkups } from "../api/linkUpAPI";
-import { useFeed } from "../hooks/useFeed";
-import useFilteredFeed from "../hooks/useFilteredFeed";
-import { useSentRequests } from "../hooks/useSentRequests";
-import LoadingSpinner from "../components/LoadingSpinner";
-import TopNavBar from "../components/TopNavBar";
-import WidgetSection from "../components/WidgetSection";
 import { styled } from "@mui/material/styles";
 import { Box, IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
-import { Suspense, lazy } from "react";
+import debounce from "lodash/debounce";
+
+import { searchLinkups } from "../api/linkUpAPI";
+import { useFeed } from "../hooks/useFeed";
+import useFilteredFeed from "../hooks/useFilteredFeed";
+import { useSentRequests } from "../hooks/useSentRequests";
 import { useResponsiveWidget } from "../hooks/useResponsiveWidget";
+
+import LoadingSpinner from "../components/LoadingSpinner";
+import TopNavBar from "../components/TopNavBar";
+import WidgetSection from "../components/WidgetSection";
 import UpdateFeedButton from "../components/UpdateFeedButton";
 import SearchInput from "../components/SearchInputWidget";
-import debounce from "lodash/debounce";
 import FeedItem from "../components/FeedItem";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
-import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
 import ScrollToTopButton from "../components/ScrollToTopButton";
-// import PullToRefresh from "react-pull-to-refresh";
+import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering";
 
-// Dynamically import Feed component
-const Feed = lazy(() => import("../components/Feed")); // Lazy load Feed
+const Feed = lazy(() => import("../components/Feed"));
 
-// Styled Components
+// Helpers for sessionStorage persistence
+const serializeFormData = (data) =>
+  JSON.stringify({
+    ...data,
+    selectedDate: data.selectedDate?.toISOString() ?? null,
+  });
+
+const deserializeFormData = (str) => {
+  const parsed = JSON.parse(str);
+  return {
+    ...parsed,
+    selectedDate: parsed.selectedDate ? new Date(parsed.selectedDate) : null,
+  };
+};
+
+// Custom hook to sync state with sessionStorage
+function useSessionStorage(key, defaultValue, { serialize, deserialize }) {
+  const [state, setState] = useState(() => {
+    const saved = sessionStorage.getItem(key);
+    return saved ? deserialize(saved) : defaultValue;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem(key, serialize(state));
+  }, [key, state, serialize]);
+
+  return [state, setState];
+}
+
 const FeedPageContainer = styled("div")({
   display: "flex",
   width: "100%",
@@ -40,16 +69,15 @@ const FeedPageContainer = styled("div")({
 });
 
 const FeedSection = styled("div")(({ theme, colorMode }) => ({
-  flex: "2.5",
+  flex: 2.5,
   overflowY: "auto",
   borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
-  [theme.breakpoints.down("md")]: { flex: "2" },
-  [theme.breakpoints.down("sm")]: { flex: "1", borderRight: "none" },
+  [theme.breakpoints.down("md")]: { flex: 2 },
+  [theme.breakpoints.down("sm")]: { flex: 1, borderRight: "none" },
 }));
 
 const SearchInputContainer = styled("div")(({ theme }) => ({
-  padding: 8,
-  width: "100%",
+  padding: theme.spacing(1),
   position: "sticky",
   top: 0,
   zIndex: theme.zIndex.appBar,
@@ -58,18 +86,18 @@ const SearchInputContainer = styled("div")(({ theme }) => ({
 
 const WidgetSectionContainer = styled("div")(
   ({ theme, colorMode, isVisible }) => ({
-    flex: "1.5",
+    flex: 1.5,
     overflowY: "auto",
     borderLeft: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
     paddingBottom: "60px",
-    [theme.breakpoints.down("md")]: { flex: "2" },
+    [theme.breakpoints.down("md")]: { flex: 2 },
     [theme.breakpoints.down("sm")]: {
       position: "fixed",
       top: 0,
       right: 0,
       width: "100%",
       height: "100vh",
-      backgroundColor: colorMode === "dark" ? "black" : "white",
+      backgroundColor: colorMode === "dark" ? "#000" : "#fff",
       boxShadow: "-2px 0 5px rgba(0,0,0,0.1)",
       transform: isVisible ? "translateX(0)" : "translateX(100%)",
       transition: "transform 0.3s ease",
@@ -81,120 +109,72 @@ const WidgetSectionContainer = styled("div")(
   })
 );
 
-const CreateLinkupFloatingButton = ({
-  onClick,
-  isClose,
-  colorMode,
-  opacity = 1,
-}) => (
-  <IconButton
-    onClick={onClick}
-    sx={{
-      position: "fixed",
-      width: isClose ? "50px" : "64px",
-      height: isClose ? "50px" : "64px",
-      zIndex: 1000,
-      opacity,
-      transition: "all 0.3s ease-in-out",
-      ...(isClose
-        ? { top: "16px", right: "16px" }
-        : { bottom: "85px", right: "22px" }),
-      color: colorMode === "dark" ? "white" : "black",
+const CreateLinkupFloatingButton = styled(IconButton)(
+  ({ theme, isClose, colorMode, opacity }) => ({
+    position: "fixed",
+    zIndex: 1000,
+    opacity,
+    transition: "all 0.3s ease-in-out",
+    width: isClose ? 50 : 64,
+    height: isClose ? 50 : 64,
+    ...(isClose
+      ? { top: theme.spacing(2), right: theme.spacing(2) }
+      : { bottom: theme.spacing(10.5), right: theme.spacing(2.75) }),
+    color: colorMode === "dark" ? "#fff" : "#000",
+    backgroundColor: isClose
+      ? colorMode === "dark"
+        ? "rgba(255,255,255,0.1)"
+        : "rgba(0,0,0,0.1)"
+      : "#0097A7",
+    borderRadius: "50%",
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+    "&:hover": {
       backgroundColor: isClose
         ? colorMode === "dark"
-          ? "rgba(255,255,255,0.1)"
-          : "rgba(0,0,0,0.1)"
-        : "#0097A7",
-      borderRadius: "50%",
-      p: isClose ? 1 : 1.5,
-      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)", // adds depth by default
-      "&:hover": {
-        backgroundColor: isClose
-          ? colorMode === "dark"
-            ? "rgba(255,255,255,0.2)"
-            : "rgba(0,0,0,0.2)"
-          : "#008394",
-        opacity: 1, // make it fully visible
-        transform: "scale(1.05)", // slight grow effect
-        boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)", // stronger shadow on hover
-      },
-      "&:active": {
-        transform: "scale(0.95)", // subtle press-down effect
-        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)", // pressed shadow
-      },
-    }}
-  >
-    {isClose ? <CloseIcon fontSize="small" /> : <AddIcon />}
-  </IconButton>
+          ? "rgba(255,255,255,0.2)"
+          : "rgba(0,0,0,0.2)"
+        : "#008394",
+      opacity: 1,
+      transform: "scale(1.05)",
+      boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
+    },
+    "&:active": {
+      transform: "scale(0.95)",
+      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
+    },
+    padding: isClose ? theme.spacing(1) : theme.spacing(1.5),
+  })
 );
 
 const FeedWrapper = styled(Box)(({ theme }) => ({
   display: "grid",
-  // gap: theme.spacing(2),
-  // padding: theme.spacing(2),
-  "@media (max-width: 900px)": {
-    paddingBottom: "65px", // Add padding for footer
+  "@media (max-width:900px)": {
+    paddingBottom: "65px",
   },
 }));
 
-const FeedPage = ({ isMobile }) => {
+export default function FeedPage({ isMobile }) {
   const { colorMode } = useColorMode();
-  const loggedUser = useSelector((state) => state.loggedUser?.user || {});
-  const userSettings = useSelector(
-    (state) => state.userSettings?.userSettings || {}
+  const loggedUser = useSelector((s) => s.loggedUser.user || {});
+  const userSettings = useSelector((s) => s.userSettings.userSettings || {});
+  const { id, gender } = loggedUser;
+
+  // Persist form data
+  const [linkupFormData, setLinkupFormData] = useSessionStorage(
+    "linkupFormData",
+    {
+      activity: "",
+      location: "",
+      selectedDate: null,
+      genderPreference: [],
+      paymentOption: null,
+      formErrors: {},
+      isLoading: false,
+    },
+    { serialize: serializeFormData, deserialize: deserializeFormData }
   );
 
-  // In FeedPage.js
-  const serializeFormData = (data) => {
-    return JSON.stringify({
-      ...data,
-      selectedDate: data.selectedDate ? data.selectedDate.toISOString() : null,
-    });
-  };
-
-  const deserializeFormData = (str) => {
-    const parsed = JSON.parse(str);
-    return {
-      ...parsed,
-      selectedDate: parsed.selectedDate ? new Date(parsed.selectedDate) : null,
-    };
-  };
-
-  // Initialize form data from sessionStorage or default values
-  const [linkupFormData, setLinkupFormData] = useState(() => {
-    const savedFormData = sessionStorage.getItem("linkupFormData");
-    return savedFormData
-      ? deserializeFormData(savedFormData)
-      : {
-          activity: "",
-          location: "",
-          selectedDate: null,
-          genderPreference: [],
-          paymentOption: null,
-          formErrors: {},
-          isLoading: false,
-        };
-  });
-
-  // Save form data to sessionStorage whenever it changes
-  useEffect(() => {
-    sessionStorage.setItem("linkupFormData", serializeFormData(linkupFormData));
-  }, [linkupFormData]);
-
-  // Search query states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const [buttonOpacity, setButtonOpacity] = useState(1);
-
-  // Scroll to top state
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  const { id, gender, latitude, longitude } = loggedUser;
-
-  // Other feed and search related hooks
+  // Feed + pagination
   const {
     rawFeed,
     hasMore,
@@ -205,159 +185,150 @@ const FeedPage = ({ isMobile }) => {
     updateLinkup,
     removeLinkup,
     reload,
-  } = useFeed(loggedUser.id, loggedUser.gender, {
+  } = useFeed(id, gender, {
     latitude: loggedUser.latitude,
     longitude: loggedUser.longitude,
   });
 
+  const prevScrollTop = useRef(0);
+
   const filteredFeed = useFilteredFeed(rawFeed, id);
+  const { sentRequests } = useSentRequests(id);
 
-  const { sentRequests, loading: requestLoading } = useSentRequests(id);
-
+  // Responsive widget
   const { isMobileView, isWidgetVisible, toggleWidget } = useResponsiveWidget();
 
-  const isUpdateFeedButtonVisible = useSelector(
-    (state) => state.linkups.showUpdateFeedButton
+  const showUpdateFeedButton = useSelector(
+    (s) => s.linkups.showUpdateFeedButton
   );
 
-  const feedRef = useRef(null);
-  const observer = useRef();
-
-  const updateLinkupForm = (field, value) => {
-    setLinkupFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const isSearching = Boolean(searchQuery.trim());
 
   const debounceTime = isMobile ? 500 : 300;
-
-  // Update the debouncedSearch memo to include dependencies
   const debouncedSearch = useMemo(
     () =>
-      debounce(async (query) => {
-        if (!query.trim()) {
+      debounce(async (q) => {
+        if (!q.trim()) {
           setSearchResults([]);
-          setIsSearching(false);
+          setSearchLoading(false);
           return;
         }
-
-        setIsSearching(true); // <-- Add this
         try {
-          setSearchLoading(true);
-          const response = await searchLinkups(query, id, gender);
-
-          const rawResults = response.linkupList || [];
-          const filteredResults = filterLinkupsByUserPreferences(
-            rawResults,
-            id,
-            userSettings
+          const { linkupList = [] } = await searchLinkups(q, id, gender);
+          setSearchResults(
+            filterLinkupsByUserPreferences(linkupList, id, userSettings)
           );
-
-          setSearchResults(filteredResults);
-        } catch (error) {
-          console.error("Search error:", error);
+        } catch {
           setSearchResults([]);
         } finally {
           setSearchLoading(false);
         }
       }, debounceTime),
-    [id, gender, userSettings, debounceTime] // <-- Add dependencies
+    [id, gender, userSettings, debounceTime]
   );
 
-  // Update the handleSearchChange function
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+  const handleSearchChange = useCallback(
+    (e) => {
+      const q = e.target.value;
+      setSearchQuery(q);
+      setSearchLoading(Boolean(q.trim()));
+      debouncedSearch(q);
+    },
+    [debouncedSearch]
+  );
 
-    if (query.trim()) {
-      setIsSearching(true); // <-- Add this
-      setSearchLoading(true);
+  // Scroll + FAB opacity
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [buttonOpacity, setButtonOpacity] = useState(1);
+
+  const feedRef = useRef();
+  const observer = useRef();
+
+  // Scroll position persistence: adjusted to account for content height changes
+  useEffect(() => {
+    if (!loading && filteredFeed.length && feedRef.current) {
+      const saved = sessionStorage.getItem("feedScrollPosition");
+      if (saved) {
+        const savedScrollTop = Number(saved);
+        feedRef.current.scrollTop =
+          savedScrollTop * (feedRef.current.scrollHeight / Number(saved));
+      }
+    }
+  }, [loading, filteredFeed.length]);
+
+  // Scroll + FAB opacity
+  const handleScroll = useCallback(() => {
+    const top = feedRef.current?.scrollTop ?? 0;
+    sessionStorage.setItem("feedScrollPosition", top);
+
+    setShowScrollTop(top > 300);
+
+    const isScrollingUp = top < prevScrollTop.current;
+
+    if (isScrollingUp) {
+      setButtonOpacity(1); // Reset to full opacity
     } else {
-      setIsSearching(false);
-      setSearchResults([]);
-      setSearchLoading(false);
+      const opacity = Math.max(0.4, 1 - top / 200);
+      setButtonOpacity(opacity);
     }
 
-    debouncedSearch(query);
-  };
-
-  // Store and restore the scroll position
-  useEffect(() => {
-    if (!loading && filteredFeed.length > 0 && feedRef.current) {
-      const savedScroll = sessionStorage.getItem("feedScrollPosition");
-      if (savedScroll !== null) {
-        // Delay scroll restore until DOM is updated
-        requestAnimationFrame(() => {
-          feedRef.current.scrollTop = parseInt(savedScroll, 10);
-        });
-      }
-    }
-  }, [loading, filteredFeed.length]); // track length instead of full array
-
-  // Save the scroll position on scroll
-  const handleScroll = () => {
-    if (feedRef.current) {
-      const scrollTop = feedRef.current.scrollTop;
-
-      // Store scroll position
-      sessionStorage.setItem("feedScrollPosition", scrollTop);
-      setShowScrollTop(scrollTop > 300);
-
-      // Fade out the button between 0px and 200px scroll
-      const maxScroll = 200;
-      const newOpacity = Math.max(0.4, 1 - scrollTop / maxScroll);
-      setButtonOpacity(newOpacity);
-    }
-  };
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (feedRef.current) {
-        sessionStorage.setItem("feedScrollPosition", 0);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
+    prevScrollTop.current = top;
   }, []);
+  useEffect(() => {
+    const throttledScroll = debounce(handleScroll, 50);
+    const node = feedRef.current;
+    node?.addEventListener("scroll", throttledScroll);
+    return () => node?.removeEventListener("scroll", throttledScroll);
+  }, [handleScroll]);
 
-  // Set up the intersection observer for the last item
+  // Infinite scroll
   const lastItemRef = useCallback(
     (node) => {
       if (loading || !hasMore) return;
+
       if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
+
+      observer.current = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          const currentScrollTop = feedRef.current?.scrollTop;
+
+          // Save scroll position before incrementing the page
+          setTimeout(() => {
+            setPage((p) => p + 1);
+
+            // After the page has updated, restore scroll position
+            requestAnimationFrame(() => {
+              if (currentScrollTop != null && feedRef.current) {
+                feedRef.current.scrollTop = currentScrollTop;
+              }
+            });
+          }, 0);
         }
       });
+
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore, setPage]
   );
 
-  const handleScrollToTop = () => {
-    if (feedRef.current) {
-      feedRef.current.scrollTo({
-        top: 0,
-        behavior: "smooth", // Smooth scrolling
-      });
-    }
-  };
+  const scrollToTop = useCallback(() => {
+    feedRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
-  const handleUpdateFeed = () => {
+  const handleUpdateFeed = useCallback(() => {
     reload();
-    handleScrollToTop();
-  };
+    scrollToTop();
+  }, [reload, scrollToTop]);
 
   return (
     <FeedPageContainer>
       <FeedSection ref={feedRef} onScroll={handleScroll} colorMode={colorMode}>
         <TopNavBar title="Home" />
+
         <SearchInputContainer>
           <SearchInput
             handleInputChange={handleSearchChange}
@@ -366,8 +337,7 @@ const FeedPage = ({ isMobile }) => {
           />
         </SearchInputContainer>
 
-        {/* <PullToRefresh onRefresh={reload} style={{ height: "100%" }}> */}
-        {isUpdateFeedButtonVisible && (
+        {showUpdateFeedButton && (
           <UpdateFeedButton
             refreshFeed={handleUpdateFeed}
             colorMode={colorMode}
@@ -375,18 +345,15 @@ const FeedPage = ({ isMobile }) => {
         )}
 
         {showScrollTop && (
-          <ScrollToTopButton
-            onClick={handleScrollToTop}
-            colorMode={colorMode}
-          />
+          <ScrollToTopButton onClick={scrollToTop} colorMode={colorMode} />
         )}
 
         {loading ? (
           <LoadingSpinner />
         ) : isSearching ? (
-          searchResults.length > 0 ? (
+          searchResults.length ? (
             searchResults.map((linkup) => (
-              <FeedWrapper>
+              <FeedWrapper key={linkup.id}>
                 <FeedItem
                   linkup={linkup}
                   colorMode={colorMode}
@@ -394,7 +361,7 @@ const FeedPage = ({ isMobile }) => {
                   updateLinkup={updateLinkup}
                   removeLinkup={removeLinkup}
                   useDistance={useDistance}
-                  handleScrollToTop={handleScrollToTop}
+                  handleScrollToTop={scrollToTop}
                   loggedUser={loggedUser}
                   sentRequests={sentRequests}
                 />
@@ -418,13 +385,12 @@ const FeedPage = ({ isMobile }) => {
               updateLinkup={updateLinkup}
               removeLinkup={removeLinkup}
               useDistance={useDistance}
-              handleScrollToTop={handleScrollToTop}
+              handleScrollToTop={scrollToTop}
               loggedUser={loggedUser}
               sentRequests={sentRequests}
             />
           </Suspense>
         )}
-        {/* </PullToRefresh> */}
       </FeedSection>
 
       <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>
@@ -434,15 +400,19 @@ const FeedPage = ({ isMobile }) => {
             isClose
             colorMode={colorMode}
             opacity={buttonOpacity}
-          />
+          >
+            <CloseIcon fontSize="small" />
+          </CreateLinkupFloatingButton>
         )}
         <WidgetSection
           toggleWidget={toggleWidget}
           isMobile={isMobile}
           addLinkup={addLinkup}
-          handleScrollToTop={handleScrollToTop}
+          handleScrollToTop={scrollToTop}
           linkupFormData={linkupFormData}
-          updateLinkupForm={updateLinkupForm}
+          updateLinkupForm={(f, v) =>
+            setLinkupFormData((p) => ({ ...p, [f]: v }))
+          }
         />
       </WidgetSectionContainer>
 
@@ -452,10 +422,10 @@ const FeedPage = ({ isMobile }) => {
           isClose={false}
           colorMode={colorMode}
           opacity={buttonOpacity}
-        />
+        >
+          <AddIcon />
+        </CreateLinkupFloatingButton>
       )}
     </FeedPageContainer>
   );
-};
-
-export default FeedPage;
+}
