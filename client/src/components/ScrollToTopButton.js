@@ -32,7 +32,7 @@ const ScrollToTopButton = ({ onClick, colorMode }) => {
 
   let topPosition = "90%"; // default for large screens
   if (isMobile) {
-    topPosition = isLandscape ? "68%" : "83%";
+    topPosition = isLandscape ? "68%" : "82.5%";
   }
 
   return (

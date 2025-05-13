@@ -109,6 +109,22 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const ClearFormButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "transparent",
+  color: theme.palette.error.main,
+  border: `1px solid ${theme.palette.error.main}`,
+  borderRadius: "9999px",
+  padding: "12px 16px",
+  fontSize: "0.9375rem",
+  fontWeight: 700,
+  textTransform: "none",
+  transition: "background-color 0.2s",
+  marginTop: theme.spacing(1),
+  "&:hover": {
+    backgroundColor: theme.palette.error.light + "20", // 20% opacity
+  },
+}));
+
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
   padding: "12px 16px",
@@ -309,6 +325,19 @@ const CreateLinkupWidget = ({
     e.target.blur();
   };
 
+  const handleClearForm = () => {
+    // Reset all form fields
+    onFormChange("activity", "");
+    onFormChange("location", "");
+    onFormChange("selectedDate", null);
+    onFormChange("genderPreference", []);
+    onFormChange("paymentOption", null);
+    onFormChange("formErrors", {});
+
+    // Show confirmation message
+    addSnackbar("Form cleared", "info");
+  };
+
   const placeholderStyle = {
     color: "#71767B",
     fontSize: "0.9375rem",
@@ -448,6 +477,14 @@ const CreateLinkupWidget = ({
         >
           POST
         </CreateLinkUpButton>
+        <ClearFormButton
+          type="button"
+          onClick={handleClearForm}
+          aria-label="clear-form"
+          size="large"
+        >
+          CLEAR FORM
+        </ClearFormButton>
       </Form>
     </WidgetContainer>
   );
