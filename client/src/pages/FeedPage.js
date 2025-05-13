@@ -14,7 +14,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import TopNavBar from "../components/TopNavBar";
 import WidgetSection from "../components/WidgetSection";
 import { styled } from "@mui/material/styles";
-import { IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import { Suspense, lazy } from "react";
@@ -25,7 +25,6 @@ import debounce from "lodash/debounce";
 import FeedItem from "../components/FeedItem";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
-import { ArrowUpward } from "@mui/icons-material";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 
 // Dynamically import Feed component
@@ -112,6 +111,15 @@ const CreateLinkupFloatingButton = ({ onClick, isClose, colorMode }) => (
   </IconButton>
 );
 
+const FeedWrapper = styled(Box)(({ theme }) => ({
+  display: "grid",
+  // gap: theme.spacing(2),
+  // padding: theme.spacing(2),
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
+}));
+
 const FeedPage = ({ isMobile }) => {
   const { colorMode } = useColorMode();
   const loggedUser = useSelector((state) => state.loggedUser?.user || {});
@@ -120,20 +128,20 @@ const FeedPage = ({ isMobile }) => {
   );
 
   // Initialize form data from sessionStorage or default values
-const [linkupFormData, setLinkupFormData] = useState(() => {
-  const savedFormData = sessionStorage.getItem("linkupFormData");
-  return savedFormData
-    ? JSON.parse(savedFormData)
-    : {
-        activity: "",
-        location: "",
-        selectedDate: null,
-        genderPreference: [],
-        paymentOption: null,
-        formErrors: {},
-        isLoading: false,
-      };
-});
+  const [linkupFormData, setLinkupFormData] = useState(() => {
+    const savedFormData = sessionStorage.getItem("linkupFormData");
+    return savedFormData
+      ? JSON.parse(savedFormData)
+      : {
+          activity: "",
+          location: "",
+          selectedDate: null,
+          genderPreference: [],
+          paymentOption: null,
+          formErrors: {},
+          isLoading: false,
+        };
+  });
 
   // Save form data to sessionStorage whenever it changes
   useEffect(() => {
@@ -187,6 +195,9 @@ const [linkupFormData, setLinkupFormData] = useState(() => {
     }));
   };
 
+  const debounceTime = isMobile ? 500 : 300;
+
+  // Update the debouncedSearch memo to include dependencies
   const debouncedSearch = useMemo(
     () =>
       debounce(async (query) => {
@@ -196,6 +207,7 @@ const [linkupFormData, setLinkupFormData] = useState(() => {
           return;
         }
 
+        setIsSearching(true); // <-- Add this
         try {
           setSearchLoading(true);
           const response = await searchLinkups(query, id, gender);
@@ -208,26 +220,32 @@ const [linkupFormData, setLinkupFormData] = useState(() => {
           );
 
           setSearchResults(filteredResults);
-          setIsSearching(true);
         } catch (error) {
           console.error("Search error:", error);
           setSearchResults([]);
         } finally {
           setSearchLoading(false);
         }
-      }, 300),
-    [id, gender, userSettings]
+      }, debounceTime),
+    [id, gender, userSettings, debounceTime] // <-- Add dependencies
   );
 
+  // Update the handleSearchChange function
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+
+    if (query.trim()) {
+      setIsSearching(true); // <-- Add this
+      setSearchLoading(true);
+    } else {
+      setIsSearching(false);
+      setSearchResults([]);
+      setSearchLoading(false);
+    }
+
     debouncedSearch(query);
   };
-
-  useEffect(() => {
-    return () => debouncedSearch.cancel();
-  }, [debouncedSearch]);
 
   // Store and restore the scroll position
   useEffect(() => {
@@ -325,17 +343,19 @@ const [linkupFormData, setLinkupFormData] = useState(() => {
         ) : isSearching ? (
           searchResults.length > 0 ? (
             searchResults.map((linkup) => (
-              <FeedItem
-                linkup={linkup}
-                colorMode={colorMode}
-                addLinkup={addLinkup}
-                updateLinkup={updateLinkup}
-                removeLinkup={removeLinkup}
-                useDistance={useDistance}
-                handleScrollToTop={handleScrollToTop}
-                loggedUser={loggedUser}
-                sentRequests={sentRequests}
-              />
+              <FeedWrapper>
+                <FeedItem
+                  linkup={linkup}
+                  colorMode={colorMode}
+                  addLinkup={addLinkup}
+                  updateLinkup={updateLinkup}
+                  removeLinkup={removeLinkup}
+                  useDistance={useDistance}
+                  handleScrollToTop={handleScrollToTop}
+                  loggedUser={loggedUser}
+                  sentRequests={sentRequests}
+                />
+              </FeedWrapper>
             ))
           ) : (
             <EmptyFeedPlaceholder message="No matching linkups found" />
