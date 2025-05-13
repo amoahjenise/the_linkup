@@ -127,11 +127,27 @@ const FeedPage = ({ isMobile }) => {
     (state) => state.userSettings?.userSettings || {}
   );
 
+  // In FeedPage.js
+  const serializeFormData = (data) => {
+    return JSON.stringify({
+      ...data,
+      selectedDate: data.selectedDate ? data.selectedDate.toISOString() : null,
+    });
+  };
+
+  const deserializeFormData = (str) => {
+    const parsed = JSON.parse(str);
+    return {
+      ...parsed,
+      selectedDate: parsed.selectedDate ? new Date(parsed.selectedDate) : null,
+    };
+  };
+
   // Initialize form data from sessionStorage or default values
   const [linkupFormData, setLinkupFormData] = useState(() => {
     const savedFormData = sessionStorage.getItem("linkupFormData");
     return savedFormData
-      ? JSON.parse(savedFormData)
+      ? deserializeFormData(savedFormData)
       : {
           activity: "",
           location: "",
@@ -145,7 +161,7 @@ const FeedPage = ({ isMobile }) => {
 
   // Save form data to sessionStorage whenever it changes
   useEffect(() => {
-    sessionStorage.setItem("linkupFormData", JSON.stringify(linkupFormData));
+    sessionStorage.setItem("linkupFormData", serializeFormData(linkupFormData));
   }, [linkupFormData]);
 
   // Search query states
