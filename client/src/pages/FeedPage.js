@@ -26,7 +26,7 @@ import FeedItem from "../components/FeedItem";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering"; // <-- Create this utility
 import ScrollToTopButton from "../components/ScrollToTopButton";
-import PullToRefresh from "react-pull-to-refresh";
+// import PullToRefresh from "react-pull-to-refresh";
 
 // Dynamically import Feed component
 const Feed = lazy(() => import("../components/Feed")); // Lazy load Feed
@@ -366,65 +366,65 @@ const FeedPage = ({ isMobile }) => {
           />
         </SearchInputContainer>
 
-        <PullToRefresh onRefresh={reload} style={{ height: "100%" }}>
-          {isUpdateFeedButtonVisible && (
-            <UpdateFeedButton
-              refreshFeed={handleUpdateFeed}
-              colorMode={colorMode}
-            />
-          )}
+        {/* <PullToRefresh onRefresh={reload} style={{ height: "100%" }}> */}
+        {isUpdateFeedButtonVisible && (
+          <UpdateFeedButton
+            refreshFeed={handleUpdateFeed}
+            colorMode={colorMode}
+          />
+        )}
 
-          {showScrollTop && (
-            <ScrollToTopButton
-              onClick={handleScrollToTop}
-              colorMode={colorMode}
-            />
-          )}
+        {showScrollTop && (
+          <ScrollToTopButton
+            onClick={handleScrollToTop}
+            colorMode={colorMode}
+          />
+        )}
 
-          {loading ? (
-            <LoadingSpinner />
-          ) : isSearching ? (
-            searchResults.length > 0 ? (
-              searchResults.map((linkup) => (
-                <FeedWrapper>
-                  <FeedItem
-                    linkup={linkup}
-                    colorMode={colorMode}
-                    addLinkup={addLinkup}
-                    updateLinkup={updateLinkup}
-                    removeLinkup={removeLinkup}
-                    useDistance={useDistance}
-                    handleScrollToTop={handleScrollToTop}
-                    loggedUser={loggedUser}
-                    sentRequests={sentRequests}
-                  />
-                </FeedWrapper>
-              ))
-            ) : (
-              <EmptyFeedPlaceholder message="No matching linkups found" />
-            )
-          ) : filteredFeed.length === 0 ? (
-            <LoadingSpinner />
+        {loading ? (
+          <LoadingSpinner />
+        ) : isSearching ? (
+          searchResults.length > 0 ? (
+            searchResults.map((linkup) => (
+              <FeedWrapper>
+                <FeedItem
+                  linkup={linkup}
+                  colorMode={colorMode}
+                  addLinkup={addLinkup}
+                  updateLinkup={updateLinkup}
+                  removeLinkup={removeLinkup}
+                  useDistance={useDistance}
+                  handleScrollToTop={handleScrollToTop}
+                  loggedUser={loggedUser}
+                  sentRequests={sentRequests}
+                />
+              </FeedWrapper>
+            ))
           ) : (
-            <Suspense fallback={<LoadingSpinner />}>
-              <Feed
-                linkups={filteredFeed}
-                loading={loading}
-                hasMore={hasMore}
-                setPage={setPage}
-                colorMode={colorMode}
-                lastItemRef={lastItemRef}
-                addLinkup={addLinkup}
-                updateLinkup={updateLinkup}
-                removeLinkup={removeLinkup}
-                useDistance={useDistance}
-                handleScrollToTop={handleScrollToTop}
-                loggedUser={loggedUser}
-                sentRequests={sentRequests}
-              />
-            </Suspense>
-          )}
-        </PullToRefresh>
+            <EmptyFeedPlaceholder message="No matching linkups found" />
+          )
+        ) : filteredFeed.length === 0 ? (
+          <LoadingSpinner />
+        ) : (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Feed
+              linkups={filteredFeed}
+              loading={loading}
+              hasMore={hasMore}
+              setPage={setPage}
+              colorMode={colorMode}
+              lastItemRef={lastItemRef}
+              addLinkup={addLinkup}
+              updateLinkup={updateLinkup}
+              removeLinkup={removeLinkup}
+              useDistance={useDistance}
+              handleScrollToTop={handleScrollToTop}
+              loggedUser={loggedUser}
+              sentRequests={sentRequests}
+            />
+          </Suspense>
+        )}
+        {/* </PullToRefresh> */}
       </FeedSection>
 
       <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>
