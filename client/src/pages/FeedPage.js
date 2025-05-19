@@ -159,6 +159,18 @@ export default function FeedPage({ isMobile }) {
   const userSettings = useSelector((s) => s.userSettings.userSettings || {});
   const { id, gender } = loggedUser;
 
+  // State for scroll-related UI
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [buttonOpacity, setButtonOpacity] = useState(1);
+
+  // Refs for scroll management
+  const feedRef = useRef(null);
+  const observer = useRef(null);
+  const prevScrollTop = useRef(0);
+  const [scrollRestoreData, setScrollRestoreData] = useState(null);
+  const isRestoringScroll = useRef(false);
+  const feedDataRef = useRef({ length: 0 });
+
   // Persist form data
   const [linkupFormData, setLinkupFormData] = useSessionStorage(
     "linkupFormData",
@@ -189,8 +201,6 @@ export default function FeedPage({ isMobile }) {
     latitude: loggedUser.latitude,
     longitude: loggedUser.longitude,
   });
-
-  const prevScrollTop = useRef(0);
 
   const filteredFeed = useFilteredFeed(rawFeed, id);
   const { sentRequests } = useSentRequests(id);
@@ -241,79 +251,125 @@ export default function FeedPage({ isMobile }) {
     [debouncedSearch]
   );
 
-  // Scroll + FAB opacity
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [buttonOpacity, setButtonOpacity] = useState(1);
+  // Save scroll position with feed length
+  const saveScrollPosition = useCallback(() => {
+    if (feedRef.current && !isRestoringScroll.current) {
+      sessionStorage.setItem(
+        "feedScrollData",
+        JSON.stringify({
+          position: feedRef.current.scrollTop,
+          feedLength: filteredFeed.length,
+        })
+      );
+    }
+  }, [filteredFeed.length]);
 
-  const feedRef = useRef();
-  const observer = useRef();
+  // Scroll handler with requestAnimationFrame
+  const handleScroll = useCallback(() => {
+    if (!feedRef.current) return;
 
-  // Scroll position persistence: adjusted to account for content height changes
+    const top = feedRef.current.scrollTop;
+    saveScrollPosition();
+
+    // Update UI based on scroll position
+    setShowScrollTop(top > 300);
+    setButtonOpacity(Math.max(0.4, 1 - Math.min(top, 200) / 200));
+
+    prevScrollTop.current = top;
+  }, [saveScrollPosition]);
+
   useEffect(() => {
-    if (!loading && filteredFeed.length && feedRef.current) {
-      const saved = sessionStorage.getItem("feedScrollPosition");
-      if (saved) {
-        const savedScrollTop = Number(saved);
-        feedRef.current.scrollTop =
-          savedScrollTop * (feedRef.current.scrollHeight / Number(saved));
+    const node = feedRef.current;
+    if (!node) return;
+
+    // Use passive scroll listener for better performance
+    node.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      node.removeEventListener("scroll", handleScroll, { passive: true });
+    };
+  }, [handleScroll]);
+
+  // Restore scroll position with improved logic
+  useEffect(() => {
+    if (!loading && filteredFeed.length > 0 && feedRef.current) {
+      const savedData = sessionStorage.getItem("feedScrollData");
+      if (savedData) {
+        try {
+          const { position, feedLength } = JSON.parse(savedData);
+
+          // Only restore if the feed length hasn't changed significantly
+          // and we have a valid scroll position
+          if (
+            position > 0 &&
+            Math.abs(feedLength - filteredFeed.length) <= 10
+          ) {
+            // Use requestAnimationFrame to ensure DOM is ready
+            requestAnimationFrame(() => {
+              if (feedRef.current) {
+                feedRef.current.scrollTop = position;
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Failed to restore scroll position", e);
+        }
       }
     }
   }, [loading, filteredFeed.length]);
 
-  // Scroll + FAB opacity
-  const handleScroll = useCallback(() => {
-    const top = feedRef.current?.scrollTop ?? 0;
-    sessionStorage.setItem("feedScrollPosition", top);
-
-    setShowScrollTop(top > 300);
-
-    const isScrollingUp = top < prevScrollTop.current;
-
-    if (isScrollingUp) {
-      setButtonOpacity(1); // Reset to full opacity
-    } else {
-      const opacity = Math.max(0.4, 1 - top / 200);
-      setButtonOpacity(opacity);
-    }
-
-    prevScrollTop.current = top;
-  }, []);
-  useEffect(() => {
-    const throttledScroll = debounce(handleScroll, 50);
-    const node = feedRef.current;
-    node?.addEventListener("scroll", throttledScroll);
-    return () => node?.removeEventListener("scroll", throttledScroll);
-  }, [handleScroll]);
-
-  // Infinite scroll
+  // Infinite scroll with improved intersection observer
   const lastItemRef = useCallback(
     (node) => {
-      if (loading || !hasMore) return;
+      if (loading || !hasMore || isRestoringScroll.current) return;
 
       if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          const currentScrollTop = feedRef.current?.scrollTop;
-
-          // Save scroll position before incrementing the page
-          setTimeout(() => {
-            setPage((p) => p + 1);
-
-            // After the page has updated, restore scroll position
-            requestAnimationFrame(() => {
-              if (currentScrollTop != null && feedRef.current) {
-                feedRef.current.scrollTop = currentScrollTop;
-              }
-            });
-          }, 0);
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            const container = feedRef.current;
+            if (container) {
+              setScrollRestoreData({
+                scrollTop: container.scrollTop,
+                scrollHeight: container.scrollHeight,
+              });
+              setPage((prevPage) => prevPage + 1);
+            }
+          }
+        },
+        { root: null, rootMargin: "200px", threshold: 0.1 }
+      );
 
       if (node) observer.current.observe(node);
     },
     [loading, hasMore, setPage]
   );
+
+  useEffect(() => {
+    if (
+      !loading &&
+      scrollRestoreData &&
+      feedRef.current &&
+      !isRestoringScroll.current
+    ) {
+      isRestoringScroll.current = true;
+
+      requestAnimationFrame(() => {
+        const container = feedRef.current;
+        const { scrollTop, scrollHeight } = scrollRestoreData;
+        const heightDiff = container.scrollHeight - scrollHeight;
+
+        container.scrollTop = scrollTop + heightDiff;
+
+        // Reset after a small delay to allow UI to settle
+        setTimeout(() => {
+          setScrollRestoreData(null);
+          isRestoringScroll.current = false;
+        }, 100);
+      });
+    }
+  }, [loading, scrollRestoreData]);
 
   const scrollToTop = useCallback(() => {
     feedRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -324,9 +380,14 @@ export default function FeedPage({ isMobile }) {
     scrollToTop();
   }, [reload, scrollToTop]);
 
+  // Track feed length changes
+  useEffect(() => {
+    feedDataRef.current.length = filteredFeed.length;
+  }, [filteredFeed.length]);
+
   return (
     <FeedPageContainer>
-      <FeedSection ref={feedRef} onScroll={handleScroll} colorMode={colorMode}>
+      <FeedSection ref={feedRef} colorMode={colorMode}>
         <TopNavBar title="Home" />
 
         <SearchInputContainer>
