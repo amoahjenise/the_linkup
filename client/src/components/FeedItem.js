@@ -24,7 +24,7 @@ const Container = styled("div")(({ theme }) => ({
   backgroundColor: "transparent",
   [theme.breakpoints.down("sm")]: {
     alignItems: "flex-start",
-    padding: "0.6rem 0.4rem",
+    padding: "0.4rem 0.6rem",
   },
 }));
 
@@ -37,7 +37,8 @@ const CardContainer = styled("div")(({ theme, colorMode }) => ({
   borderRadius: "1rem",
 
   // Color and effects
-  backgroundColor: colorMode === "dark" ? "hsl(210, 15%, 13%)" : "#FFFFFF", // Dark blue for trust and calm
+  backgroundColor:
+    colorMode === "dark" ? "hsl(210, 100.00%, 50.00%)" : "#FFFFFF",
   border:
     colorMode === "dark"
       ? "1px solid hsl(210, 18%, 20%)" // Muted, deep blue for subtle sophistication
