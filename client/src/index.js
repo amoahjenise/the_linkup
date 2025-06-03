@@ -11,6 +11,7 @@ import Modal from "react-modal";
 import { SocketProvider } from "./contexts/SocketContext";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { PrimeReactProvider } from "primereact/api";
+import { dark } from "@clerk/themes";
 
 Modal.setAppElement("#root");
 
@@ -20,7 +21,12 @@ const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <ClerkProvider publishableKey={clerkPubKey}>
+      <ClerkProvider
+        appearance={{
+          baseTheme: dark,
+        }}
+        publishableKey={clerkPubKey}
+      >
         <SnackbarProvider>
           <SocketProvider>
             <React.StrictMode>

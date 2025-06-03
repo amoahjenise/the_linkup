@@ -77,8 +77,12 @@ const CustomSignInButton = styled(SignInButton)(({ theme }) => ({
   color: "white", // Dark blue-gray for text
   boxShadow: "0 0 8px rgba(0, 255, 209, 0.6)", // Glow effect
   "&:hover": {
+    transform: "translateY(-2px)",
     backgroundColor: "rgba(0, 255, 209, 1)",
     boxShadow: "0 0 12px rgba(0, 255, 209, 0.8)", // Stronger glow on hover
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.96)",
   },
 }));
 
@@ -88,13 +92,18 @@ const CustomSignUpButton = styled(SignUpButton)(({ theme }) => ({
   color: "white", // Dark blue-gray for text
   boxShadow: "0 0 8px rgba(0, 230, 190, 0.6)", // Glow effect
   "&:hover": {
+    transform: "translateY(-2px)",
     backgroundColor: "rgba(0, 230, 190, 1)",
     boxShadow: "0 0 12px rgba(0, 230, 190, 0.8)", // Stronger glow on hover
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.96)",
   },
 }));
 
 const CustomInstallAppButton = styled("button")(({ theme }) => ({
   ...sharedButtonStyles,
+  marginBottom: 4,
   backgroundColor: "rgba(255, 20, 147, 0.9)", // Neon pink (DeepPink)
   color: "white",
   border: "none",
@@ -102,8 +111,12 @@ const CustomInstallAppButton = styled("button")(({ theme }) => ({
   width: "100%",
   boxShadow: "0 0 8px rgba(255, 20, 147, 0.6)", // Adds glow effect
   "&:hover": {
+    transform: "translateY(-2px)",
     backgroundColor: "rgba(255, 20, 147, 1)",
     boxShadow: "0 0 12px rgba(255, 20, 147, 0.8)", // Enhanced glow on hover
+  },
+  "&:active": {
+    transform: "translateY(0) scale(0.96)",
   },
 }));
 
@@ -144,7 +157,7 @@ const WidgetTemplate = ({
       <Box
         sx={{
           position: "absolute",
-          top: "55%",
+          top: "50%",
           left: 0,
           right: 0,
           bottom: 0,
@@ -162,7 +175,7 @@ const WidgetTemplate = ({
             color="white"
             sx={{
               fontWeight: "bold",
-              marginBottom: "4px",
+              marginBottom: "10px",
               lineHeight: 1.3,
             }}
           >

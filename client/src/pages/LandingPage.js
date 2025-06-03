@@ -611,7 +611,6 @@ const LandingPage = ({ showInstallButton, handleInstallClick, isMobile }) => {
           delay={500}
           variant="body2"
           color="white"
-          // sx={{ mt: 3, textAlign: "center" }}
         />
         <FooterLinksSection />
       </Footer>
