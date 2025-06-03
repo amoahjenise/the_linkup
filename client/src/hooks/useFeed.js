@@ -4,7 +4,7 @@ import { getLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 
 // useFeed.js - Handles fetching and managing the feed data
-export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
+export const useFeed = (userId, gender, userLocation, pageSize = 3) => {
   const dispatch = useDispatch();
 
   const [feed, setFeed] = useState([]); // Stores the feed data
@@ -17,6 +17,7 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
 
   const loadFeed = useCallback(async () => {
     if (loading || !userId || !userLocation || !hasMore) return;
+
     setLoading(true);
     try {
       const offset = page * pageSize;
@@ -33,20 +34,20 @@ export const useFeed = (userId, gender, userLocation, pageSize = 10) => {
         const newItems = response.linkupList.filter(
           (item) => !loadedIds.current.has(item.id)
         );
-        newItems.forEach((item) => loadedIds.current.add(item.id));
 
-        setFeed((prev) => {
-          const updatedFeed = [...prev, ...newItems];
-          // ⚠️ Avoid replacing the array in Redux unless required.
-          if (newItems.length > 0) {
-            dispatch(fetchLinkupsSuccess([...prev, ...newItems]));
-          }
-          return updatedFeed;
-        });
+        // Only update state if we have new items
+        if (newItems.length > 0) {
+          newItems.forEach((item) => loadedIds.current.add(item.id));
 
-        if (response.linkupList.length < pageSize) {
-          setHasMore(false);
+          setFeed((prev) => {
+            const updatedFeed = [...prev, ...newItems];
+            dispatch(fetchLinkupsSuccess(updatedFeed));
+            return updatedFeed;
+          });
         }
+
+        // Set hasMore based on whether we got the expected number of items
+        setHasMore(response.linkupList.length >= pageSize);
       } else {
         setHasMore(false);
       }

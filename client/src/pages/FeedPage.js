@@ -290,6 +290,14 @@ export default function FeedPage({ isMobile }) {
     };
   }, [handleScroll]);
 
+  useEffect(() => {
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, []);
+
   // Restore scroll position with improved logic
   useEffect(() => {
     if (!loading && filteredFeed.length > 0 && feedRef.current) {
@@ -321,24 +329,22 @@ export default function FeedPage({ isMobile }) {
   // Infinite scroll with improved intersection observer
   const lastItemRef = useCallback(
     (node) => {
-      if (loading || !hasMore || isRestoringScroll.current) return;
+      if (loading || !hasMore) return;
 
+      // Disconnect previous observer
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting) {
-            const container = feedRef.current;
-            if (container) {
-              setScrollRestoreData({
-                scrollTop: container.scrollTop,
-                scrollHeight: container.scrollHeight,
-              });
-              setPage((prevPage) => prevPage + 1);
-            }
+          if (entries[0].isIntersecting && hasMore && !loading) {
+            setPage((prevPage) => prevPage + 1);
           }
         },
-        { root: null, rootMargin: "200px", threshold: 0.1 }
+        {
+          root: feedRef.current,
+          rootMargin: "20px",
+          threshold: 0.1,
+        }
       );
 
       if (node) observer.current.observe(node);
