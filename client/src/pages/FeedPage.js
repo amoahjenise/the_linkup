@@ -438,7 +438,7 @@ export default function FeedPage({ isMobile }) {
             <EmptyFeedPlaceholder message="No matching linkups found" />
           )
         ) : filteredFeed.length === 0 ? (
-          <LoadingSpinner />
+          <EmptyFeedPlaceholder />
         ) : (
           <Suspense fallback={<LoadingSpinner />}>
             <Feed
