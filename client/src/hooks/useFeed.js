@@ -4,7 +4,7 @@ import { getLinkups } from "../api/linkUpAPI";
 import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 
 // useFeed.js - Handles fetching and managing the feed data
-export const useFeed = (userId, gender, userLocation, pageSize = 50) => {
+export const useFeed = (userId, gender, userLocation, pageSize = 3) => {
   const dispatch = useDispatch();
 
   const [feed, setFeed] = useState([]); // Stores the feed data

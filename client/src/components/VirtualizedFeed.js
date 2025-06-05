@@ -1,144 +1,97 @@
-import React, { useRef, useCallback } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useCallback,
+  useState,
+} from "react";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import FeedItem from "./FeedItem";
-import PropTypes from "prop-types";
 
-const VirtualizedFeed = React.memo(
-  ({
-    linkups,
-    colorMode = "dark",
-    addLinkup,
-    updateLinkup,
-    removeLinkup,
-    useDistance,
-    handleScrollToTop,
-    loggedUser,
-    sentRequests,
-    loading,
-    hasMore,
-    loadMore,
-    outerRef,
-  }) => {
+const VirtualizedFeed = forwardRef(
+  (
+    {
+      linkups,
+      loadMore,
+      loading,
+      hasMore,
+      colorMode,
+      addLinkup,
+      updateLinkup,
+      removeLinkup,
+      handleScrollToTop,
+      loggedUser,
+      sentRequests,
+    },
+    ref
+  ) => {
     const listRef = useRef(null);
-    const sizeMap = useRef({});
-    const itemRefs = useRef([]);
+    const [containerHeight, setContainerHeight] = useState(0);
 
-    if (itemRefs.current.length !== linkups.length) {
-      itemRefs.current = Array(linkups.length)
-        .fill()
-        .map((_, i) => itemRefs.current[i] || React.createRef());
-    }
+    useImperativeHandle(ref, () => ({
+      scrollTo: (options) => {
+        listRef.current?.scrollTo(options?.top ?? 0);
+      },
+      getScrollElement: () => listRef.current?.outerRef?.firstElementChild, // Get the actual scroll container
+      getScrollPosition: () => listRef.current?.state?.scrollOffset ?? 0,
+    }));
 
-    const setItemSize = useCallback((index, size) => {
-      if (sizeMap.current[index] !== size) {
-        sizeMap.current = { ...sizeMap.current, [index]: size };
-        listRef.current?.resetAfterIndex(index);
+    const getItemSize = useCallback(() => 250, []);
+
+    const onScroll = ({ scrollOffset }) => {
+      if (
+        hasMore &&
+        !loading &&
+        scrollOffset + containerHeight >= linkups.length * getItemSize() - 100
+      ) {
+        loadMore();
       }
-    }, []);
-
-    const getItemSize = (index) => sizeMap.current[index] || 280;
-
-    const Row = ({ index, style }) => {
-      const linkup = linkups[index];
-      return (
-        <div style={{ ...style, paddingBottom: "16px" }}>
-          <FeedItem
-            ref={itemRefs.current[index]}
-            linkup={linkup}
-            colorMode={colorMode}
-            addLinkup={addLinkup}
-            updateLinkup={updateLinkup}
-            removeLinkup={removeLinkup}
-            useDistance={useDistance}
-            handleScrollToTop={handleScrollToTop}
-            loggedUser={loggedUser}
-            sentRequests={sentRequests}
-            onHeightChange={(height) => setItemSize(index, height + 24)}
-          />
-        </div>
-      );
     };
 
-    React.useEffect(() => {
-      if (itemRefs.current.length > 0) {
-        itemRefs.current.forEach((ref, index) => {
-          if (ref.current) {
-            const height = ref.current.getBoundingClientRect().height;
-            setItemSize(index, height + 40);
-          }
-        });
-      }
-    }, [linkups, setItemSize]);
-
     return (
-      <div className="relative w-full h-full" ref={outerRef}>
-        {linkups.length > 0 ? (
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                ref={listRef}
-                height={height}
-                width={width}
-                itemCount={linkups.length}
-                itemSize={getItemSize}
-                overscanCount={5}
-                style={{
-                  scrollbarWidth: "thin",
-                  scrollbarColor:
-                    colorMode === "dark"
-                      ? "#4a5568 transparent"
-                      : "#cbd5e0 transparent",
-                }}
-                onItemsRendered={({ visibleStopIndex }) => {
-                  if (
-                    visibleStopIndex === linkups.length - 1 &&
-                    hasMore &&
-                    !loading
-                  ) {
-                    loadMore();
-                  }
-                }}
-              >
-                {Row}
-              </List>
-            )}
-          </AutoSizer>
-        ) : (
-          <div className="p-8 text-center">No linkups to display</div>
-        )}
-        {loading && (
-          <div className="flex justify-center p-4">
-            <div
-              className="animate-spin rounded-full h-6 w-6 border-2"
+      <AutoSizer>
+        {({ height, width }) => {
+          // Update containerHeight state on every AutoSizer resize
+          if (height !== containerHeight) setContainerHeight(height);
+
+          return (
+            <List
+              height={height}
+              itemCount={linkups.length}
+              itemSize={getItemSize}
+              width={width}
+              onScroll={onScroll}
+              ref={listRef}
+              overscanCount={2}
               style={{
-                borderColor:
+                scrollbarWidth: "thin",
+                scrollbarColor:
                   colorMode === "dark"
-                    ? "#4a5568 transparent transparent"
-                    : "#cbd5e0 transparent transparent",
-                borderTopColor: "#3182ce",
+                    ? "#4a5568 transparent"
+                    : "#cbd5e0 transparent",
               }}
-            />
-          </div>
-        )}
-      </div>
+            >
+              {({ index, style }) => (
+                <div style={style}>
+                  <FeedItem
+                    linkup={linkups[index]}
+                    colorMode={colorMode}
+                    addLinkup={addLinkup}
+                    updateLinkup={updateLinkup}
+                    removeLinkup={removeLinkup}
+                    handleScrollToTop={handleScrollToTop}
+                    loggedUser={loggedUser}
+                    sentRequests={sentRequests}
+                  />
+                </div>
+              )}
+            </List>
+          );
+        }}
+      </AutoSizer>
     );
   }
 );
-
-VirtualizedFeed.propTypes = {
-  linkups: PropTypes.array.isRequired,
-  colorMode: PropTypes.string,
-  addLinkup: PropTypes.func.isRequired,
-  updateLinkup: PropTypes.func.isRequired,
-  removeLinkup: PropTypes.func.isRequired,
-  useDistance: PropTypes.func.isRequired,
-  handleScrollToTop: PropTypes.func.isRequired,
-  loggedUser: PropTypes.object.isRequired,
-  sentRequests: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired,
-  hasMore: PropTypes.bool.isRequired,
-  loadMore: PropTypes.func.isRequired,
-};
 
 export default VirtualizedFeed;

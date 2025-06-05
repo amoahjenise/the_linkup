@@ -76,8 +76,9 @@ const useFeedItemUtils = () => {
             {creator_name}
           </a>{" "}
           is trying to link up{" "}
-          <span style={{ fontWeight: 500 }}>{activityFormatted}</span> on{" "}
-          <span style={{ fontWeight: 500 }}>{formattedDate}</span>.
+          <span className="text-gray-200">{activityFormatted}.</span>
+          {/* on{" "}
+          <span style={{ fontWeight: 500 }}>{formattedDate}</span>. */}
         </p>
       );
     },

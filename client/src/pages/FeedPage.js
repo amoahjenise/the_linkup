@@ -30,7 +30,6 @@ import ScrollToTopButton from "../components/ScrollToTopButton";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering";
 import { CircularProgress } from "@mui/material";
 
-// Helpers for sessionStorage persistence
 const serializeFormData = (data) =>
   JSON.stringify({
     ...data,
@@ -45,7 +44,6 @@ const deserializeFormData = (str) => {
   };
 };
 
-// Custom hook to sync state with sessionStorage
 function useSessionStorage(key, defaultValue, { serialize, deserialize }) {
   const [state, setState] = useState(() => {
     const saved = sessionStorage.getItem(key);
@@ -59,7 +57,6 @@ function useSessionStorage(key, defaultValue, { serialize, deserialize }) {
   return [state, setState];
 }
 
-// In FeedPage.js
 const LoadingIndicator = () => (
   <div
     style={{
@@ -73,7 +70,20 @@ const LoadingIndicator = () => (
   </div>
 );
 
-const EndOfFeedIndicator = (colorMode) => (
+const StyledScrollToTopButton = styled(ScrollToTopButton)(
+  ({ theme, $visible }) => ({
+    position: "fixed",
+    bottom: 80,
+    right: 20,
+    zIndex: 1000,
+    opacity: $visible ? 1 : 0,
+    pointerEvents: $visible ? "auto" : "none", // Disable interactions when hidden
+    transition: "opacity 0.3s ease",
+    transform: $visible ? "scale(1)" : "scale(0.8)", // Optional: Add a small scale effect
+  })
+);
+
+const EndOfFeedIndicator = ({ colorMode }) => (
   <div
     style={{
       padding: "20px",
@@ -92,13 +102,14 @@ const FeedPageContainer = styled("div")({
   overflow: "hidden",
 });
 
-const FeedSection = styled("div")(({ theme, colorMode }) => ({
+const FeedSection = styled("div", {
+  shouldForwardProp: (prop) => prop !== "colorMode",
+})(({ theme, colorMode }) => ({
   flex: 2.5,
   overflowY: "auto",
-  // Hide scrollbar but keep functionality
   "&::-webkit-scrollbar": {
-    width: "0px", // Hide vertical scrollbar
-    height: "0px", // Hide horizontal scrollbar
+    width: "0px",
+    height: "0px",
     background: "transparent",
   },
   [theme.breakpoints.down("md")]: { flex: 2 },
@@ -108,71 +119,72 @@ const FeedSection = styled("div")(({ theme, colorMode }) => ({
 const SearchInputContainer = styled("div")(({ theme }) => ({
   top: 0,
   position: "sticky",
-  padding: `${theme.spacing(0)} ${theme.spacing(1)}`, // Reduced vertical padding  position: "sticky",
+  padding: `${theme.spacing(0)} ${theme.spacing(1)}`,
   zIndex: theme.zIndex.appBar,
 }));
 
-const WidgetSectionContainer = styled("div")(
-  ({ theme, colorMode, isVisible }) => ({
-    flex: 1.5,
-    overflowY: "auto",
-    borderLeft: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
-    paddingBottom: "60px",
-    [theme.breakpoints.down("md")]: { flex: 2 },
-    [theme.breakpoints.down("sm")]: {
-      position: "fixed",
-      top: 0,
-      right: 0,
-      width: "100%",
-      height: "100vh",
-      backgroundColor: colorMode === "dark" ? "#000" : "#fff",
-      boxShadow: "-2px 0 5px rgba(0,0,0,0.1)",
-      transform: isVisible ? "translateX(0)" : "translateX(100%)",
-      transition: "transform 0.3s ease",
-      zIndex: 2000,
-      paddingTop: "60px",
-      paddingBottom: "env(safe-area-inset-bottom, 60px)",
-      borderLeft: "none",
-    },
-  })
-);
-
-const CreateLinkupFloatingButton = styled(IconButton)(
-  ({ theme, isClose, colorMode, opacity }) => ({
+const WidgetSectionContainer = styled("div", {
+  shouldForwardProp: (prop) => prop !== "colorMode" && prop !== "isVisible",
+})(({ theme, colorMode, isVisible }) => ({
+  flex: 1.5,
+  overflowY: "auto",
+  borderLeft: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
+  paddingBottom: "60px",
+  [theme.breakpoints.down("md")]: { flex: 2 },
+  [theme.breakpoints.down("sm")]: {
     position: "fixed",
-    zIndex: 1000,
-    opacity,
-    transition: "all 0.3s ease-in-out",
-    width: isClose ? 50 : 64,
-    height: isClose ? 50 : 64,
-    ...(isClose
-      ? { top: theme.spacing(2), right: theme.spacing(2) }
-      : { bottom: theme.spacing(10.5), right: theme.spacing(2.75) }),
-    color: colorMode === "dark" ? "#fff" : "#000",
+    top: 0,
+    right: 0,
+    width: "100%",
+    height: "100vh",
+    backgroundColor: colorMode === "dark" ? "#000" : "#fff",
+    boxShadow: "-2px 0 5px rgba(0,0,0,0.1)",
+    transform: isVisible ? "translateX(0)" : "translateX(100%)",
+    transition: "transform 0.3s ease",
+    zIndex: 2000,
+    paddingTop: "60px",
+    paddingBottom: "env(safe-area-inset-bottom, 60px)",
+    borderLeft: "none",
+  },
+}));
+
+// CreateLinkupFloatingButton (already fixed in your snippet)
+const CreateLinkupFloatingButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== "isClose",
+})(({ theme, isClose, colorMode, opacity }) => ({
+  position: "fixed",
+  zIndex: 1000,
+  opacity,
+  transition: "all 0.3s ease-in-out",
+  width: isClose ? 50 : 64,
+  height: isClose ? 50 : 64,
+  ...(isClose
+    ? { top: theme.spacing(2), right: theme.spacing(2) }
+    : { bottom: theme.spacing(10.5), right: theme.spacing(2.75) }),
+  color: colorMode === "dark" ? "#fff" : "#000",
+  backgroundColor: isClose
+    ? colorMode === "dark"
+      ? "rgba(255,255,255,0.1)"
+      : "rgba(0,0,0,0.1)"
+    : "#0097A7",
+  borderRadius: "50%",
+  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+  "&:hover": {
     backgroundColor: isClose
       ? colorMode === "dark"
-        ? "rgba(255,255,255,0.1)"
-        : "rgba(0,0,0,0.1)"
-      : "#0097A7",
-    borderRadius: "50%",
-    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
-    "&:hover": {
-      backgroundColor: isClose
-        ? colorMode === "dark"
-          ? "rgba(255,255,255,0.2)"
-          : "rgba(0,0,0,0.2)"
-        : "#008394",
-      opacity: 1,
-      transform: "scale(1.05)",
-      boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
-    },
-    "&:active": {
-      transform: "scale(0.95)",
-      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
-    },
-    padding: isClose ? theme.spacing(1) : theme.spacing(1.5),
-  })
-);
+        ? "rgba(255,255,255,0.2)"
+        : "rgba(0,0,0,0.2)"
+      : "#008394",
+    opacity: 1,
+    transform: "scale(1.05)",
+    boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
+  },
+  "&:active": {
+    transform: "scale(0.95)",
+    boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
+  },
+  padding: isClose ? theme.spacing(1) : theme.spacing(1.5),
+}));
 
 export default function FeedPage({ isMobile }) {
   const { colorMode } = useColorMode();
@@ -180,16 +192,14 @@ export default function FeedPage({ isMobile }) {
   const userSettings = useSelector((s) => s.userSettings.userSettings || {});
   const { id, gender } = loggedUser;
 
-  // State for scroll-related UI
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [buttonOpacity, setButtonOpacity] = useState(1);
+  const scrollContainerRef = useRef(null);
 
-  // Refs for scroll management
-  const feedRef = useRef(null);
+  const virtualizedFeedRef = useRef(null);
   const observer = useRef(null);
   const isRestoringScroll = useRef(false);
 
-  // Persist form data
   const [linkupFormData, setLinkupFormData] = useSessionStorage(
     "linkupFormData",
     {
@@ -204,13 +214,11 @@ export default function FeedPage({ isMobile }) {
     { serialize: serializeFormData, deserialize: deserializeFormData }
   );
 
-  // Feed + pagination
   const {
     rawFeed,
     hasMore,
     loading,
     setPage,
-    useDistance,
     addLinkup,
     updateLinkup,
     removeLinkup,
@@ -224,13 +232,12 @@ export default function FeedPage({ isMobile }) {
   const filteredFeed = useFilteredFeed(rawFeed, id);
   const { sentRequests } = useSentRequests(id);
 
-  // Responsive widget
   const { isMobileView, isWidgetVisible, toggleWidget } = useResponsiveWidget();
+
   const showUpdateFeedButton = useSelector(
     (s) => s.linkups.showUpdateFeedButton
   );
 
-  // Search
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -269,15 +276,14 @@ export default function FeedPage({ isMobile }) {
     [debouncedSearch]
   );
 
-  // Debounce scroll position saving
   const debouncedSaveScrollPosition = useMemo(
     () =>
       debounce(() => {
-        if (feedRef.current && !isRestoringScroll.current) {
+        if (virtualizedFeedRef.current && !isRestoringScroll.current) {
           sessionStorage.setItem(
             "feedScrollData",
             JSON.stringify({
-              position: feedRef.current.scrollTop,
+              position: virtualizedFeedRef.current.scrollTop,
               feedLength: filteredFeed.length,
             })
           );
@@ -286,29 +292,46 @@ export default function FeedPage({ isMobile }) {
     [filteredFeed.length]
   );
 
-  // Scroll handler
   const handleScroll = useCallback(() => {
-    if (!feedRef.current) return;
+    if (!scrollContainerRef.current) return;
 
-    const top = feedRef.current.scrollTop;
+    const scrollTop = scrollContainerRef.current.scrollTop;
     debouncedSaveScrollPosition();
-    setShowScrollTop(top > 300);
-    setButtonOpacity(Math.max(0.4, 1 - Math.min(top, 200) / 200));
+    setShowScrollTop(scrollTop > 300);
+    setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollTop, 200) / 200));
   }, [debouncedSaveScrollPosition]);
 
-  // Set up scroll listener
-  useEffect(() => {
-    const node = feedRef.current;
-    if (!node) return;
+  const scrollToTop = useCallback(() => {
+    if (virtualizedFeedRef.current) {
+      virtualizedFeedRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, []);
 
-    node.addEventListener("scroll", handleScroll, { passive: true });
+  // Remove the duplicate useEffect for scroll handling and keep only this one:
+  useEffect(() => {
+    const scrollElement = virtualizedFeedRef.current?.getScrollElement?.();
+    if (!scrollElement) return;
+
+    const handleScroll = () => {
+      const scrollTop = scrollElement.scrollTop;
+      debouncedSaveScrollPosition();
+      setShowScrollTop(scrollTop > 300); // Only show after 300px scroll
+      setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollTop, 200) / 200));
+    };
+
+    scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Initial check in case content is already scrolled
+    handleScroll();
+
     return () => {
-      node.removeEventListener("scroll", handleScroll, { passive: true });
+      scrollElement.removeEventListener("scroll", handleScroll, {
+        passive: true,
+      });
       debouncedSaveScrollPosition.cancel();
     };
-  }, [handleScroll, debouncedSaveScrollPosition]);
+  }, [debouncedSaveScrollPosition]);
 
-  // Clean up observer
   useEffect(() => {
     return () => {
       if (observer.current) {
@@ -317,19 +340,17 @@ export default function FeedPage({ isMobile }) {
     };
   }, []);
 
-  // Restore scroll position on initial load
   useEffect(() => {
-    if (!loading && filteredFeed.length > 0 && feedRef.current) {
+    if (!loading && filteredFeed.length > 0 && virtualizedFeedRef.current) {
       const savedData = sessionStorage.getItem("feedScrollData");
       if (savedData) {
         try {
           const { position, feedLength } = JSON.parse(savedData);
-          // Only restore if the feed length is similar to prevent jumping
           if (position > 0 && Math.abs(filteredFeed.length - feedLength) < 5) {
             isRestoringScroll.current = true;
             requestAnimationFrame(() => {
-              if (feedRef.current) {
-                feedRef.current.scrollTop = position;
+              if (virtualizedFeedRef.current) {
+                virtualizedFeedRef.current.scrollTo({ top: position });
               }
               setTimeout(() => {
                 isRestoringScroll.current = false;
@@ -343,125 +364,106 @@ export default function FeedPage({ isMobile }) {
     }
   }, [loading, filteredFeed.length]);
 
-  const scrollToTop = useCallback(() => {
-    feedRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
   const handleUpdateFeed = useCallback(() => {
     reload();
     scrollToTop();
   }, [reload, scrollToTop]);
 
-  const loadMore = useCallback(() => {
-    if (!loading && hasMore && !isSearching) {
+  const loadMoreLinkups = useCallback(() => {
+    if (hasMore && !loading) {
       setPage((prev) => prev + 1);
     }
-  }, [loading, hasMore, isSearching, setPage]);
+  }, [hasMore, loading, setPage]);
+
+  const linkupsToShow = isSearching ? searchResults : filteredFeed;
 
   return (
-    <FeedPageContainer>
-      <FeedSection colorMode={colorMode}>
-        <TopNavBar title="Home" />
-
-        <SearchInputContainer>
-          <SearchInput
-            handleInputChange={handleSearchChange}
-            loading={searchLoading}
-            value={searchQuery}
-          />
-        </SearchInputContainer>
-
-        {showUpdateFeedButton && (
-          <UpdateFeedButton
-            refreshFeed={handleUpdateFeed}
-            colorMode={colorMode}
-          />
-        )}
-
-        {showScrollTop && (
-          <ScrollToTopButton onClick={scrollToTop} colorMode={colorMode} />
-        )}
-
-        {loading && !hasLoadedOnce ? (
-          <LoadingSpinner />
-        ) : isSearching ? (
-          searchResults.length ? (
-            <VirtualizedFeed
-              ref={feedRef}
-              linkups={searchResults}
-              colorMode={colorMode}
-              addLinkup={addLinkup}
-              updateLinkup={updateLinkup}
-              removeLinkup={removeLinkup}
-              useDistance={useDistance}
-              handleScrollToTop={scrollToTop}
-              loggedUser={loggedUser}
-              sentRequests={sentRequests}
-              loading={searchLoading}
-              hasMore={false}
-              loadMore={() => {}}
+    <>
+      <FeedPageContainer>
+        <FeedSection colorMode={colorMode} data-testid="feed-section">
+          <TopNavBar title="Home" />
+          <SearchInputContainer>
+            <SearchInput
+              value={searchQuery}
+              onChange={handleSearchChange}
+              isLoading={searchLoading}
+              placeholder="Search linkups..."
             />
-          ) : (
-            <EmptyFeedPlaceholder message="No matching linkups found" />
-          )
-        ) : filteredFeed.length === 0 ? (
-          <EmptyFeedPlaceholder />
-        ) : (
-          <Suspense fallback={<LoadingSpinner />}>
-            <VirtualizedFeed
-              ref={feedRef}
-              linkups={filteredFeed}
+          </SearchInputContainer>
+          {showUpdateFeedButton && (
+            <UpdateFeedButton
+              refreshFeed={handleUpdateFeed}
               colorMode={colorMode}
-              addLinkup={addLinkup}
-              updateLinkup={updateLinkup}
-              removeLinkup={removeLinkup}
-              useDistance={useDistance}
-              handleScrollToTop={scrollToTop}
-              loggedUser={loggedUser}
-              sentRequests={sentRequests}
+            />
+          )}
+
+          {loading && !hasLoadedOnce ? (
+            <LoadingSpinner />
+          ) : linkupsToShow.length === 0 ? (
+            <EmptyFeedPlaceholder isMobile={isMobile} />
+          ) : (
+            <VirtualizedFeed
+              ref={virtualizedFeedRef}
+              linkups={linkupsToShow}
+              loadMore={loadMoreLinkups}
               loading={loading}
               hasMore={hasMore}
-              loadMore={loadMore}
+              colorMode={colorMode}
+              addLinkup={addLinkup}
+              updateLinkup={updateLinkup}
+              removeLinkup={removeLinkup}
+              handleScrollToTop={scrollToTop}
+              loggedUser={loggedUser}
+              sentRequests={sentRequests}
             />
-            {loading && <LoadingIndicator />}
-            {!hasMore && filteredFeed.length > 0 && <EndOfFeedIndicator />}
-          </Suspense>
-        )}
-      </FeedSection>
+          )}
+          {loading && hasLoadedOnce && <LoadingIndicator />}
+          {!hasMore && hasLoadedOnce && (
+            <EndOfFeedIndicator colorMode={colorMode} />
+          )}
+          <StyledScrollToTopButton
+            onClick={scrollToTop}
+            colorMode={colorMode}
+            $visible={showScrollTop}
+          />
+        </FeedSection>
+        <WidgetSectionContainer
+          colorMode={colorMode}
+          isVisible={isWidgetVisible}
+        >
+          {isMobileView && (
+            <CreateLinkupFloatingButton
+              onClick={toggleWidget}
+              isClose
+              colorMode={colorMode}
+              opacity={buttonOpacity}
+            >
+              <CloseIcon fontSize="small" />
+            </CreateLinkupFloatingButton>
+          )}
+          <WidgetSection
+            toggleWidget={toggleWidget}
+            isMobile={isMobile}
+            addLinkup={addLinkup}
+            handleScrollToTop={scrollToTop}
+            linkupFormData={linkupFormData}
+            updateLinkupForm={(f, v) =>
+              setLinkupFormData((p) => ({ ...p, [f]: v }))
+            }
+          />
+        </WidgetSectionContainer>
 
-      <WidgetSectionContainer colorMode={colorMode} isVisible={isWidgetVisible}>
-        {isMobileView && (
+        {isMobileView && !isWidgetVisible && (
           <CreateLinkupFloatingButton
             onClick={toggleWidget}
-            isClose
+            isClose={false}
             colorMode={colorMode}
             opacity={buttonOpacity}
           >
-            <CloseIcon fontSize="small" />
+            <AddIcon />
           </CreateLinkupFloatingButton>
         )}
-        <WidgetSection
-          toggleWidget={toggleWidget}
-          isMobile={isMobile}
-          addLinkup={addLinkup}
-          handleScrollToTop={scrollToTop}
-          linkupFormData={linkupFormData}
-          updateLinkupForm={(f, v) =>
-            setLinkupFormData((p) => ({ ...p, [f]: v }))
-          }
-        />
-      </WidgetSectionContainer>
-
-      {isMobileView && !isWidgetVisible && (
-        <CreateLinkupFloatingButton
-          onClick={toggleWidget}
-          isClose={false}
-          colorMode={colorMode}
-          opacity={buttonOpacity}
-        >
-          <AddIcon />
-        </CreateLinkupFloatingButton>
-      )}
-    </FeedPageContainer>
+      </FeedPageContainer>
+    </>
   );
 }
