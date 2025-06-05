@@ -8,7 +8,7 @@ import { Box } from "@mui/material";
 const FeedWrapper = styled(Box)(({ theme }) => ({
   display: "grid",
   "@media (max-width: 900px)": {
-    paddingBottom: "65px", // Add padding for footer
+    paddingBottom: "65px",
   },
 }));
 
@@ -30,9 +30,12 @@ const Feed = ({
       {linkups.map((linkup, index) => {
         const isLastItem = index === linkups.length - 1;
         return (
-          <div key={linkup.id} ref={isLastItem ? lastItemRef : null}>
+          <Box
+            data-feed-item
+            key={linkup.id}
+            ref={isLastItem ? lastItemRef : null}
+          >
             <FeedItem
-              key={linkup.id}
               linkup={linkup}
               colorMode={colorMode}
               addLinkup={addLinkup}
@@ -43,7 +46,7 @@ const Feed = ({
               loggedUser={loggedUser}
               sentRequests={sentRequests}
             />
-          </div>
+          </Box>
         );
       })}
       {loading && <FeedSkeleton />}

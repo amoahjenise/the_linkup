@@ -1,15 +1,14 @@
-import React, {
+import {
   useEffect,
   useRef,
   useCallback,
   useState,
   useMemo,
   Suspense,
-  lazy,
 } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
-import { Box, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
 import { useColorMode } from "@chakra-ui/react";
 import debounce from "lodash/debounce";
@@ -25,12 +24,11 @@ import TopNavBar from "../components/TopNavBar";
 import WidgetSection from "../components/WidgetSection";
 import UpdateFeedButton from "../components/UpdateFeedButton";
 import SearchInput from "../components/SearchInputWidget";
-import FeedItem from "../components/FeedItem";
+import VirtualizedFeed from "../components/VirtualizedFeed";
 import EmptyFeedPlaceholder from "../components/EmptyFeedPlaceholder";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import { filterLinkupsByUserPreferences } from "../utils/linkupFiltering";
-
-const Feed = lazy(() => import("../components/Feed"));
+import { CircularProgress } from "@mui/material";
 
 // Helpers for sessionStorage persistence
 const serializeFormData = (data) =>
@@ -61,6 +59,32 @@ function useSessionStorage(key, defaultValue, { serialize, deserialize }) {
   return [state, setState];
 }
 
+// In FeedPage.js
+const LoadingIndicator = () => (
+  <div
+    style={{
+      padding: "20px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <CircularProgress />
+  </div>
+);
+
+const EndOfFeedIndicator = (colorMode) => (
+  <div
+    style={{
+      padding: "20px",
+      textAlign: "center",
+      color: colorMode === "dark" ? "#E4E6EB" : "#606770",
+    }}
+  >
+    You've reached the end of the feed
+  </div>
+);
+
 const FeedPageContainer = styled("div")({
   display: "flex",
   width: "100%",
@@ -71,17 +95,21 @@ const FeedPageContainer = styled("div")({
 const FeedSection = styled("div")(({ theme, colorMode }) => ({
   flex: 2.5,
   overflowY: "auto",
-  borderRight: `1px solid ${colorMode === "dark" ? "#2D3748" : "#D3D3D3"}`,
+  // Hide scrollbar but keep functionality
+  "&::-webkit-scrollbar": {
+    width: "0px", // Hide vertical scrollbar
+    height: "0px", // Hide horizontal scrollbar
+    background: "transparent",
+  },
   [theme.breakpoints.down("md")]: { flex: 2 },
   [theme.breakpoints.down("sm")]: { flex: 1, borderRight: "none" },
 }));
 
 const SearchInputContainer = styled("div")(({ theme }) => ({
-  padding: theme.spacing(1),
-  position: "sticky",
   top: 0,
+  position: "sticky",
+  padding: `${theme.spacing(0)} ${theme.spacing(1)}`, // Reduced vertical padding  position: "sticky",
   zIndex: theme.zIndex.appBar,
-  backgroundColor: "background.paper",
 }));
 
 const WidgetSectionContainer = styled("div")(
@@ -146,13 +174,6 @@ const CreateLinkupFloatingButton = styled(IconButton)(
   })
 );
 
-const FeedWrapper = styled(Box)(({ theme }) => ({
-  display: "grid",
-  "@media (max-width:900px)": {
-    paddingBottom: "65px",
-  },
-}));
-
 export default function FeedPage({ isMobile }) {
   const { colorMode } = useColorMode();
   const loggedUser = useSelector((s) => s.loggedUser.user || {});
@@ -166,10 +187,7 @@ export default function FeedPage({ isMobile }) {
   // Refs for scroll management
   const feedRef = useRef(null);
   const observer = useRef(null);
-  const prevScrollTop = useRef(0);
-  const [scrollRestoreData, setScrollRestoreData] = useState(null);
   const isRestoringScroll = useRef(false);
-  const feedDataRef = useRef({ length: 0 });
 
   // Persist form data
   const [linkupFormData, setLinkupFormData] = useSessionStorage(
@@ -197,6 +215,7 @@ export default function FeedPage({ isMobile }) {
     updateLinkup,
     removeLinkup,
     reload,
+    hasLoadedOnce,
   } = useFeed(id, gender, {
     latitude: loggedUser.latitude,
     longitude: loggedUser.longitude,
@@ -207,7 +226,6 @@ export default function FeedPage({ isMobile }) {
 
   // Responsive widget
   const { isMobileView, isWidgetVisible, toggleWidget } = useResponsiveWidget();
-
   const showUpdateFeedButton = useSelector(
     (s) => s.linkups.showUpdateFeedButton
   );
@@ -251,45 +269,46 @@ export default function FeedPage({ isMobile }) {
     [debouncedSearch]
   );
 
-  // Save scroll position with feed length
-  const saveScrollPosition = useCallback(() => {
-    if (feedRef.current && !isRestoringScroll.current) {
-      sessionStorage.setItem(
-        "feedScrollData",
-        JSON.stringify({
-          position: feedRef.current.scrollTop,
-          feedLength: filteredFeed.length,
-        })
-      );
-    }
-  }, [filteredFeed.length]);
+  // Debounce scroll position saving
+  const debouncedSaveScrollPosition = useMemo(
+    () =>
+      debounce(() => {
+        if (feedRef.current && !isRestoringScroll.current) {
+          sessionStorage.setItem(
+            "feedScrollData",
+            JSON.stringify({
+              position: feedRef.current.scrollTop,
+              feedLength: filteredFeed.length,
+            })
+          );
+        }
+      }, 500),
+    [filteredFeed.length]
+  );
 
-  // Scroll handler with requestAnimationFrame
+  // Scroll handler
   const handleScroll = useCallback(() => {
     if (!feedRef.current) return;
 
     const top = feedRef.current.scrollTop;
-    saveScrollPosition();
-
-    // Update UI based on scroll position
+    debouncedSaveScrollPosition();
     setShowScrollTop(top > 300);
     setButtonOpacity(Math.max(0.4, 1 - Math.min(top, 200) / 200));
+  }, [debouncedSaveScrollPosition]);
 
-    prevScrollTop.current = top;
-  }, [saveScrollPosition]);
-
+  // Set up scroll listener
   useEffect(() => {
     const node = feedRef.current;
     if (!node) return;
 
-    // Use passive scroll listener for better performance
     node.addEventListener("scroll", handleScroll, { passive: true });
-
     return () => {
       node.removeEventListener("scroll", handleScroll, { passive: true });
+      debouncedSaveScrollPosition.cancel();
     };
-  }, [handleScroll]);
+  }, [handleScroll, debouncedSaveScrollPosition]);
 
+  // Clean up observer
   useEffect(() => {
     return () => {
       if (observer.current) {
@@ -298,25 +317,23 @@ export default function FeedPage({ isMobile }) {
     };
   }, []);
 
-  // Restore scroll position with improved logic
+  // Restore scroll position on initial load
   useEffect(() => {
     if (!loading && filteredFeed.length > 0 && feedRef.current) {
       const savedData = sessionStorage.getItem("feedScrollData");
       if (savedData) {
         try {
           const { position, feedLength } = JSON.parse(savedData);
-
-          // Only restore if the feed length hasn't changed significantly
-          // and we have a valid scroll position
-          if (
-            position > 0 &&
-            Math.abs(feedLength - filteredFeed.length) <= 10
-          ) {
-            // Use requestAnimationFrame to ensure DOM is ready
+          // Only restore if the feed length is similar to prevent jumping
+          if (position > 0 && Math.abs(filteredFeed.length - feedLength) < 5) {
+            isRestoringScroll.current = true;
             requestAnimationFrame(() => {
               if (feedRef.current) {
                 feedRef.current.scrollTop = position;
               }
+              setTimeout(() => {
+                isRestoringScroll.current = false;
+              }, 100);
             });
           }
         } catch (e) {
@@ -325,57 +342,6 @@ export default function FeedPage({ isMobile }) {
       }
     }
   }, [loading, filteredFeed.length]);
-
-  // Infinite scroll with improved intersection observer
-  const lastItemRef = useCallback(
-    (node) => {
-      if (loading || !hasMore) return;
-
-      // Disconnect previous observer
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore && !loading) {
-            setPage((prevPage) => prevPage + 1);
-          }
-        },
-        {
-          root: feedRef.current,
-          rootMargin: "20px",
-          threshold: 0.1,
-        }
-      );
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore, setPage]
-  );
-
-  useEffect(() => {
-    if (
-      !loading &&
-      scrollRestoreData &&
-      feedRef.current &&
-      !isRestoringScroll.current
-    ) {
-      isRestoringScroll.current = true;
-
-      requestAnimationFrame(() => {
-        const container = feedRef.current;
-        const { scrollTop, scrollHeight } = scrollRestoreData;
-        const heightDiff = container.scrollHeight - scrollHeight;
-
-        container.scrollTop = scrollTop + heightDiff;
-
-        // Reset after a small delay to allow UI to settle
-        setTimeout(() => {
-          setScrollRestoreData(null);
-          isRestoringScroll.current = false;
-        }, 100);
-      });
-    }
-  }, [loading, scrollRestoreData]);
 
   const scrollToTop = useCallback(() => {
     feedRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -386,14 +352,15 @@ export default function FeedPage({ isMobile }) {
     scrollToTop();
   }, [reload, scrollToTop]);
 
-  // Track feed length changes
-  useEffect(() => {
-    feedDataRef.current.length = filteredFeed.length;
-  }, [filteredFeed.length]);
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore && !isSearching) {
+      setPage((prev) => prev + 1);
+    }
+  }, [loading, hasMore, isSearching, setPage]);
 
   return (
     <FeedPageContainer>
-      <FeedSection ref={feedRef} colorMode={colorMode}>
+      <FeedSection colorMode={colorMode}>
         <TopNavBar title="Home" />
 
         <SearchInputContainer>
@@ -415,39 +382,14 @@ export default function FeedPage({ isMobile }) {
           <ScrollToTopButton onClick={scrollToTop} colorMode={colorMode} />
         )}
 
-        {loading ? (
+        {loading && !hasLoadedOnce ? (
           <LoadingSpinner />
         ) : isSearching ? (
           searchResults.length ? (
-            searchResults.map((linkup) => (
-              <FeedWrapper key={linkup.id}>
-                <FeedItem
-                  linkup={linkup}
-                  colorMode={colorMode}
-                  addLinkup={addLinkup}
-                  updateLinkup={updateLinkup}
-                  removeLinkup={removeLinkup}
-                  useDistance={useDistance}
-                  handleScrollToTop={scrollToTop}
-                  loggedUser={loggedUser}
-                  sentRequests={sentRequests}
-                />
-              </FeedWrapper>
-            ))
-          ) : (
-            <EmptyFeedPlaceholder message="No matching linkups found" />
-          )
-        ) : filteredFeed.length === 0 ? (
-          <EmptyFeedPlaceholder />
-        ) : (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Feed
-              linkups={filteredFeed}
-              loading={loading}
-              hasMore={hasMore}
-              setPage={setPage}
+            <VirtualizedFeed
+              ref={feedRef}
+              linkups={searchResults}
               colorMode={colorMode}
-              lastItemRef={lastItemRef}
               addLinkup={addLinkup}
               updateLinkup={updateLinkup}
               removeLinkup={removeLinkup}
@@ -455,7 +397,34 @@ export default function FeedPage({ isMobile }) {
               handleScrollToTop={scrollToTop}
               loggedUser={loggedUser}
               sentRequests={sentRequests}
+              loading={searchLoading}
+              hasMore={false}
+              loadMore={() => {}}
             />
+          ) : (
+            <EmptyFeedPlaceholder message="No matching linkups found" />
+          )
+        ) : filteredFeed.length === 0 ? (
+          <EmptyFeedPlaceholder />
+        ) : (
+          <Suspense fallback={<LoadingSpinner />}>
+            <VirtualizedFeed
+              ref={feedRef}
+              linkups={filteredFeed}
+              colorMode={colorMode}
+              addLinkup={addLinkup}
+              updateLinkup={updateLinkup}
+              removeLinkup={removeLinkup}
+              useDistance={useDistance}
+              handleScrollToTop={scrollToTop}
+              loggedUser={loggedUser}
+              sentRequests={sentRequests}
+              loading={loading}
+              hasMore={hasMore}
+              loadMore={loadMore}
+            />
+            {loading && <LoadingIndicator />}
+            {!hasMore && filteredFeed.length > 0 && <EndOfFeedIndicator />}
           </Suspense>
         )}
       </FeedSection>
