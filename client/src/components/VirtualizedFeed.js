@@ -3,29 +3,6 @@ import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import FeedItem from "./FeedItem";
 import PropTypes from "prop-types";
-import { styled } from "@mui/material/styles";
-
-const Container = styled("div")({
-  position: "relative",
-  width: "100%",
-  height: "100%",
-});
-
-const EmptyState = styled("div")(({ theme }) => ({
-  padding: theme.spacing(4),
-  textAlign: "center",
-}));
-
-const LoadingContainer = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  padding: theme.spacing(2),
-}));
-
-const EndMessage = styled("div")(({ theme }) => ({
-  textAlign: "center",
-  padding: theme.spacing(2),
-}));
 
 const VirtualizedFeed = React.memo(
   ({
@@ -47,7 +24,6 @@ const VirtualizedFeed = React.memo(
     const sizeMap = useRef({});
     const itemRefs = useRef([]);
 
-    // Initialize refs array
     if (itemRefs.current.length !== linkups.length) {
       itemRefs.current = Array(linkups.length)
         .fill()
@@ -84,7 +60,6 @@ const VirtualizedFeed = React.memo(
       );
     };
 
-    // Update item sizes when data changes
     React.useEffect(() => {
       if (itemRefs.current.length > 0) {
         itemRefs.current.forEach((ref, index) => {
@@ -97,7 +72,7 @@ const VirtualizedFeed = React.memo(
     }, [linkups, setItemSize]);
 
     return (
-      <Container ref={outerRef}>
+      <div className="relative w-full h-full" ref={outerRef}>
         {linkups.length > 0 ? (
           <AutoSizer>
             {({ height, width }) => (
@@ -130,17 +105,13 @@ const VirtualizedFeed = React.memo(
             )}
           </AutoSizer>
         ) : (
-          <EmptyState>No linkups to display</EmptyState>
+          <div className="p-8 text-center">No linkups to display</div>
         )}
         {loading && (
-          <LoadingContainer>
+          <div className="flex justify-center p-4">
             <div
+              className="animate-spin rounded-full h-6 w-6 border-2"
               style={{
-                animation: "spin 1s linear infinite",
-                borderRadius: "50%",
-                height: "24px",
-                width: "24px",
-                border: "2px solid",
                 borderColor:
                   colorMode === "dark"
                     ? "#4a5568 transparent transparent"
@@ -148,9 +119,9 @@ const VirtualizedFeed = React.memo(
                 borderTopColor: "#3182ce",
               }}
             />
-          </LoadingContainer>
+          </div>
         )}
-      </Container>
+      </div>
     );
   }
 );

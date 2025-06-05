@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useFeedItemUtils from "../hooks/useFeedItemUtils";
-import { styled } from "@mui/material/styles";
 import { useColorMode } from "@chakra-ui/react";
 import UserAvatar from "./UserAvatar";
 import MoreMenu from "./MoreMenu";
@@ -12,141 +11,6 @@ import { Tooltip } from "@mui/material";
 import { IoReceipt } from "react-icons/io5";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkUpAPI";
-
-const Container = styled("div")(({ theme }) => ({
-  padding: "0.8rem",
-  width: "100%",
-  backgroundColor: "transparent",
-}));
-
-const CardContainer = styled("div")(({ theme, colorMode }) => ({
-  width: "100%",
-  minHeight: "260px",
-  padding: "1.2rem",
-  borderRadius: "12px",
-  backgroundColor: colorMode === "dark" ? "hsl(210, 20%, 15%)" : "#FFFFFF",
-  border:
-    colorMode === "dark" ? "1px solid hsl(210, 18%, 25%)" : "1px solid #e5e7eb",
-  boxShadow:
-    colorMode === "dark"
-      ? "0 4px 12px hsla(210, 100%, 50%, 0.08)"
-      : "0 2px 8px rgba(0, 0, 0, 0.05)",
-  transition: "all 0.2s ease",
-  cursor: "pointer",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow:
-      colorMode === "light"
-        ? "0 6px 12px rgba(0, 0, 0, 0.1)"
-        : "0 6px 12px rgba(255, 255, 255, 0.05)",
-  },
-  [theme.breakpoints.down("sm")]: {
-    padding: "1.2rem",
-    minHeight: "250px",
-  },
-}));
-
-const PostContent = styled("div")(({ colorMode, theme }) => ({
-  lineHeight: "1.6",
-  fontSize: "0.95rem",
-  fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
-  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB",
-  wordWrap: "break-word",
-  "& div:first-of-type": {
-    fontWeight: "600",
-    fontSize: "1.05rem",
-    color: colorMode === "light" ? "#242526" : "#DADDE1",
-    marginBottom: "0.5rem",
-  },
-  "& div:last-of-type": {
-    marginTop: "0.5rem",
-    fontWeight: "500",
-    fontSize: "0.9rem",
-    color: colorMode === "light" ? "#606770" : "#B0B3B8",
-  },
-}));
-
-const PaymentOptionIconContainer = styled("div")({
-  display: "inline-block",
-});
-
-const PostActionsContainer = styled("div")(({ theme, colorMode }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  width: "100%",
-  paddingTop: "0.5rem",
-  borderTop:
-    colorMode === "dark" ? "1px solid hsl(210, 18%, 25%)" : "1px solid #e5e7eb",
-}));
-
-const UserInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  width: "100%",
-  marginBottom: "0.75rem",
-}));
-
-const MoreMenuContainer = styled("div")({
-  marginLeft: "auto",
-});
-
-const UserName = styled("div")({
-  fontSize: "1rem",
-  fontWeight: "600",
-  color: "inherit",
-});
-
-const Name = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-});
-
-const DistanceInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  color: "#718096",
-  fontSize: "0.85rem",
-  fontFamily:
-    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-}));
-
-const PostInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  fontSize: "0.85rem",
-  color: "#718096",
-  gap: "0.75rem",
-  fontWeight: "400",
-  textTransform: "capitalize",
-}));
-
-const LeftSide = styled("div")(({ theme }) => ({
-  flex: 1,
-  minWidth: 0,
-  marginRight: "1rem",
-  display: "flex",
-  flexDirection: "column",
-  overflowWrap: "break-word",
-  width: "100%",
-}));
-
-const OnlineIndicator = styled("div")(({ isOnline }) => ({
-  width: "0.5rem",
-  height: "0.5rem",
-  borderRadius: "50%",
-  backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
-  marginLeft: "0.5rem",
-}));
-
-const PaymentOptionIcon = styled("div")({
-  display: "flex",
-  justifyContent: "space-between",
-  width: "100%",
-  height: "100%",
-});
 
 const areEqual = (prevProps, nextProps) =>
   prevProps.linkup.id === nextProps.linkup.id &&
@@ -226,16 +90,12 @@ const FeedItem = ({
             <span
               role="img"
               aria-label="split the bill"
-              style={{
-                fontSize: "30px",
-                ...(window.innerWidth < 600 && { fontSize: "24px" }),
-                fontFamily: "'Segoe UI Emoji', ...",
-              }}
+              className="text-[30px] sm:text-[24px] font-['Segoe_UI_Emoji']"
             >
-              <PaymentOptionIcon>
+              <div className="flex justify-between w-full h-full">
                 <IoReceipt />
                 <IoReceipt />
-              </PaymentOptionIcon>
+              </div>
             </span>
           </Tooltip>
         );
@@ -245,23 +105,19 @@ const FeedItem = ({
             <span
               role="img"
               aria-label="i'll pay"
-              style={{
-                fontSize: "30px",
-                fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
-              }}
+              className="text-[30px] font-['Segoe_UI_Emoji','Apple_Color_Emoji','Segoe_UI','Roboto',sans-serif]"
             >
-              <PaymentOptionIcon>
+              <div className="flex justify-between w-full h-full">
                 <IoReceipt />
-              </PaymentOptionIcon>
+              </div>
             </span>
           </Tooltip>
         );
       case "pleasePay":
         return (
-          <PaymentOptionIconContainer>
+          <div className="inline-block">
             <EmojiTooltip />
-          </PaymentOptionIconContainer>
+          </div>
         );
       default:
         return null;
@@ -269,41 +125,77 @@ const FeedItem = ({
   };
 
   return (
-    <Container>
-      <CardContainer colorMode={colorMode}>
-        <div style={{ display: "flex", width: "100%" }}>
-          <LeftSide>
-            <UserInfo>
-              <Name>
-                <UserName>
-                  <Link to={`/profile/${creator_id}`} className={UserName}>
+    <div className="p-2 w-full bg-transparent">
+      <div
+        className={`w-full min-h-[260px] p-5 rounded-xl transition-all duration-200 ease-in-out cursor-pointer
+        ${
+          colorMode === "dark"
+            ? "bg-[hsl(210,20%,15%)] border-[hsl(210,18%,25%)] shadow-[0_4px_12px_hsla(210,100%,50%,0.08)]"
+            : "bg-white border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+        }
+        hover:-translate-y-0.5
+        ${
+          colorMode === "light"
+            ? "hover:shadow-[0_6px_12px_rgba(0,0,0,0.1)]"
+            : "hover:shadow-[0_6px_12px_rgba(255,255,255,0.05)]"
+        }
+        sm:p-5 sm:min-h-[250px]`}
+      >
+        <div className="flex w-full">
+          <div className="flex-1 min-w-0 mr-4 flex flex-col break-words w-full">
+            <div className="flex items-center justify-between w-full mb-3">
+              <div className="flex items-center gap-2">
+                <div className="text-base font-semibold text-inherit">
+                  <Link
+                    to={`/profile/${creator_id}`}
+                    className="text-base font-semibold text-inherit"
+                  >
                     {creator_name || "Undefined contacts"}
                   </Link>
-                </UserName>
+                </div>
                 {creator_name && (
                   <Tooltip
                     title={linkup.is_online ? "Online" : "Offline"}
                     arrow
                   >
-                    <OnlineIndicator isOnline={linkup.is_online} />
+                    <div
+                      className={`w-2 h-2 rounded-full ml-2 ${
+                        linkup.is_online ? "bg-[#31A24C]" : "bg-[#B0B3B8]"
+                      }`}
+                    />
                   </Tooltip>
                 )}
-              </Name>
-            </UserInfo>
-            <PostInfo>
+              </div>
+            </div>
+            <div className="flex items-center text-sm text-gray-500 gap-3 font-normal capitalize">
               <span>{getTimeAgo(created_at)}</span>
-            </PostInfo>
-            <PostContent colorMode={colorMode}>
+            </div>
+            <div
+              className={`leading-6 text-[0.95rem] font-['Roboto','Helvetica_Neue',Helvetica,Arial,sans-serif] break-words
+              ${colorMode === "light" ? "text-[#1C1E21]" : "text-[#E4E6EB]"}`}
+            >
               {formatActivityText(
                 activity,
                 creator_name,
                 creator_id,
                 formattedDate,
-                UserName
+                "text-[1.05rem] font-semibold"
               )}
-              <div>Location: {capitalizeLocation(location)}</div>
-            </PostContent>
-            <PostActionsContainer colorMode={colorMode}>
+              <div
+                className={`mt-2 text-[0.9rem] font-medium
+                ${colorMode === "light" ? "text-[#606770]" : "text-[#B0B3B8]"}`}
+              >
+                Location: {capitalizeLocation(location)}
+              </div>
+            </div>
+            <div
+              className={`flex items-center justify-between w-full pt-2 border-t
+              ${
+                colorMode === "dark"
+                  ? "border-[hsl(210,18%,25%)]"
+                  : "border-gray-200"
+              }`}
+            >
               {loggedUser.id !== linkup.creator_id && (
                 <PostActions
                   paymentOption={linkup.payment_option}
@@ -312,18 +204,11 @@ const FeedItem = ({
                 />
               )}
               <span>{renderPaymentOptionIcon()}</span>
-            </PostActionsContainer>
-          </LeftSide>
+            </div>
+          </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: "1rem",
-            }}
-          >
-            <MoreMenuContainer>
+          <div className="flex flex-col items-end gap-4">
+            <div className="ml-auto">
               {loggedUser.id === linkup.creator_id ? (
                 <MoreMenu
                   showGoToItem={true}
@@ -341,7 +226,7 @@ const FeedItem = ({
                   scrollToTop={handleScrollToTop}
                 />
               ) : (
-                <DistanceInfo>
+                <div className="flex items-center text-gray-500 text-[0.85rem] font-['system-ui','-apple-system','BlinkMacSystemFont','Segoe_UI',Roboto,Helvetica,Arial,sans-serif]">
                   <span>
                     {distanceInKm ? (
                       distanceInKm < 0.5 ? (
@@ -355,9 +240,9 @@ const FeedItem = ({
                       <CircularProgress size={24} />
                     )}
                   </span>
-                </DistanceInfo>
+                </div>
               )}
-            </MoreMenuContainer>
+            </div>
             {creator_name && (
               <UserAvatar
                 userData={{
@@ -371,8 +256,8 @@ const FeedItem = ({
             )}
           </div>
         </div>
-      </CardContainer>
-    </Container>
+      </div>
+    </div>
   );
 };
 
