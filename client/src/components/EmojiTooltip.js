@@ -31,7 +31,7 @@ const EmojiTooltip = () => {
         role="img"
         aria-label="pleading face"
         style={{
-          fontSize: "14px",
+          fontSize: "24px",
           fontFamily:
             "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
         }}

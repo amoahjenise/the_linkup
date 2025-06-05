@@ -6,4 +6,5 @@ RETURNING
     (SELECT latitude FROM users WHERE users.id = $1::uuid) AS latitude,
     (SELECT longitude FROM users WHERE users.id = $1::uuid) AS longitude,
     (SELECT date_of_birth FROM users WHERE users.id = $1::uuid) AS date_of_birth,
-    (SELECT gender FROM users WHERE users.id = $1::uuid) AS creator_gender;
+    (SELECT gender FROM users WHERE users.id = $1::uuid) AS creator_gender,
+    (SELECT is_online FROM users WHERE users.id = $1::uuid) AS is_online;

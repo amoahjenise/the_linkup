@@ -12,6 +12,7 @@ import { SocketProvider } from "./contexts/SocketContext";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { PrimeReactProvider } from "primereact/api";
 import { dark } from "@clerk/themes";
+import "./App.css";
 
 Modal.setAppElement("#root");
 

@@ -1,491 +1,272 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import useFeedItemUtils from "../hooks/useFeedItemUtils"; // Adjust the path accordingly
-import { styled } from "@mui/material/styles";
+import useFeedItemUtils from "../hooks/useFeedItemUtils";
 import { useColorMode } from "@chakra-ui/react";
-import UserAvatar from "./UserAvatar"; // Placeholder
-import MoreMenu from "./MoreMenu"; // Placeholder
-import PostActions from "./PostActions"; // Placeholder
+import UserAvatar from "./UserAvatar";
+import MoreMenu from "./MoreMenu";
+import PostActions from "./PostActions";
 import { CircularProgress } from "@mui/material";
 import EmojiTooltip from "./EmojiTooltip";
 import { Tooltip } from "@mui/material";
 import { IoReceipt } from "react-icons/io5";
 import { useSnackbar } from "../contexts/SnackbarContext";
 import { getLinkupStatus } from "../api/linkUpAPI";
+import { FiMapPin, FiCalendar } from "react-icons/fi";
 
-// Container wrapper
-const Container = styled("div")(({ theme }) => ({
-  padding: "0.4rem 0.8rem",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "transparent",
-  [theme.breakpoints.down("sm")]: {
-    alignItems: "flex-start",
-    padding: "0.4rem 0.6rem",
-  },
-}));
+const areEqual = (prevProps, nextProps) =>
+  prevProps.linkup.id === nextProps.linkup.id &&
+  prevProps.linkup.updatedAt === nextProps.linkup.updatedAt;
 
-// Card-like container with refined hover effects
-const CardContainer = styled("div")(({ theme, colorMode }) => ({
-  // Base styles (mobile-first)
-  width: "100%",
-  minHeight: "175px",
-  padding: "1rem",
-  borderRadius: "1rem",
-
-  // Color and effects
-  backgroundColor:
-    colorMode === "dark" ? "hsl(210, 100.00%, 50.00%)" : "#FFFFFF",
-  border:
-    colorMode === "dark"
-      ? "1px solid hsl(210, 18%, 20%)" // Muted, deep blue for subtle sophistication
-      : "1px solid #e5e7eb", // Light border for contrast in light mode
-  boxShadow:
-    colorMode === "dark"
-      ? "0 4px 20px hsla(210, 100%, 50%, 0.12)" // Soft shadow with a hint of blue for professionalism
-      : "0 2px 8px rgba(0, 0, 0, 0.08)", // Lighter shadow in light mode
-  backdropFilter: colorMode === "dark" ? "blur(12px)" : "none",
-  backgroundImage:
-    colorMode === "dark"
-      ? "linear-gradient(to bottom, hsla(210, 18%, 13%, 0.9), hsla(210, 20%, 15%, 0.95))"
-      : "none",
-
-  // Responsive widths for smaller screens
-
-  [theme.breakpoints.down("sm")]: {
-    padding: "1rem 1.25rem",
-    borderRadius: "0.75rem",
-  },
-
-  // Responsive widths for larger screens
-  [theme.breakpoints.up("md")]: {
-    width: "100%",
-  },
-  [theme.breakpoints.up("lg")]: {
-    width: "100%",
-  },
-  [theme.breakpoints.up("xl")]: {
-    width: "100%",
-  },
-  [theme.breakpoints.up(1800)]: {
-    width: "60%",
-  },
-
-  // Hover effects
-  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-  "&:hover": {
-    transform: "translateY(-3px)",
-    boxShadow:
-      colorMode === "light"
-        ? "0 6px 18px rgba(0, 0, 0, 0.1)"
-        : "0 6px 18px rgba(255, 255, 255, 0.15)", // Lighter hover effect
-  },
-  cursor: "pointer",
-
-  // Additional highlights for engaging interactions
-  "& .cta-button": {
-    backgroundColor:
-      colorMode === "dark" ? "hsl(340, 70%, 50%)" : "hsl(45, 100%, 50%)", // Red for urgency in dark, yellow for energy in light mode
-    color: "#FFFFFF",
-    borderRadius: "0.5rem",
-    padding: "0.8rem 1.5rem",
-    transition: "background-color 0.3s ease",
-    "&:hover": {
-      backgroundColor:
-        colorMode === "dark" ? "hsl(340, 70%, 55%)" : "hsl(45, 100%, 60%)", // Slightly lighter for hover
+const FeedItem = forwardRef(
+  (
+    {
+      linkup,
+      addLinkup,
+      updateLinkup,
+      removeLinkup,
+      handleScrollToTop,
+      loggedUser,
+      sentRequests,
     },
-  },
-}));
+    ref
+  ) => {
+    const { colorMode } = useColorMode();
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const navigate = useNavigate();
+    const { addSnackbar } = useSnackbar();
 
-// Menu container for additional options
-const MoreMenuContainer = styled("div")({
-  marginLeft: "auto",
-});
+    const {
+      id,
+      created_at,
+      creator_id,
+      creator_name,
+      activity,
+      date,
+      avatar,
+      location,
+      latitude,
+      longitude,
+    } = linkup;
 
-// Username styling with a modern touch
-const UserName = styled("div")({
-  fontSize: "0.9rem",
-  fontWeight: "600",
-  color: "inherit",
-});
+    const {
+      getTimeAgo,
+      capitalizeLocation,
+      formatActivityText,
+      useDistance,
+      formatDate,
+    } = useFeedItemUtils();
 
-// User name and online status container
-const Name = styled("div")({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-});
+    const formattedDate = formatDate(date);
+    const distanceInKm = useDistance(loggedUser, latitude, longitude);
+    const disableRequest = sentRequests.has(linkup.id);
 
-// User info container
-const UserInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: "0.5rem",
-  flexWrap: "wrap",
-  [theme.breakpoints.down("sm")]: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "0.3rem",
-  },
-}));
+    const handleRequestLinkup = async (linkupId) => {
+      const response = await getLinkupStatus(linkupId);
+      let message = "";
 
-const PostActionsContainer = styled("div")(() => ({
-  display: "flex",
-  alignItems: "center",
-  marginTop: "0.5rem",
-}));
+      const isDisabled = sentRequests.has(linkupId); // fresh check
 
-// Distance and meta information
-const DistanceInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  color: "#718096",
-  marginBottom: "1rem",
-  // marginLeft: "2rem",
-  fontSize: "0.8rem",
-  fontFamily:
-    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-  [theme.breakpoints.down("sm")]: {
-    fontSize: "0.7rem",
-    flexDirection: "column", // stack meta info
-    alignItems: "flex-start",
-    gap: "0.25rem",
-  },
-}));
+      switch (response.linkupStatus) {
+        case "expired":
+          message = "This linkup has expired.";
+          break;
+        case "closed":
+          message =
+            "This linkup was closed and can no longer receive requests.";
+          break;
+        case "inactive":
+          message = "This linkup was deleted.";
+          break;
+        default:
+          const destination = isDisabled
+            ? `/history/requests-sent`
+            : `/send-request/${linkupId}`;
+          navigate(destination);
+          return;
+      }
 
-// Post content component with word wrapping
-const PostContent = styled("div")(({ colorMode, theme }) => ({
-  marginTop: "1rem",
-  lineHeight: "1.5rem",
-  fontSize: "0.9rem",
-  fontFamily: 'Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif',
-  color: colorMode === "light" ? "#1C1E21" : "#E4E6EB",
-  wordWrap: "break-word", // Added word wrapping
+      if (!isDisabled) {
+        addSnackbar(message, { timeout: 7000 });
+      }
+    };
 
-  "& div:first-of-type": {
-    fontWeight: "600",
-    color: colorMode === "light" ? "#242526" : "#DADDE1",
-    marginBottom: "10px",
-  },
+    const renderPaymentOptionIcon = () => {
+      switch (linkup.payment_option) {
+        case "split":
+          return (
+            <Tooltip title="Let's split the bill!">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
+                <IoReceipt className="text-lg" />
+              </div>
+            </Tooltip>
+          );
+        case "iWillPay":
+          return (
+            <Tooltip title="I'll pay!">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-300">
+                <IoReceipt className="text-lg" />
+              </div>
+            </Tooltip>
+          );
+        case "pleasePay":
+          return (
+            <div className="inline-block">
+              <EmojiTooltip />
+            </div>
+          );
+        default:
+          return null;
+      }
+    };
 
-  "& p": {
-    fontWeight: "400",
-    marginBottom: "8px",
-  },
+    const renderDistance = () => {
+      if (!distanceInKm) return <CircularProgress size={16} />;
 
-  "& div:last-of-type": {
-    marginTop: "2px",
-    fontWeight: "500",
-    fontSize: "0.85rem",
-    color: colorMode === "light" ? "#606770" : "#D1D4D9",
-  },
+      const distance = parseFloat(distanceInKm);
+      if (isNaN(distance)) return "Nearby";
 
-  [theme.breakpoints.down("sm")]: {
-    fontSize: "0.8rem", // Smaller font size for mobile
-    "& div:last-of-type": {
-      fontSize: "0.8rem", // Smaller meta font on mobile
-    },
-  },
-}));
+      if (distance < 0.5) return "< 500m away";
+      if (distance < 1) return "< 1 km away";
+      return `${distance.toFixed(1)} km away`;
+    };
 
-// Post metadata (timestamp, location, etc.)
-const PostInfo = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  fontSize: "0.8rem",
-  color: "#718096",
-  gap: "12px",
-  fontWeight: "400",
-  textTransform: "capitalize",
-
-  // MODIFY THIS MEDIA QUERY:
-  [theme.breakpoints.down("sm")]: {
-    fontSize: "0.7rem",
-    flexDirection: "column", // stack meta info
-    alignItems: "flex-start",
-    gap: "0.25rem",
-  },
-}));
-
-// Adjusting the left side container
-const LeftSide = styled("div")(({ theme }) => ({
-  flex: 1,
-  minWidth: 0,
-  marginRight: "1rem",
-  display: "flex",
-  flexDirection: "column",
-  overflowWrap: "break-word", // Ensures no overflow
-  width: "100%", // Ensure it takes the full available space
-}));
-
-// Online status indicator
-const OnlineIndicator = styled("div")(({ isOnline }) => ({
-  width: "0.5rem",
-  height: "0.5rem",
-  borderRadius: "50%",
-  backgroundColor: isOnline ? "#31A24C" : "#B0B3B8",
-  marginLeft: "0.5rem",
-}));
-
-// Payment option icon container
-const PaymentOptionIcon = styled("div")({
-  display: "flex",
-  justifyContent: "space-between",
-  width: "50%",
-  height: "50%",
-});
-
-const PaymentOptionIconContainer = styled("div")({
-  display: "inline-block",
-});
-
-const FeedItem = ({
-  linkup,
-  addLinkup,
-  updateLinkup,
-  removeLinkup,
-  handleScrollToTop,
-  loggedUser,
-  sentRequests,
-}) => {
-  const { colorMode } = useColorMode();
-
-  const [menuAnchor, setMenuAnchor] = useState(null);
-
-  const navigate = useNavigate();
-
-  const { addSnackbar } = useSnackbar();
-
-  const {
-    id,
-    created_at,
-    creator_id,
-    creator_name,
-    activity,
-    date,
-    avatar,
-    location,
-    latitude,
-    longitude,
-  } = linkup;
-
-  const {
-    getTimeAgo,
-    capitalizeLocation,
-    formatActivityText,
-    useDistance,
-    formatDate,
-  } = useFeedItemUtils();
-
-  const formattedDate = formatDate(date);
-
-  const distanceInKm = useDistance(loggedUser, latitude, longitude); // Use the distance hook
-
-  const disableRequest = sentRequests.has(linkup.id);
-
-  const handleRequestLinkup = async (linkupId) => {
-    const response = await getLinkupStatus(linkupId);
-    let message = "";
-
-    switch (response.linkupStatus) {
-      case "expired":
-        message = "This linkup has expired.";
-        break;
-      case "closed":
-        message = "This linkup was closed and can no longer receive requests.";
-        break;
-      case "inactive":
-        message = "This linkup was deleted.";
-        break;
-      default:
-        const destination = disableRequest
-          ? `/history/requests-sent`
-          : `/send-request/${linkupId}`;
-        navigate(destination);
-        return;
-    }
-
-    if (!disableRequest) {
-      addSnackbar(message, { timeout: 7000 });
-    }
-  };
-
-  const renderPaymentOptionIcon = () => {
-    switch (linkup.payment_option) {
-      case "split":
-        return (
-          <Tooltip title="Lets split the bill!">
-            <span
-              role="img"
-              aria-label="split the bill"
-              style={{
-                fontSize: "30px",
-                ...(window.innerWidth < 600 && { fontSize: "24px" }), // mobile size
-                fontFamily: "'Segoe UI Emoji', ...",
-              }}
-            >
-              <PaymentOptionIcon>
-                <IoReceipt />
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>
-          </Tooltip>
-        );
-      case "iWillPay":
-        return (
-          <Tooltip title="I'll pay!">
-            <span
-              role="img"
-              aria-label="i'll pay"
-              style={{
-                fontSize: "30px",
-                fontFamily:
-                  "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
-              }}
-            >
-              <PaymentOptionIcon>
-                <IoReceipt />
-              </PaymentOptionIcon>
-            </span>
-          </Tooltip>
-        );
-      case "pleasePay":
-        return (
-          <PaymentOptionIconContainer>
-            <EmojiTooltip />
-          </PaymentOptionIconContainer>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <Container>
-      <CardContainer colorMode={colorMode}>
+    return (
+      <div ref={ref} className="px-2 py-0.5 w-full bg-transparent">
         <div
-          style={{
-            display: "flex",
-            flex: 1,
-            flexWrap: "wrap", // allow wrapping
-            width: "100%",
-            justifyContent: "space-between",
-            rowGap: "0.5rem", // better spacing for stacked content
-          }}
+          className={`w-full min-h-[220px] p-4 rounded-lg transition-all duration-200 ease-in-out cursor-pointer
+        ${
+          colorMode === "dark"
+            ? "bg-gray-800 border-gray-700 shadow-md hover:shadow-lg hover:shadow-blue-900/10"
+            : "bg-white border-gray-100 shadow-sm hover:shadow-md hover:shadow-blue-500/10"
+        }
+        hover:-translate-y-0.5 border mb-1`}
         >
-          {/* Left Side */}
-          <LeftSide>
-            <UserInfo>
-              <Name>
-                <UserName>
-                  <Link to={`/profile/${creator_id}`} className={UserName}>
-                    {creator_name}
-                  </Link>
-                </UserName>
-                <Tooltip title={linkup.is_online ? "Online" : "Offline"} arrow>
-                  <OnlineIndicator isOnline={linkup.is_online} />
-                </Tooltip>
-              </Name>
-            </UserInfo>
-            <PostInfo>
-              <span>{getTimeAgo(created_at)}</span>
-            </PostInfo>
-            <PostContent colorMode={colorMode}>
-              {formatActivityText(
-                activity,
-                creator_name,
-                creator_id,
-                formattedDate,
-                UserName
-              )}
-              <div>Location: {capitalizeLocation(location)}</div>
-            </PostContent>
-            <PostActionsContainer>
-              {loggedUser.id !== linkup.creator_id && (
-                <div>
+          <div className="flex w-full gap-3">
+            <div className="flex-1 min-w-0 flex flex-col break-words w-full">
+              <div className="flex items-center justify-between w-full mb-3">
+                <div className="flex items-center gap-2">
+                  <UserAvatar
+                    userData={{
+                      id: creator_id,
+                      name: creator_name,
+                      avatar: avatar,
+                    }}
+                    width="60px"
+                    height="60px"
+                    className="border border-white shadow-xs"
+                  />
                   <div>
-                    <PostActions
-                      paymentOption={linkup.payment_option}
-                      onRequestClick={() => handleRequestLinkup(linkup.id)}
-                      disableRequest={disableRequest}
-                    />
+                    <Link
+                      to={`/profile/${creator_id}`}
+                      className={`text-base font-semibold hover:underline ${
+                        colorMode === "light" ? "text-gray-900" : "text-white"
+                      }`}
+                    >
+                      {creator_name || "Undefined contacts"}
+                    </Link>
+                    <div className="flex items-center text-xs mt-0.5">
+                      <span
+                        className={`${
+                          colorMode === "light"
+                            ? "text-gray-500"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {getTimeAgo(created_at)}
+                      </span>
+                      {creator_name && (
+                        <Tooltip
+                          title={linkup.is_online ? "Online" : "Offline"}
+                          arrow
+                        >
+                          <div
+                            className={`w-1.5 h-1.5 rounded-full ml-1.5 ${
+                              linkup.is_online ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                          />
+                        </Tooltip>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-              <span>{renderPaymentOptionIcon()}</span>
-            </PostActionsContainer>
-          </LeftSide>
 
-          {/* Right Side */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              justifyContent: "center",
-            }}
-          >
-            <MoreMenuContainer>
-              {loggedUser.id === linkup.creator_id ? (
-                <MoreMenu
-                  showGoToItem={true}
-                  showEditItem={true}
-                  showDeleteItem={true}
-                  showCloseItem={true}
-                  showCheckInLinkup={false}
-                  showAcceptLinkupRequest={false}
-                  linkupItem={linkup}
-                  addLinkup={addLinkup}
-                  updateLinkup={updateLinkup}
-                  removeLinkup={removeLinkup}
-                  menuAnchor={menuAnchor}
-                  setMenuAnchor={setMenuAnchor}
-                  scrollToTop={handleScrollToTop}
-                />
-              ) : (
-                <DistanceInfo>
-                  <span>
-                    {distanceInKm ? (
-                      distanceInKm < 0.5 ? (
-                        "< 500m away"
-                      ) : distanceInKm < 1 ? (
-                        "< 1 km away"
-                      ) : (
-                        `${distanceInKm} km away`
-                      )
-                    ) : (
-                      <CircularProgress size={24} />
-                    )}
-                  </span>
-                </DistanceInfo>
-              )}
-            </MoreMenuContainer>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
-            >
-              <UserAvatar
-                userData={{
-                  id: creator_id,
-                  name: creator_name,
-                  avatar: avatar,
-                }}
-                width="100px"
-                height="100px"
-              />
+                <div className="ml-auto">
+                  {loggedUser.id === linkup.creator_id ? (
+                    <MoreMenu
+                      showGoToItem={true}
+                      showEditItem={true}
+                      showDeleteItem={true}
+                      showCloseItem={true}
+                      showCheckInLinkup={false}
+                      showAcceptLinkupRequest={false}
+                      linkupItem={linkup}
+                      addLinkup={addLinkup}
+                      updateLinkup={updateLinkup}
+                      removeLinkup={removeLinkup}
+                      menuAnchor={menuAnchor}
+                      setMenuAnchor={setMenuAnchor}
+                      scrollToTop={handleScrollToTop}
+                    />
+                  ) : (
+                    <div className="flex items-center text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                      {renderDistance()}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div
+                className={`leading-normal text-sm mb-3 font-['Inter',sans-serif] break-words
+              ${colorMode === "light" ? "text-gray-700" : "text-gray-200"}`}
+              >
+                {formatActivityText(
+                  activity,
+                  creator_name,
+                  creator_id,
+                  formattedDate,
+                  "text-base font-semibold mb-1"
+                )}
+
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <div
+                    className={`flex items-center text-xs ${
+                      colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  >
+                    <FiCalendar className="mr-1" size={14} />
+                    {formattedDate}
+                  </div>
+                  <div
+                    className={`flex items-center text-xs ${
+                      colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  >
+                    <FiMapPin className="mr-1" size={14} />
+                    {capitalizeLocation(location)}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`flex items-center justify-between w-full pt-3 mt-auto border-t ${
+                  colorMode === "dark" ? "border-gray-700" : "border-gray-100"
+                }`}
+              >
+                {loggedUser.id !== linkup.creator_id && (
+                  <PostActions
+                    paymentOption={linkup.payment_option}
+                    onRequestClick={() => handleRequestLinkup(linkup.id)}
+                    disableRequest={disableRequest}
+                  />
+                )}
+                <div className="ml-auto">{renderPaymentOptionIcon()}</div>
+              </div>
             </div>
           </div>
         </div>
-      </CardContainer>
-    </Container>
-  );
-};
+      </div>
+    );
+  }
+);
 
-export default FeedItem;
+export default React.memo(FeedItem, areEqual);

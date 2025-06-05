@@ -143,5 +143,6 @@ export const useFeed = (userId, gender, userLocation, pageSize = 3) => {
     updateLinkup,
     removeLinkup,
     reload: refreshFeed,
+    hasLoadedOnce,
   };
 };

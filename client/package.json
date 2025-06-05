@@ -50,7 +50,8 @@
     "react-select": "^5.8.1",
     "react-slick": "^0.30.2",
     "react-step-progress-bar": "^1.0.3",
-    "react-window": "^1.8.9",
+    "react-virtualized-auto-sizer": "^1.0.26",
+    "react-window": "^1.8.11",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
@@ -91,8 +92,10 @@
     ]
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.21",
     "babel-plugin-webpack-alias": "^2.1.2",
     "ignore-loader": "^0.1.2",
+    "postcss": "^8.5.4",
     "webpack-node-externals": "^3.0.0"
   }
 }
