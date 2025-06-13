@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useFeedItemUtils from "../hooks/useFeedItemUtils";
 import { useColorMode } from "@chakra-ui/react";
@@ -32,6 +32,8 @@ const FeedItem = forwardRef(
   ) => {
     const { colorMode } = useColorMode();
     const [menuAnchor, setMenuAnchor] = useState(null);
+    const [tilt, setTilt] = useState({ x: 0, y: 0 });
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const navigate = useNavigate();
     const { addSnackbar } = useSnackbar();
 
@@ -59,6 +61,43 @@ const FeedItem = forwardRef(
     const formattedDate = formatDate(date);
     const distanceInKm = useDistance(loggedUser, latitude, longitude);
     const disableRequest = sentRequests.has(linkup.id);
+
+    useEffect(() => {
+      const handleMouseMove = (e) => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      };
+
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+      };
+    }, []);
+
+    const handleMouseEnter = () => {
+      // Reset tilt on enter
+      setTilt({ x: 0, y: 0 });
+    };
+
+    const handleMouseMove = (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const tiltX = ((y - centerY) / centerY) * 5;
+      const tiltY = ((centerX - x) / centerX) * 5;
+
+      setTilt({ x: tiltX, y: tiltY });
+    };
+
+    const handleMouseLeave = () => {
+      // Smoothly return to neutral position
+      setTimeout(() => {
+        setTilt({ x: 0, y: 0 });
+      }, 100);
+    };
 
     const handleRequestLinkup = async (linkupId) => {
       const response = await getLinkupStatus(linkupId);
@@ -95,15 +134,16 @@ const FeedItem = forwardRef(
         case "split":
           return (
             <Tooltip title="Let's split the bill!">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                <IoReceipt className="text-lg" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100/70 backdrop-blur-md dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
+                <IoReceipt className="text-m" />
+                <IoReceipt className="text-m" />
               </div>
             </Tooltip>
           );
         case "iWillPay":
           return (
             <Tooltip title="I'll pay!">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-300">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100/70 backdrop-blur-md dark:bg-green-900/30 text-green-600 dark:text-green-300 border border-green-200/50 dark:border-green-800/50 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]">
                 <IoReceipt className="text-lg" />
               </div>
             </Tooltip>
@@ -133,15 +173,51 @@ const FeedItem = forwardRef(
     return (
       <div ref={ref} className="px-2 py-0.5 w-full bg-transparent">
         <div
-          className={`w-full min-h-[220px] p-4 rounded-lg transition-all duration-200 ease-in-out cursor-pointer
-        ${
-          colorMode === "dark"
-            ? "bg-gray-800 border-gray-700 shadow-md hover:shadow-lg hover:shadow-blue-900/10"
-            : "bg-white border-gray-100 shadow-sm hover:shadow-md hover:shadow-blue-500/10"
-        }
-        hover:-translate-y-0.5 border mb-1`}
+          className={`w-full min-h-[220px] p-4 rounded-2xl transition-all duration-500 ease-out cursor-pointer relative overflow-hidden
+          ${
+            colorMode === "dark"
+              ? "bg-gray-800/30 backdrop-blur-md border border-gray-700/50 shadow-lg hover:shadow-xl"
+              : "bg-white/70 backdrop-blur-md border border-gray-200/50 shadow-sm hover:shadow-md"
+          }
+          hover:-translate-y-1 mb-2`}
+          style={{
+            transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+            transition: "transform 0.5s cubic-bezier(0.03, 0.98, 0.52, 0.99)",
+          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
-          <div className="flex w-full gap-3">
+          {/* Glass reflection effect */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `
+                radial-gradient(
+                  600px circle at ${mousePosition.x}px ${mousePosition.y}px,
+                  rgba(255, 255, 255, ${
+                    colorMode === "dark" ? "0.05" : "0.3"
+                  }) 0%,
+                  rgba(255, 255, 255, 0) 70%
+                )
+              `,
+              mask: "linear-gradient(transparent, white 20%, white 80%, transparent)",
+              WebkitMask:
+                "linear-gradient(transparent, white 20%, white 80%, transparent)",
+            }}
+          />
+
+          {/* Inner glow */}
+          <div
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              boxShadow: `inset 0 0 12px rgba(255, 255, 255, ${
+                colorMode === "dark" ? "0.1" : "0.3"
+              })`,
+            }}
+          />
+
+          <div className="relative z-10 flex w-full gap-3">
             <div className="flex-1 min-w-0 flex flex-col break-words w-full">
               <div className="flex items-center justify-between w-full mb-3">
                 <div className="flex items-center gap-2">
@@ -153,7 +229,7 @@ const FeedItem = forwardRef(
                     }}
                     width="60px"
                     height="60px"
-                    className="border border-white shadow-xs"
+                    className="border-2 border-white/50 shadow-lg"
                   />
                   <div>
                     <Link
@@ -168,8 +244,8 @@ const FeedItem = forwardRef(
                       <span
                         className={`${
                           colorMode === "light"
-                            ? "text-gray-500"
-                            : "text-gray-400"
+                            ? "text-gray-600"
+                            : "text-gray-300"
                         }`}
                       >
                         {getTimeAgo(created_at)}
@@ -208,7 +284,14 @@ const FeedItem = forwardRef(
                       scrollToTop={handleScrollToTop}
                     />
                   ) : (
-                    <div className="flex items-center text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                    <div
+                      className={`flex items-center text-xs px-3 py-1 rounded-full 
+                      ${
+                        colorMode === "light"
+                          ? "bg-white/80 text-gray-700 border border-gray-200/50 shadow-sm"
+                          : "bg-gray-800/50 text-gray-300 border border-gray-700/50 shadow-sm"
+                      }`}
+                    >
                       {renderDistance()}
                     </div>
                   )}
@@ -217,7 +300,7 @@ const FeedItem = forwardRef(
 
               <div
                 className={`leading-normal text-sm mb-3 font-['Inter',sans-serif] break-words
-              ${colorMode === "light" ? "text-gray-700" : "text-gray-200"}`}
+                ${colorMode === "light" ? "text-gray-700" : "text-gray-200"}`}
               >
                 {formatActivityText(
                   activity,
@@ -227,21 +310,25 @@ const FeedItem = forwardRef(
                   "text-base font-semibold mb-1"
                 )}
 
-                <div className="flex flex-wrap gap-2 mt-3">
+                <div className="flex flex-wrap gap-3 mt-4">
                   <div
-                    className={`flex items-center text-xs ${
-                      colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                    className={`flex items-center text-sm px-3 py-1.5 rounded-full ${
+                      colorMode === "light"
+                        ? "bg-white/80 text-gray-700 border border-gray-200/50"
+                        : "bg-gray-800/50 text-gray-300 border border-gray-700/50"
                     }`}
                   >
-                    <FiCalendar className="mr-1" size={14} />
+                    <FiCalendar className="mr-2" size={14} />
                     {formattedDate}
                   </div>
                   <div
-                    className={`flex items-center text-xs ${
-                      colorMode === "light" ? "text-gray-600" : "text-gray-400"
+                    className={`flex items-center text-sm px-3 py-1.5 rounded-full ${
+                      colorMode === "light"
+                        ? "bg-white/80 text-gray-700 border border-gray-200/50"
+                        : "bg-gray-800/50 text-gray-300 border border-gray-700/50"
                     }`}
                   >
-                    <FiMapPin className="mr-1" size={14} />
+                    <FiMapPin className="mr-2" size={14} />
                     {capitalizeLocation(location)}
                   </div>
                 </div>
@@ -249,7 +336,9 @@ const FeedItem = forwardRef(
 
               <div
                 className={`flex items-center justify-between w-full pt-3 mt-auto border-t ${
-                  colorMode === "dark" ? "border-gray-700" : "border-gray-100"
+                  colorMode === "dark"
+                    ? "border-gray-700/50"
+                    : "border-gray-200/50"
                 }`}
               >
                 {loggedUser.id !== linkup.creator_id && (

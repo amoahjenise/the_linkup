@@ -4,6 +4,7 @@ import React, {
   useRef,
   useCallback,
   useState,
+  useEffect,
 } from "react";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -27,14 +28,24 @@ const VirtualizedFeed = forwardRef(
     ref
   ) => {
     const listRef = useRef(null);
+    const outerRef = useRef(null);
     const [containerHeight, setContainerHeight] = useState(0);
 
     useImperativeHandle(ref, () => ({
       scrollTo: (options) => {
-        listRef.current?.scrollTo(options?.top ?? 0);
+        if (listRef.current) {
+          listRef.current.scrollTo(options?.top ?? 0);
+        }
       },
-      getScrollElement: () => listRef.current?.outerRef?.firstElementChild, // Get the actual scroll container
-      getScrollPosition: () => listRef.current?.state?.scrollOffset ?? 0,
+      getScrollElement: () => outerRef.current,
+      getScrollPosition: () => {
+        return outerRef.current?.scrollTop ?? 0;
+      },
+      isReady: () => !!listRef.current && !!outerRef.current,
+      getState: () => ({
+        scrollOffset: listRef.current?.state?.scrollOffset ?? 0,
+        scrollDirection: listRef.current?.state?.scrollDirection ?? "forward",
+      }),
     }));
 
     const getItemSize = useCallback(() => 250, []);
@@ -43,17 +54,37 @@ const VirtualizedFeed = forwardRef(
       if (
         hasMore &&
         !loading &&
-        scrollOffset + containerHeight >= linkups.length * getItemSize() - 100
+        scrollOffset + containerHeight >= linkups.length * getItemSize() - 300
       ) {
         loadMore();
       }
     };
 
+    useEffect(() => {
+      const estimatedContentHeight = linkups.length * getItemSize();
+      if (
+        hasMore &&
+        !loading &&
+        containerHeight > 0 &&
+        estimatedContentHeight <= containerHeight + 100
+      ) {
+        loadMore();
+      }
+    }, [
+      linkups.length,
+      containerHeight,
+      hasMore,
+      loading,
+      loadMore,
+      getItemSize,
+    ]);
+
     return (
       <AutoSizer>
         {({ height, width }) => {
-          // Update containerHeight state on every AutoSizer resize
-          if (height !== containerHeight) setContainerHeight(height);
+          if (containerHeight !== height) {
+            setContainerHeight(height);
+          }
 
           return (
             <List
@@ -63,6 +94,7 @@ const VirtualizedFeed = forwardRef(
               width={width}
               onScroll={onScroll}
               ref={listRef}
+              outerRef={outerRef}
               overscanCount={2}
               style={{
                 scrollbarWidth: "thin",

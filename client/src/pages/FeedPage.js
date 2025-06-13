@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useCallback,
-  useState,
-  useMemo,
-  Suspense,
-} from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
@@ -57,6 +50,17 @@ function useSessionStorage(key, defaultValue, { serialize, deserialize }) {
   return [state, setState];
 }
 
+function simpleHash(feed) {
+  if (!feed || feed.length === 0) return "";
+
+  // Take first 3 and last 3 items for better stability
+  const itemsToHash = [...feed.slice(0, 3), ...feed.slice(-3)];
+
+  return itemsToHash
+    .map((item) => `${item.id}:${item.updatedAt || ""}`)
+    .join("|");
+}
+
 const LoadingIndicator = () => (
   <div
     style={{
@@ -73,22 +77,26 @@ const LoadingIndicator = () => (
 const StyledScrollToTopButton = styled(ScrollToTopButton)(
   ({ theme, $visible }) => ({
     position: "fixed",
-    bottom: 80,
-    right: 20,
+    bottom: theme.spacing(10),
+    right: theme.spacing(2),
     zIndex: 1000,
     opacity: $visible ? 1 : 0,
-    pointerEvents: $visible ? "auto" : "none", // Disable interactions when hidden
-    transition: "opacity 0.3s ease",
-    transform: $visible ? "scale(1)" : "scale(0.8)", // Optional: Add a small scale effect
+    pointerEvents: $visible ? "auto" : "none",
+    transition: "opacity 0.3s ease, transform 0.3s ease",
+    transform: $visible ? "translateY(0)" : "translateY(20px)",
+    "&:hover": {
+      transform: $visible ? "translateY(-2px)" : "translateY(20px)",
+    },
   })
 );
 
 const EndOfFeedIndicator = ({ colorMode }) => (
   <div
     style={{
-      padding: "20px",
+      padding: "40px 20px",
       textAlign: "center",
       color: colorMode === "dark" ? "#E4E6EB" : "#606770",
+      fontSize: "0.9rem",
     }}
   >
     You've reached the end of the feed
@@ -148,7 +156,6 @@ const WidgetSectionContainer = styled("div", {
   },
 }));
 
-// CreateLinkupFloatingButton (already fixed in your snippet)
 const CreateLinkupFloatingButton = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== "isClose",
 })(({ theme, isClose, colorMode, opacity }) => ({
@@ -194,10 +201,8 @@ export default function FeedPage({ isMobile }) {
 
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [buttonOpacity, setButtonOpacity] = useState(1);
-  const scrollContainerRef = useRef(null);
 
-  const virtualizedFeedRef = useRef(null);
-  const observer = useRef(null);
+  const virtualizedScrollRef = useRef(null);
   const isRestoringScroll = useRef(false);
 
   const [linkupFormData, setLinkupFormData] = useSessionStorage(
@@ -276,93 +281,159 @@ export default function FeedPage({ isMobile }) {
     [debouncedSearch]
   );
 
-  const debouncedSaveScrollPosition = useMemo(
-    () =>
-      debounce(() => {
-        if (virtualizedFeedRef.current && !isRestoringScroll.current) {
-          sessionStorage.setItem(
-            "feedScrollData",
-            JSON.stringify({
-              position: virtualizedFeedRef.current.scrollTop,
-              feedLength: filteredFeed.length,
-            })
-          );
-        }
-      }, 500),
-    [filteredFeed.length]
-  );
+  const latestFeedRef = useRef(filteredFeed);
+  useEffect(() => {
+    latestFeedRef.current = filteredFeed;
+  }, [filteredFeed]);
 
-  const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+  const debouncedSaveScrollPosition = useMemo(() => {
+    return debounce(() => {
+      if (virtualizedScrollRef.current && !isRestoringScroll.current) {
+        const scrollPosition = virtualizedScrollRef.current.getScrollPosition();
+        const firstItem = latestFeedRef.current[0];
+        const state = virtualizedScrollRef.current.getState?.();
 
-    const scrollTop = scrollContainerRef.current.scrollTop;
-    debouncedSaveScrollPosition();
-    setShowScrollTop(scrollTop > 300);
-    setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollTop, 200) / 200));
-  }, [debouncedSaveScrollPosition]);
+        sessionStorage.setItem(
+          "feedScrollData",
+          JSON.stringify({
+            position: scrollPosition,
+            feedLength: latestFeedRef.current.length,
+            feedVersion: firstItem?.updatedAt || firstItem?.id,
+            feedHash: simpleHash(latestFeedRef.current),
+            scrollDirection: state?.scrollDirection,
+          })
+        );
+      }
+    }, 500);
+  }, []);
 
   const scrollToTop = useCallback(() => {
-    if (virtualizedFeedRef.current) {
-      virtualizedFeedRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    if (virtualizedScrollRef.current) {
+      virtualizedScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, []);
 
-  // Remove the duplicate useEffect for scroll handling and keep only this one:
-  useEffect(() => {
-    const scrollElement = virtualizedFeedRef.current?.getScrollElement?.();
-    if (!scrollElement) return;
+  const handleScroll = useCallback(() => {
+    const scrollPosition =
+      virtualizedScrollRef.current?.getScrollPosition() ?? 0;
 
-    const handleScroll = () => {
-      const scrollTop = scrollElement.scrollTop;
+    console.log("Scroll position:", scrollPosition); // ✅ Add this line
+
+    if (!isRestoringScroll.current) {
       debouncedSaveScrollPosition();
-      setShowScrollTop(scrollTop > 300); // Only show after 300px scroll
-      setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollTop, 200) / 200));
-    };
+    }
 
-    scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+    setShowScrollTop(scrollPosition > 300);
+    setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollPosition, 200) / 200));
+  }, []);
 
-    // Initial check in case content is already scrolled
-    handleScroll();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const scrollElement = virtualizedScrollRef.current?.getScrollElement?.();
+      if (scrollElement) {
+        scrollElement.addEventListener("scroll", handleScroll, {
+          passive: true,
+        });
+        clearInterval(interval); // cleanup interval after attaching
+      }
+    }, 100); // retry every 100ms
 
     return () => {
-      scrollElement.removeEventListener("scroll", handleScroll, {
-        passive: true,
-      });
+      const scrollElement = virtualizedScrollRef.current?.getScrollElement?.();
+      if (scrollElement) {
+        scrollElement.removeEventListener("scroll", handleScroll);
+      }
+      clearInterval(interval);
       debouncedSaveScrollPosition.cancel();
     };
-  }, [debouncedSaveScrollPosition]);
+  }, [handleScroll]);
+
+  useEffect(() => {
+    if (isSearching) {
+      sessionStorage.removeItem("feedScrollData");
+    }
+  }, [isSearching]);
 
   useEffect(() => {
     return () => {
-      if (observer.current) {
-        observer.current.disconnect();
+      if (virtualizedScrollRef.current) {
+        const scrollPosition = virtualizedScrollRef.current.getScrollPosition();
+        const firstItem = latestFeedRef.current[0];
+        const state = virtualizedScrollRef.current.getState?.();
+
+        sessionStorage.setItem(
+          "feedScrollData",
+          JSON.stringify({
+            position: scrollPosition,
+            feedLength: latestFeedRef.current.length,
+            feedVersion: firstItem?.updatedAt || firstItem?.id,
+            feedHash: simpleHash(latestFeedRef.current),
+            scrollDirection: state?.scrollDirection,
+          })
+        );
       }
+
+      isRestoringScroll.current = false;
+      debouncedSaveScrollPosition.cancel();
     };
   }, []);
 
   useEffect(() => {
-    if (!loading && filteredFeed.length > 0 && virtualizedFeedRef.current) {
+    if (
+      !loading &&
+      filteredFeed.length > 0 &&
+      hasLoadedOnce &&
+      virtualizedScrollRef.current?.isReady?.()
+    ) {
       const savedData = sessionStorage.getItem("feedScrollData");
-      if (savedData) {
-        try {
-          const { position, feedLength } = JSON.parse(savedData);
-          if (position > 0 && Math.abs(filteredFeed.length - feedLength) < 5) {
-            isRestoringScroll.current = true;
-            requestAnimationFrame(() => {
-              if (virtualizedFeedRef.current) {
-                virtualizedFeedRef.current.scrollTo({ top: position });
-              }
-              setTimeout(() => {
-                isRestoringScroll.current = false;
-              }, 100);
-            });
-          }
-        } catch (e) {
-          console.error("Failed to restore scroll position", e);
+      if (!savedData) return;
+
+      try {
+        const { position, feedLength, feedVersion, feedHash } =
+          JSON.parse(savedData);
+        const currentFirstItem = filteredFeed[0];
+
+        // Enhanced comparison logic
+        const isSameFeedVersion =
+          feedVersion === currentFirstItem?.updatedAt ||
+          feedVersion === currentFirstItem?.id;
+
+        const isSimilarFeed = Math.abs(filteredFeed.length - feedLength) < 20; // remove hash check entirely
+
+        const shouldRestore =
+          position > 0 && !isSearching && (isSameFeedVersion || isSimilarFeed);
+
+        if (shouldRestore) {
+          isRestoringScroll.current = true;
+          virtualizedScrollRef.current.scrollTo({ top: position });
+
+          // Add a scroll event listener to reset the flag after restoration
+          const scrollElement = virtualizedScrollRef.current.getScrollElement();
+          const handleScrollAfterRestore = () => {
+            isRestoringScroll.current = false;
+            scrollElement.removeEventListener(
+              "scroll",
+              handleScrollAfterRestore
+            );
+          };
+
+          scrollElement.addEventListener("scroll", handleScrollAfterRestore, {
+            passive: true,
+            once: true,
+          });
+
+          // Fallback in case scroll event doesn't fire
+          const timeout = setTimeout(() => {
+            isRestoringScroll.current = false;
+          }, 500);
+
+          return () => clearTimeout(timeout);
         }
+      } catch (e) {
+        console.error("Failed to restore scroll position", e);
       }
     }
-  }, [loading, filteredFeed.length]);
+  }, [loading, filteredFeed, hasLoadedOnce, isSearching]);
 
   const handleUpdateFeed = useCallback(() => {
     reload();
@@ -384,10 +455,9 @@ export default function FeedPage({ isMobile }) {
           <TopNavBar title="Home" />
           <SearchInputContainer>
             <SearchInput
+              handleInputChange={handleSearchChange}
+              loading={searchLoading}
               value={searchQuery}
-              onChange={handleSearchChange}
-              isLoading={searchLoading}
-              placeholder="Search linkups..."
             />
           </SearchInputContainer>
           {showUpdateFeedButton && (
@@ -403,7 +473,7 @@ export default function FeedPage({ isMobile }) {
             <EmptyFeedPlaceholder isMobile={isMobile} />
           ) : (
             <VirtualizedFeed
-              ref={virtualizedFeedRef}
+              ref={virtualizedScrollRef}
               linkups={linkupsToShow}
               loadMore={loadMoreLinkups}
               loading={loading}

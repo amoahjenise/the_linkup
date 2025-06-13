@@ -114,24 +114,38 @@ const RangeInput = styled(TextField)(({ theme, colormode }) => ({
 
 const GenderChip = styled(Chip)(({ theme, selected, colormode }) => ({
   margin: 4,
-  borderRadius: 8,
-  fontWeight: selected ? 600 : 400,
-  transition: "all 0.2s ease",
-  backgroundColor: selected ? theme.palette.primary.main : "transparent",
+  borderRadius: 9999, // pill shape
+  fontWeight: selected ? 600 : 500,
+  padding: "4px 12px", // smaller padding
+  fontSize: 13, // slightly smaller font
+  lineHeight: 1.25,
+  transition: "all 0.3s ease",
+  backdropFilter: "blur(12px)",
+  backgroundColor: selected
+    ? "rgba(0, 200, 255, 0.25)" // vibrant selection
+    : "rgba(255, 255, 255, 0.08)", // subtle glass background
   color: selected
-    ? theme.palette.primary.contrastText
+    ? "#fff"
     : colormode === "dark"
-    ? theme.palette.common.white
-    : theme.palette.text.primary,
-  borderColor:
-    colormode === "dark" ? theme.palette.grey[700] : "rgba(0, 0, 0, 0.23)",
+    ? "rgba(255,255,255,0.85)"
+    : "rgba(0,0,0,0.8)",
+  border: selected
+    ? "1px solid rgba(0, 200, 255, 0.6)"
+    : `1px solid ${
+        colormode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)"
+      }`,
+  boxShadow: selected
+    ? "0 0 12px rgba(0, 200, 255, 0.3)"
+    : "0 1px 4px rgba(0, 0, 0, 0.1)",
   "&:hover": {
     transform: "scale(1.05)",
     backgroundColor: selected
-      ? theme.palette.primary.dark
+      ? "rgba(0, 200, 255, 0.35)"
       : colormode === "dark"
-      ? theme.palette.grey[700]
-      : theme.palette.action.hover,
+      ? "rgba(255, 255, 255, 0.1)"
+      : "rgba(255, 255, 255, 0.15)",
+    borderColor: "rgba(0, 200, 255, 0.5)",
+    boxShadow: "0 0 8px rgba(0, 200, 255, 0.15)",
   },
 }));
 
@@ -547,7 +561,7 @@ const UserSettings = ({ onClose, isMobile }) => {
           >
             Show me profiles of
           </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
             {genderOptions.map((gender) => (
               <GenderChip
                 key={gender.key}
@@ -557,8 +571,8 @@ const UserSettings = ({ onClose, isMobile }) => {
                 variant={
                   genderPreference.includes(gender.key) ? "filled" : "outlined"
                 }
-                color="primary"
                 selected={genderPreference.includes(gender.key)}
+                color="primary"
               />
             ))}
           </Box>
