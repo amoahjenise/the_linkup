@@ -128,8 +128,8 @@ const FeedItem = forwardRef(
           return (
             <Tooltip title="Let's split the bill!">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
-                <IoReceipt className="text-sm" />
-                <IoReceipt className="text-sm" />
+                <IoReceipt className="text-xs" />
+                <IoReceipt className="text-xs" />
               </div>
             </Tooltip>
           );

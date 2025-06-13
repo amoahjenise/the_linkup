@@ -75,18 +75,20 @@ const LoadingIndicator = () => (
 );
 
 const StyledScrollToTopButton = styled(ScrollToTopButton)(
-  ({ theme, $visible }) => ({
+  ({ theme, $visible, $opacity }) => ({
     position: "fixed",
     bottom: theme.spacing(10),
     right: theme.spacing(2),
     zIndex: 1000,
-    opacity: $visible ? 1 : 0,
+    opacity: $visible ? $opacity : 0,
     pointerEvents: $visible ? "auto" : "none",
     transition: "opacity 0.3s ease, transform 0.3s ease",
     transform: $visible ? "translateY(0)" : "translateY(20px)",
     "&:hover": {
       transform: $visible ? "translateY(-2px)" : "translateY(20px)",
     },
+    // Add this condition to ensure the button doesn't exist in the DOM when not visible
+    visibility: $visible ? "visible" : "hidden", // or you can use `display: $visible ? "block" : "none"` instead
   })
 );
 
@@ -316,15 +318,24 @@ export default function FeedPage({ isMobile }) {
   const handleScroll = useCallback(() => {
     const scrollPosition =
       virtualizedScrollRef.current?.getScrollPosition() ?? 0;
+    console.log("Scroll Position:", scrollPosition); // Log for debugging
 
-    console.log("Scroll position:", scrollPosition); // ✅ Add this line
+    // Show the button only after scrolling 300px
+    const shouldShowButton = scrollPosition > 300;
+    setShowScrollTop(shouldShowButton);
+    console.log("Show Scroll Top:", shouldShowButton); // Log to check if it's updating correctly
+
+    // Calculate opacity based on the scroll position
+    const opacity =
+      scrollPosition > 500
+        ? 0.8
+        : Math.max(0.4, 1 - Math.min(scrollPosition, 200) / 200);
+    setButtonOpacity(opacity);
+    console.log("Button Opacity:", opacity);
 
     if (!isRestoringScroll.current) {
       debouncedSaveScrollPosition();
     }
-
-    setShowScrollTop(scrollPosition > 300);
-    setButtonOpacity(Math.max(0.4, 1 - Math.min(scrollPosition, 200) / 200));
   }, []);
 
   useEffect(() => {
@@ -334,9 +345,9 @@ export default function FeedPage({ isMobile }) {
         scrollElement.addEventListener("scroll", handleScroll, {
           passive: true,
         });
-        clearInterval(interval); // cleanup interval after attaching
+        clearInterval(interval); // Clean up interval once listener is attached
       }
-    }, 100); // retry every 100ms
+    }, 100); // Retry every 100ms
 
     return () => {
       const scrollElement = virtualizedScrollRef.current?.getScrollElement?.();
@@ -491,11 +502,14 @@ export default function FeedPage({ isMobile }) {
           {/* {!hasMore && hasLoadedOnce && (
             <EndOfFeedIndicator colorMode={colorMode} />
           )} */}
-          <StyledScrollToTopButton
-            onClick={scrollToTop}
-            colorMode={colorMode}
-            $visible={showScrollTop}
-          />
+          {showScrollTop && (
+            <StyledScrollToTopButton
+              onClick={scrollToTop}
+              colorMode={colorMode}
+              $visible={showScrollTop}
+              $opacity={buttonOpacity}
+            />
+          )}
         </FeedSection>
         <WidgetSectionContainer
           colorMode={colorMode}
