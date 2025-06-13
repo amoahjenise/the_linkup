@@ -48,7 +48,8 @@ const VirtualizedFeed = forwardRef(
       }),
     }));
 
-    const getItemSize = useCallback(() => 250, []);
+    // Adjust the item size to be smaller (200px instead of 250px)
+    const getItemSize = useCallback(() => 200, []); // Adjusted height here
 
     const onScroll = ({ scrollOffset }) => {
       if (

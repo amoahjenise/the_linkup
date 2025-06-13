@@ -488,9 +488,9 @@ export default function FeedPage({ isMobile }) {
             />
           )}
           {loading && hasLoadedOnce && <LoadingIndicator />}
-          {!hasMore && hasLoadedOnce && (
+          {/* {!hasMore && hasLoadedOnce && (
             <EndOfFeedIndicator colorMode={colorMode} />
-          )}
+          )} */}
           <StyledScrollToTopButton
             onClick={scrollToTop}
             colorMode={colorMode}

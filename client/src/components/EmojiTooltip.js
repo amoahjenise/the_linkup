@@ -1,9 +1,7 @@
 import React from "react";
 import { Tooltip } from "@mui/material";
 
-// Function to check if an emoji is supported
 const isEmojiSupported = (emoji) => {
-  // Create a temporary element to test emoji rendering
   const testElement = document.createElement("div");
   testElement.style.fontSize = "50px";
   testElement.style.visibility = "hidden";
@@ -16,13 +14,12 @@ const isEmojiSupported = (emoji) => {
 
 const EmojiTooltip = () => {
   const pleadingFaceEmoji = "🥹";
-  const fallbackEmoji = "Please pay"; // Fallback emoji
-  const [supportedEmoji, setSupportedEmoji] = React.useState(fallbackEmoji);
+  const fallbackText = "Please pay";
+  const [emojiOrText, setEmojiOrText] = React.useState(pleadingFaceEmoji);
 
   React.useEffect(() => {
-    // Check if the emoji is supported
-    const isSupported = isEmojiSupported(pleadingFaceEmoji);
-    setSupportedEmoji(isSupported ? pleadingFaceEmoji : fallbackEmoji);
+    const supported = isEmojiSupported(pleadingFaceEmoji);
+    setEmojiOrText(supported ? pleadingFaceEmoji : fallbackText);
   }, []);
 
   return (
@@ -31,12 +28,19 @@ const EmojiTooltip = () => {
         role="img"
         aria-label="pleading face"
         style={{
+          display: "inline-block",
           fontSize: "24px",
+          lineHeight: "1",
+          width: "24px",
+          height: "24px",
+          textAlign: "center",
+          verticalAlign: "middle",
           fontFamily:
             "'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', 'Roboto', sans-serif",
+          whiteSpace: "nowrap",
         }}
       >
-        {supportedEmoji}
+        {emojiOrText}
       </span>
     </Tooltip>
   );
