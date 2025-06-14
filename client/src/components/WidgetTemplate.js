@@ -66,7 +66,7 @@ const ButtonContent = ({ icon, text }) => (
         {icon}
       </span>
     )}
-    <span style={{ transition: "transform 0.2s ease" }}>{text}</span>
+    <div style={{ transition: "transform 0.2s ease" }}>{text}</div>
   </>
 );
 
