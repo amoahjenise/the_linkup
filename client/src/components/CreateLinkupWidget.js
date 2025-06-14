@@ -19,27 +19,23 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   flexDirection: "column",
   padding: "24px",
-  maxWidth: "100%", // Default max-width to be 100%
-  width: "100%", // Ensure the container spans 100% width on smaller screens
+  maxWidth: "100%",
+  width: "100%",
   borderRadius: "28px",
   border: `1px solid ${
     colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)"
   }`,
-  background:
-    colorMode === "dark"
-      ? "linear-gradient(135deg, rgba(28, 28, 30, 0.7) 0%, rgba(44, 44, 46, 0.5) 100%)"
-      : "linear-gradient(135deg, rgba(250, 250, 255, 0.8) 0%, rgba(245, 245, 250, 0.6) 100%)",
-  backdropFilter: "blur(24px) saturate(140%)", // Enhanced blur for that glass-like effect
+  backdropFilter: "blur(24px) saturate(140%)",
   WebkitBackdropFilter: "blur(24px) saturate(140%)",
   boxShadow:
     colorMode === "dark"
       ? "0 20px 64px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08)"
       : "0 20px 64px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
   position: "relative",
-  overflow: "hidden",
-  transition: "transform 0.3s ease-out, box-shadow 0.3s ease-out", // Smooth transition
+  // Remove overflow: hidden
+  transition: "transform 0.3s ease-out, box-shadow 0.3s ease-out",
   "&:hover": {
-    transform: "translateY(-6px)", // Slightly deeper hover effect for the glass feel
+    transform: "translateY(-6px)",
     boxShadow:
       colorMode === "dark"
         ? "0 24px 72px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12)"
@@ -58,8 +54,8 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
     bottom: 0,
     background:
       colorMode === "dark"
-        ? "radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.1) 0%, transparent 50%)"
-        : "radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 50%)",
+        ? "radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.1) 0%, transparent 50%)" // Dark mode glass effect
+        : "radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 50%)", // Light mode glass effect
     zIndex: -1,
   },
 
@@ -72,8 +68,8 @@ const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
     bottom: 0,
     background:
       colorMode === "dark"
-        ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%)"
-        : "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%)", // Lighter for dark mode
+        ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%)" // Dark mode overlay
+        : "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%)", // Light mode overlay
     zIndex: -1,
   },
 
