@@ -683,7 +683,7 @@ const CreateLinkupWidget = ({
             size="large"
             className="w-full py-3 px-6 text-xl font-semibold rounded-lg border border-transparent bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
-            CLEAR FORM
+            CLEAR
           </ClearFormButton>
         </div>
       </Form>
