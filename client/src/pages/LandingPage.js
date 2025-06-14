@@ -75,7 +75,7 @@ const sharedButtonStyles = {
 const ButtonContent = ({ icon, text }) => (
   <>
     {icon && (
-      <span
+      <div
         className="material-icons"
         style={{
           fontSize: "20px",
@@ -84,9 +84,9 @@ const ButtonContent = ({ icon, text }) => (
         }}
       >
         {icon}
-      </span>
+      </div>
     )}
-    <span style={{ transition: "transform 0.2s ease" }}>{text}</span>
+    <div style={{ transition: "transform 0.2s ease" }}>{text}</div>
   </>
 );
 
