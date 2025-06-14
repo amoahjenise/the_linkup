@@ -1,129 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Checkbox from "@mui/material/Checkbox";
 
-const DropdownContainer = styled("div")(({ theme, colorMode, hasError }) => ({
-  width: "100%",
-  minWidth: "200px", // Set a minimum width
-  maxWidth: "100%", // Add this to constrain growth
-  marginBottom: theme.spacing(1.5),
-  borderRadius: "8px",
-  border: `1px solid ${
-    hasError
-      ? theme.palette.error.main
-      : colorMode === "dark"
-      ? "#2F3336"
-      : "#EFF3F4"
-  }`,
-  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
-  transition: "border-color 0.2s, box-shadow 0.2s",
-  position: "relative",
-  cursor: "pointer",
-  "&:focus-within": {
-    borderColor: hasError ? theme.palette.error.main : "#0097A7",
-    boxShadow: `0 0 0 2px ${
-      hasError
-        ? theme.palette.error.light
-        : colorMode === "dark"
-        ? "rgba(0, 151, 167, 0.2)"
-        : "rgba(0, 151, 167, 0.1)"
-    }`,
-  },
-  "&:hover": {
-    borderColor: hasError
-      ? theme.palette.error.main
-      : colorMode === "dark"
-      ? "#4E5155"
-      : "#D6D9DB",
-  },
-}));
-
-const DropdownHeader = styled("div")(({ theme, colorMode }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
-  minHeight: "20px", // Ensure consistent height
-}));
-
-const DropdownList = styled("ul")(({ theme, colorMode }) => ({
-  position: "absolute",
-  top: "calc(100% + 4px)",
-  left: 0,
-  right: 0,
-  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
-  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
-  borderRadius: "8px",
-  maxHeight: "200px",
-  overflowY: "auto",
-  zIndex: 1000,
-  listStyle: "none",
-  padding: "4px 0",
-  margin: 0,
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-  minWidth: "100%", // Ensure dropdown matches input width
-}));
-
-const DropdownItem = styled("li")(({ theme, colorMode, selected }) => ({
-  padding: "8px 16px",
-  display: "flex",
-  alignItems: "center",
-  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
-  backgroundColor: selected
-    ? colorMode === "dark"
-      ? "#1C3D5A"
-      : "#E1F5FE"
-    : "transparent",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
-  "&:hover": {
-    backgroundColor: colorMode === "dark" ? "#1C3D5A" : "#E1F5FE",
-  },
-  whiteSpace: "nowrap", // Prevent text wrapping
-  overflow: "hidden", // Hide overflow
-  textOverflow: "ellipsis", // Add ellipsis for long text
-}));
-
-const SelectedChips = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexWrap: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  alignItems: "center",
-  gap: "4px",
-  flex: 1,
-  maxWidth: "100%",
-}));
-
-const Chip = styled("div")(({ theme, colorMode, isMobile }) => ({
-  backgroundColor: colorMode === "dark" ? "#2F3336" : "#EFF3F4",
-  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
-  padding: "4px 8px",
-  borderRadius: "12px",
-  fontSize: "0.8125rem",
-  flexShrink: 0,
-  maxWidth: isMobile ? "60px" : "70px", // Approx. 8 characters wide
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-}));
-
-const OptionLabel = styled("span")({
-  marginLeft: "8px",
-  fontSize: "0.9375rem",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  flex: 1, // Take remaining space
-});
-
-const PlaceholderText = styled("span")(({ colorMode }) => ({
-  color: colorMode === "dark" ? "#71767B" : "#8B98A5",
-}));
+const sharedFontFamily = `"SF Pro Display", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif`;
 
 const CustomMultiSelect = ({
   colorMode,
@@ -172,9 +51,14 @@ const CustomMultiSelect = ({
   const renderSelectedText = () => {
     if (selectedValues.length === 0)
       return (
-        <PlaceholderText colorMode={colorMode} style={placeholderStyle}>
+        <span
+          className={`truncate ${
+            colorMode === "dark" ? "text-gray-400" : "text-gray-500"
+          }`}
+          style={placeholderStyle}
+        >
           {placeholder}
-        </PlaceholderText>
+        </span>
       );
 
     const selectedLabels = selectedValues.slice(0, 2);
@@ -183,95 +67,170 @@ const CustomMultiSelect = ({
     return (
       <>
         {selectedLabels.map((val) => (
-          <Chip key={val} colorMode={colorMode} isMobile={isMobile}>
-            {" "}
+          <div
+            key={val}
+            className={`bg-opacity-50 rounded-full px-2 py-1 text-xs truncate ${
+              colorMode === "dark"
+                ? "bg-gray-700 text-gray-100"
+                : "bg-gray-300 text-gray-800"
+            }`}
+            style={{ maxWidth: isMobile ? 80 : 100 }}
+          >
             {val}
-          </Chip>
+          </div>
         ))}
         {remainingCount > 0 && (
-          <Chip colorMode={colorMode}>+{remainingCount} more</Chip>
+          <div
+            className={`bg-opacity-50 rounded-full px-2 py-1 text-xs ${
+              colorMode === "dark"
+                ? "bg-gray-700 text-gray-100"
+                : "bg-gray-300 text-gray-800"
+            }`}
+            style={{ maxWidth: isMobile ? 80 : 100 }}
+          >
+            +{remainingCount} more
+          </div>
         )}
       </>
     );
   };
 
+  // Use styles from dropdown unfocused state
+  const isDark = colorMode === "dark";
+
+  const containerStyle = {
+    boxShadow: isDark
+      ? "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2)"
+      : "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.05)",
+    border: isDark
+      ? "1px solid rgba(55, 65, 81, 0.5)"
+      : "1px solid rgba(209, 213, 219, 0.5)",
+    fontFamily: sharedFontFamily,
+  };
+
+  const containerClasses = `w-full mb-3 rounded-xl cursor-pointer relative transition-all duration-200 outline-none focus:outline-none
+    flex justify-between items-center px-4 py-3 min-h-[20px] text-sm
+    ${
+      isDark
+        ? "text-gray-100 bg-gray-800 bg-opacity-50"
+        : "text-gray-800 bg-white bg-opacity-80"
+    }
+    hover:${isDark ? "border-gray-600" : "border-gray-400"}
+    `;
+
   return (
-    <DropdownContainer
+    <div
       ref={dropdownRef}
-      colorMode={colorMode}
-      hasError={hasError}
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           toggleDropdown();
         }
       }}
+      className={containerClasses}
+      onClick={(e) => {
+        // Only toggle if not clicking inside the dropdown menu
+        if (!isOpen) {
+          toggleDropdown();
+        }
+      }}
+      style={containerStyle}
     >
-      <DropdownHeader colorMode={colorMode} onClick={toggleDropdown}>
-        <SelectedChips>{renderSelectedText()}</SelectedChips>
-        <KeyboardArrowDownIcon
-          style={{
-            transition: "transform 0.2s ease",
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-            color: colorMode === "dark" ? "#71767B" : "#8B98A5",
-            fontSize: "20px",
-            flexShrink: 0, // Prevent icon from being squeezed
-          }}
-        />
-      </DropdownHeader>
+      <div className="flex flex-wrap gap-1 flex-1 overflow-hidden">
+        {renderSelectedText()}
+      </div>
+      <KeyboardArrowDownIcon
+        style={{
+          transition: "transform 0.2s ease",
+          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+          color: isDark ? "#9CA3AF" : "#6B7280",
+          fontSize: 20,
+        }}
+      />
 
       {isOpen && (
-        <DropdownList colorMode={colorMode}>
-          <DropdownItem
-            colorMode={colorMode}
-            selected={isAllSelected}
-            onClick={() => handleOptionClick({ value: "SELECT_ALL" })}
+        <ul
+          className={`absolute top-full left-0 right-0 mt-2 rounded-xl max-h-52 overflow-y-auto border backdrop-blur-md z-50 text-sm
+            ${
+              isDark
+                ? "bg-gray-800 bg-opacity-90 border-gray-700 text-gray-100 shadow-black/30"
+                : "bg-white bg-opacity-95 border-gray-300 text-gray-800 shadow-black/10"
+            }`}
+          style={{ fontFamily: sharedFontFamily }}
+        >
+          <li
+            tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 handleOptionClick({ value: "SELECT_ALL" });
               }
             }}
-            tabIndex={0}
+            onClick={() => handleOptionClick({ value: "SELECT_ALL" })}
+            className={`flex items-center px-4 py-3 cursor-pointer select-none ${
+              isAllSelected
+                ? isDark
+                  ? "bg-cyan-600 bg-opacity-20"
+                  : "bg-cyan-300 bg-opacity-20"
+                : ""
+            } hover:${
+              isDark ? "bg-cyan-600 bg-opacity-20" : "bg-cyan-300 bg-opacity-20"
+            }`}
           >
             <Checkbox
               checked={isAllSelected}
               indeterminate={selectedValues.length > 0 && !isAllSelected}
               style={{
-                color: colorMode === "dark" ? "#0097A7" : "#0097A7",
-                padding: "0 8px 0 0",
+                color: isDark ? "#06B6D4" : "#0891B2",
+                padding: 0,
+                marginRight: 8,
               }}
+              size="small"
             />
-            <OptionLabel>
+            <span className="truncate flex-1 select-none">
               {isAllSelected ? "Deselect All" : "Select All"}
-            </OptionLabel>
-          </DropdownItem>
+            </span>
+          </li>
 
-          {options.map((option) => (
-            <DropdownItem
-              key={option.value}
-              colorMode={colorMode}
-              selected={selectedValues.includes(option.value)}
-              onClick={() => handleOptionClick(option)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleOptionClick(option);
-                }
-              }}
-              tabIndex={0}
-            >
-              <Checkbox
-                checked={selectedValues.includes(option.value)}
-                style={{
-                  color: colorMode === "dark" ? "#0097A7" : "#0097A7",
-                  padding: "0 8px 0 0",
+          {options.map((option) => {
+            const isSelected = selectedValues.includes(option.value);
+            return (
+              <li
+                key={option.value}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleOptionClick(option);
+                  }
                 }}
-              />
-              <OptionLabel>{option.value}</OptionLabel>
-            </DropdownItem>
-          ))}
-        </DropdownList>
+                onClick={() => handleOptionClick(option)}
+                className={`flex items-center px-4 py-3 cursor-pointer select-none ${
+                  isSelected
+                    ? isDark
+                      ? "bg-cyan-600 bg-opacity-20"
+                      : "bg-cyan-300 bg-opacity-20"
+                    : ""
+                } hover:${
+                  isDark
+                    ? "bg-cyan-600 bg-opacity-20"
+                    : "bg-cyan-300 bg-opacity-20"
+                }`}
+              >
+                <Checkbox
+                  checked={isSelected}
+                  style={{
+                    color: isDark ? "#06B6D4" : "#0891B2",
+                    padding: 0,
+                    marginRight: 8,
+                  }}
+                  size="small"
+                />
+                <span className="truncate flex-1">{option.value}</span>
+              </li>
+            );
+          })}
+        </ul>
       )}
-    </DropdownContainer>
+    </div>
   );
 };
 

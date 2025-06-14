@@ -203,23 +203,6 @@ const OnlineStatusContainer = styled("p")(({ isMobile }) => ({
   fontStyle: "italic",
 }));
 
-const TransparentButton = styled(Button)(({ isMobile }) => ({
-  color: "#fff",
-  borderColor: "#fff",
-  textTransform: "none",
-  borderRadius: "24px",
-  padding: isMobile ? "0.25rem 1rem" : "0.5rem 1.5rem",
-  fontSize: isMobile ? "0.85rem" : "1rem",
-  backdropFilter: "blur(10px)",
-  backgroundColor: "rgba(255, 255, 255, 0.1)",
-  border: "1px solid rgba(255, 255, 255, 0.3)",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-  },
-  marginTop: isMobile ? "8px" : "0",
-}));
-
 const StyledMenu = styled(Menu)(({ theme }) => ({
   "& .MuiPaper-root": {
     backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -391,13 +374,12 @@ const UserProfile = ({
 
             <RightSide>
               {isLoggedUserProfile && (
-                <TransparentButton
-                  isMobile={isMobile}
+                <button
                   onClick={toggleEditModal}
-                  variant="outlined"
+                  className="mt-4 md:mt-0 px-6 py-2 rounded-full border border-white/50 text-white bg-white/10 hover:bg-white/20 transition text-sm md:text-base"
                 >
                   Edit
-                </TransparentButton>
+                </button>
               )}
             </RightSide>
           </ProfileRow>

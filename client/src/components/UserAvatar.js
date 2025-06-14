@@ -1,40 +1,48 @@
 import React from "react";
 import { Avatar } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
-// Create a styled component for Avatar with enhanced styles
-const ClickableAvatar = styled(Avatar)(({ theme }) => ({
+const LiquidGlassAvatar = styled(Avatar)(({ theme }) => ({
   borderRadius: "50%",
   objectFit: "cover",
-  // marginRight: "1.25rem",
-  border: `2px solid ${theme.palette.common.white}`, // White border
-  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   cursor: "pointer",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  width: 56,
+  height: 56,
+  position: "relative",
+  zIndex: 1,
+
+  // Simulated "Liquid Glass" glow and depth
+  backgroundColor: "rgba(255, 255, 255, 0.05)",
+  border: "1px solid rgba(255, 255, 255, 0.3)",
+  backdropFilter: "blur(24px) saturate(180%)",
+  WebkitBackdropFilter: "blur(24px) saturate(180%)",
+  boxShadow:
+    "0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.2)",
+
+  transition: "transform 0.25s ease, box-shadow 0.3s ease",
+
   "&:hover": {
-    transform: "scale(1.05)", // Slight zoom on hover
-    boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.15)", // Enhanced shadow on hover
+    transform: "scale(1.06)",
+    boxShadow:
+      "0 0 0 2px rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.25)",
   },
 }));
 
-const UserAvatar = ({ userData, width, height }) => {
-  const navigate = useNavigate(); // Use useNavigate hook
+const UserAvatar = ({ userData, width = 56, height = 56 }) => {
+  const navigate = useNavigate();
 
-  // Function to handle click on the Avatar
   const handleClick = () => {
-    // Check if userData contains the user's profile URL
     if (userData?.id) {
-      // Use navigate to redirect to the user's profile URL
       navigate(`/profile/${userData.id}`);
     }
   };
 
   return (
-    <ClickableAvatar
+    <LiquidGlassAvatar
       alt={userData?.name}
       src={userData?.avatar}
-      style={{ width, height }} // Set width and height as inline styles
+      sx={{ width, height }}
       onClick={handleClick}
     />
   );

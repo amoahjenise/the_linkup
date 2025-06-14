@@ -105,7 +105,7 @@ const CustomInstallAppButton = styled("button")(({ theme }) => ({
   ...sharedButtonStyles,
   marginBottom: 4,
   backgroundColor: "rgba(255, 20, 147, 0.9)", // Neon pink (DeepPink)
-  color: "white",
+  color: "white !important", // Force white text color
   border: "none",
   cursor: "pointer",
   width: "100%",
@@ -114,9 +114,14 @@ const CustomInstallAppButton = styled("button")(({ theme }) => ({
     transform: "translateY(-2px)",
     backgroundColor: "rgba(255, 20, 147, 1)",
     boxShadow: "0 0 12px rgba(255, 20, 147, 0.8)", // Enhanced glow on hover
+    color: "white !important", // Ensure text stays white on hover
   },
   "&:active": {
     transform: "translateY(0) scale(0.96)",
+  },
+  "& span": {
+    // Target the text span specifically
+    color: "white !important",
   },
 }));
 

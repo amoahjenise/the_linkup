@@ -13,6 +13,8 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import { PrimeReactProvider } from "primereact/api";
 import { dark } from "@clerk/themes";
 import "./App.css";
+// In App.js
+import { GlobalGlassEffectDefs } from "./components/GlobalEffects";
 
 Modal.setAppElement("#root");
 
@@ -36,6 +38,7 @@ root.render(
                   initialColorMode={theme.config.initialColorMode}
                 />
                 <PrimeReactProvider>
+                  <GlobalGlassEffectDefs />
                   <App />
                 </PrimeReactProvider>
               </ChakraProvider>

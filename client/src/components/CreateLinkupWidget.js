@@ -15,139 +15,271 @@ import LoadingSpinner from "./LoadingSpinner";
 import CustomDropdown from "./CustomDropdown";
 import CustomMultiSelect from "./CustomMultiSelect";
 
-// Styled components for iOS-like design
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   flexDirection: "column",
-  padding: theme.spacing(2),
-  width: "100%",
-  maxWidth: "380px",
-  borderRadius: "12px",
-  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
-  backgroundColor: colorMode === "dark" ? "#16181C" : "#FFFFFF",
+  padding: "24px",
+  maxWidth: "100%", // Default max-width to be 100%
+  width: "100%", // Ensure the container spans 100% width on smaller screens
+  borderRadius: "28px",
+  border: `1px solid ${
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)"
+  }`,
+  background:
+    colorMode === "dark"
+      ? "linear-gradient(135deg, rgba(28, 28, 30, 0.7) 0%, rgba(44, 44, 46, 0.5) 100%)"
+      : "linear-gradient(135deg, rgba(250, 250, 255, 0.8) 0%, rgba(245, 245, 250, 0.6) 100%)",
+  backdropFilter: "blur(24px) saturate(140%)", // Enhanced blur for that glass-like effect
+  WebkitBackdropFilter: "blur(24px) saturate(140%)",
   boxShadow:
     colorMode === "dark"
-      ? "0 4px 12px rgba(255, 255, 255, 0.08)"
-      : "0 4px 12px rgba(0, 0, 0, 0.1)",
-  transition: "box-shadow 0.3s ease",
+      ? "0 20px 64px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08)"
+      : "0 20px 64px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
+  position: "relative",
+  overflow: "hidden",
+  transition: "transform 0.3s ease-out, box-shadow 0.3s ease-out", // Smooth transition
   "&:hover": {
+    transform: "translateY(-6px)", // Slightly deeper hover effect for the glass feel
     boxShadow:
       colorMode === "dark"
-        ? "0 4px 24px rgba(255, 255, 255, 0.15)"
-        : "0 8px 24px rgba(0, 0, 0, 0.15)",
+        ? "0 24px 72px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12)"
+        : "0 24px 72px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
   },
   fontFamily:
-    "'TwitterChirp', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", // Smooth iOS font
+
+  // Liquid glass layers
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      colorMode === "dark"
+        ? "radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.1) 0%, transparent 50%)"
+        : "radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 50%)",
+    zIndex: -1,
+  },
+
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      colorMode === "dark"
+        ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%)"
+        : "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%)", // Lighter for dark mode
+    zIndex: -1,
+  },
+
+  // Media Query to set width to 380px for larger screens
+  [theme.breakpoints.up("lg")]: {
+    maxWidth: "380px", // 380px on large screens
+    width: "380px", // Ensure the container is also 380px wide
+  },
 }));
 
 const Header = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  marginBottom: theme.spacing(1),
-  fontWeight: "500",
-  fontSize: "1.25rem",
-  letterSpacing: "0.5px",
-  textTransform: "capitalize",
-  color: colorMode === "dark" ? "#00E5FF" : "#007B86",
-  background:
-    colorMode === "dark"
-      ? "linear-gradient(90deg, #00E5FF, #0097A7)"
-      : "linear-gradient(90deg, #007B86, #0097A7)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
+  marginBottom: "20px",
+  fontWeight: "600",
+  fontSize: "1.6rem",
+  letterSpacing: "-0.5px",
+  color:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 0, 0, 0.95)",
   textShadow:
     colorMode === "dark"
-      ? "0px 2px 10px rgba(0, 229, 255, 0.4)"
-      : "0px 1px 4px rgba(0, 123, 134, 0.2)",
-  cursor: "default",
-}));
-
-const Form = styled("form")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  padding: theme.spacing(1, 1.5),
-}));
-
-const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
-  width: "100%",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
-  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
-  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
-  borderRadius: "8px",
-  outline: "none",
-  transition: "border-color 0.2s, box-shadow 0.2s",
-  "&:focus": {
-    borderColor: "#0097A7",
-    boxShadow: `0 0 0 2px ${
-      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
-    }`,
-  },
-  marginBottom: theme.spacing(1.5),
-  "&:hover": {
-    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
-  },
-  cursor: "pointer",
-}));
-
-const CreateLinkUpButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#0097A7",
-  color: "#FFFFFF",
-  borderRadius: "9999px",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  fontWeight: 700,
-  textTransform: "none",
-  transition: "background-color 0.2s",
-  "&:hover": {
-    backgroundColor: "#007B86",
-  },
-  "&:disabled": {
-    backgroundColor: "#0097A780",
-  },
-}));
-
-const ClearFormButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "transparent",
-  color: theme.palette.error.main,
-  border: `1px solid ${theme.palette.error.main}`,
-  borderRadius: "9999px",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  fontWeight: 700,
-  textTransform: "none",
-  transition: "background-color 0.2s",
-  marginTop: theme.spacing(1),
-  "&:hover": {
-    backgroundColor: theme.palette.error.light + "20", // 20% opacity
+      ? "0 2px 12px rgba(0, 229, 255, 0.25)"
+      : "0 2px 8px rgba(0, 123, 255, 0.15)",
+  position: "relative",
+  zIndex: 2,
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: "-10px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "50%",
+    height: "3px",
+    background:
+      colorMode === "dark"
+        ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)"
+        : "linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.5), transparent)",
+    borderRadius: "3px",
+    opacity: 0.8,
   },
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  color: colorMode === "dark" ? "#E7E9EA" : "#0F1419",
-  backgroundColor: colorMode === "dark" ? "#202327" : "#F7F9F9",
-  border: `1px solid ${colorMode === "dark" ? "#2F3336" : "#EFF3F4"}`,
-  borderRadius: "8px",
+  padding: "10px 18px",
+  fontSize: "0.925rem",
+  color:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 0, 0, 0.95)",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(31, 41, 55, 0.4)" : "rgba(255, 255, 255, 0.7)",
+  border: `1px solid ${
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)"
+  }`,
+  borderRadius: "14px",
   outline: "none",
-  transition: "border-color 0.2s, box-shadow 0.2s",
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(12px)",
+  boxShadow:
+    colorMode === "dark"
+      ? "inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.2)"
+      : "inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.05)",
+  marginBottom: "8px",
   "&:hover": {
-    borderColor: colorMode === "dark" ? "#4E5155" : "#D6D9DB",
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(31, 41, 55, 0.6)"
+        : "rgba(255, 255, 255, 0.9)",
+    boxShadow:
+      colorMode === "dark"
+        ? "inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.25)"
+        : "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 6px 16px rgba(0, 0, 0, 0.08)",
   },
   "&:focus": {
-    borderColor: "#0097A7",
-    boxShadow: `0 0 0 2px ${
-      colorMode === "dark" ? "rgba(0, 151, 167, 0.2)" : "rgba(0, 151, 167, 0.1)"
-    }`,
+    backgroundColor:
+      colorMode === "dark" ? "rgba(31, 41, 55, 0.8)" : "rgba(255, 255, 255, 1)",
+    boxShadow:
+      colorMode === "dark"
+        ? `0 0 0 2px rgba(0, 229, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15)`
+        : `0 0 0 2px rgba(0, 123, 255, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.6)`,
+    borderColor:
+      colorMode === "dark"
+        ? "rgba(0, 229, 255, 0.4)"
+        : "rgba(0, 123, 255, 0.3)",
+  },
+}));
+
+const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
+  width: "100%",
+  padding: "10px 18px",
+  fontSize: "0.9375rem",
+  color: colorMode === "dark" ? "#F3F4F6" : "#1F2937",
+  backgroundColor:
+    colorMode === "dark" ? "rgba(31, 41, 55, 0.5)" : "rgba(255, 255, 255, 0.8)",
+  border: `1px solid ${
+    colorMode === "dark" ? "rgba(55, 65, 81, 0.5)" : "rgba(209, 213, 219, 0.5)"
+  }`,
+  borderRadius: "12px",
+  outline: "none",
+  transition: "all 0.3s ease",
+  backdropFilter: "blur(8px)",
+  boxShadow:
+    colorMode === "dark"
+      ? "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2)"
+      : "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.05)",
+  marginBottom: "12px",
+  "&:hover": {
+    boxShadow:
+      colorMode === "dark"
+        ? "inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3)"
+        : "inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.1)",
+  },
+  "&:focus": {
+    boxShadow:
+      colorMode === "dark"
+        ? `0 0 0 2px rgba(0, 229, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2)`
+        : `0 0 0 2px rgba(0, 123, 134, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.7)`,
   },
   "&::placeholder": {
-    color: colorMode === "dark" ? "#71767B" : "#8B98A5",
+    color:
+      colorMode === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.4)",
   },
-  marginBottom: theme.spacing(1.5),
+  cursor: "pointer",
+}));
+
+const CreateLinkUpButton = styled(Button)(({ theme }) => ({
+  marginTop: "12px",
+  minWidth: "120px", // Maintain consistency in width
+  background: "linear-gradient(135deg, #00BFAE 0%, #008C73 100%)", // Teal gradient
+  color: "#FFFFFF", // Text color remains white
+  borderRadius: "8px", // Slightly softer radius for a cleaner look
+  padding: "10px 20px", // Balanced padding for a neat look
+  fontSize: "0.875rem", // Moderate font size
+  fontWeight: 600,
+  textTransform: "none",
+  border: "none", // Remove border for a more modern, clean look
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(8px)", // Slightly lighter blur to keep the focus on the button
+  boxShadow:
+    "0 4px 12px rgba(0, 191, 174, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15)", // Subtle shadow for depth
+  "&:hover": {
+    background: "linear-gradient(135deg, #008C73 0%, #00BFAE 100%)", // Hover effect with the same teal gradient
+    boxShadow:
+      "0 6px 16px rgba(0, 191, 174, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2)", // More prominent hover shadow
+    transform: "translateY(-2px)", // Slight lift effect for a cleaner interaction
+  },
+  "&:active": {
+    transform: "translateY(0)", // Ensure the button feels responsive when clicked
+  },
+  "&:disabled": {
+    background:
+      "linear-gradient(135deg, rgba(0, 191, 174, 0.4) 0%, rgba(0, 140, 115, 0.4) 100%)", // Lighter disabled state
+    boxShadow: "none",
+  },
+}));
+
+const ClearFormButton = styled(Button)(({ theme }) => ({
+  background: "transparent",
+  color: theme.palette.error.main,
+  border: `1px solid ${theme.palette.error.main}50`,
+  borderRadius: "12px",
+  padding: "10px 16px", // Matching padding
+  fontSize: "0.875rem", // Matching font size
+  fontWeight: 600,
+  textTransform: "none",
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(12px)",
+  marginTop: "12px",
+  minWidth: "120px", // Matching minimum width
+  "&:hover": {
+    background: `${theme.palette.error.main}15`,
+    borderColor: theme.palette.error.main,
+    boxShadow: `0 4px 12px ${theme.palette.error.main}15`,
+    transform: "translateY(-1px)",
+  },
+  "&:active": {
+    transform: "translateY(0)",
+  },
+}));
+
+const InfoIconStyled = styled(IconButton)(({ theme, colorMode }) => ({
+  position: "absolute",
+  right: "10px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  color:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.7)",
+  padding: 0,
+  backdropFilter: "blur(12px)",
+  background:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)",
+  borderRadius: "50%",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background:
+      colorMode === "dark" ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.1)",
+    transform: "translateY(-50%) scale(1.1)",
+  },
+}));
+
+const Form = styled("form")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  padding: "0 8px",
+  position: "relative",
+  zIndex: 2,
 }));
 
 const InputWithIcon = styled("div")({
@@ -155,19 +287,11 @@ const InputWithIcon = styled("div")({
   width: "100%",
 });
 
-const InfoIconStyled = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  right: "8px",
-  top: "40%",
-  transform: "translateY(-50%)",
-  color: "lightslategray",
-  padding: "2px",
-}));
-
 const ErrorText = styled("p")(({ theme }) => ({
   color: theme.palette.error.main,
   fontSize: "12px",
   margin: "0 0 8px 8px",
+  textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
 }));
 
 const CreateLinkupWidget = ({
@@ -193,7 +317,9 @@ const CreateLinkupWidget = ({
   const { colorMode } = useColorMode();
   const { changeTheme } = useContext(PrimeReactContext);
   const [currentTheme, setCurrentTheme] = useState("");
-  const [isLoadingState, setIsLoading] = useState(false); // Initialize as false (boolean)
+  const [isLoadingState, setIsLoading] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const paymentOptions = [
     { label: "No Payment Option", value: null },
@@ -203,8 +329,42 @@ const CreateLinkupWidget = ({
   ];
 
   useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const tiltX = ((y - centerY) / centerY) * 3;
+    const tiltY = ((centerX - x) / centerX) * 3;
+
+    setTilt({ x: tiltX, y: tiltY });
+  };
+
+  const handleMouseLeave = () => {
+    setTimeout(() => {
+      setTilt({ x: 0, y: 0 });
+    }, 100);
+  };
+
+  useEffect(() => {
     const applyTheme = async () => {
-      // setIsLoading(true); // Set loading state to true
       try {
         const themeLink = document.getElementById("theme-link");
         const initialTheme = themeLink.getAttribute("href").includes("dark")
@@ -219,7 +379,6 @@ const CreateLinkupWidget = ({
 
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Change the theme and wait for it to complete
         await new Promise((resolve) => {
           changeTheme(initialTheme, newTheme, "theme-link", () => {
             setCurrentTheme(newTheme);
@@ -229,11 +388,11 @@ const CreateLinkupWidget = ({
       } catch (error) {
         console.error("Error applying theme:", error);
       } finally {
-        setIsLoading(false); // Reset loading state regardless of success or failure
+        setIsLoading(false);
       }
     };
 
-    applyTheme(); // Call the async function
+    applyTheme();
   }, [colorMode, changeTheme]);
 
   const maxTime = new Date();
@@ -254,11 +413,9 @@ const CreateLinkupWidget = ({
   const handleCreateLinkUp = async (e) => {
     e.preventDefault();
 
-    // Reset form errors
     onFormChange("formErrors", {});
     onFormChange("isLoading", true);
 
-    // Custom validation
     const errors = {};
 
     if (!formActivity.trim()) {
@@ -296,7 +453,6 @@ const CreateLinkupWidget = ({
       if (response.success) {
         addSnackbar("Linkup created successfully!", "success");
 
-        // Reset the form through parent component
         onFormChange("activity", "");
         onFormChange("location", "");
         onFormChange("selectedDate", null);
@@ -304,11 +460,9 @@ const CreateLinkupWidget = ({
         onFormChange("paymentOption", null);
         onFormChange("isLoading", false);
 
-        // Update the list and scroll to top
         addLinkup(response.newLinkup);
         setTimeout(() => handleScrollToTop(), 0);
 
-        // Toggle widget in mobile view
         if (window.innerWidth <= 600) {
           toggleWidget();
         }
@@ -326,7 +480,6 @@ const CreateLinkupWidget = ({
   };
 
   const handleClearForm = () => {
-    // Reset all form fields
     onFormChange("activity", "");
     onFormChange("location", "");
     onFormChange("selectedDate", null);
@@ -334,7 +487,6 @@ const CreateLinkupWidget = ({
     onFormChange("paymentOption", null);
     onFormChange("formErrors", {});
 
-    // Show confirmation message
     addSnackbar("Form cleared", "info");
   };
 
@@ -344,7 +496,6 @@ const CreateLinkupWidget = ({
     fontWeight: 400,
   };
 
-  // Gender options for MultiSelect
   const genderOptions = [
     { key: "men", value: "Men" },
     { key: "women", value: "Women" },
@@ -359,11 +510,51 @@ const CreateLinkupWidget = ({
   return isLoadingState ? (
     <LoadingSpinner />
   ) : (
-    <WidgetContainer colorMode={colorMode}>
+    <WidgetContainer
+      colorMode={colorMode}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        transition: "transform 0.5s cubic-bezier(0.03, 0.98, 0.52, 0.99)",
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Water reflection effect */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(
+              600px circle at ${mousePosition.x}px ${mousePosition.y}px,
+              rgba(255, 255, 255, ${colorMode === "dark" ? "0.08" : "0.3"}) 0%,
+              rgba(255, 255, 255, 0) 70%
+            )
+          `,
+          mask: "linear-gradient(transparent, white 20%, white 80%, transparent)",
+          WebkitMask:
+            "linear-gradient(transparent, white 20%, white 80%, transparent)",
+        }}
+      />
+
+      {/* Inner glow */}
+      <div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        style={{
+          boxShadow: `inset 0 0 16px rgba(255, 255, 255, ${
+            colorMode === "dark" ? "0.1" : "0.3"
+          })`,
+        }}
+      />
+
       <style>
         {` 
           ::placeholder { 
-            color: grey; 
+            color: ${
+              colorMode === "dark"
+                ? "rgba(255, 255, 255, 0.5)"
+                : "rgba(0, 0, 0, 0.4)"
+            }; 
           }`}
       </style>
       <Header colorMode={colorMode}>
@@ -413,9 +604,15 @@ const CreateLinkupWidget = ({
             componentsProps={{
               tooltip: {
                 sx: {
-                  backgroundColor: colorMode === "dark" ? "#181717" : "#f0f0f0",
-                  color: colorMode === "dark" ? "#ffffff" : "#333333",
-                  border: "1px solid #b3b3b3",
+                  backgroundColor:
+                    colorMode === "dark" ? "rgb(31,41,55)" : "rgb(243,244,246)",
+                  color:
+                    colorMode === "dark" ? "rgb(229,231,235)" : "rgb(31,41,55)",
+                  border:
+                    colorMode === "dark"
+                      ? "1px solid rgb(55,65,81)"
+                      : "1px solid rgb(209,213,219)",
+                  maxWidth: "250px",
                 },
               },
               popper: {
@@ -425,7 +622,7 @@ const CreateLinkupWidget = ({
               },
             }}
           >
-            <InfoIconStyled size="large">
+            <InfoIconStyled size="large" colorMode={colorMode}>
               <InfoIcon />
             </InfoIconStyled>
           </Tooltip>
@@ -470,21 +667,25 @@ const CreateLinkupWidget = ({
           placeholderStyle={placeholderStyle}
           colorMode={colorMode}
         />
-        <CreateLinkUpButton
-          type="submit"
-          aria-label="create-linkup"
-          size="large"
-        >
-          POST
-        </CreateLinkUpButton>
-        <ClearFormButton
-          type="button"
-          onClick={handleClearForm}
-          aria-label="clear-form"
-          size="large"
-        >
-          CLEAR FORM
-        </ClearFormButton>
+        <div className="flex space-x-4">
+          <CreateLinkUpButton
+            type="submit"
+            aria-label="create-linkup"
+            size="large"
+            className="w-full py-3 px-6 text-xl font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            POST
+          </CreateLinkUpButton>
+          <ClearFormButton
+            type="button"
+            onClick={handleClearForm}
+            aria-label="clear-form"
+            size="large"
+            className="w-full py-3 px-6 text-xl font-semibold rounded-lg border border-transparent bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            CLEAR FORM
+          </ClearFormButton>
+        </div>
       </Form>
     </WidgetContainer>
   );

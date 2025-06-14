@@ -7,8 +7,28 @@ import { fetchLinkupsSuccess } from "../redux/actions/linkupActions";
 export const useFeed = (userId, gender, userLocation, pageSize = 3) => {
   const dispatch = useDispatch();
 
-  const [feed, setFeed] = useState([]); // Stores the feed data
-  const [page, setPage] = useState(0); // Tracks the current page for pagination
+  const [feed, setFeed] = useState(() => {
+    const saved = sessionStorage.getItem("feedData");
+    if (saved) {
+      try {
+        return JSON.parse(saved).feed || [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+  const [page, setPage] = useState(() => {
+    const saved = sessionStorage.getItem("feedData");
+    if (saved) {
+      try {
+        return JSON.parse(saved).page || 0;
+      } catch {
+        return 0;
+      }
+    }
+    return 0;
+  });
   const [hasMore, setHasMore] = useState(true); // Indicates whether more feed items exist
   const [loading, setLoading] = useState(false); // Prevents multiple simultaneous fetches
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Ensures feed is only loaded once initially
@@ -79,6 +99,16 @@ export const useFeed = (userId, gender, userLocation, pageSize = 3) => {
     if (page === 0 || !hasLoadedOnce) return; // Skip if no page change or first load
     loadFeed(); // Fetch new feed data when page changes
   }, [page, hasLoadedOnce]);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      "feedData",
+      JSON.stringify({
+        page,
+        feed,
+      })
+    );
+  }, [page, feed]);
 
   // Add a newly created linkup to the feed
   const addLinkup = (newLinkup) => {
