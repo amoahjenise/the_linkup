@@ -448,6 +448,22 @@ export default function FeedPage({ isMobile }) {
     }
   }, [loading, filteredFeed, hasLoadedOnce, isSearching]);
 
+  // Add this useEffect to clear scroll position when the page is refreshed or reloaded
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Clear the scroll position data from sessionStorage on page unload/refresh
+      sessionStorage.removeItem("feedScrollData");
+    };
+
+    // Attach the beforeunload event listener
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   const handleUpdateFeed = useCallback(() => {
     reload();
     scrollToTop();
