@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { styled } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
 import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material";
-import { useColorMode } from "@chakra-ui/react";
+import { position, useColorMode } from "@chakra-ui/react";
 import debounce from "lodash/debounce";
 
 import { searchLinkups } from "../api/linkUpAPI";
@@ -76,19 +76,17 @@ const LoadingIndicator = () => (
 
 const StyledScrollToTopButton = styled(ScrollToTopButton)(
   ({ theme, $visible, $opacity }) => ({
-    position: "fixed",
-    bottom: theme.spacing(10),
-    right: theme.spacing(2),
-    zIndex: 1000,
-    opacity: $visible ? $opacity : 0,
-    pointerEvents: $visible ? "auto" : "none",
+    position: "fixed", // Keep the position fixed
+    bottom: theme.spacing(2), // Set the bottom position for the button
+    left: "50%", // Center horizontally
+    opacity: $visible ? $opacity : 0, // Control opacity based on visibility
+    pointerEvents: $visible ? "auto" : "none", // Enable pointer events when visible
     transition: "opacity 0.3s ease, transform 0.3s ease",
-    transform: $visible ? "translateY(0)" : "translateY(20px)",
+    transform: $visible ? "translateY(0)" : "translateY(20px)", // Slide effect when appearing/disappearing
     "&:hover": {
       transform: $visible ? "translateY(-2px)" : "translateY(20px)",
     },
-    // Add this condition to ensure the button doesn't exist in the DOM when not visible
-    visibility: $visible ? "visible" : "hidden", // or you can use `display: $visible ? "block" : "none"` instead
+    visibility: $visible ? "visible" : "hidden", // Ensure the button is hidden when not visible
   })
 );
 
@@ -110,6 +108,10 @@ const FeedPageContainer = styled("div")({
   width: "100%",
   position: "relative",
   overflow: "hidden",
+  minHeight: "100vh", // Ensures full height of the viewport
+  "@media (max-width: 900px)": {
+    paddingBottom: "65px", // Add padding for footer
+  },
 });
 
 const FeedSection = styled("div", {

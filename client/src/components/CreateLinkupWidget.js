@@ -18,114 +18,152 @@ import CustomMultiSelect from "./CustomMultiSelect";
 const WidgetContainer = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   flexDirection: "column",
-  padding: "20px",
-  width: "100%",
-  maxWidth: "380px",
-  borderRadius: "24px",
-  border: "none",
+  padding: "24px",
+  maxWidth: "100%", // Default max-width to be 100%
+  width: "100%", // Ensure the container spans 100% width on smaller screens
+  borderRadius: "28px",
+  border: `1px solid ${
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)"
+  }`,
   background:
     colorMode === "dark"
-      ? "linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(50, 50, 50, 0.4) 100%)"
-      : "linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 245, 245, 0.5) 100%)",
-  backdropFilter: "blur(12px)",
+      ? "linear-gradient(135deg, rgba(28, 28, 30, 0.7) 0%, rgba(44, 44, 46, 0.5) 100%)"
+      : "linear-gradient(135deg, rgba(250, 250, 255, 0.8) 0%, rgba(245, 245, 250, 0.6) 100%)",
+  backdropFilter: "blur(24px) saturate(140%)", // Enhanced blur for that glass-like effect
+  WebkitBackdropFilter: "blur(24px) saturate(140%)",
   boxShadow:
     colorMode === "dark"
-      ? "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1)"
-      : "0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
+      ? "0 20px 64px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08)"
+      : "0 20px 64px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
   position: "relative",
   overflow: "hidden",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  transition: "transform 0.3s ease-out, box-shadow 0.3s ease-out", // Smooth transition
   "&:hover": {
-    transform: "translateY(-2px)",
+    transform: "translateY(-6px)", // Slightly deeper hover effect for the glass feel
     boxShadow:
       colorMode === "dark"
-        ? "0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15)"
-        : "0 12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.6)",
+        ? "0 24px 72px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12)"
+        : "0 24px 72px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.5)",
   },
   fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", // Smooth iOS font
+
+  // Liquid glass layers
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      colorMode === "dark"
+        ? "radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.1) 0%, transparent 50%)"
+        : "radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 50%)",
+    zIndex: -1,
+  },
+
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      colorMode === "dark"
+        ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%)"
+        : "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%)", // Lighter for dark mode
+    zIndex: -1,
+  },
+
+  // Media Query to set width to 380px for larger screens
+  [theme.breakpoints.up("lg")]: {
+    maxWidth: "380px", // 380px on large screens
+    width: "380px", // Ensure the container is also 380px wide
+  },
 }));
 
 const Header = styled("div")(({ theme, colorMode }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  marginBottom: "16px",
+  marginBottom: "20px",
   fontWeight: "600",
-  fontSize: "1.5rem",
+  fontSize: "1.6rem",
   letterSpacing: "-0.5px",
   color:
-    colorMode === "dark" ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 0, 0, 0.9)",
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 0, 0, 0.95)",
   textShadow:
     colorMode === "dark"
-      ? "0 2px 10px rgba(0, 229, 255, 0.3)"
-      : "0 2px 6px rgba(0, 123, 134, 0.2)",
+      ? "0 2px 12px rgba(0, 229, 255, 0.25)"
+      : "0 2px 8px rgba(0, 123, 255, 0.15)",
   position: "relative",
   zIndex: 2,
   "&::after": {
     content: '""',
     position: "absolute",
-    bottom: "-8px",
+    bottom: "-10px",
     left: "50%",
     transform: "translateX(-50%)",
-    width: "40%",
+    width: "50%",
     height: "3px",
     background:
       colorMode === "dark"
-        ? "linear-gradient(90deg, rgba(0, 229, 255, 0), rgba(0, 229, 255, 0.7), rgba(0, 229, 255, 0))"
-        : "linear-gradient(90deg, rgba(0, 123, 134, 0), rgba(0, 123, 134, 0.7), rgba(0, 123, 134, 0))",
+        ? "linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.6), transparent)"
+        : "linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.5), transparent)",
     borderRadius: "3px",
+    opacity: 0.8,
   },
-}));
-
-const Form = styled("form")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  padding: "0 4px",
-  position: "relative",
-  zIndex: 2,
 }));
 
 const InputField = styled("input")(({ theme, colorMode }) => ({
   width: "100%",
-  padding: "12px 16px",
-  fontSize: "0.9375rem",
-  color: colorMode === "dark" ? "#F3F4F6" : "#1F2937",
+  padding: "10px 18px",
+  fontSize: "0.925rem",
+  color:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 0, 0, 0.95)",
   backgroundColor:
-    colorMode === "dark" ? "rgba(31, 41, 55, 0.5)" : "rgba(255, 255, 255, 0.8)",
+    colorMode === "dark" ? "rgba(31, 41, 55, 0.4)" : "rgba(255, 255, 255, 0.7)",
   border: `1px solid ${
-    colorMode === "dark" ? "rgba(55, 65, 81, 0.5)" : "rgba(209, 213, 219, 0.5)"
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.08)"
   }`,
-  borderRadius: "12px",
+  borderRadius: "14px",
   outline: "none",
-  transition: "all 0.3s ease",
-  backdropFilter: "blur(8px)",
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(12px)",
   boxShadow:
     colorMode === "dark"
-      ? "inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2)"
-      : "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.05)",
-  marginBottom: "4px",
+      ? "inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.2)"
+      : "inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 12px rgba(0, 0, 0, 0.05)",
+  marginBottom: "8px",
   "&:hover": {
+    backgroundColor:
+      colorMode === "dark"
+        ? "rgba(31, 41, 55, 0.6)"
+        : "rgba(255, 255, 255, 0.9)",
     boxShadow:
       colorMode === "dark"
-        ? "inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3)"
-        : "inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.1)",
+        ? "inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.25)"
+        : "inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 6px 16px rgba(0, 0, 0, 0.08)",
   },
   "&:focus": {
+    backgroundColor:
+      colorMode === "dark" ? "rgba(31, 41, 55, 0.8)" : "rgba(255, 255, 255, 1)",
     boxShadow:
       colorMode === "dark"
-        ? `0 0 0 2px rgba(0, 229, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2)`
-        : `0 0 0 2px rgba(0, 123, 134, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.7)`,
-  },
-  "&::placeholder": {
-    color:
-      colorMode === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.4)",
+        ? `0 0 0 2px rgba(0, 229, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15)`
+        : `0 0 0 2px rgba(0, 123, 255, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.6)`,
+    borderColor:
+      colorMode === "dark"
+        ? "rgba(0, 229, 255, 0.4)"
+        : "rgba(0, 123, 255, 0.3)",
   },
 }));
 
 const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
   width: "100%",
-  padding: "12px 16px",
+  padding: "10px 18px",
   fontSize: "0.9375rem",
   color: colorMode === "dark" ? "#F3F4F6" : "#1F2937",
   backgroundColor:
@@ -162,25 +200,32 @@ const DatePickerStyled = styled(DatePicker)(({ theme, colorMode }) => ({
 }));
 
 const CreateLinkUpButton = styled(Button)(({ theme }) => ({
-  background: "linear-gradient(135deg, #007BFF 0%, #00A5FF 100%)",
-  color: "#FFFFFF",
-  borderRadius: "12px",
-  padding: "14px 16px",
-  fontSize: "0.9375rem",
+  marginTop: "12px",
+  minWidth: "120px", // Maintain consistency in width
+  background: "linear-gradient(135deg, #00BFAE 0%, #008C73 100%)", // Teal gradient
+  color: "#FFFFFF", // Text color remains white
+  borderRadius: "8px", // Slightly softer radius for a cleaner look
+  padding: "10px 20px", // Balanced padding for a neat look
+  fontSize: "0.875rem", // Moderate font size
   fontWeight: 600,
   textTransform: "none",
-  transition: "all 0.3s ease",
-  border: "none",
-  backdropFilter: "blur(8px)",
+  border: "none", // Remove border for a more modern, clean look
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(8px)", // Slightly lighter blur to keep the focus on the button
   boxShadow:
-    "0 4px 20px rgba(0, 123, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.3)",
+    "0 4px 12px rgba(0, 191, 174, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15)", // Subtle shadow for depth
   "&:hover": {
-    background: "linear-gradient(135deg, #0069D9 0%, #0088FF 100%)",
+    background: "linear-gradient(135deg, #008C73 0%, #00BFAE 100%)", // Hover effect with the same teal gradient
     boxShadow:
-      "0 6px 24px rgba(0, 123, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4)",
+      "0 6px 16px rgba(0, 191, 174, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2)", // More prominent hover shadow
+    transform: "translateY(-2px)", // Slight lift effect for a cleaner interaction
+  },
+  "&:active": {
+    transform: "translateY(0)", // Ensure the button feels responsive when clicked
   },
   "&:disabled": {
-    background: "linear-gradient(135deg, #007BFF80 0%, #00A5FF80 100%)",
+    background:
+      "linear-gradient(135deg, rgba(0, 191, 174, 0.4) 0%, rgba(0, 140, 115, 0.4) 100%)", // Lighter disabled state
     boxShadow: "none",
   },
 }));
@@ -188,41 +233,59 @@ const CreateLinkUpButton = styled(Button)(({ theme }) => ({
 const ClearFormButton = styled(Button)(({ theme }) => ({
   background: "transparent",
   color: theme.palette.error.main,
-  border: `1px solid ${theme.palette.error.main}80`,
+  border: `1px solid ${theme.palette.error.main}50`,
   borderRadius: "12px",
-  padding: "14px 16px",
-  fontSize: "0.9375rem",
+  padding: "10px 16px", // Matching padding
+  fontSize: "0.875rem", // Matching font size
   fontWeight: 600,
   textTransform: "none",
-  transition: "all 0.3s ease",
-  backdropFilter: "blur(8px)",
+  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+  backdropFilter: "blur(12px)",
   marginTop: "12px",
+  minWidth: "120px", // Matching minimum width
   "&:hover": {
-    background: `${theme.palette.error.main}20`,
+    background: `${theme.palette.error.main}15`,
     borderColor: theme.palette.error.main,
-    boxShadow: `0 4px 20px ${theme.palette.error.main}20`,
+    boxShadow: `0 4px 12px ${theme.palette.error.main}15`,
+    transform: "translateY(-1px)",
   },
+  "&:active": {
+    transform: "translateY(0)",
+  },
+}));
+
+const InfoIconStyled = styled(IconButton)(({ theme, colorMode }) => ({
+  position: "absolute",
+  right: "10px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  color:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.7)",
+  padding: 0,
+  backdropFilter: "blur(12px)",
+  background:
+    colorMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)",
+  borderRadius: "50%",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    background:
+      colorMode === "dark" ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.1)",
+    transform: "translateY(-50%) scale(1.1)",
+  },
+}));
+
+const Form = styled("form")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  padding: "0 8px",
+  position: "relative",
+  zIndex: 2,
 }));
 
 const InputWithIcon = styled("div")({
   position: "relative",
   width: "100%",
 });
-
-const InfoIconStyled = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  right: "8px",
-  top: "50%",
-  transform: "translateY(-50%)",
-  color: "rgba(255, 255, 255, 0.7)",
-  padding: "4px",
-  backdropFilter: "blur(8px)",
-  background: "rgba(0, 0, 0, 0.1)",
-  borderRadius: "50%",
-  "&:hover": {
-    background: "rgba(0, 0, 0, 0.2)",
-  },
-}));
 
 const ErrorText = styled("p")(({ theme }) => ({
   color: theme.palette.error.main,
@@ -559,7 +622,7 @@ const CreateLinkupWidget = ({
               },
             }}
           >
-            <InfoIconStyled size="large">
+            <InfoIconStyled size="large" colorMode={colorMode}>
               <InfoIcon />
             </InfoIconStyled>
           </Tooltip>
@@ -604,21 +667,25 @@ const CreateLinkupWidget = ({
           placeholderStyle={placeholderStyle}
           colorMode={colorMode}
         />
-        <CreateLinkUpButton
-          type="submit"
-          aria-label="create-linkup"
-          size="large"
-        >
-          POST
-        </CreateLinkUpButton>
-        <ClearFormButton
-          type="button"
-          onClick={handleClearForm}
-          aria-label="clear-form"
-          size="large"
-        >
-          CLEAR FORM
-        </ClearFormButton>
+        <div className="flex space-x-4">
+          <CreateLinkUpButton
+            type="submit"
+            aria-label="create-linkup"
+            size="large"
+            className="w-full py-3 px-6 text-xl font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            POST
+          </CreateLinkUpButton>
+          <ClearFormButton
+            type="button"
+            onClick={handleClearForm}
+            aria-label="clear-form"
+            size="large"
+            className="w-full py-3 px-6 text-xl font-semibold rounded-lg border border-transparent bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            CLEAR FORM
+          </ClearFormButton>
+        </div>
       </Form>
     </WidgetContainer>
   );
